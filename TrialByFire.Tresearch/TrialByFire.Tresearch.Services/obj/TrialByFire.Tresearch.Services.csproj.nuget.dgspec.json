@@ -1,20 +1,96 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj": {}
+    "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj": {
+    "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj",
-        "projectName": "TrialByFire.Tresearch.Services",
-        "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj",
-        "packagesPath": "C:\\Users\\Matthew Chen\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\obj\\",
+        "projectUniqueName": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj",
+        "projectName": "TrialByFire.Tresearch.DAL",
+        "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj",
+        "packagesPath": "C:\\Users\\pammy\\.nuget\\packages\\",
+        "outputPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Matthew Chen\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\pammy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj": {
+                "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Dapper": {
+              "target": "Package",
+              "version": "[2.0.123, )"
+            },
+            "System.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.8.3, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj",
+        "projectName": "TrialByFire.Tresearch.DomainModels",
+        "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj",
+        "packagesPath": "C:\\Users\\pammy\\.nuget\\packages\\",
+        "outputPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\pammy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -28,6 +104,132 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj",
+        "projectName": "TrialByFire.Tresearch.Logging",
+        "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj",
+        "packagesPath": "C:\\Users\\pammy\\.nuget\\packages\\",
+        "outputPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\pammy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj",
+        "projectName": "TrialByFire.Tresearch.Services",
+        "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj",
+        "packagesPath": "C:\\Users\\pammy\\.nuget\\packages\\",
+        "outputPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\pammy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
+                "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
+              },
+              "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj": {
+                "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj"
+              },
+              "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj": {
+                "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
