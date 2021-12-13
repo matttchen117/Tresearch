@@ -4,6 +4,7 @@ using Dapper;
 using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
+using System.IO.Compression;
 
 namespace TrialByFire.Tresearch.DAL
 {
@@ -169,13 +170,14 @@ namespace TrialByFire.Tresearch.DAL
             {
                 var readQuery = "SELECT * FORM Logs WHERE Timestamp > @Timestamp";
                 var logs = connection.Query<Log>(readQuery, new { Timestamp = System.DateTime.Now }).ToList();
-                using (FileStream fs = File.Create(FilePath + "Archive.txt"))
+                using(StreamWriter writer = new StreamWriter(FilePath))
                 {
                     foreach (Log log in logs)
                     {
-                        
+                        writer.WriteLine(log.ToString());
                     }
                 }
+                ZipFile.CreateFromDirectory(FilePath, Destination);
             }
             if (affectedRows == 1)
             {

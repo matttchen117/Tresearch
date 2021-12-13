@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\TrialByFire.Tresearch",
+    "\\TrialByFire.Tresearch\\Tresearch.DAL.Tests"
   ],
-  "SelectedNode": "\\TrialByFire.Tresearch.sln",
+  "SelectedNode": "\\TrialByFire.Tresearch\\Tresearch.DAL.Tests\\MSSQLDAOShould.cs",
   "PreviewInSolutionExplorer": false
 }
