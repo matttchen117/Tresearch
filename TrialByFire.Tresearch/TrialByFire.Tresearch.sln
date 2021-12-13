@@ -3,7 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrialByFire.Tresearch", "TrialByFire.Tresearch\TrialByFire.Tresearch.csproj", "{0ED3F731-624C-481F-AF85-45911D18E2EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch", "TrialByFire.Tresearch\TrialByFire.Tresearch.csproj", "{0ED3F731-624C-481F-AF85-45911D18E2EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrialByFire.Tresearch.Logging", "TrialByFire.Tresearch.Logging\TrialByFire.Tresearch.Logging.csproj", "{127E07F3-30D9-4679-8F0C-758DA07305BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrialByFire.Tresearch.DomainModels", "TrialByFire.Tresearch.DomainModels\TrialByFire.Tresearch.DomainModels.csproj", "{52EDA6B3-C414-495A-85A1-DB47C8C59B06}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrialByFire.Tresearch.Services", "TrialByFire.Tresearch.Services\TrialByFire.Tresearch.Services.csproj", "{47C6E5C7-3852-43F9-BAE9-B7E6B4DCB418}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrialByFire.Tresearch.Managers", "TrialByFire.Tresearch.Managers\TrialByFire.Tresearch.Managers.csproj", "{BC616190-834E-4335-8746-42E9E90C84F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrialByFire.Tresearch.DAL", "TrialByFire.Tresearch.DAL\TrialByFire.Tresearch.DAL.csproj", "{8AFEED92-2F79-43A6-9039-E7A76AD614EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +25,26 @@ Global
 		{0ED3F731-624C-481F-AF85-45911D18E2EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0ED3F731-624C-481F-AF85-45911D18E2EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0ED3F731-624C-481F-AF85-45911D18E2EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{127E07F3-30D9-4679-8F0C-758DA07305BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{127E07F3-30D9-4679-8F0C-758DA07305BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{127E07F3-30D9-4679-8F0C-758DA07305BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{127E07F3-30D9-4679-8F0C-758DA07305BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52EDA6B3-C414-495A-85A1-DB47C8C59B06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52EDA6B3-C414-495A-85A1-DB47C8C59B06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52EDA6B3-C414-495A-85A1-DB47C8C59B06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52EDA6B3-C414-495A-85A1-DB47C8C59B06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47C6E5C7-3852-43F9-BAE9-B7E6B4DCB418}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47C6E5C7-3852-43F9-BAE9-B7E6B4DCB418}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47C6E5C7-3852-43F9-BAE9-B7E6B4DCB418}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47C6E5C7-3852-43F9-BAE9-B7E6B4DCB418}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC616190-834E-4335-8746-42E9E90C84F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC616190-834E-4335-8746-42E9E90C84F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC616190-834E-4335-8746-42E9E90C84F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC616190-834E-4335-8746-42E9E90C84F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AFEED92-2F79-43A6-9039-E7A76AD614EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AFEED92-2F79-43A6-9039-E7A76AD614EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AFEED92-2F79-43A6-9039-E7A76AD614EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AFEED92-2F79-43A6-9039-E7A76AD614EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
