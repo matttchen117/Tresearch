@@ -35,7 +35,17 @@
       "ProjectGuid": "b3ae7f99-de28-4aa8-ad16-73b99b5ab16b",
       "DisplayName": "Tresearch.DAL.Tests",
       "ColorIndex": 6
+    },
+    "b6131ba7-39fa-4e47-8d8e-281b74656dfc": {
+      "ProjectGuid": "b6131ba7-39fa-4e47-8d8e-281b74656dfc",
+      "DisplayName": "Exceptions",
+      "ColorIndex": 7
+    },
+    "39997351-8b48-4b59-82cf-5a5cb1247fd2": {
+      "ProjectGuid": "39997351-8b48-4b59-82cf-5a5cb1247fd2",
+      "DisplayName": "TrialByFire.Tresearch.Exceptions",
+      "ColorIndex": 8
     }
   },
-  "NextColorIndex": 7
+  "NextColorIndex": 9
 }
