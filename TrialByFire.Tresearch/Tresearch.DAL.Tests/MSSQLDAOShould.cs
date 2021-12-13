@@ -131,9 +131,9 @@ namespace TrialByFire.DAL.Tests
 
             // Arrange
             string sqlConnectionString = @"Server=.\LAPTOP-6SF4R1QG;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
-            string filePath = @"C:\Users\Matthew Chen\Desktop\Archive Test\";
-            string destination = @"C:\Users\Matthew Chen\Desktop\Archive Test\";
-            MSSQLDAO mssqlDAO = new MSSQLDAO(sqlConnectionString);
+            string filePath = @"C:Work\";
+            string destination = @"C:\Work\";
+            MSSQLDAO mssqlDAO = new MSSQLDAO(sqlConnectionString, filePath, destination);
 
             // Act
             var actual = mssqlDAO.Archive();

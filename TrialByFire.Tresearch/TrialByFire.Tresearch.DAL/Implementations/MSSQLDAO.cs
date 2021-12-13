@@ -173,7 +173,7 @@ namespace TrialByFire.Tresearch.DAL
                 {
                     foreach (Log log in logs)
                     {
-                        fs.wr(FilePath, log.ToString());
+                        
                     }
                 }
             }

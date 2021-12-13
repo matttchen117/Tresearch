@@ -5,7 +5,37 @@
       "ProjectGuid": "0ed3f731-624c-481f-af85-45911d18e2ef",
       "DisplayName": "TrialByFire.Tresearch",
       "ColorIndex": 0
+    },
+    "127e07f3-30d9-4679-8f0c-758da07305ba": {
+      "ProjectGuid": "127e07f3-30d9-4679-8f0c-758da07305ba",
+      "DisplayName": "TrialByFire.Tresearch.Logging",
+      "ColorIndex": 1
+    },
+    "52eda6b3-c414-495a-85a1-db47c8c59b06": {
+      "ProjectGuid": "52eda6b3-c414-495a-85a1-db47c8c59b06",
+      "DisplayName": "TrialByFire.Tresearch.DomainModels",
+      "ColorIndex": 2
+    },
+    "47c6e5c7-3852-43f9-bae9-b7e6b4dcb418": {
+      "ProjectGuid": "47c6e5c7-3852-43f9-bae9-b7e6b4dcb418",
+      "DisplayName": "TrialByFire.Tresearch.Services",
+      "ColorIndex": 3
+    },
+    "bc616190-834e-4335-8746-42e9e90c84f1": {
+      "ProjectGuid": "bc616190-834e-4335-8746-42e9e90c84f1",
+      "DisplayName": "TrialByFire.Tresearch.Managers",
+      "ColorIndex": 4
+    },
+    "8afeed92-2f79-43a6-9039-e7a76ad614ee": {
+      "ProjectGuid": "8afeed92-2f79-43a6-9039-e7a76ad614ee",
+      "DisplayName": "TrialByFire.Tresearch.DAL",
+      "ColorIndex": 5
+    },
+    "b3ae7f99-de28-4aa8-ad16-73b99b5ab16b": {
+      "ProjectGuid": "b3ae7f99-de28-4aa8-ad16-73b99b5ab16b",
+      "DisplayName": "Tresearch.DAL.Tests",
+      "ColorIndex": 6
     }
   },
-  "NextColorIndex": 1
+  "NextColorIndex": 7
 }
