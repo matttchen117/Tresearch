@@ -6,13 +6,16 @@ namespace TrialByFire.DAL.Tests
 {
     public class MSSQLDAOShould
     {
+
+        string SqlConnectionString = @".\Server=LAPTOP-6SF4R1QG;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
+
         [Fact]
         public void GetTheAccount()
         {
             // Triple A Format
 
             // Arrange
-            string sqlConnectionString = @".\Server=LAPTOP-6SF4R1QG;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
+            string sqlConnectionString = SqlConnectionString;
             MSSQLDAO mssqlDAO = new MSSQLDAO(sqlConnectionString);
             var expected = new Account("bob@gmail.com", "abcdef123456", "User");
 
@@ -29,7 +32,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            string sqlConnectionString = @".\Server=LAPTOP-6SF4R1QG;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
+            string sqlConnectionString = SqlConnectionString;
             MSSQLDAO mssqlDAO = new MSSQLDAO(sqlConnectionString);
             Account account = new Account("bob@gmail.com", "abcdef123456", "User");
 
@@ -46,7 +49,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            string sqlConnectionString = @".\Server=LAPTOP-6SF4R1QG;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
+            string sqlConnectionString = SqlConnectionString;
             MSSQLDAO mssqlDAO = new MSSQLDAO(sqlConnectionString);
 
 
@@ -63,7 +66,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            string sqlConnectionString = @".\Server=LAPTOP-6SF4R1QG;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
+            string sqlConnectionString = SqlConnectionString;
             MSSQLDAO mssqlDAO = new MSSQLDAO(sqlConnectionString);
 
 
@@ -80,7 +83,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            string sqlConnectionString = @".\Server=LAPTOP-6SF4R1QG;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
+            string sqlConnectionString = SqlConnectionString;
             MSSQLDAO mssqlDAO = new MSSQLDAO(sqlConnectionString);
 
 
@@ -97,7 +100,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            string sqlConnectionString = @".\Server=LAPTOP-6SF4R1QG;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
+            string sqlConnectionString = SqlConnectionString;
             MSSQLDAO mssqlDAO = new MSSQLDAO(sqlConnectionString);
 
 
@@ -114,7 +117,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            string sqlConnectionString = @".\Server=LAPTOP-6SF4R1QG;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
+            string sqlConnectionString = SqlConnectionString;
             MSSQLDAO mssqlDAO = new MSSQLDAO(sqlConnectionString);
             Log log = new Log(System.DateTime.Now, "Info", "larry@gmail.com", "DataStore", "This is a test.");
 
@@ -130,7 +133,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            string sqlConnectionString = @"Server=.\LAPTOP-6SF4R1QG;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
+            string sqlConnectionString = SqlConnectionString;
             string filePath = @"C:Work\";
             string destination = @"C:\Work\";
             MSSQLDAO mssqlDAO = new MSSQLDAO(sqlConnectionString, filePath, destination);
