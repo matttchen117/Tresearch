@@ -139,6 +139,16 @@
             "rid": "win"
           }
         }
+      },
+      "TrialByFire.Tresearch.DomainModels/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/TrialByFire.Tresearch.DomainModels.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/TrialByFire.Tresearch.DomainModels.dll": {}
+        }
       }
     }
   },
@@ -473,12 +483,18 @@
         "useSharedDesignerContext.txt",
         "version.txt"
       ]
+    },
+    "TrialByFire.Tresearch.DomainModels/1.0.0": {
+      "type": "project",
+      "path": "../TrialByFire.Tresearch.DomainModels/TrialByFire.Tresearch.DomainModels.csproj",
+      "msbuildProject": "../TrialByFire.Tresearch.DomainModels/TrialByFire.Tresearch.DomainModels.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net6.0": [
       "Dapper >= 2.0.123",
-      "System.Data.SqlClient >= 4.8.3"
+      "System.Data.SqlClient >= 4.8.3",
+      "TrialByFire.Tresearch.DomainModels >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -507,7 +523,11 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
