@@ -55,12 +55,7 @@
       "ProjectGuid": "08d2ca01-71a8-41fc-ab97-f07669154bcb",
       "DisplayName": "TrialByFire.Managers.Test",
       "ColorIndex": 9
-    },
-    "39997351-8b48-4b59-82cf-5a5cb1247fd2": {
-      "ProjectGuid": "39997351-8b48-4b59-82cf-5a5cb1247fd2",
-      "DisplayName": "TrialByFire.Tresearch.Exceptions",
-      "ColorIndex": 10
     }
   },
-  "NextColorIndex": 11
+  "NextColorIndex": 10
 }
