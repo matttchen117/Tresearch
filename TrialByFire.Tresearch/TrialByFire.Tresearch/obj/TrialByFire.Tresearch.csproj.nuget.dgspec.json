@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.csproj": {}
+    "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.csproj": {
+    "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.csproj",
+        "projectUniqueName": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.csproj",
         "projectName": "TrialByFire.Tresearch",
-        "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.csproj",
-        "packagesPath": "C:\\Users\\Matthew Chen\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch\\obj\\",
+        "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.csproj",
+        "packagesPath": "C:\\Users\\JeLaz\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Matthew Chen\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\JeLaz\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

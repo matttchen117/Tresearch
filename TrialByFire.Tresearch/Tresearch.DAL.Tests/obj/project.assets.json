@@ -6455,19 +6455,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Matthew Chen\\.nuget\\packages\\": {}
+    "C:\\Users\\JeLaz\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\Tresearch.DAL.Tests\\TrialByFire.DAL.Tests.csproj",
+      "projectUniqueName": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\Tresearch.DAL.Tests\\TrialByFire.DAL.Tests.csproj",
       "projectName": "TrialByFire.DAL.Tests",
-      "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\Tresearch.DAL.Tests\\TrialByFire.DAL.Tests.csproj",
-      "packagesPath": "C:\\Users\\Matthew Chen\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\Tresearch.DAL.Tests\\obj\\",
+      "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\Tresearch.DAL.Tests\\TrialByFire.DAL.Tests.csproj",
+      "packagesPath": "C:\\Users\\JeLaz\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\Tresearch.DAL.Tests\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\Matthew Chen\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\JeLaz\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -6481,11 +6486,11 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
-              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
+            "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
+              "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
             },
-            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj": {
-              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj"
+            "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj": {
+              "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj"
             }
           }
         }
@@ -6539,13 +6544,5 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "Undefined",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Problem reading the cache file C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\Tresearch.DAL.Tests\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
-    }
-  ]
+  }
 }
