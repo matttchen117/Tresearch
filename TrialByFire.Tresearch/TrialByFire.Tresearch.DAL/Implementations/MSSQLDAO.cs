@@ -242,7 +242,8 @@ namespace TrialByFire.Tresearch.DAL
                         {
                             return false;
                         }
-                        using (StreamWriter writer = new StreamWriter(FilePath + @"\test.txt"))
+                        using (StreamWriter writer = new StreamWriter(FilePath + 
+                            $@"\{DateTime.UtcNow.ToString("yyyy-MM")}_Logs.txt"))
                         {
                             foreach (Log log in logs)
                             {

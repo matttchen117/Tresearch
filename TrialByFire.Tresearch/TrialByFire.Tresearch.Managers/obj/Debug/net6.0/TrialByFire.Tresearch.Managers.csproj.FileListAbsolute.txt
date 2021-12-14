@@ -17,3 +17,5 @@ C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.T
 C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\obj\Debug\net6.0\TrialByFire.Tresearch.Managers.dll
 C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\obj\Debug\net6.0\ref\TrialByFire.Tresearch.Managers.dll
 C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\obj\Debug\net6.0\TrialByFire.Tresearch.Managers.pdb
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\bin\Debug\net6.0\TrialByFire.Tresearch.Services.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\bin\Debug\net6.0\TrialByFire.Tresearch.Services.pdb

@@ -9,7 +9,8 @@
       "TrialByFire.Tresearch.Managers/1.0.0": {
         "dependencies": {
           "TrialByFire.Tresearch.DAL": "1.0.0",
-          "TrialByFire.Tresearch.Logging": "1.0.0"
+          "TrialByFire.Tresearch.Logging": "1.0.0",
+          "TrialByFire.Tresearch.Services": "1.0.0"
         },
         "runtime": {
           "TrialByFire.Tresearch.Managers.dll": {}
@@ -114,8 +115,22 @@
         }
       },
       "TrialByFire.Tresearch.Logging/1.0.0": {
+        "dependencies": {
+          "TrialByFire.Tresearch.DAL": "1.0.0",
+          "TrialByFire.Tresearch.DomainModels": "1.0.0"
+        },
         "runtime": {
           "TrialByFire.Tresearch.Logging.dll": {}
+        }
+      },
+      "TrialByFire.Tresearch.Services/1.0.0": {
+        "dependencies": {
+          "TrialByFire.Tresearch.DAL": "1.0.0",
+          "TrialByFire.Tresearch.DomainModels": "1.0.0",
+          "TrialByFire.Tresearch.Logging": "1.0.0"
+        },
+        "runtime": {
+          "TrialByFire.Tresearch.Services.dll": {}
         }
       }
     }
@@ -207,6 +222,11 @@
       "sha512": ""
     },
     "TrialByFire.Tresearch.Logging/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "TrialByFire.Tresearch.Services/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
