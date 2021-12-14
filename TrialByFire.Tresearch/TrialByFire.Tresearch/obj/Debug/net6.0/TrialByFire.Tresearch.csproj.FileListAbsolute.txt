@@ -1,0 +1,15 @@
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\bin\Debug\net6.0\TrialByFire.Tresearch.exe
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\bin\Debug\net6.0\TrialByFire.Tresearch.deps.json
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\bin\Debug\net6.0\TrialByFire.Tresearch.runtimeconfig.json
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\bin\Debug\net6.0\TrialByFire.Tresearch.dll
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\bin\Debug\net6.0\ref\TrialByFire.Tresearch.dll
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\bin\Debug\net6.0\TrialByFire.Tresearch.pdb
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\TrialByFire.Tresearch.csproj.AssemblyReference.cache
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\TrialByFire.Tresearch.GeneratedMSBuildEditorConfig.editorconfig
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\TrialByFire.Tresearch.AssemblyInfoInputs.cache
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\TrialByFire.Tresearch.AssemblyInfo.cs
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\TrialByFire.Tresearch.csproj.CoreCompileInputs.cache
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\TrialByFire.Tresearch.dll
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\ref\TrialByFire.Tresearch.dll
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\TrialByFire.Tresearch.pdb
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\TrialByFire.Tresearch.genruntimeconfig.cache
