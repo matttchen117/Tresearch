@@ -17,31 +17,8 @@ namespace TrialByFire.Tresearch.UserManagement
 
         public bool CreateAccount(string email, string passphrase, string authorizationLevel)
         {
-            bool createAccountSuccessful = false;
             Account account = new Account(email, passphrase, authorizationLevel);
-            try
-            {
-                createAccountSuccessful = mssqlDAO.CreateAccount(account);
-            }
-            catch (Exception e)
-            {
-                createAccountSuccessful = false;
-            }
-            return createAccountSuccessful;
-        }
-
-        public bool DeleteAccount(string username)
-        {
-            bool isDeleted = false;
-            try
-            {
-                isDeleted = mssqlDAO.DeleteAccount(username);
-            }
-            catch (Exception e)
-            {
-                isDeleted = false;
-            }
-            return isDeleted;
+            return true;
         }
 
         public bool EnableAccount(string username, string email)

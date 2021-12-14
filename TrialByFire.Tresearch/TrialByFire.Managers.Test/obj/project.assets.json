@@ -1838,6 +1838,36 @@
         "runtime": {
           "bin/placeholder/TrialByFire.Tresearch.Logging.dll": {}
         }
+      },
+      "TrialByFire.Tresearch.Managers/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "TrialByFire.Tresearch.DAL": "1.0.0",
+          "TrialByFire.Tresearch.Logging": "1.0.0",
+          "TrialByFire.Tresearch.Services": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/TrialByFire.Tresearch.Managers.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/TrialByFire.Tresearch.Managers.dll": {}
+        }
+      },
+      "TrialByFire.Tresearch.Services/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "TrialByFire.Tresearch.DAL": "1.0.0",
+          "TrialByFire.Tresearch.DomainModels": "1.0.0",
+          "TrialByFire.Tresearch.Logging": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/TrialByFire.Tresearch.Services.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/TrialByFire.Tresearch.Services.dll": {}
+        }
       }
     }
   },
@@ -6461,38 +6491,43 @@
       "type": "project",
       "path": "../TrialByFire.Tresearch.Logging/TrialByFire.Tresearch.Logging.csproj",
       "msbuildProject": "../TrialByFire.Tresearch.Logging/TrialByFire.Tresearch.Logging.csproj"
+    },
+    "TrialByFire.Tresearch.Managers/1.0.0": {
+      "type": "project",
+      "path": "../TrialByFire.Tresearch.Managers/TrialByFire.Tresearch.Managers.csproj",
+      "msbuildProject": "../TrialByFire.Tresearch.Managers/TrialByFire.Tresearch.Managers.csproj"
+    },
+    "TrialByFire.Tresearch.Services/1.0.0": {
+      "type": "project",
+      "path": "../TrialByFire.Tresearch.Services/TrialByFire.Tresearch.Services.csproj",
+      "msbuildProject": "../TrialByFire.Tresearch.Services/TrialByFire.Tresearch.Services.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net6.0": [
-      "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Managers\\TrialByFire.Tresearch.Managers.csproj",
       "Microsoft.NET.Test.Sdk >= 16.11.0",
       "TrialByFire.Tresearch.DAL >= 1.0.0",
       "TrialByFire.Tresearch.Logging >= 1.0.0",
+      "TrialByFire.Tresearch.Managers >= 1.0.0",
       "coverlet.collector >= 3.1.0",
       "xunit >= 2.4.1",
       "xunit.runner.visualstudio >= 2.4.3"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\JeLaz\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Managers.Test\\TrialByFire.Managers.Test.csproj",
+      "projectUniqueName": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Managers.Test\\TrialByFire.Managers.Test.csproj",
       "projectName": "TrialByFire.Managers.Test",
-      "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Managers.Test\\TrialByFire.Managers.Test.csproj",
-      "packagesPath": "C:\\Users\\JeLaz\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Managers.Test\\obj\\",
+      "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Managers.Test\\TrialByFire.Managers.Test.csproj",
+      "packagesPath": "C:\\Users\\Matthew Chen\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Managers.Test\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\JeLaz\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\Matthew Chen\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -6506,14 +6541,14 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
-              "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
+            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
             },
-            "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj": {
-              "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj"
+            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj"
             },
-            "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Managers\\TrialByFire.Tresearch.Managers.csproj": {
-              "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Managers\\TrialByFire.Tresearch.Managers.csproj"
+            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Managers\\TrialByFire.Tresearch.Managers.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Managers\\TrialByFire.Tresearch.Managers.csproj"
             }
           }
         }
@@ -6567,16 +6602,5 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1105",
-      "level": "Error",
-      "message": "Unable to find project information for 'C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Managers\\TrialByFire.Tresearch.Managers.csproj'. If you are using Visual Studio, this may be because the project is unloaded or not part of the current solution so run a restore from the command-line. Otherwise, the project file may be invalid or missing targets required for restore.",
-      "libraryId": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Managers\\TrialByFire.Tresearch.Managers.csproj",
-      "targetGraphs": [
-        "net6.0"
-      ]
-    }
-  ]
+  }
 }
