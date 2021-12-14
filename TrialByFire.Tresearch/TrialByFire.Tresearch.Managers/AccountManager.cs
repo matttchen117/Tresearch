@@ -1,6 +1,7 @@
 ﻿using TrialByFire.Tresearch.DomainModels;
 using TrialByFire.Tresearch.DAL;
 using TrialByFire.Tresearch.Logging;
+using TrialByFire.Tresearch.Services;
 
 namespace TrialByFire.Tresearch.UserManagement
 {
@@ -22,17 +23,12 @@ namespace TrialByFire.Tresearch.UserManagement
 
         public bool EnableAccount(string username, string email)
         {
-            bool isEnabled = false;
-            try
-            {
-                isEnabled = mssqlDAO.EnableAccount(username, email);
-               
-            }
-            catch(Exception e)
-            {
-                isEnabled = false;
-            }
-            return isEnabled;
+            AccountService accountService = new AccountService(mssqlDAO, logService);
+        }
+
+        public bool DisableAccount(string usrname)
+        {
+            AccountService accountService = new AccountService(mssqlDAO, logService);
         }
     }
 }
