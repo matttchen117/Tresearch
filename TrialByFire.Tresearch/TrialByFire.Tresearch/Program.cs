@@ -13,6 +13,8 @@ namespace TrialByFire.Tresearch.Main
         static string GlobalSqlConnectionString;
         static string GlobalFilePath;
         static string GlobalDestination;
+        static Account UserAccount;
+
         public static void Main(string[] args)
         {
             string sqlConnectionString = "";
@@ -20,8 +22,8 @@ namespace TrialByFire.Tresearch.Main
             string destination = "";
             string username = "";
             string passphrase = "";
+            string view = "";
             int operation = -1;
-            Account userAccount = new Account();
             bool finished = false;
 
 
@@ -77,23 +79,135 @@ namespace TrialByFire.Tresearch.Main
                 username = Console.ReadLine();
                 Console.WriteLine("Please enter in your passphrase.");
                 passphrase = Console.ReadLine();
-                
+
+                UserAccount = new Account();
             }
 
-            while(!finished)
+            switch (UserAccount.AuthorizationLevel)
             {
-                switch(userAccount.AuthorizationLevel)
+                case "User":
+                    view = "User";
+                    break;
+                case "System Admin":
+                    view = "SysAdmin";
+                    break;
+                default:
+                    Console.Write("Error, user has unknown authorization level. System shutting down.");
+                    Environment.Exit(1);
+                    break;
+            }
+
+            while (!finished)
+            {
+                switch (view)
                 {
                     case "User":
                         Console.WriteLine("1. Quit");
+                        try
+                        {
+                            operation = Convert.ToInt32(Console.ReadLine());
+                        }
+                        catch (Exception ex)
+                        {
+                            InvalidNumberInput();
+                            return;
+                        }
+                        switch (operation)
+                        {
+                            case 1:
+                                Console.WriteLine("System shutting down.");
+                                Environment.Exit(0);
+                                break;
+                            default:
+                                InvalidNumberInput();
+                                break;
+                        }
                         break;
-                    case "System Admin":
-                        Console.WriteLine("1. UM View \n2. Quit");
+                    case "SysAdmin":
+                        Console.WriteLine("1. UM View \n 2. Quit");
+                        try
+                        {
+                            operation = Convert.ToInt32(Console.ReadLine());
+                        }
+                        catch (Exception ex)
+                        {
+                            InvalidNumberInput();
+                            return;
+                        }
+                        switch (operation)
+                        {
+                            case 1:
+                                switch (UserAccount.AuthorizationLevel)
+                                {
+                                    case "User":
+                                        InvalidAuthorizationLevel();
+                                        break;
+                                    case "System Admin":
+                                        view = "UMView";
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                break;
+                            case 2:
+                                Console.WriteLine("System shutting down.");
+                                Environment.Exit(0);
+                                break;
+                            default:
+                                InvalidNumberInput();
+                                break;
+
+                        }
+                        break;
+                    case "UM":
+                        Console.WriteLine("1. Create Account \n2. Update Account \n3. Delete Account \n4. Disable Account " +
+                            "\n5. Enable Account \n6. Bulk Operation \n7. Go Back");
+                        try
+                        {
+                            operation = Convert.ToInt32(Console.ReadLine());
+                        }
+                        catch (Exception ex)
+                        {
+                            InvalidNumberInput();
+                            return;
+                        }
+                        switch (operation)
+                        {
+                            case 1:
+                                break;
+                            case 2:
+                                break;
+                            case 3:
+                                break;
+                            case 4:
+                                break;
+                            case 5:
+                                break;
+                            case 6:
+                                break;
+                            case 7:
+                                view = "SysAdmin";
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    default:
+                        Console.Write("Error, no view has been set. System shutting down.");
+                        Environment.Exit(1);
                         break;
                 }
             }
+        }
 
+        public static void InvalidNumberInput()
+        {
+            Console.WriteLine("Input is not a valid number. Please try again.");
+        }
 
+        public static void InvalidAuthorizationLevel()
+        {
+            Console.WriteLine("You are not authorized to perform this action.");
         }
     }
 }

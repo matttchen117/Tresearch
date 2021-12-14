@@ -3,7 +3,7 @@
   "ProjectMap": {
     "0ed3f731-624c-481f-af85-45911d18e2ef": {
       "ProjectGuid": "0ed3f731-624c-481f-af85-45911d18e2ef",
-      "DisplayName": "TrialByFire.Tresearch",
+      "DisplayName": "TrialByFire.Tresearch.Main",
       "ColorIndex": 0
     },
     "127e07f3-30d9-4679-8f0c-758da07305ba": {
@@ -45,7 +45,17 @@
       "ProjectGuid": "e4bcbb61-6892-4628-beee-39fdecb980f0",
       "DisplayName": "Tresearch.Logging.Tests",
       "ColorIndex": 7
+    },
+    "08d2ca01-71a8-41fc-ab97-f07669154bcb": {
+      "ProjectGuid": "08d2ca01-71a8-41fc-ab97-f07669154bcb",
+      "DisplayName": "TrialByFire.Managers.Test",
+      "ColorIndex": 8
+    },
+    "5ad3032c-ef22-44a2-9d75-b36b289336f8": {
+      "ProjectGuid": "5ad3032c-ef22-44a2-9d75-b36b289336f8",
+      "DisplayName": "TrialByFire.Services.Test",
+      "ColorIndex": 9
     }
   },
-  "NextColorIndex": 8
+  "NextColorIndex": 10
 }
