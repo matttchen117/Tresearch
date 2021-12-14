@@ -20,35 +20,5 @@ namespace TrialByFire.Tresearch.UserManagement
             Account account = new Account(email, passphrase, authorizationLevel);
             return true;
         }
-
-        public bool EnableAccount(string username, string email)
-        {
-            bool isEnabled = false;
-            try
-            {
-                isEnabled = mssqlDAO.EnableAccount(username, email);
-
-            }
-            catch (Exception e)
-            {
-                isEnabled = false;
-            }
-            return isEnabled;
-        }
-
-        public bool DisableAccount(string username)
-        {
-            bool isDisabled = false;
-            try
-            {
-                isDisabled = mssqlDAO.DisableAccount(username);
-
-            }
-            catch (Exception e)
-            {
-                isDisabled = false;
-            }
-            return isDisabled;
-        }
     }
 }
