@@ -1,0 +1,15 @@
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\bin\Debug\net6.0\TrialByFire.Tresearch.exe
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\bin\Debug\net6.0\TrialByFire.Tresearch.deps.json
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\bin\Debug\net6.0\TrialByFire.Tresearch.runtimeconfig.json
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\bin\Debug\net6.0\TrialByFire.Tresearch.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\bin\Debug\net6.0\ref\TrialByFire.Tresearch.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\bin\Debug\net6.0\TrialByFire.Tresearch.pdb
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\TrialByFire.Tresearch.csproj.AssemblyReference.cache
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\TrialByFire.Tresearch.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\TrialByFire.Tresearch.AssemblyInfoInputs.cache
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\TrialByFire.Tresearch.AssemblyInfo.cs
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\TrialByFire.Tresearch.csproj.CoreCompileInputs.cache
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\TrialByFire.Tresearch.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\ref\TrialByFire.Tresearch.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\TrialByFire.Tresearch.pdb
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch\obj\Debug\net6.0\TrialByFire.Tresearch.genruntimeconfig.cache

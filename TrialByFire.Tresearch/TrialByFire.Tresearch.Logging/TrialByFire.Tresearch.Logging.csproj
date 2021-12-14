@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TrialByFire.Tresearch.DAL\TrialByFire.Tresearch.DAL.csproj" />
+    <ProjectReference Include="..\TrialByFire.Tresearch.DomainModels\TrialByFire.Tresearch.DomainModels.csproj" />
+  </ItemGroup>
+
 </Project>

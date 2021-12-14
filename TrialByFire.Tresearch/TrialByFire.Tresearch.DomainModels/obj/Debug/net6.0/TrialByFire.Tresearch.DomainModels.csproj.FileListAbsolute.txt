@@ -1,0 +1,12 @@
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DomainModels\bin\Debug\net6.0\TrialByFire.Tresearch.DomainModels.deps.json
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DomainModels\bin\Debug\net6.0\TrialByFire.Tresearch.DomainModels.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DomainModels\bin\Debug\net6.0\ref\TrialByFire.Tresearch.DomainModels.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DomainModels\bin\Debug\net6.0\TrialByFire.Tresearch.DomainModels.pdb
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DomainModels\obj\Debug\net6.0\TrialByFire.Tresearch.DomainModels.csproj.AssemblyReference.cache
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DomainModels\obj\Debug\net6.0\TrialByFire.Tresearch.DomainModels.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DomainModels\obj\Debug\net6.0\TrialByFire.Tresearch.DomainModels.AssemblyInfoInputs.cache
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DomainModels\obj\Debug\net6.0\TrialByFire.Tresearch.DomainModels.AssemblyInfo.cs
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DomainModels\obj\Debug\net6.0\TrialByFire.Tresearch.DomainModels.csproj.CoreCompileInputs.cache
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DomainModels\obj\Debug\net6.0\TrialByFire.Tresearch.DomainModels.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DomainModels\obj\Debug\net6.0\ref\TrialByFire.Tresearch.DomainModels.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DomainModels\obj\Debug\net6.0\TrialByFire.Tresearch.DomainModels.pdb

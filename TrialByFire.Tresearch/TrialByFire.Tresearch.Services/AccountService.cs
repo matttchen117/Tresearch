@@ -17,7 +17,7 @@ namespace TrialByFire.Tresearch.UserManagement
 
         public bool CreateAccount(string email, string passphrase, string authorizationLevel)
         {
-            Account account = new Account(string email, string passphrase, string authorizationLevel);
+            Account account = new Account(email, passphrase, authorizationLevel);
             return true;
         }
     }

@@ -1,5 +1,7 @@
 ﻿using System;
-using TrialByFire.Tresearch.DAO;
+using TrialByFire.Tresearch.DAL;
+using TrialByFire.Tresearch.DomainModels;
+using TrialByFire.Tresearch.Logging;
 
 namespace TrialByFire.Tresearch.UserManagement
 {
@@ -17,6 +19,7 @@ namespace TrialByFire.Tresearch.UserManagement
 
         public bool CreateAccount(string email, string passphrase, string authorizationLevel)
         {
+            throw new NotImplementedException();
         }
     }
 }
