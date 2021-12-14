@@ -26,9 +26,10 @@ namespace TrialByFire.Tresearch.UserManagement
             AccountService accountService = new AccountService(mssqlDAO, logService);
         }
 
-        public bool DisableAccount(string usrname)
+        public bool DisableAccount(string username)
         {
             AccountService accountService = new AccountService(mssqlDAO, logService);
+            bool isEnabled = accountService.EnableAccount(username);
         }
     }
 }

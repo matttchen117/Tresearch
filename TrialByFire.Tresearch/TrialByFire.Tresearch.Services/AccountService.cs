@@ -35,5 +35,20 @@ namespace TrialByFire.Tresearch.UserManagement
             }
             return isEnabled;
         }
+
+        public bool DisableAccount(string username)
+        {
+            bool isDisabled = false;
+            try
+            {
+                isDisabled = mssqlDAO.DisableAccount(username);
+
+            }
+            catch (Exception e)
+            {
+                isDisabled = false;
+            }
+            return isDisabled;
+        }
     }
 }
