@@ -1,4 +1,4 @@
-namespace TrialByFire.Tresearch.DAL
+namespace TrialByFire.Tresearch.Exceptions
 {
     public class AuthorizationSeviceNotCreatedException : Exception
     {
