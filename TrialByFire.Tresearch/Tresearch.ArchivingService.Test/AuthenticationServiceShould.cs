@@ -8,8 +8,6 @@ namespace Tresearch.Services.Tests
 {
     public class AuthenticationServiceShould
     {
-        string SqlConnectionString = ConfigurationManager.AppSettings.Get("SqlConnectionString");
-
         [Theory]
         [InlineData("pammypoor@gmail.com", "myPassword", "System Admin")]
         public void GetAccount(string username, string passphrase, string authenticationLevel)
@@ -17,7 +15,7 @@ namespace Tresearch.Services.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
             LogService logService = new LogService(mssqlDAO);
             AuthenticationService authenticationService = new AuthenticationService(mssqlDAO, logService);
             Account expected = new Account(username, username, passphrase, authenticationLevel);
