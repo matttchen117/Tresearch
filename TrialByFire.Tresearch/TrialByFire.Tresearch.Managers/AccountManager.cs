@@ -22,15 +22,18 @@ namespace TrialByFire.Tresearch.UserManagement
             throw new NotImplementedException();
         }
         
-        public bool EnableAccount(string username, string email)
+         public bool EnableAccount(string username, string email)
         {
             AccountService accountService = new AccountService(mssqlDAO, logService);
+            bool isEnabled = accountService.EnableAccount(username, email);
+            return isEnabled;
         }
 
         public bool DisableAccount(string username)
         {
             AccountService accountService = new AccountService(mssqlDAO, logService);
-            bool isEnabled = accountService.EnableAccount(username);
+            bool isEnabled = accountService.DisableAccount(username);
+            return isEnabled;
         }
     }
 }
