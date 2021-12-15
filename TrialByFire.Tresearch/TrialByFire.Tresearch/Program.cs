@@ -170,8 +170,66 @@ namespace TrialByFire.Tresearch.Main
                             case 3:
                                 break;
                             case 4:
+                                if (VerifyAuthorization(UserAccount, "SysAdmin", mssqlDAO, logService))
+                                {
+                                    Console.WriteLine("Enter Username");
+                                    string usernameToDisable;
+
+                                    try
+                                    {
+                                        usernameToDisable = Console.ReadLine();
+                                        bool isValidUsername = ValidateUsername(usernameToDisable, logService);
+
+                                        if (isValidUsername == false)
+                                        {
+                                            Console.WriteLine("Invalid Username");
+                                            break;
+                                        }
+
+                                        bool isEnabled = accountManager.DisableAccount(usernameToDisable);
+                                        if (isEnabled)
+                                        {
+                                            Console.WriteLine("Disable Account Was Successful");
+                                        }
+
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Console.WriteLine(e);
+                                    }
+                                }
                                 break;
                             case 5:
+                                if (VerifyAuthorization(UserAccount, "SysAdmin", mssqlDAO, logService))
+                                    {
+                                        Console.WriteLine("Enter Username and Email");
+                                        string usernameToEnable;
+                                        string emailToEnable;
+
+                                        try
+                                        {
+                                            usernameToEnable = Console.ReadLine();
+                                            emailToEnable = Console.ReadLine();
+                                            bool isValidUsername = ValidateUsername(usernameToEnable, logService);
+                                            bool isValidEmail = ValidateEmail(emailToEnable, logService);
+
+                                            if(isValidUsername == false || isValidEmail == false)
+                                            {
+                                                break;
+                                            }
+
+                                             bool isEnabled = accountManager.EnableAccount(usernameToEnable, emailToEnable);
+                                            if (isEnabled)
+                                            {
+                                                Console.WriteLine("Enable Account Was Successful");
+                                            }
+                                          
+                                        }
+                                        catch (Exception e)
+                                        {
+                                        Console.WriteLine(e);
+                                        }
+                                    }
                                 break;
                             case 6:
                                 MSSQLDAO mssqlDAO = new MSSQLDAO();
