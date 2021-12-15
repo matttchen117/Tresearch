@@ -210,6 +210,84 @@ namespace TrialByFire.Tresearch.Main
                                 }
                                 break;
                             case 2:
+                                if (VerifyAuthorization(UserAccount, "SysAdmin", mssqlDAO, logService))
+                                {
+                                    string existingUsername;
+                                    string newEmail;
+                                    string newPassphrase;
+                                    string newAuthorizationLevel;
+                                    try
+                                    {
+                                        Console.WriteLine("Enter existing username");
+                                        existingUsername = Console.ReadLine();
+                                        bool isValidUsername = ValidateUsername(existingUsername);
+                                        if(isValidUsername == false)
+                                        {
+                                            Console.WriteLine("Username is not valid");
+                                            break;
+                                        }
+                                        string eChoice;
+                                        string pChoice;
+                                        string aChoice;
+                                        Console.WriteLine("Would you like to update email? Enter: y/n");
+                                        eChoice = Console.ReadLine();
+                                        Console.WriteLine("Would you like to update passphrase? Enter: y/n");
+                                        pChoice = Console.ReadLine();
+                                        Console.WriteLine("Would you like to update authorizationLevel? Enter: y/n");
+                                        aChoice = Console.ReadLine();
+                                        if((eChoice == "n") && (pChoice == "n") && (aChoice == "n")){
+                                            Console.WriteLine("Update Account Failed");
+                                            break;
+                                        }
+                                        if(eChoice == "y")
+                                        {
+                                            newEmail = Console.ReadLine();
+                                        }
+                                        if(passphrase == "y")
+                                        {
+                                            newPassphrase = Console.ReadLine();
+                                        }
+                                        if(aChoice == "y")
+                                        {
+                                            newAuthorizationLevel = Console.ReadLine();
+                                        }
+                                        bool isValidEmail = ValidateEmail(newEmail);
+
+                                        if (isValidEmail == false)
+                                        {
+                                            Console.WriteLine("Email is not valid");
+                                            break;
+                                        }
+
+                                        bool isValidPassphrase = ValidatePassphrase(newPassphrase);
+
+                                        if (isValidPassphrase == false)
+                                        {
+                                            Console.WriteLine("Passphrase is not valid");
+                                            break;
+                                        }
+
+                                        bool isValidAuthorizationLevel = ValidateAuthorizationLevel(newAuthorizationLevel);
+
+                                        if (isValidAuthorizationLevel == false)
+                                        {
+                                            Console.WriteLine("AuthorizationLevel is invalid");
+                                            break;
+                                        }
+
+                                        bool updateAccountSuccessful = accountManager.UpdateAccount(existingUsername, newEmail, newPassphrase, newAuthorizationLevel);
+                                        
+                                        if (updateAccountSuccessful)
+                                        {
+                                            Console.WriteLine("Update Account was Successful");
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine(ex);
+                                    }
+                                    break;
+                                }
                                 break;
                             case 3:
                                 if (VerifyAuthorization(UserAccount, "SysAdmin", mssqlDAO, logService))
