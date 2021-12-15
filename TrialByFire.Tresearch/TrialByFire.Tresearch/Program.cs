@@ -31,6 +31,11 @@ namespace TrialByFire.Tresearch.Main
             bool isValidOperation = false;
             bool isValidFilePath;
 
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            LogService logService = new LogService(mssqlDAO);
+            AuthenticationService authenticationService = new AuthenticationService(mssqlDAO, logService);
+            AccountManager accountManager = new AccountManager(mssqlDAO, logService);
+            
             while (sqlConnectionString.Equals(""))
             {
                 Console.WriteLine("Please input your sql connection string");
