@@ -1,5 +1,5 @@
 using Xunit;
-
+using System.Configuration;
 using TrialByFire.Tresearch.DAL;
 using TrialByFire.Tresearch.DomainModels;
 using TrialByFire.Tresearch.Logging;
@@ -18,7 +18,7 @@ namespace Tresearch.Services.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
             LogService logService = new LogService(mssqlDAO);
             AuthorizationService authorizationService = new AuthorizationService(mssqlDAO, logService);
             Account a = new Account(email, username, passphrase, authenticationLevel);
