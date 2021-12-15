@@ -1,0 +1,12 @@
+namespace TrialByFire.Tresearch.DAL
+{
+    public class AccountManagerCreationFailedException : Exception
+    {
+        public AccountManagerCreationFailedException() { }
+
+        public AccountManagerCreationFailedException(string message) : base(message) { }
+
+        public AccountManagerCreationFailedException(string message, Exception inner) : base(message, inner) { }
+
+    }
+}
