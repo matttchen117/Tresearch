@@ -83,31 +83,9 @@ namespace TrialByFire.Tresearch.Main
             bool isArchived = await archiveTask;
             Console.WriteLine(isArchived);*/
 
-            //Authenticate and store account
-            while (username.Equals("")  && passphrase.Equals(""))
-            {
-                // need to validate these two
-                Console.WriteLine("Please enter in your username.");
-                username = Console.ReadLine();
-                Console.WriteLine("Please enter in your passphrase.");
-                passphrase = Console.ReadLine();
+            UserAccount = GetAccount(mssqlDAO, logService, authenticationService);
 
-                UserAccount = new Account();
-            }
-
-            switch (UserAccount.AuthorizationLevel)
-            {
-                case "User":
-                    view = "User";
-                    break;
-                case "SysAdmin":
-                    view = "SysAdmin";
-                    break;
-                default:
-                    Console.Write("Error, user has unknown authorization level. System shutting down.");
-                    Environment.Exit(1);
-                    break;
-            }
+            view = GetView();
 
             while (!finished)
             {
@@ -241,6 +219,52 @@ namespace TrialByFire.Tresearch.Main
                         break;
                 }
             }
+        }
+        
+        public static Account GetAccount(MSSQLDAO mssqlDAO, LogService logService, AuthenticationService authenticationService)
+        {
+            string username = "";
+            string passphrase = "";
+
+           
+
+            while (username.Equals("") && passphrase.Equals(""))
+            {
+                // need to validate these two
+                Console.WriteLine("Please enter in your username.");
+                username = Console.ReadLine();
+                Console.WriteLine("Please enter in your passphrase.");
+                passphrase = Console.ReadLine();
+
+                UserAccount = authenticationService.GetAccount(username, passphrase);
+
+                if(UserAccount == null)
+                {
+                    Console.WriteLine("Invalid Username/password or Disabled account");
+                    username = "";
+                    passphrase = "";
+                }
+            }
+            return UserAccount;
+        }
+        
+        public static string GetView()
+        {
+            string view = "";
+            switch (UserAccount.AuthorizationLevel)
+            {
+                case "User":
+                    view = "User";
+                    break;
+                case "System Admin":
+                    view = "SysAdmin";
+                    break;
+                default:
+                    Console.Write("Error, user has unknown authorization level. System shutting down.");
+                    Environment.Exit(1);
+                    break;
+            }
+            return view;
         }
 
         public static void InvalidNumberInput()
