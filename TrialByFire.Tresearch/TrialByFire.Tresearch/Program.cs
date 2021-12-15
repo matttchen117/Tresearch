@@ -176,7 +176,7 @@ namespace TrialByFire.Tresearch.Main
                                     string creationAuthorizationLevel;
                                     try
                                     {
-                                        Console.WriteLine("Please enter an email")
+                                        Console.WriteLine("Please enter an email");
                                         creationEmail = Console.ReadLine();
                                         Console.WriteLine("Please enter a passphrase at least eight characters in length");
                                         creationPassphrase = Console.ReadLine();
