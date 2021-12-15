@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL;
 using TrialByFire.Tresearch.Logging;
 using TrialByFire.Tresearch.Services;
-using TrialByFire.Tresearch.UserManagement;
 using Xunit;
 
 namespace TrialByFire.Services.Test
 {
     public class AccountServiceShould
     {
-        string SqlConnectionString = "Server=JESSIES-RAZER-B;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
+        string SqlConnectionString = ConfigurationManager.AppSettings.Get("SqlConnectionString");
 
         [Theory]
         [InlineData("jessie@gmail.com", "test", "User")]
@@ -22,7 +22,7 @@ namespace TrialByFire.Services.Test
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
             LogService logService = new LogService(mssqlDAO);
             AccountService accountService = new AccountService(mssqlDAO, logService);
 
@@ -43,7 +43,7 @@ namespace TrialByFire.Services.Test
             //Triple A Format
 
             //Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
             LogService logService = new LogService(mssqlDAO);
             AccountService accountService = new AccountService(mssqlDAO, logService);
             
@@ -61,7 +61,7 @@ namespace TrialByFire.Services.Test
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
             LogService logService = new LogService(mssqlDAO);
             AccountService accountService = new AccountService(mssqlDAO, logService);
 
@@ -80,7 +80,7 @@ namespace TrialByFire.Services.Test
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
             LogService logService = new LogService(mssqlDAO);
             AccountService accountService = new AccountService(mssqlDAO, logService);
 
@@ -99,7 +99,7 @@ namespace TrialByFire.Services.Test
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
             LogService logService = new LogService(mssqlDAO);
             AccountService accountService = new AccountService(mssqlDAO, logService);
 

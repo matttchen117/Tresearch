@@ -10,12 +10,13 @@ using TrialByFire.Tresearch.DAL;
 using TrialByFire.Tresearch.DomainModels;
 using TrialByFire.Tresearch.Logging;
 using TrialByFire.Tresearch.Managers;
+using TrialByFire.Tresearch.Services;
 
 namespace TrialByFire.Tresearch.Main
 {
-
     public class Program
     {
+        public static Account UserAccount;
         public static async Task Main(string[] args)
         {
             string sqlConnectionString = "";
@@ -29,7 +30,6 @@ namespace TrialByFire.Tresearch.Main
             bool isAuthorized = false;
             bool isValidOperation = false;
             bool isValidFilePath;
-            Account UserAccount = new Account();
 
             while (sqlConnectionString.Equals(""))
             {
@@ -100,7 +100,7 @@ namespace TrialByFire.Tresearch.Main
                 case "User":
                     view = "User";
                     break;
-                case "System Admin":
+                case "SysAdmin":
                     view = "SysAdmin";
                     break;
                 default:
@@ -154,7 +154,7 @@ namespace TrialByFire.Tresearch.Main
                                     case "User":
                                         InvalidAuthorizationLevel();
                                         break;
-                                    case "System Admin":
+                                    case "SysAdmin":
                                         view = "UMView";
                                         break;
                                     default:
@@ -196,11 +196,91 @@ namespace TrialByFire.Tresearch.Main
                             case 5:
                                 break;
                             case 6:
+                                MSSQLDAO mssqlDAO = new MSSQLDAO();
+                                LogService logService = new LogService(mssqlDAO);
+                                if(VerifyAuthorization(UserAccount, "SysAdmin", mssqlDAO, logService))
+                                {
+                                    Console.WriteLine("Please enter in the file path containing the operation requests.");
+                                    string file;
+                                    try
+                                    {
+                                        file = Console.ReadLine();
+                                        if(File.Exists(file))
+                                        {
+                                            int successes = 0;
+                                            int requests = 0;
+                                            AccountService accountService = new AccountService(mssqlDAO, logService);
+                                            foreach(string line in File.ReadLines("@"+file))
+                                            {
+                                                requests++;
+                                                string[] request = line.Split(';');
+                                                try
+                                                {
+                                                    switch (request[0])
+                                                    {
+                                                        case "Create":
+                                                            if (accountService.CreateAccount(request[1], request[2], request[3]))
+                                                            {
+                                                                successes++;
+                                                            }
+                                                            break;
+                                                        case "Update":
+                                                            if (accountService.UpdateAccount(request[1], request[2], request[3],
+                                                                request[4]))
+                                                            {
+                                                                successes++;
+                                                            }
+                                                            break;
+                                                        case "Delete":
+                                                            if (accountService.DeleteAccount(request[1]))
+                                                            {
+                                                                successes++;
+                                                            }
+                                                            break;
+                                                        case "Disable":
+                                                            if (accountService.DisableAccount(request[1]))
+                                                            {
+                                                                successes++;
+                                                            }
+                                                            break;
+                                                        case "Enable":
+                                                            if (accountService.EnableAccount(request[1], request[2]))
+                                                            {
+                                                                successes++;
+                                                            }
+                                                            break;
+                                                        default:
+                                                            logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, 
+                                                                "Business", "Improper request detected in bulk operation.");
+                                                            break;
+                                                    }
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Business",
+                                                        ex.Message);
+                                                }
+                                            }
+                                            logService.CreateLog(DateTime.Now, "Info", UserAccount.Username, "Business",
+                                                        $"Bulk Operation Was Successful with {successes} successes in " +
+                                                        $"{requests} requests.");
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Error, the file path is not valid. Please try again.");
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine();
+                                    }
+                                }
                                 break;
                             case 7:
                                 view = "SysAdmin";
                                 break;
                             default:
+                                Console.WriteLine("Error, invalid operation. Please try again.");
                                 break;
                         }
                         break;
@@ -225,6 +305,21 @@ namespace TrialByFire.Tresearch.Main
         public static bool ValidateOperation(string operation)
         {
             throw new NotImplementedException();
+        }
+
+        public static bool VerifyAuthorization(Account account, string requiredAuthorizationLevel, MSSQLDAO mssqlDAO, 
+            LogService logService)
+        {
+            try
+            {
+                AuthorizationService authorizationService = new AuthorizationService(mssqlDAO, logService);
+                return authorizationService.GetAccountAuthLevel(account, requiredAuthorizationLevel);
+            }
+            catch (Exception ex)
+            {
+                logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Business", ex.Message);
+                return false;
+            }
         }
     }
 }

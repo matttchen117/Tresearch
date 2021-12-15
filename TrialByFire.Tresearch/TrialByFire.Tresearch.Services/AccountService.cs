@@ -25,6 +25,7 @@ namespace TrialByFire.Tresearch.Services
             }
             catch (Exception e)
             {
+                logService.CreateLog(DateTime.Now, "Error", account.Username, "Business", e.Message);
                 createAccountSuccessful = false;
             }
             return createAccountSuccessful;

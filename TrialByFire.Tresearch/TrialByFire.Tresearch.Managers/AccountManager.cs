@@ -2,6 +2,7 @@
 using TrialByFire.Tresearch.DAL;
 using TrialByFire.Tresearch.DomainModels;
 using TrialByFire.Tresearch.Logging;
+using TrialByFire.Tresearch.Services;
 
 namespace TrialByFire.Tresearch.Managers
 {
@@ -27,8 +28,10 @@ namespace TrialByFire.Tresearch.Managers
             }
             catch (Exception e)
             {
+                logService.CreateLog(DateTime.Now, "Error", userAccount.Username, "Business", "An error occurred when trying to create the account.");
                 createAccountSuccessful = false;
             }
+            logService.CreateLog(DateTime.Now, "Error", userAccount.Username, "Business", "An error occurred when trying to create the account.");
             return createAccountSuccessful;
         }
 
