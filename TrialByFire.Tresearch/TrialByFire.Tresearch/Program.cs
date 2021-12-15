@@ -212,15 +212,19 @@ namespace TrialByFire.Tresearch.Main
                             case 2:
                                 if (VerifyAuthorization(UserAccount, "SysAdmin", mssqlDAO, logService))
                                 {
-                                    string existingUsername;
-                                    string newEmail;
-                                    string newPassphrase;
-                                    string newAuthorizationLevel;
+                                    
                                     try
                                     {
+                                        string existingUsername;
+                                        string newEmail = "";
+                                        string newPassphrase = "";
+                                        string newAuthorizationLevel = "";
                                         Console.WriteLine("Enter existing username");
                                         existingUsername = Console.ReadLine();
                                         bool isValidUsername = ValidateUsername(existingUsername);
+                                        bool isValidEmail = false;
+                                        bool isVaildPassphrase = false;
+                                        bool isValidAuthorizationLevel = false;
                                         if(isValidUsername == false)
                                         {
                                             Console.WriteLine("Username is not valid");
@@ -251,7 +255,7 @@ namespace TrialByFire.Tresearch.Main
                                         {
                                             newAuthorizationLevel = Console.ReadLine();
                                         }
-                                        bool isValidEmail = ValidateEmail(newEmail);
+                                        isValidEmail = ValidateEmail(newEmail);
 
                                         if (isValidEmail == false)
                                         {
@@ -259,15 +263,15 @@ namespace TrialByFire.Tresearch.Main
                                             break;
                                         }
 
-                                        bool isValidPassphrase = ValidatePassphrase(newPassphrase);
+                                        isVaildPassphrase = ValidatePassphrase(newPassphrase);
 
-                                        if (isValidPassphrase == false)
+                                        if (isVaildPassphrase == false)
                                         {
                                             Console.WriteLine("Passphrase is not valid");
                                             break;
                                         }
 
-                                        bool isValidAuthorizationLevel = ValidateAuthorizationLevel(newAuthorizationLevel);
+                                        isValidAuthorizationLevel = ValidateAuthorizationLevel(newAuthorizationLevel);
 
                                         if (isValidAuthorizationLevel == false)
                                         {
