@@ -165,7 +165,7 @@ namespace TrialByFire.Tresearch.Main
                         switch (operation)
                         {
                             case 1:
-                                if (VerifyAuthorization(UserAccount, "SysAdmin", mssqlDAO, logService))
+                                if (VerifyAuthorization(UserAccount, "System Admin", mssqlDAO, logService))
                                 {
                                     string creationEmail;
                                     string creationPassphrase;
@@ -178,7 +178,7 @@ namespace TrialByFire.Tresearch.Main
                                         creationPassphrase = Console.ReadLine();
                                         Console.WriteLine("Please enter Authorization Level");
                                         creationAuthorizationLevel = Console.ReadLine();
-                                        bool isValidEmail = ValidateEmail(creationEmail);
+                                        bool isValidEmail = ValidateEmail(creationEmail, logService);
                                         bool isValidPassphrase = ValidatePassphrase(creationPassphrase);
                                         bool isValidAuthorizationLevel = ValidateAuthorizationLevel(creationAuthorizationLevel);
                                         if(isValidEmail || isValidPassphrase == false)
@@ -206,7 +206,7 @@ namespace TrialByFire.Tresearch.Main
                                 }
                                 break;
                             case 2:
-                                if (VerifyAuthorization(UserAccount, "SysAdmin", mssqlDAO, logService))
+                                if (VerifyAuthorization(UserAccount, "System Admin", mssqlDAO, logService))
                                 {
                                     
                                     try
@@ -217,7 +217,7 @@ namespace TrialByFire.Tresearch.Main
                                         string newAuthorizationLevel = "";
                                         Console.WriteLine("Enter existing username");
                                         existingUsername = Console.ReadLine();
-                                        bool isValidUsername = ValidateUsername(existingUsername);
+                                        bool isValidUsername = ValidateUsername(existingUsername, logService);
                                         bool isValidEmail = false;
                                         bool isVaildPassphrase = false;
                                         bool isValidAuthorizationLevel = false;
@@ -251,7 +251,7 @@ namespace TrialByFire.Tresearch.Main
                                         {
                                             newAuthorizationLevel = Console.ReadLine();
                                         }
-                                        isValidEmail = ValidateEmail(newEmail);
+                                        isValidEmail = ValidateEmail(newEmail, logService);
 
                                         if (isValidEmail == false)
                                         {
@@ -290,7 +290,7 @@ namespace TrialByFire.Tresearch.Main
                                 }
                                 break;
                             case 3:
-                                if (VerifyAuthorization(UserAccount, "SysAdmin", mssqlDAO, logService))
+                                if (VerifyAuthorization(UserAccount, "System Admin", mssqlDAO, logService))
                                 {
                                     Console.WriteLine("Enter Username for deletion");
                                     string deletionUsername;
@@ -298,7 +298,7 @@ namespace TrialByFire.Tresearch.Main
                                     try
                                     {
                                         deletionUsername = Console.ReadLine();
-                                        bool isValidUsername = ValidateUsername(deletionUsername);
+                                        bool isValidUsername = ValidateUsername(deletionUsername, logService);
 
                                         if (isValidUsername == false)
                                         {
@@ -525,7 +525,7 @@ namespace TrialByFire.Tresearch.Main
             bool isValidAuthorizationLevel = false;
             try
             {
-                if ((authorizationLevel == "User") || (authorizationLevel == "SysAdmin"))
+                if ((authorizationLevel == "User") || (authorizationLevel == "System Admin"))
                 {
                     isValidAuthorizationLevel = true;
                     return isValidAuthorizationLevel;
