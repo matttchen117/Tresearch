@@ -13,3 +13,4 @@ C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.T
 C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.dll
 C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\ref\TrialByFire.Tresearch.DAL.dll
 C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.pdb
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.dll.config

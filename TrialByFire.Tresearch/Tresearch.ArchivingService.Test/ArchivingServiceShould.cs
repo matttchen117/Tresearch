@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using TrialByFire.Tresearch.DAL;
 using TrialByFire.Tresearch.Logging;
 using TrialByFire.Tresearch.Services;
@@ -9,9 +10,9 @@ namespace Tresearch.Services.Test
     
     public class ArchivingServiceShould
     {
-        string SqlConnectionString = "Server=LAPTOP-6SF4R1QG;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
-        string FilePath = @"C:\Work\Logs";
-        string Destination = @"C:\Work";
+        string SqlConnectionString = ConfigurationManager.AppSettings.Get("SqlConnectionString");
+        string FilePath = ConfigurationManager.AppSettings.Get("FilePath");
+        string Destination = ConfigurationManager.AppSettings.Get("Destination");
 
         [Fact]
         public void ArchiveTheLogs()
@@ -19,7 +20,7 @@ namespace Tresearch.Services.Test
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString, FilePath, Destination);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
             LogService logService = new LogService(mssqlDAO);
             ArchivingService archivingService = new ArchivingService(mssqlDAO, logService);
             bool expected = true;

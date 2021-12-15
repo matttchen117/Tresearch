@@ -15,3 +15,4 @@ C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.T
 C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Logging\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.pdb
 C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Logging\bin\Debug\net6.0\TrialByFire.Tresearch.DomainModels.pdb
 C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Logging\obj\Debug\net6.0\TrialByFire.Tresearch.Logging.csproj.CopyComplete
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Logging\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.dll.config

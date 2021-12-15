@@ -1,4 +1,5 @@
 using System;
+using System.Configuration;
 using TrialByFire.Tresearch.DAL;
 using TrialByFire.Tresearch.DomainModels;
 using Xunit;
@@ -8,9 +9,9 @@ namespace TrialByFire.DAL.Tests
     public class MSSQLDAOShould
     {
 
-        string SqlConnectionString = "Server=LAPTOP-6SF4R1QG;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
-        string FilePath = @"C:\Work\Logs";
-        string Destination = @"C:\Work";
+        string SqlConnectionString = ConfigurationManager.AppSettings.Get("SqlConnectionString");
+        string FilePath = ConfigurationManager.AppSettings.Get("FilePath");
+        string Destination = ConfigurationManager.AppSettings.Get("Destination");
 
         [Theory]
         [InlineData("bob@gmail.com", "abcdef123456", "bob@gmail.com", "abcdef123456", "User", false)]
@@ -21,14 +22,14 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
             var expected = new Account(expectedEmail, expectedPassphrase, expectedAuthorizationLevel);
 
             // Act
             var actual = mssqlDAO.GetAccount(email, passphrase);
 
             // Assert
-            Assert.Equal(expected.Equals(actual), expectedResult);
+            Assert.Equal(expectedResult, expected.Equals(actual));
         }
 
         [Fact]
@@ -37,7 +38,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
             Account account = new Account("bob@gmail.com", "abcdef123456", "User");
 
             // Act
@@ -53,7 +54,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
 
 
             // Act
@@ -69,7 +70,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
 
 
             // Act
@@ -85,7 +86,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
 
 
             // Act
@@ -101,7 +102,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
 
 
             // Act
@@ -122,7 +123,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
             DateTime timeStamp = DateTime.Parse(timeString).ToUniversalTime();
             Log log = new Log(timeStamp, level, username, category, description);
             bool expected = true;
@@ -140,7 +141,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString, FilePath, Destination);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
 
             // Act
             var actual = mssqlDAO.Archive();

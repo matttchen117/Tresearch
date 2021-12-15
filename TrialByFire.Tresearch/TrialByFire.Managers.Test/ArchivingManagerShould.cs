@@ -1,4 +1,7 @@
 using System;
+using System.Configuration;
+using System.Collections.Specialized;
+using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL;
 using TrialByFire.Tresearch.Logging;
 using TrialByFire.Tresearch.Managers;
@@ -8,28 +11,46 @@ namespace TrialByFire.Managers.Test
 {
     public class ArchivingManagerShould
     {
-        string SqlConnectionString = "Server=LAPTOP-6SF4R1QG;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
-        string FilePath = @"C:\Work\Logs";
-        string Destination = @"C:\Work";
+        string SqlConnectionString = ConfigurationManager.AppSettings.Get("SqlConnectionString");
+        string FilePath = ConfigurationManager.AppSettings.Get("FilePath");
+        string Destination = ConfigurationManager.AppSettings.Get("Destination");
 
-        public void LaunchTheArchivingService()
-        {
-
-        }
 
         [Fact]
-        public void ArchiveTheLogs()
+        public async void ArchiveTheLogs()
         {
             // Triple A Format
+            Destination = ConfigurationManager.AppSettings.Get("SqlConnectionString");
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString, FilePath, Destination);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
             LogService logService = new LogService(mssqlDAO);
             ArchivingManager archivingManager = new ArchivingManager(mssqlDAO, logService);
             bool expected = true;
 
             // Act
-            var actual = archivingManager.ArchiveLogs();
+            Task<bool> archiveTask = archivingManager.ArchiveLogs();
+            var actual = await archiveTask;
+
+            // Assert
+            Assert.Equal(actual, expected);
+        }
+
+        [Theory]
+        [InlineData("2021-12-15 04:27:00")]
+        public async void ArchiveTheLogsAtThisTime(string sArchiveTime)
+        {
+            // Triple A Format
+
+            // Arrange
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            LogService logService = new LogService(mssqlDAO);
+            ArchivingManager archivingManager = new ArchivingManager(mssqlDAO, logService);
+            bool expected = true;
+
+            // Act
+            Task<bool> archiveTask = archivingManager.ArchiveLogs(sArchiveTime);
+            var actual = await archiveTask;
 
             // Assert
             Assert.Equal(actual, expected);

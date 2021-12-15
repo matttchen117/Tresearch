@@ -1,4 +1,5 @@
 using System;
+using System.Configuration;
 using TrialByFire.Tresearch.DAL;
 using TrialByFire.Tresearch.Logging;
 using Xunit;
@@ -7,7 +8,7 @@ namespace Tresearch.Logging.Tests
 {
     public class LogServiceShould
     {
-        string SqlConnectionString = "Server=LAPTOP-6SF4R1QG;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
+        string SqlConnectionString = ConfigurationManager.AppSettings.Get("SqlConnectionString");
 
         [Theory]
         [InlineData("Jan 1, 2021", "Info", "larry@gmail.com", "DataStore", "This is a test.")]
@@ -20,7 +21,7 @@ namespace Tresearch.Logging.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
             LogService logService = new LogService(mssqlDAO);
             DateTime timeStamp = DateTime.Parse(timeString).ToUniversalTime();
             bool expected = true;

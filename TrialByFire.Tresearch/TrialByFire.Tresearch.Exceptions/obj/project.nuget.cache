@@ -1,8 +1,16 @@
 {
   "version": 2,
-  "dgSpecHash": "jns/+tj37H4gBZMbKaLEzhAUPwUQ6Z/WlakAMNsYW2Xon0frFoSyIGs+TycMMLXMs/Ad1TwJDSl9yzA0k1tzRg==",
+  "dgSpecHash": "srvfp826zKglnUoHaS98qj5YuCfoSRml9lDfn4fXOGMsVjVyEg1I/yX+9XDKxQ3hggPmf4+9wdDCcCEX+WsU9Q==",
   "success": true,
   "projectFilePath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\TrialByFire.Tresearch.Exceptions.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\microsoft.win32.systemevents\\6.0.0\\microsoft.win32.systemevents.6.0.0.nupkg.sha512",
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\system.configuration.configurationmanager\\6.0.0\\system.configuration.configurationmanager.6.0.0.nupkg.sha512",
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\system.drawing.common\\6.0.0\\system.drawing.common.6.0.0.nupkg.sha512",
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\system.security.accesscontrol\\6.0.0\\system.security.accesscontrol.6.0.0.nupkg.sha512",
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\system.security.cryptography.protecteddata\\6.0.0\\system.security.cryptography.protecteddata.6.0.0.nupkg.sha512",
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\system.security.permissions\\6.0.0\\system.security.permissions.6.0.0.nupkg.sha512",
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512"
+  ],
   "logs": []
 }

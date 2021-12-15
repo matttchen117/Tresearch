@@ -1,0 +1,13 @@
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Configs\bin\Debug\net6.0\TrialByFire.Tresearch.Configs.dll.config
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Configs\bin\Debug\net6.0\TrialByFire.Tresearch.Configs.deps.json
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Configs\bin\Debug\net6.0\TrialByFire.Tresearch.Configs.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Configs\bin\Debug\net6.0\ref\TrialByFire.Tresearch.Configs.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Configs\bin\Debug\net6.0\TrialByFire.Tresearch.Configs.pdb
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Configs\obj\Debug\net6.0\TrialByFire.Tresearch.Configs.csproj.AssemblyReference.cache
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Configs\obj\Debug\net6.0\TrialByFire.Tresearch.Configs.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Configs\obj\Debug\net6.0\TrialByFire.Tresearch.Configs.AssemblyInfoInputs.cache
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Configs\obj\Debug\net6.0\TrialByFire.Tresearch.Configs.AssemblyInfo.cs
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Configs\obj\Debug\net6.0\TrialByFire.Tresearch.Configs.csproj.CoreCompileInputs.cache
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Configs\obj\Debug\net6.0\TrialByFire.Tresearch.Configs.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Configs\obj\Debug\net6.0\ref\TrialByFire.Tresearch.Configs.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Configs\obj\Debug\net6.0\TrialByFire.Tresearch.Configs.pdb

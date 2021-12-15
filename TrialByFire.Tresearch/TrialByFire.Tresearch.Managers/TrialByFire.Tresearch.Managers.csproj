@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TrialByFire.Tresearch.DAL\TrialByFire.Tresearch.DAL.csproj" />
     <ProjectReference Include="..\TrialByFire.Tresearch.Logging\TrialByFire.Tresearch.Logging.csproj" />
     <ProjectReference Include="..\TrialByFire.Tresearch.Services\TrialByFire.Tresearch.Services.csproj" />

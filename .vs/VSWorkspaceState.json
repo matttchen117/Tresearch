@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\TrialByFire.Tresearch",
+    "\\TrialByFire.Tresearch\\TrialByFire.Tresearch"
   ],
-  "SelectedNode": "\\TrialByFire.Tresearch.sln",
+  "SelectedNode": "\\TrialByFire.Tresearch\\TrialByFire.Tresearch\\Program.cs",
   "PreviewInSolutionExplorer": false
 }

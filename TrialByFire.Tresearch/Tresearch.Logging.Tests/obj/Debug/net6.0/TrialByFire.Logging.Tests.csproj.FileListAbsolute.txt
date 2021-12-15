@@ -111,3 +111,4 @@ C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\Tresearch.Log
 C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\Tresearch.Logging.Tests\obj\Debug\net6.0\ref\TrialByFire.Logging.Tests.dll
 C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\Tresearch.Logging.Tests\obj\Debug\net6.0\TrialByFire.Logging.Tests.pdb
 C:\Users\Matthew Chen\source\repos\Tresearch\TrialByFire.Tresearch\Tresearch.Logging.Tests\obj\Debug\net6.0\TrialByFire.Logging.Tests.genruntimeconfig.cache
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\Tresearch.Logging.Tests\bin\Debug\net6.0\TrialByFire.Logging.Tests.dll.config

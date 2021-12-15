@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
 using System.IO.Compression;
+using System.Configuration;
 
 namespace TrialByFire.Tresearch.DAL
 {
@@ -16,18 +17,9 @@ namespace TrialByFire.Tresearch.DAL
 
         public MSSQLDAO()
         {
-        }
-
-        public MSSQLDAO(string sqlConnectionString)
-        {
-            SqlConnectionString = sqlConnectionString;
-        }
-
-        public MSSQLDAO(string sqlConnectionString, string filePath, string destination)
-        {
-            SqlConnectionString = sqlConnectionString;
-            FilePath = filePath;
-            Destination = destination;
+            SqlConnectionString = ConfigurationManager.AppSettings.Get("SqlConnectionString");
+            FilePath = ConfigurationManager.AppSettings.Get("FilePath");
+            Destination = ConfigurationManager.AppSettings.Get("Destination");
         }
 
         public Account GetAccount(string username, string passphrase)
@@ -88,11 +80,11 @@ namespace TrialByFire.Tresearch.DAL
                 using (var connection = new SqlConnection(SqlConnectionString))
                 {
                     string updateQuery = "UPDATE Accounts SET ";
-                    if (newPassPhrase != null)
+                    if (!newPassPhrase.Equals(""))
                     {
                         updateQuery += "PassPhrase = '" + newPassPhrase + "', ";
                     }
-                    if (newEmail != null)
+                    if (!newEmail.Equals(""))
                     {
                         var readQuery = "SELECT COUNT(*) FROM Accounts WHERE Email = @Email";
                         var accounts = connection.ExecuteScalar<int>(readQuery, new { Email = newEmail });
@@ -106,7 +98,7 @@ namespace TrialByFire.Tresearch.DAL
                         }
                         updateQuery += "Username = '" + newUsername + "', Email = '" + newEmail + "', ";
                     }
-                    if (newAuthorizationLevel != null)
+                    if (!newAuthorizationLevel.Equals(""))
                     {
                         updateQuery += "AuthorizationLevel = '" + newAuthorizationLevel + "', ";
                     }
@@ -237,13 +229,13 @@ namespace TrialByFire.Tresearch.DAL
                     using (var connection = new SqlConnection(SqlConnectionString))
                     {
                         var readQuery = "SELECT * FROM Logs WHERE Timestamp <= @Timestamp";
-                        var logs = connection.Query<Log>(readQuery, new {Timestamp = System.DateTime.UtcNow.AddDays(-30)}).ToList();
+                        var logs = connection.Query<Log>(readQuery, new {Timestamp = DateTime.UtcNow.AddDays(-30)}).ToList();
                         if (logs.Count() == 0) // No logs meet requirement for archiving
                         {
                             return false;
                         }
                         using (StreamWriter writer = new StreamWriter(FilePath + 
-                            $@"\{DateTime.UtcNow.ToString("yyyy-MM")}_Logs.txt"))
+                            $@"\{DateTime.Now.ToString("yyyy-MM")}_Logs.txt"))
                         {
                             foreach (Log log in logs)
                             {
@@ -252,9 +244,9 @@ namespace TrialByFire.Tresearch.DAL
                         }
                         // Compress file at FilePath and store ZipFile at Destination
                         ZipFile.CreateFromDirectory(FilePath, Destination +
-                            $@"\{DateTime.UtcNow.ToString("yyyy-MM")}_Archive.zip"); // New zip every month
+                            $@"\{DateTime.Now.ToString("yyyy-MM")}_Archive.zip"); // New zip every month
                         var deleteQuery = "DELETE FROM Logs WHERE Timestamp <= @Timestamp";
-                        var affectedRows = connection.Execute(deleteQuery, new {Timestamp = System.DateTime.UtcNow.AddDays(-30)});
+                        var affectedRows = connection.Execute(deleteQuery, new {Timestamp = DateTime.UtcNow.AddDays(-30)});
                         return true;
                     }
                 }

@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Collections.Specialized;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TrialByFire.Tresearch.DAL;
 using TrialByFire.Tresearch.DomainModels;
+using TrialByFire.Tresearch.Logging;
+using TrialByFire.Tresearch.Managers;
 
 namespace TrialByFire.Tresearch.Main
 {
+
     public class Program
     {
-        static string GlobalSqlConnectionString;
-        static string GlobalFilePath;
-        static string GlobalDestination;
-        static Account UserAccount;
-
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             string sqlConnectionString = "";
             string filePath = "";
@@ -25,7 +26,10 @@ namespace TrialByFire.Tresearch.Main
             string view = "";
             int operation = -1;
             bool finished = false;
-
+            bool isAuthorized = false;
+            bool isValidOperation = false;
+            bool isValidFilePath;
+            Account UserAccount = new Account();
 
             while (sqlConnectionString.Equals(""))
             {
@@ -44,7 +48,7 @@ namespace TrialByFire.Tresearch.Main
                     sqlConnectionString = "";
                 }
             }
-            GlobalSqlConnectionString = sqlConnectionString;
+            ConfigurationManager.AppSettings.Set("SqlConnectionString", sqlConnectionString);
 
             while (filePath.Equals(""))
             {
@@ -56,7 +60,7 @@ namespace TrialByFire.Tresearch.Main
                     filePath = "";
                 }
             }
-            GlobalFilePath = filePath;
+            ConfigurationManager.AppSettings.Set("FilePath", filePath);
 
             while (destination.Equals(""))
             {
@@ -69,10 +73,18 @@ namespace TrialByFire.Tresearch.Main
                     destination = "";
                 }
             }
-            GlobalDestination = destination;
+            ConfigurationManager.AppSettings.Set("Destination", destination);
+
+            // Archiving Service
+            /*MSSQLDAO mssqlDAO = new MSSQLDAO();
+            LogService logService = new LogService(mssqlDAO);
+            ArchivingManager archivingManager = new ArchivingManager(mssqlDAO, logService);
+            Task<bool> archiveTask = archivingManager.ArchiveLogs("2021-12-14 22:12:00");
+            bool isArchived = await archiveTask;
+            Console.WriteLine(isArchived);*/
 
             //Authenticate and store account
-            while(username.Equals("")  && passphrase.Equals(""))
+            while (username.Equals("")  && passphrase.Equals(""))
             {
                 // need to validate these two
                 Console.WriteLine("Please enter in your username.");
@@ -208,6 +220,11 @@ namespace TrialByFire.Tresearch.Main
         public static void InvalidAuthorizationLevel()
         {
             Console.WriteLine("You are not authorized to perform this action.");
+        }
+
+        public static bool ValidateOperation(string operation)
+        {
+            throw new NotImplementedException();
         }
     }
 }
