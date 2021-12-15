@@ -18,6 +18,7 @@ namespace TrialByFire.Tresearch.Main
     public class Program
     {
         public static Account UserAccount;
+
         public static async Task Main(string[] args)
         {
             string sqlConnectionString = "";
@@ -174,14 +175,16 @@ namespace TrialByFire.Tresearch.Main
                                     {
                                         Console.WriteLine("Please enter an email");
                                         creationEmail = Console.ReadLine();
+                                        bool isValidEmail = ValidateEmail(creationEmail, logService);
                                         Console.WriteLine("Please enter a passphrase at least eight characters in length");
                                         creationPassphrase = Console.ReadLine();
+                                        bool isValidPassphrase = ValidatePassphrase(creationPassphrase);
                                         Console.WriteLine("Please enter Authorization Level");
                                         creationAuthorizationLevel = Console.ReadLine();
-                                        bool isValidEmail = ValidateEmail(creationEmail, logService);
-                                        bool isValidPassphrase = ValidatePassphrase(creationPassphrase);
                                         bool isValidAuthorizationLevel = ValidateAuthorizationLevel(creationAuthorizationLevel);
-                                        if(isValidEmail || isValidPassphrase == false)
+
+
+                                        if (isValidEmail == false || isValidPassphrase == false)
                                         {
                                             Console.WriteLine("Invalid Username or Passphrase");
                                             break;
@@ -229,6 +232,7 @@ namespace TrialByFire.Tresearch.Main
                                         string eChoice;
                                         string pChoice;
                                         string aChoice;
+                                        bool isChanged = false;
                                         Console.WriteLine("Would you like to update email? Enter: y/n");
                                         eChoice = Console.ReadLine();
                                         Console.WriteLine("Would you like to update passphrase? Enter: y/n");
@@ -241,46 +245,50 @@ namespace TrialByFire.Tresearch.Main
                                         }
                                         if(eChoice == "y")
                                         {
+                                            Console.Write("Enter new email: ");
                                             newEmail = Console.ReadLine();
+                                            isValidEmail = ValidateEmail(newEmail, logService);
+                                            if (isValidEmail == false)
+                                            {
+                                                Console.WriteLine("Email is not valid");
+                                                break;
+                                            }
+                                            isChanged = true;
                                         }
-                                        if(passphrase == "y")
+                                        if(pChoice == "y")
                                         {
+                                            Console.Write("Enter new passphrase: ");
                                             newPassphrase = Console.ReadLine();
+                                            isVaildPassphrase = ValidatePassphrase(newPassphrase);
+                                            if (isVaildPassphrase == false)
+                                            {
+                                                Console.WriteLine("Passphrase is not valid");
+                                                break;
+                                            }
+                                            isChanged = true;
                                         }
                                         if(aChoice == "y")
                                         {
+                                            Console.Write("Enter new authentication level: ");
                                             newAuthorizationLevel = Console.ReadLine();
+                                            isValidAuthorizationLevel = ValidateAuthorizationLevel(newAuthorizationLevel);
+                                            if (isValidAuthorizationLevel == false)
+                                            {
+                                                Console.WriteLine("AuthorizationLevel is invalid");
+                                                break;
+                                            }
+                                            isChanged = true;
                                         }
-                                        isValidEmail = ValidateEmail(newEmail, logService);
 
-                                        if (isValidEmail == false)
+                                        if(isChanged)
                                         {
-                                            Console.WriteLine("Email is not valid");
-                                            break;
-                                        }
+                                            bool updateAccountSuccessful = accountManager.UpdateAccount(existingUsername, newPassphrase, newEmail, newAuthorizationLevel);
+                                            if (updateAccountSuccessful)
+                                            {
+                                                Console.WriteLine("Update Account was Successful");
+                                            }
 
-                                        isVaildPassphrase = ValidatePassphrase(newPassphrase);
-
-                                        if (isVaildPassphrase == false)
-                                        {
-                                            Console.WriteLine("Passphrase is not valid");
-                                            break;
-                                        }
-
-                                        isValidAuthorizationLevel = ValidateAuthorizationLevel(newAuthorizationLevel);
-
-                                        if (isValidAuthorizationLevel == false)
-                                        {
-                                            Console.WriteLine("AuthorizationLevel is invalid");
-                                            break;
-                                        }
-
-                                        bool updateAccountSuccessful = accountManager.UpdateAccount(existingUsername, newEmail, newPassphrase, newAuthorizationLevel);
-                                        
-                                        if (updateAccountSuccessful)
-                                        {
-                                            Console.WriteLine("Update Account was Successful");
-                                        }
+                                        }  
                                     }
                                     catch (Exception ex)
                                     {
@@ -358,7 +366,9 @@ namespace TrialByFire.Tresearch.Main
 
                                         try
                                         {
+                                            Console.Write("Username: ");
                                             usernameToEnable = Console.ReadLine();
+                                            Console.Write("Passphrase: ");
                                             emailToEnable = Console.ReadLine();
                                             bool isValidUsername = ValidateUsername(usernameToEnable, logService);
                                             bool isValidEmail = ValidateEmail(emailToEnable, logService);

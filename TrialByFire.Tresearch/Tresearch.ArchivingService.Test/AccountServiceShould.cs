@@ -37,7 +37,7 @@ namespace TrialByFire.Services.Test
         
 
         [Theory]
-        [InlineData("jessie@gmail.com", "test2", "jessie2@gmail.com", "")]
+        [InlineData("williams@gmail.com", "test2", "jessie2@gmail.com", "")]
         public void UpdateAccount(string username, string newPassphrase, string newEmail, string newAuthorizationLevel)
         {
             //Triple A Format
@@ -55,7 +55,7 @@ namespace TrialByFire.Services.Test
         }
 
         [Theory]
-        [InlineData("jessie@gmail.com", "test")]
+        [InlineData("natalie@gmail.com", "processor")]
         public void EnableAccount(string username, string passphrase)
         {
             // Triple A Format
@@ -74,7 +74,7 @@ namespace TrialByFire.Services.Test
         }
 
         [Theory]
-        [InlineData("jessie@gmail.com")]
+        [InlineData("kim@gmail.com")]
         public void DisableAccount(string username)
         {
             // Triple A Format
@@ -93,7 +93,7 @@ namespace TrialByFire.Services.Test
         }
 
         [Theory]
-        [InlineData("larry@gmail.com")]
+        [InlineData("novak@gmail.com")]
         public void DeleteAccount(string username)
         {
             // Triple A Format
