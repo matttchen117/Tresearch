@@ -1,4 +1,4 @@
-﻿namespace Tresearch
+﻿namespace TrialByFire.Tresearch.Exceptions
 {
     public class GetViewFailException : Exception
     {
