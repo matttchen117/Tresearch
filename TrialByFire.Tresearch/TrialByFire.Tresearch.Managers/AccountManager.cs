@@ -3,7 +3,7 @@ using TrialByFire.Tresearch.DAL;
 using TrialByFire.Tresearch.DomainModels;
 using TrialByFire.Tresearch.Logging;
 
-namespace TrialByFire.Tresearch.UserManagement
+namespace TrialByFire.Tresearch.Managers
 {
     public class AccountManager
     {
