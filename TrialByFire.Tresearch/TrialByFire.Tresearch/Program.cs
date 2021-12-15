@@ -149,7 +149,7 @@ namespace TrialByFire.Tresearch.Main
 
                         }
                         break;
-                    case "UM":
+                    case "UMView":
                         Console.WriteLine("1. Create Account \n2. Update Account \n3. Delete Account \n4. Disable Account " +
                             "\n5. Enable Account \n6. Bulk Operation \n7. Go Back");
                         try
