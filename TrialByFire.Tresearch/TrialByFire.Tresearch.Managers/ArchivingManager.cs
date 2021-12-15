@@ -56,20 +56,29 @@ namespace TrialByFire.Tresearch.Managers
 
         public async Task<bool> CheckForAppropriateTime()
         {
-            DateTime now = DateTime.Now;
-            DateTime target = now.Date.AddDays(DateTime.DaysInMonth(now.Year, now.Month) + 1 - now.Day);
-            if (now == target)
+            try
             {
-                return true;
-            }
-            else
-            {
-                while (now <= target)
+                DateTime now = DateTime.Now;
+                DateTime target = now.Date.AddDays(DateTime.DaysInMonth(now.Year, now.Month) + 1 - now.Day);
+                if (now == target)
                 {
-                    now = DateTime.Now;
+                    return true;
                 }
-                return true;
+                else
+                {
+                    while (now <= target)
+                    {
+                        now = DateTime.Now;
+                    }
+                    return true;
+                }
             }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
+            
             /*Timer timer;
             DateTime now = DateTime.Now;
             int day = now.Day;

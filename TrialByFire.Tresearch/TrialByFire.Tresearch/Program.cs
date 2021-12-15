@@ -11,6 +11,7 @@ using TrialByFire.Tresearch.DomainModels;
 using TrialByFire.Tresearch.Logging;
 using TrialByFire.Tresearch.Managers;
 using TrialByFire.Tresearch.Services;
+using System.Net.Mail;
 
 namespace TrialByFire.Tresearch.Main
 {
@@ -31,11 +32,6 @@ namespace TrialByFire.Tresearch.Main
             bool isValidOperation = false;
             bool isValidFilePath;
 
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
-            LogService logService = new LogService(mssqlDAO);
-            AuthenticationService authenticationService = new AuthenticationService(mssqlDAO, logService);
-            AccountManager accountManager = new AccountManager(mssqlDAO, logService);
-            
             while (sqlConnectionString.Equals(""))
             {
                 Console.WriteLine("Please input your sql connection string");
@@ -88,6 +84,10 @@ namespace TrialByFire.Tresearch.Main
             bool isArchived = await archiveTask;
             Console.WriteLine(isArchived);*/
 
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            LogService logService = new LogService(mssqlDAO);
+            AuthenticationService authenticationService = new AuthenticationService(mssqlDAO, logService);
+            AccountManager accountManager = new AccountManager(mssqlDAO, logService);
             UserAccount = GetAccount(mssqlDAO, logService, authenticationService);
 
             view = GetView();
@@ -105,7 +105,6 @@ namespace TrialByFire.Tresearch.Main
                         catch (Exception ex)
                         {
                             InvalidNumberInput();
-                            return;
                         }
                         switch (operation)
                         {
@@ -118,7 +117,7 @@ namespace TrialByFire.Tresearch.Main
                                 break;
                         }
                         break;
-                    case "SysAdmin":
+                    case "System Admin":
                         Console.WriteLine("1. UM View \n 2. Quit");
                         try
                         {
@@ -127,7 +126,6 @@ namespace TrialByFire.Tresearch.Main
                         catch (Exception ex)
                         {
                             InvalidNumberInput();
-                            return;
                         }
                         switch (operation)
                         {
@@ -137,7 +135,7 @@ namespace TrialByFire.Tresearch.Main
                                     case "User":
                                         InvalidAuthorizationLevel();
                                         break;
-                                    case "SysAdmin":
+                                    case "System Admin":
                                         view = "UMView";
                                         break;
                                     default:
@@ -151,7 +149,6 @@ namespace TrialByFire.Tresearch.Main
                             default:
                                 InvalidNumberInput();
                                 break;
-
                         }
                         break;
                     case "UMView":
@@ -164,7 +161,6 @@ namespace TrialByFire.Tresearch.Main
                         catch (Exception ex)
                         {
                             InvalidNumberInput();
-                            return;
                         }
                         switch (operation)
                         {
@@ -175,7 +171,7 @@ namespace TrialByFire.Tresearch.Main
                             case 3:
                                 break;
                             case 4:
-                                if (VerifyAuthorization(UserAccount, "SysAdmin", mssqlDAO, logService))
+                                if (VerifyAuthorization(UserAccount, "System Admin", mssqlDAO, logService))
                                 {
                                     Console.WriteLine("Enter Username");
                                     string usernameToDisable;
@@ -205,7 +201,7 @@ namespace TrialByFire.Tresearch.Main
                                 }
                                 break;
                             case 5:
-                                if (VerifyAuthorization(UserAccount, "SysAdmin", mssqlDAO, logService))
+                                if (VerifyAuthorization(UserAccount, "System Admin", mssqlDAO, logService))
                                     {
                                         Console.WriteLine("Enter Username and Email");
                                         string usernameToEnable;
@@ -237,9 +233,9 @@ namespace TrialByFire.Tresearch.Main
                                     }
                                 break;
                             case 6:
-                                MSSQLDAO mssqlDAO = new MSSQLDAO();
-                                LogService logService = new LogService(mssqlDAO);
-                                if(VerifyAuthorization(UserAccount, "SysAdmin", mssqlDAO, logService))
+                                //MSSQLDAO mssqlDAO = new MSSQLDAO();
+                                //LogService logService = new LogService(mssqlDAO);
+                                if(VerifyAuthorization(UserAccount, "System Admin", mssqlDAO, logService))
                                 {
                                     Console.WriteLine("Please enter in the file path containing the operation requests.");
                                     string file;
@@ -269,7 +265,7 @@ namespace TrialByFire.Tresearch.Main
                                 }
                                 break;
                             case 7:
-                                view = "SysAdmin";
+                                view = "System Admin";
                                 break;
                             default:
                                 Console.WriteLine("Error, invalid operation. Please try again.");
@@ -288,8 +284,6 @@ namespace TrialByFire.Tresearch.Main
         {
             string username = "";
             string passphrase = "";
-
-           
 
             while (username.Equals("") && passphrase.Equals(""))
             {
@@ -320,7 +314,7 @@ namespace TrialByFire.Tresearch.Main
                     view = "User";
                     break;
                 case "System Admin":
-                    view = "SysAdmin";
+                    view = "System Admin";
                     break;
                 default:
                     Console.Write("Error, user has unknown authorization level. System shutting down.");
