@@ -8,7 +8,7 @@ namespace Tresearch.Managers.Tests
 {
     public class AccountManagerShould
     {
-        string SqlConnectionString = "Server=DESKTOP-F0O7ECC;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
+        string SqlConnectionString = ConfigurationManager.AppSettings.Get("SqlConnectionString");
 
         [Theory]
         [InlineData("pammy@gmail.com", "Password", "User")]
