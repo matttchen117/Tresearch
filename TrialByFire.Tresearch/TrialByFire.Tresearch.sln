@@ -21,9 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch.Excep
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Logging.Tests", "Tresearch.Logging.Tests\TrialByFire.Logging.Tests.csproj", "{E4BCBB61-6892-4628-BEEE-39FDECB980F0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Services.Test", "Tresearch.ArchivingService.Test\TrialByFire.Services.Test.csproj", "{5AD3032C-EF22-44A2-9D75-B36B289336F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Services.Tests", "Tresearch.ArchivingService.Test\TrialByFire.Services.Tests.csproj", "{5AD3032C-EF22-44A2-9D75-B36B289336F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Managers.Test", "TrialByFire.Managers.Test\TrialByFire.Managers.Test.csproj", "{08D2CA01-71A8-41FC-AB97-F07669154BCB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Managers.Tests", "TrialByFire.Managers.Test\TrialByFire.Managers.Tests.csproj", "{08D2CA01-71A8-41FC-AB97-F07669154BCB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{347043E0-2B70-4DB4-9398-9E8EBD9DC496}"
 	ProjectSection(SolutionItems) = preProject

@@ -6778,9 +6778,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\Tresearch.ArchivingService.Test\\TrialByFire.Services.Test.csproj",
-      "projectName": "TrialByFire.Services.Test",
-      "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\Tresearch.ArchivingService.Test\\TrialByFire.Services.Test.csproj",
+      "projectUniqueName": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\Tresearch.ArchivingService.Test\\TrialByFire.Services.Tests.csproj",
+      "projectName": "TrialByFire.Services.Tests",
+      "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\Tresearch.ArchivingService.Test\\TrialByFire.Services.Tests.csproj",
       "packagesPath": "C:\\Users\\Matthew Chen\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\TrialByFire.Tresearch\\Tresearch.ArchivingService.Test\\obj\\",
       "projectStyle": "PackageReference",
