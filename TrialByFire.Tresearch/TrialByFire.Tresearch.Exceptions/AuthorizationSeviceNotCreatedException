@@ -1,0 +1,12 @@
+namespace TrialByFire.Tresearch.DAL
+{
+    public class AuthorizationSeviceNotCreatedException : Exception
+    {
+        public AuthorizationSeviceNotCreatedException() { }
+
+        public AuthorizationSeviceNotCreatedException(string message) : base(message) { }
+
+        public AuthorizationSeviceNotCreatedException(string message, Exception inner) : base(message, inner) { }
+
+    }
+}
