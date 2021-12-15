@@ -29,6 +29,20 @@ namespace TrialByFire.Tresearch.Services
             }
             return createAccountSuccessful;
         }
+        
+        public bool UpdateAccount(string username, string newPassphrase, string newEmail, string newAuthorization)
+        {
+            bool isUpdated = false;
+            try
+            {
+                isUpdated = mssqlDAO.UpdateAccount(username, newPassphrase, newEmail, newAuthorization);
+            }
+            catch(Exception e)
+            {
+                isUpdated = false;
+            }
+            return isUpdated;
+        }
 
         public bool DeleteAccount(string username)
         {
