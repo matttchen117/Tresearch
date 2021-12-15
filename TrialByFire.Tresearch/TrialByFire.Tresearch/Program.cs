@@ -329,6 +329,38 @@ namespace TrialByFire.Tresearch.Main
             }
             return view;
         }
+        
+        public static bool ValidateUsername(string username, LogService logService)
+        {
+            bool isValidEmail = false;
+            try
+            {
+                MailAddress checkAddress = new MailAddress(username);
+                isValidEmail = (checkAddress.Address == username);
+                return true;
+            }catch(FormatException ex)
+            {
+                logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Business", ex.Message);
+                
+            }
+            return false;
+        }
+
+        public static bool ValidateEmail(string username, LogService logService)
+        {
+            bool isValidEmail = false;
+            try
+            {
+                MailAddress checkAddress = new MailAddress(username);
+                isValidEmail = (checkAddress.Address == username);
+                return true;
+            }
+            catch (FormatException ex)
+            {
+                logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Business", ex.Message);
+            }
+            return false;
+        }
 
         public static void InvalidNumberInput()
         {
