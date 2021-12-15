@@ -2,7 +2,7 @@
 using TrialByFire.Tresearch.DomainModels;
 using TrialByFire.Tresearch.Logging;
 
-namespace TrialByFire.Tresearch.UserManagement
+namespace TrialByFire.Tresearch.Services
 {
     public class AccountService
     {
@@ -28,6 +28,20 @@ namespace TrialByFire.Tresearch.UserManagement
                 createAccountSuccessful = false;
             }
             return createAccountSuccessful;
+        }
+        
+        public bool UpdateAccount(string username, string newPassphrase, string newEmail, string newAuthorization)
+        {
+            bool isUpdated = false;
+            try
+            {
+                isUpdated = mssqlDAO.UpdateAccount(username, newPassphrase, newEmail, newAuthorization);
+            }
+            catch(Exception e)
+            {
+                isUpdated = false;
+            }
+            return isUpdated;
         }
 
         public bool DeleteAccount(string username)

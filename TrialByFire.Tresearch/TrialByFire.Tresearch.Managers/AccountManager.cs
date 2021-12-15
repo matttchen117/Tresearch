@@ -3,7 +3,7 @@ using TrialByFire.Tresearch.DAL;
 using TrialByFire.Tresearch.DomainModels;
 using TrialByFire.Tresearch.Logging;
 
-namespace TrialByFire.Tresearch.UserManagement
+namespace TrialByFire.Tresearch.Managers
 {
     public class AccountManager
     {
@@ -17,9 +17,63 @@ namespace TrialByFire.Tresearch.UserManagement
             this.logService = logService;
         }
 
-        public bool CreateAccount(string email, string passphrase, string authorizationLevel)
+       public bool CreateAccount(string email, string passphrase, string authorizationLevel)
         {
-            throw new NotImplementedException();
+            bool createAccountSuccessful = false;
+            AccountService accountService = new AccountService(mssqlDAO, logService);
+            try
+            {
+                createAccountSuccessful = accountService.CreateAccount(email, passphrase, authorizationLevel);
+            }
+            catch (Exception e)
+            {
+                createAccountSuccessful = false;
+            }
+            return createAccountSuccessful;
+        }
+
+        public bool DeleteAccount(string username)
+        {
+            bool isDeleted = false;
+            AccountService accountService = new AccountService(mssqlDAO, logService);
+            try
+            {
+                isDeleted = accountService.DeleteAccount(username);
+            }
+            catch(Exception e)
+            {
+                isDeleted = false;
+            }
+            return isDeleted;
+        }
+
+        public bool UpdateAccount(string username, string newPassphrase, string newEmail, string newAuthorizationLevel)
+        {
+            bool isUpdated = false;
+            AccountService accountService = new AccountService(mssqlDAO, logService);
+            try
+            {
+                isUpdated = accountService.UpdateAccount(username, newPassphrase, newEmail, newAuthorizationLevel);
+            }
+            catch (Exception ex)
+            {
+                isUpdated = false;
+            }
+            return isUpdated;
+        }
+        
+         public bool EnableAccount(string username, string email)
+        {
+            AccountService accountService = new AccountService(mssqlDAO, logService);
+            bool isEnabled = accountService.EnableAccount(username, email);
+            return isEnabled;
+        }
+
+        public bool DisableAccount(string username)
+        {
+            AccountService accountService = new AccountService(mssqlDAO, logService);
+            bool isEnabled = accountService.DisableAccount(username);
+            return isEnabled;
         }
     }
 }
