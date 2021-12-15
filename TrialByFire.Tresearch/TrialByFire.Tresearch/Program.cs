@@ -207,63 +207,14 @@ namespace TrialByFire.Tresearch.Main
                                         file = Console.ReadLine();
                                         if(File.Exists(file))
                                         {
-                                            int successes = 0;
-                                            int requests = 0;
-                                            AccountService accountService = new AccountService(mssqlDAO, logService);
-                                            foreach(string line in File.ReadLines("@"+file))
+                                            try
                                             {
-                                                requests++;
-                                                string[] request = line.Split(';');
-                                                try
-                                                {
-                                                    switch (request[0])
-                                                    {
-                                                        case "Create":
-                                                            if (accountService.CreateAccount(request[1], request[2], request[3]))
-                                                            {
-                                                                successes++;
-                                                            }
-                                                            break;
-                                                        case "Update":
-                                                            if (accountService.UpdateAccount(request[1], request[2], request[3],
-                                                                request[4]))
-                                                            {
-                                                                successes++;
-                                                            }
-                                                            break;
-                                                        case "Delete":
-                                                            if (accountService.DeleteAccount(request[1]))
-                                                            {
-                                                                successes++;
-                                                            }
-                                                            break;
-                                                        case "Disable":
-                                                            if (accountService.DisableAccount(request[1]))
-                                                            {
-                                                                successes++;
-                                                            }
-                                                            break;
-                                                        case "Enable":
-                                                            if (accountService.EnableAccount(request[1], request[2]))
-                                                            {
-                                                                successes++;
-                                                            }
-                                                            break;
-                                                        default:
-                                                            logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, 
-                                                                "Business", "Improper request detected in bulk operation.");
-                                                            break;
-                                                    }
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Business",
-                                                        ex.Message);
-                                                }
+                                                int successes = ReadFile(file, mssqlDAO, logService);
                                             }
-                                            logService.CreateLog(DateTime.Now, "Info", UserAccount.Username, "Business",
-                                                        $"Bulk Operation Was Successful with {successes} successes in " +
-                                                        $"{requests} requests.");
+                                            catch (Exception ex)
+                                            {
+                                                Console.WriteLine("Error, the file could not be read. Please try again.");
+                                            }
                                         }
                                         else
                                         {
@@ -320,6 +271,67 @@ namespace TrialByFire.Tresearch.Main
                 logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Business", ex.Message);
                 return false;
             }
+        }
+
+        public static int ReadFile(string file, MSSQLDAO mssqlDAO, LogService logService)
+        {
+            int successes = 0;
+            int requests = 0;
+            AccountService accountService = new AccountService(mssqlDAO, logService);
+            foreach (string line in File.ReadLines("@" + file))
+            {
+                requests++;
+                string[] request = line.Split(';');
+                try
+                {
+                    switch (request[0])
+                    {
+                        case "Create":
+                            if (accountService.CreateAccount(request[1], request[2], request[3]))
+                            {
+                                successes++;
+                            }
+                            break;
+                        case "Update":
+                            if (accountService.UpdateAccount(request[1], request[2], request[3],
+                                request[4]))
+                            {
+                                successes++;
+                            }
+                            break;
+                        case "Delete":
+                            if (accountService.DeleteAccount(request[1]))
+                            {
+                                successes++;
+                            }
+                            break;
+                        case "Disable":
+                            if (accountService.DisableAccount(request[1]))
+                            {
+                                successes++;
+                            }
+                            break;
+                        case "Enable":
+                            if (accountService.EnableAccount(request[1], request[2]))
+                            {
+                                successes++;
+                            }
+                            break;
+                        default:
+                            logService.CreateLog(DateTime.Now, "Error", UserAccount.Username,
+                                "Business", "Improper request detected in bulk operation.");
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Business",
+                        ex.Message);
+                }
+            }
+            logService.CreateLog(DateTime.Now, "Info", UserAccount.Username, "Business", 
+                $"Bulk Operation Was Successful with {successes} successes in {requests} requests.");
+            return successes;
         }
     }
 }

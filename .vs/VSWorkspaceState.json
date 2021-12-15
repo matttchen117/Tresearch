@@ -2,8 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\TrialByFire.Tresearch",
+    "\\TrialByFire.Tresearch\\TrialByFire.Managers.Test",
     "\\TrialByFire.Tresearch\\TrialByFire.Tresearch"
   ],
-  "SelectedNode": "\\TrialByFire.Tresearch\\TrialByFire.Tresearch\\Program.cs",
+  "SelectedNode": "\\TrialByFire.Tresearch\\TrialByFire.Managers.Test\\ArchivingManagerShould.cs",
   "PreviewInSolutionExplorer": false
 }
