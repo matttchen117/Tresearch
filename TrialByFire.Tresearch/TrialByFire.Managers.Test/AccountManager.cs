@@ -3,6 +3,7 @@ using TrialByFire.Tresearch.DAL;
 using TrialByFire.Tresearch.DomainModels;
 using TrialByFire.Tresearch.Logging;
 using TrialByFire.Tresearch.Managers;
+using System.Configuration;
 
 namespace Tresearch.Managers.Tests
 {
@@ -17,7 +18,7 @@ namespace Tresearch.Managers.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            MSSQLDAO mssqlDAO = new MSSQLDAO();
             LogService logService = new LogService(mssqlDAO);
             AccountManager accountManager = new AccountManager(mssqlDAO, logService);
 

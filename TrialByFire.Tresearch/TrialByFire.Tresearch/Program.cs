@@ -165,10 +165,159 @@ namespace TrialByFire.Tresearch.Main
                         switch (operation)
                         {
                             case 1:
+                                if (VerifyAuthorization(UserAccount, "SysAdmin", mssqlDAO, logService))
+                                {
+                                    string creationEmail;
+                                    string creationPassphrase;
+                                    string creationAuthorizationLevel;
+                                    try
+                                    {
+                                        Console.WriteLine("Please enter an email");
+                                        creationEmail = Console.ReadLine();
+                                        Console.WriteLine("Please enter a passphrase at least eight characters in length");
+                                        creationPassphrase = Console.ReadLine();
+                                        Console.WriteLine("Please enter Authorization Level");
+                                        creationAuthorizationLevel = Console.ReadLine();
+                                        bool isValidEmail = ValidateEmail(creationEmail);
+                                        bool isValidPassphrase = ValidatePassphrase(creationPassphrase);
+                                        bool isValidAuthorizationLevel = ValidateAuthorizationLevel(creationAuthorizationLevel);
+                                        if(isValidEmail || isValidPassphrase == false)
+                                        {
+                                            Console.WriteLine("Invalid Username or Passphrase");
+                                            break;
+                                        }
+
+                                        if (isValidAuthorizationLevel == false)
+                                        {
+                                            Console.WriteLine("Authorization Failed");
+                                        }
+
+                                        bool createAccountSuccessful = accountManager.CreateAccount(creationEmail, creationPassphrase, creationAuthorizationLevel);
+                                        if (createAccountSuccessful)
+                                        {
+                                            Console.WriteLine("Create Account was Successful");
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine(ex);
+                                    }
+                                    break;
+                                }
                                 break;
                             case 2:
+                                if (VerifyAuthorization(UserAccount, "SysAdmin", mssqlDAO, logService))
+                                {
+                                    
+                                    try
+                                    {
+                                        string existingUsername;
+                                        string newEmail = "";
+                                        string newPassphrase = "";
+                                        string newAuthorizationLevel = "";
+                                        Console.WriteLine("Enter existing username");
+                                        existingUsername = Console.ReadLine();
+                                        bool isValidUsername = ValidateUsername(existingUsername);
+                                        bool isValidEmail = false;
+                                        bool isVaildPassphrase = false;
+                                        bool isValidAuthorizationLevel = false;
+                                        if(isValidUsername == false)
+                                        {
+                                            Console.WriteLine("Username is not valid");
+                                            break;
+                                        }
+                                        string eChoice;
+                                        string pChoice;
+                                        string aChoice;
+                                        Console.WriteLine("Would you like to update email? Enter: y/n");
+                                        eChoice = Console.ReadLine();
+                                        Console.WriteLine("Would you like to update passphrase? Enter: y/n");
+                                        pChoice = Console.ReadLine();
+                                        Console.WriteLine("Would you like to update authorizationLevel? Enter: y/n");
+                                        aChoice = Console.ReadLine();
+                                        if((eChoice == "n") && (pChoice == "n") && (aChoice == "n")){
+                                            Console.WriteLine("Update Account Failed");
+                                            break;
+                                        }
+                                        if(eChoice == "y")
+                                        {
+                                            newEmail = Console.ReadLine();
+                                        }
+                                        if(passphrase == "y")
+                                        {
+                                            newPassphrase = Console.ReadLine();
+                                        }
+                                        if(aChoice == "y")
+                                        {
+                                            newAuthorizationLevel = Console.ReadLine();
+                                        }
+                                        isValidEmail = ValidateEmail(newEmail);
+
+                                        if (isValidEmail == false)
+                                        {
+                                            Console.WriteLine("Email is not valid");
+                                            break;
+                                        }
+
+                                        isVaildPassphrase = ValidatePassphrase(newPassphrase);
+
+                                        if (isVaildPassphrase == false)
+                                        {
+                                            Console.WriteLine("Passphrase is not valid");
+                                            break;
+                                        }
+
+                                        isValidAuthorizationLevel = ValidateAuthorizationLevel(newAuthorizationLevel);
+
+                                        if (isValidAuthorizationLevel == false)
+                                        {
+                                            Console.WriteLine("AuthorizationLevel is invalid");
+                                            break;
+                                        }
+
+                                        bool updateAccountSuccessful = accountManager.UpdateAccount(existingUsername, newEmail, newPassphrase, newAuthorizationLevel);
+                                        
+                                        if (updateAccountSuccessful)
+                                        {
+                                            Console.WriteLine("Update Account was Successful");
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine(ex);
+                                    }
+                                    break;
+                                }
                                 break;
                             case 3:
+                                if (VerifyAuthorization(UserAccount, "SysAdmin", mssqlDAO, logService))
+                                {
+                                    Console.WriteLine("Enter Username for deletion");
+                                    string deletionUsername;
+
+                                    try
+                                    {
+                                        deletionUsername = Console.ReadLine();
+                                        bool isValidUsername = ValidateUsername(deletionUsername);
+
+                                        if (isValidUsername == false)
+                                        {
+                                            Console.WriteLine("Invalid Username");
+                                            break;
+                                        }
+
+                                        bool isDeleted = accountManager.DeleteAccount(deletionUsername);
+                                        if (isDeleted)
+                                        {
+                                            Console.WriteLine("Delete Account was Successful");
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine(ex);
+                                    }
+                                    break;
+                                }
                                 break;
                             case 4:
                                 if (VerifyAuthorization(UserAccount, "System Admin", mssqlDAO, logService))
@@ -352,6 +501,39 @@ namespace TrialByFire.Tresearch.Main
             catch (FormatException ex)
             {
                 logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Business", ex.Message);
+            }
+            return false;
+        }
+        
+        public static bool ValidatePassphrase(string passphrase)
+        {
+            bool isValidPassphrase = false;
+            try
+            {
+                isValidPassphrase = (passphrase.Length >= 8);
+                return true;
+            }
+            catch(FormatException e)
+            {
+                Console.WriteLine("Invalid passphrase. Try again");
+            }
+            return false;
+        }
+
+        public static bool ValidateAuthorizationLevel(string authorizationLevel)
+        {
+            bool isValidAuthorizationLevel = false;
+            try
+            {
+                if ((authorizationLevel == "User") || (authorizationLevel == "SysAdmin"))
+                {
+                    isValidAuthorizationLevel = true;
+                    return isValidAuthorizationLevel;
+                }
+            }
+            catch(FormatException e)
+            {
+                Console.WriteLine("Invalid AuthorizationLevel. Try again");
             }
             return false;
         }
