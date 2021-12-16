@@ -14,7 +14,7 @@ namespace TrialByFire.Tresearch.Services
             this.logService = logService;
         }
 
-        public bool GetAccountAuthLevel(Account account, String requiredAuthorizationLevel)
+        public bool GetAccountAuthLevel(Account account, string requiredAuthorizationLevel)
         {
             string authorizationLevel = account.AuthorizationLevel;
             return authorizationLevel == requiredAuthorizationLevel;

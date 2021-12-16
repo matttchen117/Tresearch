@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Collections.Specialized;
@@ -446,7 +447,15 @@ namespace TrialByFire.Tresearch.Main
                                         {
                                             try
                                             {
-                                                int successes = ReadFile(file, mssqlDAO, logService);
+                                                FileInfo fileInfo = new FileInfo(file);
+                                                if(fileInfo.Length < (2.0 * 1024 * 1024 * 1024))
+                                                {
+                                                    int successes = ReadFile(file, mssqlDAO, logService);
+                                                }
+                                                else
+                                                {
+                                                    Console.WriteLine("Error, the file is too large. Please try again.");
+                                                }
                                             }
                                             catch (Exception ex)
                                             {

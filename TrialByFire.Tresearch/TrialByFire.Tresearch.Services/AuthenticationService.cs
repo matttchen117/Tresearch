@@ -16,7 +16,7 @@ namespace TrialByFire.Tresearch.Services
             this.logService = logService;
         }
 
-        public Account GetAccount(String username, string password)
+        public Account GetAccount(string username, string password)
         {
             userAccount = mssqlDAO.GetAccount(username, password);
             return userAccount;
