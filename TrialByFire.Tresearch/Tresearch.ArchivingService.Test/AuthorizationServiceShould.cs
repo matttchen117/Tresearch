@@ -9,7 +9,7 @@ namespace Tresearch.Services.Tests
 {
     public class AuthorizationServiceShould
     {
-        string SqlConnectionString = ConfigurationManager.AppSettings.Get("SqlConnectionString");
+        string SqlConnectionString = "Server=DESKTOP-F0O7ECC;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
 
         [Theory]
         [InlineData("bob@gmail.com", "bob1@gmail.com" ,"abcdef123456", "User")]

@@ -7,7 +7,9 @@ using TrialByFire.Tresearch.Services;
 namespace Tresearch.Services.Tests
 {
     public class AuthenticationServiceShould
+
     {
+        string SqlConnectionString = "Server=DESKTOP-F0O7ECC;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
         [Theory]
         [InlineData("pammypoor@gmail.com", "myPassword", "System Admin")]
         public void GetAccount(string username, string passphrase, string authenticationLevel)
