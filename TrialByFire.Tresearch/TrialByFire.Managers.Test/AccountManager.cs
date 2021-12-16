@@ -9,7 +9,7 @@ namespace Tresearch.Managers.Tests
 {
     public class AccountManagerShould
     {
-        string SqlConnectionString = ConfigurationManager.AppSettings.Get("SqlConnectionString");
+        string SqlConnectionString = "Server=DESKTOP-F0O7ECC;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
 
         [Theory]
         [InlineData("gregory@gmail.com", "scrumGitSome", "User")]
@@ -18,7 +18,7 @@ namespace Tresearch.Managers.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             AccountManager accountManager = new AccountManager(mssqlDAO, logService);
 

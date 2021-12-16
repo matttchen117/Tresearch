@@ -22,6 +22,13 @@ namespace TrialByFire.Tresearch.DAL
             Destination = ConfigurationManager.AppSettings.Get("Destination");
         }
 
+        public MSSQLDAO(String s)
+        {
+            SqlConnectionString = s;
+            FilePath = ConfigurationManager.AppSettings.Get("FilePath");
+            Destination = ConfigurationManager.AppSettings.Get("Destination");
+        }
+
         public Account GetAccount(string username, string passphrase)
         {
             Account userAccount;

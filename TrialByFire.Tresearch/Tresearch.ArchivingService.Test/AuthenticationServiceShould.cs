@@ -17,7 +17,7 @@ namespace Tresearch.Services.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             AuthenticationService authenticationService = new AuthenticationService(mssqlDAO, logService);
             Account expected = new Account(username, username, passphrase, authenticationLevel);

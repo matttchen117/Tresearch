@@ -13,7 +13,7 @@ namespace TrialByFire.Services.Test
 {
     public class AccountServiceShould
     {
-        string SqlConnectionString = ConfigurationManager.AppSettings.Get("SqlConnectionString");
+        string SqlConnectionString = "Server=DESKTOP-F0O7ECC;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
 
         [Theory]
         [InlineData("jessie@gmail.com", "reallyBigPassword", "User")]
@@ -22,7 +22,7 @@ namespace TrialByFire.Services.Test
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             AccountService accountService = new AccountService(mssqlDAO, logService);
 
