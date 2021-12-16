@@ -126,7 +126,7 @@ namespace TrialByFire.Tresearch.DAL
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(SqlConnectionString))
+                using (var connection = new SqlConnection(ConfigurationManager.AppSettings.Get("SqlConnectionString")))
                 {
                     var deleteQuery = "DELETE FROM Accounts WHERE Username = @Username";
                     affectedRows = connection.Execute(deleteQuery, new { Username = username });

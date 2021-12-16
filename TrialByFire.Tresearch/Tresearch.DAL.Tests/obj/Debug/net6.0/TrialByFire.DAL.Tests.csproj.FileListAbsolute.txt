@@ -244,3 +244,5 @@ D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\Tresearch.DAL.Tests\
 D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\Tresearch.DAL.Tests\obj\Debug\net6.0\ref\TrialByFire.DAL.Tests.dll
 D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\Tresearch.DAL.Tests\obj\Debug\net6.0\TrialByFire.DAL.Tests.pdb
 D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\Tresearch.DAL.Tests\obj\Debug\net6.0\TrialByFire.DAL.Tests.genruntimeconfig.cache
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\Tresearch.DAL.Tests\bin\Debug\net6.0\TrialByFire.DAL.Tests.dll.config
+C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\Tresearch.DAL.Tests\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.dll.config
