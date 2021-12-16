@@ -12,7 +12,7 @@ namespace Tresearch.Managers.Tests
         string SqlConnectionString = ConfigurationManager.AppSettings.Get("SqlConnectionString");
 
         [Theory]
-        [InlineData("pammy@gmail.com", "Password", "User")]
+        [InlineData("gregory@gmail.com", "scrumGitSome", "User")]
         public void CreateAccount(string username, string passphrase, string authorizationLevel)
         {
             // Triple A Format
@@ -31,7 +31,7 @@ namespace Tresearch.Managers.Tests
         }
 
         [Theory]
-        [InlineData("larry@gmail.com")]
+        [InlineData("cameron@gmail.com")]
         public void DeleteAccount(string username)
         {
             // Triple A Format
@@ -51,7 +51,7 @@ namespace Tresearch.Managers.Tests
         }
 
         [Theory]
-        [InlineData("pammypoor@gmail.com", "pammypoor@gmail.com")]
+        [InlineData("austin@gmail.com", "austin@gmail.com")]
         public void EnableAccount(string username, string email)
         {
             // Triple A Format
@@ -70,7 +70,7 @@ namespace Tresearch.Managers.Tests
         }
 
         [Theory]
-        [InlineData("bob@gmail.com")]
+        [InlineData("ally@gmail.com")]
         public void DisableAccount(string username)
         {
             // Triple A Format

@@ -31,7 +31,6 @@ namespace TrialByFire.Tresearch.Managers
                 logService.CreateLog(DateTime.Now, "Error", userAccount.Username, "Business", "An error occurred when trying to create the account.");
                 createAccountSuccessful = false;
             }
-            logService.CreateLog(DateTime.Now, "Error", userAccount.Username, "Business", "An error occurred when trying to create the account.");
             return createAccountSuccessful;
         }
 

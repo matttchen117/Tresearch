@@ -10,3 +10,15 @@ C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.T
 C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.dll
 C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\ref\TrialByFire.Tresearch.Exceptions.dll
 C:\Users\Matthew Chen\Source\Repos\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.pdb
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\bin\Debug\net6.0\TrialByFire.Tresearch.Exceptions.deps.json
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\bin\Debug\net6.0\TrialByFire.Tresearch.Exceptions.dll
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\bin\Debug\net6.0\ref\TrialByFire.Tresearch.Exceptions.dll
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\bin\Debug\net6.0\TrialByFire.Tresearch.Exceptions.pdb
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.csproj.AssemblyReference.cache
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.GeneratedMSBuildEditorConfig.editorconfig
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.AssemblyInfoInputs.cache
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.AssemblyInfo.cs
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.csproj.CoreCompileInputs.cache
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.dll
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\ref\TrialByFire.Tresearch.Exceptions.dll
+D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.pdb

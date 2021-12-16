@@ -14,8 +14,8 @@ namespace TrialByFire.DAL.Tests
         string Destination = ConfigurationManager.AppSettings.Get("Destination");
 
         [Theory]
-        [InlineData("bob@gmail.com", "abcdef123456", "bob@gmail.com", "abcdef123456", "User", false)]
-        [InlineData("larry@gmail.com", "abcdef123456", "larry@gmail.com", "abcdef123456", "User", true)]
+        [InlineData("federer3@gmail.com", "swissCheese20", "federer@gmail.com", "swissCheese20", "User", false)]
+        [InlineData("gibbs@gmail.com", "likeClockwork", "gibbs@gmail.com", "likeClockwork", "User", true)]
         public void GetTheAccount(string email, string passphrase, string expectedEmail, 
             string expectedPassphrase, string expectedAuthorizationLevel, bool expectedResult)
         {
@@ -58,7 +58,7 @@ namespace TrialByFire.DAL.Tests
 
 
             // Act
-            var actual = mssqlDAO.UpdateAccount("bob1@gmail.com", "123456abcdef", "larry@gmail.com", "System Admin");
+            var actual = mssqlDAO.UpdateAccount("greg@gmail.com", "hexagons333", "agatha@gmail.com", "System Admin");
 
             // Assert
             Assert.True(actual);
@@ -74,7 +74,7 @@ namespace TrialByFire.DAL.Tests
 
 
             // Act
-            var actual = mssqlDAO.DeleteAccount("bob@gmail.com");
+            var actual = mssqlDAO.DeleteAccount("c00lCoder@gmail.com");
 
             // Assert
             Assert.True(actual);
@@ -90,7 +90,7 @@ namespace TrialByFire.DAL.Tests
 
 
             // Act
-            var actual = mssqlDAO.DisableAccount("larry@gmail.com");
+            var actual = mssqlDAO.DisableAccount("trenton@gmail.com");
 
             // Assert
             Assert.True(actual);
@@ -106,7 +106,7 @@ namespace TrialByFire.DAL.Tests
 
 
             // Act
-            var actual = mssqlDAO.EnableAccount("larry@gmail.com", "larry@gmail.com");
+            var actual = mssqlDAO.EnableAccount("riley@gmail.com", "riley@gmail.com");
 
             // Assert
             Assert.True(actual);
