@@ -183,10 +183,10 @@ namespace TrialByFire.Tresearch.Main
                                         bool isValidEmail = ValidateEmail(creationEmail, logService);
                                         Console.WriteLine("Please enter a passphrase at least eight characters in length");
                                         creationPassphrase = Console.ReadLine();
-                                        bool isValidPassphrase = ValidatePassphrase(creationPassphrase);
+                                        bool isValidPassphrase = ValidatePassphrase(creationPassphrase, UserAccount, logService);
                                         Console.WriteLine("Please enter Authorization Level");
                                         creationAuthorizationLevel = Console.ReadLine();
-                                        bool isValidAuthorizationLevel = ValidateAuthorizationLevel(creationAuthorizationLevel);
+                                        bool isValidAuthorizationLevel = ValidateAuthorizationLevel(creationAuthorizationLevel, UserAccount, logService);
 
 
                                         if (isValidEmail == false || isValidPassphrase == false)
@@ -264,7 +264,7 @@ namespace TrialByFire.Tresearch.Main
                                         {
                                             Console.Write("Enter new passphrase: ");
                                             newPassphrase = Console.ReadLine();
-                                            isVaildPassphrase = ValidatePassphrase(newPassphrase);
+                                            isVaildPassphrase = ValidatePassphrase(newPassphrase, UserAccount, logService);
                                             if (isVaildPassphrase == false)
                                             {
                                                 Console.WriteLine("Passphrase is not valid");
@@ -276,7 +276,7 @@ namespace TrialByFire.Tresearch.Main
                                         {
                                             Console.Write("Enter new authentication level: ");
                                             newAuthorizationLevel = Console.ReadLine();
-                                            isValidAuthorizationLevel = ValidateAuthorizationLevel(newAuthorizationLevel);
+                                            isValidAuthorizationLevel = ValidateAuthorizationLevel(newAuthorizationLevel, UserAccount, logService);
                                             if (isValidAuthorizationLevel == false)
                                             {
                                                 Console.WriteLine("AuthorizationLevel is invalid");
@@ -323,6 +323,9 @@ namespace TrialByFire.Tresearch.Main
                                         if (isDeleted)
                                         {
                                             Console.WriteLine("Delete Account was Successful");
+                                        } else
+                                        {
+                                            Console.WriteLine("Username is not valid");
                                         }
                                     }
                                     catch (Exception ex)
@@ -353,6 +356,9 @@ namespace TrialByFire.Tresearch.Main
                                         if (isEnabled)
                                         {
                                             Console.WriteLine("Disable Account Was Successful");
+                                        } else
+                                        {
+                                            Console.WriteLine("Username is not valid.");
                                         }
 
                                     }
@@ -383,10 +389,14 @@ namespace TrialByFire.Tresearch.Main
                                                 break;
                                             }
 
-                                             bool isEnabled = accountManager.EnableAccount(usernameToEnable, emailToEnable);
+                                            bool isEnabled = accountManager.EnableAccount(usernameToEnable, emailToEnable);
                                             if (isEnabled)
                                             {
                                                 Console.WriteLine("Enable Account Was Successful");
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine("Username is not valid");
                                             }
                                           
                                         }
@@ -520,7 +530,7 @@ namespace TrialByFire.Tresearch.Main
             return false;
         }
         
-        public static bool ValidatePassphrase(string passphrase)
+        public static bool ValidatePassphrase(string passphrase, Account UserAccount, LogService logService)
         {
             bool isValidPassphrase = false;
             try
@@ -528,14 +538,15 @@ namespace TrialByFire.Tresearch.Main
                 isValidPassphrase = (passphrase.Length >= 8);
                 return true;
             }
-            catch(FormatException e)
+            catch(FormatException ex)
             {
+                logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Business", ex.Message);
                 Console.WriteLine("Invalid passphrase. Try again");
             }
             return false;
         }
 
-        public static bool ValidateAuthorizationLevel(string authorizationLevel)
+        public static bool ValidateAuthorizationLevel(string authorizationLevel, Account UserAccount, LogService logService)
         {
             bool isValidAuthorizationLevel = false;
             try
@@ -546,8 +557,9 @@ namespace TrialByFire.Tresearch.Main
                     return isValidAuthorizationLevel;
                 }
             }
-            catch(FormatException e)
+            catch(FormatException ex)
             {
+                logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Business", ex.Message);
                 Console.WriteLine("Invalid AuthorizationLevel. Try again");
             }
             return false;

@@ -16,7 +16,7 @@ namespace TrialByFire.Services.Test
         string SqlConnectionString = ConfigurationManager.AppSettings.Get("SqlConnectionString");
 
         [Theory]
-        [InlineData("jessie@gmail.com", "test", "User")]
+        [InlineData("jessie@gmail.com", "reallyBigPassword", "User")]
         public void CreateAccount(string email, string passphrase, string authorizationLevel)
         {
             // Triple A Format
