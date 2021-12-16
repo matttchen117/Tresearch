@@ -98,7 +98,8 @@ namespace TrialByFire.Tresearch.Main
                 switch (view)
                 {
                     case "User":
-                        Console.WriteLine("1. Quit");
+                        Console.WriteLine("------ Welcome " + UserAccount.Username + " ------");
+                        Console.WriteLine("\t1. Quit");
                         try
                         {
                             operation = Convert.ToInt32(Console.ReadLine());
@@ -119,7 +120,8 @@ namespace TrialByFire.Tresearch.Main
                         }
                         break;
                     case "System Admin":
-                        Console.WriteLine("1. UM View \n 2. Quit");
+                        Console.WriteLine("------ Welcome " + UserAccount.Username + " ------");
+                        Console.WriteLine("\t1. UM View \n\t2. Quit");
                         try
                         {
                             operation = Convert.ToInt32(Console.ReadLine());
@@ -153,8 +155,11 @@ namespace TrialByFire.Tresearch.Main
                         }
                         break;
                     case "UMView":
-                        Console.WriteLine("1. Create Account \n2. Update Account \n3. Delete Account \n4. Disable Account " +
-                            "\n5. Enable Account \n6. Bulk Operation \n7. Go Back");
+                        Console.WriteLine("--------------------------------------------------------------------------------");
+                        Console.WriteLine("\t\t\tUser Management View");
+                        Console.WriteLine("--------------------------------------------------------------------------------");
+                        Console.WriteLine("\t1. Create Account \n\t2. Update Account \n\t3. Delete Account \n\t4. Disable Account " +
+                            "\n\t5. Enable Account \n\t6. Bulk Operation \n\t7. Go Back");
                         try
                         {
                             operation = Convert.ToInt32(Console.ReadLine());
