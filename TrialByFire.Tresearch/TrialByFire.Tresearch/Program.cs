@@ -92,7 +92,7 @@ namespace TrialByFire.Tresearch.Main
             AccountManager accountManager = new AccountManager(mssqlDAO, logService);
             UserAccount = GetAccount(mssqlDAO, logService, authenticationService);
 
-            view = GetView();
+            view = GetView(UserAccount, logService);
 
             while (!finished)
             {
@@ -107,16 +107,17 @@ namespace TrialByFire.Tresearch.Main
                         }
                         catch (Exception ex)
                         {
-                            InvalidNumberInput();
+                            InvalidNumberInput(logService, UserAccount);
                         }
                         switch (operation)
                         {
                             case 1:
+                                logService.CreateLog(DateTime.Now, "Info", UserAccount.Username, "Business", "User logged out.");
                                 Console.WriteLine("System shutting down.");
                                 Environment.Exit(0);
                                 break;
                             default:
-                                InvalidNumberInput();
+                                InvalidNumberInput(logService, UserAccount);
                                 break;
                         }
                         break;
@@ -129,7 +130,7 @@ namespace TrialByFire.Tresearch.Main
                         }
                         catch (Exception ex)
                         {
-                            InvalidNumberInput();
+                            InvalidNumberInput(logService, UserAccount);
                         }
                         switch (operation)
                         {
@@ -137,7 +138,7 @@ namespace TrialByFire.Tresearch.Main
                                 switch (UserAccount.AuthorizationLevel)
                                 {
                                     case "User":
-                                        InvalidAuthorizationLevel();
+                                        InvalidAuthorizationLevel(logService, UserAccount);
                                         break;
                                     case "System Admin":
                                         view = "UMView";
@@ -147,11 +148,12 @@ namespace TrialByFire.Tresearch.Main
                                 }
                                 break;
                             case 2:
+                                logService.CreateLog(DateTime.Now, "Info", UserAccount.Username, "Business", "User logged out.");
                                 Console.WriteLine("System shutting down.");
                                 Environment.Exit(0);
                                 break;
                             default:
-                                InvalidNumberInput();
+                                InvalidNumberInput(logService, UserAccount);
                                 break;
                         }
                         break;
@@ -167,7 +169,7 @@ namespace TrialByFire.Tresearch.Main
                         }
                         catch (Exception ex)
                         {
-                            InvalidNumberInput();
+                            InvalidNumberInput(logService, UserAccount);
                         }
                         switch (operation)
                         {
@@ -199,19 +201,26 @@ namespace TrialByFire.Tresearch.Main
                                         if (isValidAuthorizationLevel == false)
                                         {
                                             Console.WriteLine("Authorization Failed");
+                                            break;
                                         }
 
                                         bool createAccountSuccessful = accountManager.CreateAccount(creationEmail, creationPassphrase, creationAuthorizationLevel);
                                         if (createAccountSuccessful)
                                         {
+                                            logService.CreateLog(DateTime.Now, "Info", UserAccount.Username, "Data", "Create Account was successful");
                                             Console.WriteLine("Create Account was Successful");
                                         }
-                                    }
+                                    } 
                                     catch (Exception ex)
                                     {
+                                        logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Business", ex.ToString());
                                         Console.WriteLine(ex);
                                     }
                                     break;
+                                }
+                                else
+                                {
+                                    logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Business", "Not authorized to perform operation");
                                 }
                                 break;
                             case 2:
@@ -232,6 +241,7 @@ namespace TrialByFire.Tresearch.Main
                                         bool isValidAuthorizationLevel = false;
                                         if(isValidUsername == false)
                                         {
+                                            logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Data", "Email to update is not valid");
                                             Console.WriteLine("Username is not valid");
                                             break;
                                         }
@@ -246,7 +256,8 @@ namespace TrialByFire.Tresearch.Main
                                         Console.WriteLine("Would you like to update authorizationLevel? Enter: y/n");
                                         aChoice = Console.ReadLine();
                                         if((eChoice == "n") && (pChoice == "n") && (aChoice == "n")){
-                                            Console.WriteLine("Update Account Failed");
+                                            logService.CreateLog(DateTime.Now, "info", UserAccount.Username, "Business", "No operation chosen.");
+                                            Console.WriteLine("No operation chosen");
                                             break;
                                         }
                                         if(eChoice == "y")
@@ -256,6 +267,7 @@ namespace TrialByFire.Tresearch.Main
                                             isValidEmail = ValidateEmail(newEmail, logService);
                                             if (isValidEmail == false)
                                             {
+                                                logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Data", "New email to update is invalid.");
                                                 Console.WriteLine("Email is not valid");
                                                 break;
                                             }
@@ -268,6 +280,7 @@ namespace TrialByFire.Tresearch.Main
                                             isVaildPassphrase = ValidatePassphrase(newPassphrase, UserAccount, logService);
                                             if (isVaildPassphrase == false)
                                             {
+                                                logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Data", "New passphrase to update is invalid.");
                                                 Console.WriteLine("Passphrase is not valid");
                                                 break;
                                             }
@@ -280,6 +293,7 @@ namespace TrialByFire.Tresearch.Main
                                             isValidAuthorizationLevel = ValidateAuthorizationLevel(newAuthorizationLevel, UserAccount, logService);
                                             if (isValidAuthorizationLevel == false)
                                             {
+                                                logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Data", "New AuthorizationLevel to update is invalid.");
                                                 Console.WriteLine("AuthorizationLevel is invalid");
                                                 break;
                                             }
@@ -291,7 +305,12 @@ namespace TrialByFire.Tresearch.Main
                                             bool updateAccountSuccessful = accountManager.UpdateAccount(existingUsername, newPassphrase, newEmail, newAuthorizationLevel);
                                             if (updateAccountSuccessful)
                                             {
+                                                logService.CreateLog(DateTime.Now, "Info", UserAccount.Username, "Data store", "Update Account was Successful");
                                                 Console.WriteLine("Update Account was Successful");
+                                            } else
+                                            {
+                                                logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Data store", "Update Account Failed");
+                                                Console.WriteLine("Update Account Failed");
                                             }
 
                                         }  
@@ -316,6 +335,7 @@ namespace TrialByFire.Tresearch.Main
 
                                         if (isValidUsername == false)
                                         {
+                                            logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Data", "Username to delete is not valid.");
                                             Console.WriteLine("Invalid Username");
                                             break;
                                         }
@@ -323,14 +343,17 @@ namespace TrialByFire.Tresearch.Main
                                         bool isDeleted = accountManager.DeleteAccount(deletionUsername);
                                         if (isDeleted)
                                         {
+                                            logService.CreateLog(DateTime.Now, "Info", UserAccount.Username, "Data", "Delete Account was Successful.");
                                             Console.WriteLine("Delete Account was Successful");
                                         } else
                                         {
+                                            logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Data", "Delete Account was not successful.");
                                             Console.WriteLine("Username is not valid");
                                         }
                                     }
                                     catch (Exception ex)
                                     {
+                                        logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Business", ex.ToString()) ;
                                         Console.WriteLine(ex);
                                     }
                                     break;
@@ -349,6 +372,7 @@ namespace TrialByFire.Tresearch.Main
 
                                         if (isValidUsername == false)
                                         {
+                                            logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Data", "Invalid Username to disable");
                                             Console.WriteLine("Invalid Username");
                                             break;
                                         }
@@ -356,9 +380,11 @@ namespace TrialByFire.Tresearch.Main
                                         bool isEnabled = accountManager.DisableAccount(usernameToDisable);
                                         if (isEnabled)
                                         {
+                                            logService.CreateLog(DateTime.Now, "Info", UserAccount.Username, "Data", "Disable Account was Successful.");
                                             Console.WriteLine("Disable Account Was Successful");
                                         } else
                                         {
+                                            logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Data", "Disable Account Failure.");
                                             Console.WriteLine("Username is not valid.");
                                         }
 
@@ -380,7 +406,7 @@ namespace TrialByFire.Tresearch.Main
                                         {
                                             Console.Write("Username: ");
                                             usernameToEnable = Console.ReadLine();
-                                            Console.Write("Passphrase: ");
+                                            Console.Write("Email: ");
                                             emailToEnable = Console.ReadLine();
                                             bool isValidUsername = ValidateUsername(usernameToEnable, logService);
                                             bool isValidEmail = ValidateEmail(emailToEnable, logService);
@@ -451,11 +477,13 @@ namespace TrialByFire.Tresearch.Main
                                 view = "System Admin";
                                 break;
                             default:
+                                //logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Data", "Invalid operation.");
                                 Console.WriteLine("Error, invalid operation. Please try again.");
                                 break;
                         }
                         break;
                     default:
+                        logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "View", "No view has been set.");
                         Console.Write("Error, no view has been set. System shutting down.");
                         Environment.Exit(1);
                         break;
@@ -480,15 +508,17 @@ namespace TrialByFire.Tresearch.Main
 
                 if(UserAccount == null)
                 {
+                    logService.CreateLog(DateTime.Now, "Error", "", "view", "Invalid login attempt");
                     Console.WriteLine("Invalid Username/password or Disabled account");
                     username = "";
                     passphrase = "";
                 }
             }
+            logService.CreateLog(DateTime.Now, "Info", UserAccount.Username, "Business", "Account logged in.");
             return UserAccount;
         }
         
-        public static string GetView()
+        public static string GetView(Account userAccount, LogService logService)
         {
             string view = "";
             switch (UserAccount.AuthorizationLevel)
@@ -500,6 +530,7 @@ namespace TrialByFire.Tresearch.Main
                     view = "System Admin";
                     break;
                 default:
+                    logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "view", "Unknown authorization level");
                     Console.Write("Error, user has unknown authorization level. System shutting down.");
                     Environment.Exit(1);
                     break;
@@ -545,13 +576,14 @@ namespace TrialByFire.Tresearch.Main
             try
             {
                 isValidPassphrase = (passphrase.Length >= 8);
-                return true;
+                return isValidPassphrase;
             }
             catch(FormatException ex)
             {
                 logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Business", ex.Message);
                 Console.WriteLine("Invalid passphrase. Try again");
             }
+            
             return false;
         }
 
@@ -562,6 +594,7 @@ namespace TrialByFire.Tresearch.Main
             {
                 if ((authorizationLevel == "User") || (authorizationLevel == "System Admin"))
                 {
+                    logService.CreateLog(DateTime.Now, "Info", UserAccount.Username, "Business", "User Authorized to perform operation");
                     isValidAuthorizationLevel = true;
                     return isValidAuthorizationLevel;
                 }
@@ -574,13 +607,15 @@ namespace TrialByFire.Tresearch.Main
             return false;
         }
 
-        public static void InvalidNumberInput()
+        public static void InvalidNumberInput(LogService logService, Account UserAccount)
         {
+            logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "Data", "Operation is invalid.");
             Console.WriteLine("Input is not a valid number. Please try again.");
         }
 
-        public static void InvalidAuthorizationLevel()
+        public static void InvalidAuthorizationLevel(LogService logService, Account UserAccount)
         {
+            logService.CreateLog(DateTime.Now, "Error", UserAccount.Username, "View", "Not authorized to perform operation ");
             Console.WriteLine("You are not authorized to perform this action.");
         }
 

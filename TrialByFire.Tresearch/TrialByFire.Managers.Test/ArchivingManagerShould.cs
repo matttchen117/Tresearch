@@ -11,7 +11,7 @@ namespace TrialByFire.Managers.Test
 {
     public class ArchivingManagerShould
     {
-        string SqlConnectionString = ConfigurationManager.AppSettings.Get("SqlConnectionString");
+        string SqlConnectionString = "Server=DESKTOP-F0O7ECC;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
         string FilePath = ConfigurationManager.AppSettings.Get("FilePath");
         string Destination = ConfigurationManager.AppSettings.Get("Destination");
 
@@ -23,7 +23,7 @@ namespace TrialByFire.Managers.Test
             Destination = ConfigurationManager.AppSettings.Get("SqlConnectionString");
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             ArchivingManager archivingManager = new ArchivingManager(mssqlDAO, logService);
             bool expected = true;

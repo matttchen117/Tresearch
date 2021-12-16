@@ -10,7 +10,7 @@ namespace Tresearch.Services.Test
     
     public class ArchivingServiceShould
     {
-        string SqlConnectionString = ConfigurationManager.AppSettings.Get("SqlConnectionString");
+        string SqlConnectionString = "Server=DESKTOP-F0O7ECC;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
         string FilePath = ConfigurationManager.AppSettings.Get("FilePath");
         string Destination = ConfigurationManager.AppSettings.Get("Destination");
 
