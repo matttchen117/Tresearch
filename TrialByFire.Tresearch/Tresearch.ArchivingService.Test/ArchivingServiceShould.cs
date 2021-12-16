@@ -11,8 +11,8 @@ namespace Tresearch.Services.Test
     public class ArchivingServiceShould
     {
         string SqlConnectionString = "Server=DESKTOP-F0O7ECC;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
-        string FilePath = ConfigurationManager.AppSettings.Get("FilePath");
-        string Destination = ConfigurationManager.AppSettings.Get("Destination");
+        string FilePath = "D:\\Work\\Logs";
+        string Destination = "D:\\Work";
 
         [Fact]
         public void ArchiveTheLogs()
@@ -20,7 +20,7 @@ namespace Tresearch.Services.Test
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             ArchivingService archivingService = new ArchivingService(mssqlDAO, logService);
             bool expected = true;

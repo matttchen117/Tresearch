@@ -8,7 +8,7 @@ namespace Tresearch.Logging.Tests
 {
     public class LogServiceShould
     {
-        string SqlConnectionString = ConfigurationManager.AppSettings.Get("SqlConnectionString");
+        string SqlConnectionString = "Server=DESKTOP-F0O7ECC;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
 
         [Theory]
         [InlineData("Jan 1, 2021", "Info", "larry@gmail.com", "DataStore", "This is a test.")]
@@ -21,7 +21,7 @@ namespace Tresearch.Logging.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             DateTime timeStamp = DateTime.Parse(timeString).ToUniversalTime();
             bool expected = true;
@@ -30,7 +30,7 @@ namespace Tresearch.Logging.Tests
             var actual = logService.CreateLog(timeStamp, level, username, category, description);
 
             // Assert
-            Assert.Equal(actual, expected);
+            Assert.True(actual);
         }
     }
 }

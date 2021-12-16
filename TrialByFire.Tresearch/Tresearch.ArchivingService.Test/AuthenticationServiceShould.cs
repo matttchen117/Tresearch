@@ -11,7 +11,7 @@ namespace Tresearch.Services.Tests
     {
         string SqlConnectionString = "Server=DESKTOP-F0O7ECC;Initial Catalog=TrialByFire.Tresearch; Integrated Security=true";
         [Theory]
-        [InlineData("pammypoor@gmail.com", "myPassword", "System Admin")]
+        [InlineData("pammypoor@gmail.com", "myPassword", "User")]
         public void GetAccount(string username, string passphrase, string authenticationLevel)
         {
             // Triple A Format

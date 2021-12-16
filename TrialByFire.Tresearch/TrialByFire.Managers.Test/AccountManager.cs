@@ -13,6 +13,8 @@ namespace Tresearch.Managers.Tests
 
         [Theory]
         [InlineData("gregory@gmail.com", "scrumGitSome", "User")]
+        [InlineData("trialByFire@gmail.com", "haveMercy", "System Admin")]
+        [InlineData("megamind@gmail.com", "fourHead", "User")]
         public void CreateAccount(string username, string passphrase, string authorizationLevel)
         {
             // Triple A Format
@@ -57,7 +59,7 @@ namespace Tresearch.Managers.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             AccountManager accountManager = new AccountManager(mssqlDAO, logService);
 
@@ -76,7 +78,7 @@ namespace Tresearch.Managers.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             AccountManager accountManager = new AccountManager(mssqlDAO, logService);
 

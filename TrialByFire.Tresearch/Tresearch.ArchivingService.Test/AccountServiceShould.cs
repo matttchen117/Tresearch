@@ -43,7 +43,7 @@ namespace TrialByFire.Services.Test
             //Triple A Format
 
             //Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             AccountService accountService = new AccountService(mssqlDAO, logService);
             
@@ -55,13 +55,13 @@ namespace TrialByFire.Services.Test
         }
 
         [Theory]
-        [InlineData("natalie@gmail.com", "processor")]
+        [InlineData("natalie@gmail.com", "natalie@gmail.com")]
         public void EnableAccount(string username, string passphrase)
         {
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             AccountService accountService = new AccountService(mssqlDAO, logService);
 
@@ -80,7 +80,7 @@ namespace TrialByFire.Services.Test
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             AccountService accountService = new AccountService(mssqlDAO, logService);
 
@@ -99,7 +99,7 @@ namespace TrialByFire.Services.Test
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             AccountService accountService = new AccountService(mssqlDAO, logService);
 
