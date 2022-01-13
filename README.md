@@ -11,3 +11,19 @@ Tresearch is an interactive mind mapping tool for documenting users' learning jo
 - Matthew Chen (Team Leader)
 - Pammy Poor
 - Viet Nguyen
+
+### Demo
+--------------------------------
+
+
+
+### Installation
+--------------------------------
+
+
+### Features
+--------------------------------
+
+
+### Built With
+--------------------------------
