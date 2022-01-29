@@ -70,7 +70,17 @@
       "ProjectGuid": "347043e0-2b70-4db4-9398-9e8ebd9dc496",
       "DisplayName": "Solution Items",
       "ColorIndex": 12
+    },
+    "0e5c3a6b-290a-49d6-a60c-347fa1c0822d": {
+      "ProjectGuid": "0e5c3a6b-290a-49d6-a60c-347fa1c0822d",
+      "DisplayName": "TrialByFire.Tresearch.Controllers",
+      "ColorIndex": 13
+    },
+    "ce4069db-58bf-4787-850c-75a1cfd83c0b": {
+      "ProjectGuid": "ce4069db-58bf-4787-850c-75a1cfd83c0b",
+      "DisplayName": "TrialByFire.Controllers.Tests",
+      "ColorIndex": 14
     }
   },
-  "NextColorIndex": 13
+  "NextColorIndex": 15
 }

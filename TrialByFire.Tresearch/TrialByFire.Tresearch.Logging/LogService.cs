@@ -5,30 +5,32 @@ namespace TrialByFire.Tresearch.Logging
 {
     public class LogService
     {
-
-        private readonly MSSQLDAO _mssqlDAO;
+        private readonly SqlDAO _sqlDAO;
 
         public LogService()
         {
+            Log log;
         }
 
-        public LogService(MSSQLDAO mssqlDAO)
+        public LogService(SqlDAO SqlDAO)
         {
-            _mssqlDAO = mssqlDAO;
+            _sqlDAO = SqlDAO;
         }
 
-        public bool CreateLog(DateTime timeStamp, string level, string username, string category, string description)
+        public string CreateLog(string timeStamp, string level, string username, string category, string description)
         {
-            bool isSuccessful = false;
+            string result = "CreateLog failed";
             try
             {
                 Log log = new Log(timeStamp, level, username, category, description);
-                isSuccessful = _mssqlDAO.StoreLog(log);
+                result = _sqlDAO.StoreLog(log);
+                return result;
             }catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                result = ex.Message;
+                return result;
             }
-            return isSuccessful;
         }
     }
 }

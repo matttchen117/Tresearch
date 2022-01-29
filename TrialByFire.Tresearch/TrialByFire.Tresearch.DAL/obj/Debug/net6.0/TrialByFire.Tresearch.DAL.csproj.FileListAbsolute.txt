@@ -30,3 +30,19 @@ D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearc
 D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.dll
 D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\ref\TrialByFire.Tresearch.DAL.dll
 D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.pdb
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.dll.config
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.deps.json
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.dll
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\bin\Debug\net6.0\ref\TrialByFire.Tresearch.DAL.dll
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.pdb
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\bin\Debug\net6.0\TrialByFire.Tresearch.DomainModels.dll
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\bin\Debug\net6.0\TrialByFire.Tresearch.DomainModels.pdb
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.csproj.AssemblyReference.cache
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.AssemblyInfoInputs.cache
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.AssemblyInfo.cs
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.csproj.CoreCompileInputs.cache
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.csproj.CopyComplete
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.dll
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\ref\TrialByFire.Tresearch.DAL.dll
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.pdb

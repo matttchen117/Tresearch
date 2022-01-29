@@ -20,7 +20,7 @@ namespace Tresearch.Managers.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            SqlDAO mssqlDAO = new SqlDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             AccountManager accountManager = new AccountManager(mssqlDAO, logService);
 
@@ -39,7 +39,7 @@ namespace Tresearch.Managers.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            SqlDAO mssqlDAO = new SqlDAO();
             LogService logService = new LogService(mssqlDAO);
             AccountManager accountManager = new AccountManager(mssqlDAO, logService);
             
@@ -59,7 +59,7 @@ namespace Tresearch.Managers.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            SqlDAO mssqlDAO = new SqlDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             AccountManager accountManager = new AccountManager(mssqlDAO, logService);
 
@@ -78,7 +78,7 @@ namespace Tresearch.Managers.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            SqlDAO mssqlDAO = new SqlDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             AccountManager accountManager = new AccountManager(mssqlDAO, logService);
 

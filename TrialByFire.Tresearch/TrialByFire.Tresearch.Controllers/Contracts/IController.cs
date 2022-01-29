@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrialByFire.Tresearch.DAL
+namespace TrialByFire.Tresearch.Controllers
 {
-    internal interface IRepository
+    internal interface IController
     {
     }
 }

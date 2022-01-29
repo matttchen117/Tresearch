@@ -6,23 +6,44 @@ namespace TrialByFire.Tresearch.Services
 {
     public class ArchivingService
     {
-        private readonly MSSQLDAO _mssqlDAO;
+        private readonly ISqlDAO _sqlDAO;
         private readonly LogService _logService;
 
         public ArchivingService()
         {
         }
 
-        public ArchivingService(MSSQLDAO mssqlDAO, LogService logService)
+        public ArchivingService(ISqlDAO sqlDAO, LogService logService)
         {
-            _mssqlDAO = mssqlDAO;
+            _sqlDAO = sqlDAO;
             _logService = logService;
         }
 
-        public bool Archive()
+        public async string ArchiveLogs()
         {
-            return _mssqlDAO.Archive();
+            try
+            {
+                //wait til the first day of the month 
+                int timeout = 1000;
+                var task = _sqlDAO.ArchiveLogs();
+                if(await Task.WhenAny(task, Task.Delay(timeout)) == task)
+                {
+                    return "success";
+                }
+                else
+                {
+                    return "ArchiveLogs timeout";
+                }
+            } 
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
         }
 
+        public async Task<string> ArchiveTime()
+        {
+            Task<bool> timeTask 
+        }
     }
 }

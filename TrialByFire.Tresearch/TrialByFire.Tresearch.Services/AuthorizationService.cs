@@ -6,9 +6,9 @@ namespace TrialByFire.Tresearch.Services
 {
     public class AuthorizationService
     {
-        MSSQLDAO mssqlDAO;
+        SqlDAO mssqlDAO;
         LogService logService;
-        public AuthorizationService(MSSQLDAO mssqlDAO, LogService logService)
+        public AuthorizationService(SqlDAO mssqlDAO, LogService logService)
         {
             this.mssqlDAO = mssqlDAO;
             this.logService = logService;

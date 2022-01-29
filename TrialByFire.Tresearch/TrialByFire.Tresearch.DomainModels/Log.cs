@@ -8,7 +8,7 @@ namespace TrialByFire.Tresearch.DomainModels
 {
     public class Log
     {
-        public DateTime TimeStamp { get; set; }
+        public string TimeStamp { get; set; }
 
         public string Level { get; set; }
 
@@ -23,7 +23,7 @@ namespace TrialByFire.Tresearch.DomainModels
         {
         }
 
-        public Log(DateTime timeStamp, string level, string username, string category, string description)
+        public Log(string timeStamp, string level, string username, string category, string description)
         {
             TimeStamp = timeStamp;
             Level = level;
@@ -41,8 +41,8 @@ namespace TrialByFire.Tresearch.DomainModels
             else
             {
                 Log log = (Log)obj;
-                return (System.DateTime.Equals(TimeStamp, log.TimeStamp)) && (Level.Equals(log.Level)) && (Username.Equals(log.Username))
-                    && (Category.Equals(log.Category)) && (Description.Equals(log.Description));
+                return ((TimeStamp.Equals(log.TimeStamp)) && (Level.Equals(log.Level)) && (Username.Equals(log.Username))
+                    && (Category.Equals(log.Category)) && Description.Equals(log.Description));
             }
         }
 

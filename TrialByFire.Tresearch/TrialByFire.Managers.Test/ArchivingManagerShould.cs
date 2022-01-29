@@ -23,7 +23,7 @@ namespace TrialByFire.Managers.Test
             Destination = ConfigurationManager.AppSettings.Get("SqlConnectionString");
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            SqlDAO mssqlDAO = new SqlDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             ArchivingManager archivingManager = new ArchivingManager(mssqlDAO, logService);
             bool expected = true;
@@ -43,7 +43,7 @@ namespace TrialByFire.Managers.Test
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            SqlDAO mssqlDAO = new SqlDAO();
             LogService logService = new LogService(mssqlDAO);
             ArchivingManager archivingManager = new ArchivingManager(mssqlDAO, logService);
             bool expected = true;

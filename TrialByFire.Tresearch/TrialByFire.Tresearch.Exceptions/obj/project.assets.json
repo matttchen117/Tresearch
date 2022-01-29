@@ -350,23 +350,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\pammy\\.nuget\\packages\\": {},
+    "C:\\Users\\JeLaz\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\TrialByFire.Tresearch.Exceptions.csproj",
+      "projectUniqueName": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\TrialByFire.Tresearch.Exceptions.csproj",
       "projectName": "TrialByFire.Tresearch.Exceptions",
-      "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\TrialByFire.Tresearch.Exceptions.csproj",
-      "packagesPath": "C:\\Users\\pammy\\.nuget\\packages\\",
-      "outputPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\obj\\",
+      "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\TrialByFire.Tresearch.Exceptions.csproj",
+      "packagesPath": "C:\\Users\\JeLaz\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\pammy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\JeLaz\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],

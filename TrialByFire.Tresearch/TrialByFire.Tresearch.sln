@@ -14,6 +14,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch.Managers", "TrialByFire.Tresearch.Managers\TrialByFire.Tresearch.Managers.csproj", "{BC616190-834E-4335-8746-42E9E90C84F1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch.DAL", "TrialByFire.Tresearch.DAL\TrialByFire.Tresearch.DAL.csproj", "{8AFEED92-2F79-43A6-9039-E7A76AD614EE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{39997351-8B48-4B59-82CF-5A5CB1247FD2} = {39997351-8B48-4B59-82CF-5A5CB1247FD2}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.DAL.Tests", "Tresearch.DAL.Tests\TrialByFire.DAL.Tests.csproj", "{B3AE7F99-DE28-4AA8-AD16-73B99B5AB16B}"
 EndProject
@@ -29,6 +32,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		App.config = App.config
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch.Controllers", "TrialByFire.Tresearch.Controllers\TrialByFire.Tresearch.Controllers.csproj", "{0E5C3A6B-290A-49D6-A60C-347FA1C0822D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8AFEED92-2F79-43A6-9039-E7A76AD614EE} = {8AFEED92-2F79-43A6-9039-E7A76AD614EE}
+		{127E07F3-30D9-4679-8F0C-758DA07305BA} = {127E07F3-30D9-4679-8F0C-758DA07305BA}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrialByFire.Controllers.Tests", "TrialByFire.Controllers.Tests\TrialByFire.Controllers.Tests.csproj", "{CE4069DB-58BF-4787-850C-75A1CFD83C0B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,6 +91,14 @@ Global
 		{08D2CA01-71A8-41FC-AB97-F07669154BCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08D2CA01-71A8-41FC-AB97-F07669154BCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08D2CA01-71A8-41FC-AB97-F07669154BCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E5C3A6B-290A-49D6-A60C-347FA1C0822D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E5C3A6B-290A-49D6-A60C-347FA1C0822D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E5C3A6B-290A-49D6-A60C-347FA1C0822D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E5C3A6B-290A-49D6-A60C-347FA1C0822D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE4069DB-58BF-4787-850C-75A1CFD83C0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE4069DB-58BF-4787-850C-75A1CFD83C0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE4069DB-58BF-4787-850C-75A1CFD83C0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE4069DB-58BF-4787-850C-75A1CFD83C0B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -38,3 +38,23 @@ D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearc
 D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Debug\net6.0\TrialByFire.Tresearch.Services.dll
 D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Debug\net6.0\ref\TrialByFire.Tresearch.Services.dll
 D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Debug\net6.0\TrialByFire.Tresearch.Services.pdb
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\bin\Debug\net6.0\TrialByFire.Tresearch.Services.deps.json
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\bin\Debug\net6.0\TrialByFire.Tresearch.Services.dll
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\bin\Debug\net6.0\ref\TrialByFire.Tresearch.Services.dll
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\bin\Debug\net6.0\TrialByFire.Tresearch.Services.pdb
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.dll
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\bin\Debug\net6.0\TrialByFire.Tresearch.DomainModels.dll
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\bin\Debug\net6.0\TrialByFire.Tresearch.Logging.dll
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.pdb
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.dll.config
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\bin\Debug\net6.0\TrialByFire.Tresearch.DomainModels.pdb
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\bin\Debug\net6.0\TrialByFire.Tresearch.Logging.pdb
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Debug\net6.0\TrialByFire.Tresearch.Services.csproj.AssemblyReference.cache
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Debug\net6.0\TrialByFire.Tresearch.Services.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Debug\net6.0\TrialByFire.Tresearch.Services.AssemblyInfoInputs.cache
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Debug\net6.0\TrialByFire.Tresearch.Services.AssemblyInfo.cs
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Debug\net6.0\TrialByFire.Tresearch.Services.csproj.CoreCompileInputs.cache
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Debug\net6.0\TrialByFire.Tresearch.Services.csproj.CopyComplete
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Debug\net6.0\TrialByFire.Tresearch.Services.dll
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Debug\net6.0\ref\TrialByFire.Tresearch.Services.dll
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Debug\net6.0\TrialByFire.Tresearch.Services.pdb

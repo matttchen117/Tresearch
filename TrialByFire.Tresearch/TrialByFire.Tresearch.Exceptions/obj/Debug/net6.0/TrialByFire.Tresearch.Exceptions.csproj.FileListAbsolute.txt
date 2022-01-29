@@ -22,3 +22,15 @@ D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearc
 D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.dll
 D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\ref\TrialByFire.Tresearch.Exceptions.dll
 D:\Code\Github Repositories\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.pdb
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\bin\Debug\net6.0\TrialByFire.Tresearch.Exceptions.deps.json
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\bin\Debug\net6.0\TrialByFire.Tresearch.Exceptions.dll
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\bin\Debug\net6.0\ref\TrialByFire.Tresearch.Exceptions.dll
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\bin\Debug\net6.0\TrialByFire.Tresearch.Exceptions.pdb
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.csproj.AssemblyReference.cache
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.AssemblyInfoInputs.cache
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.AssemblyInfo.cs
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.csproj.CoreCompileInputs.cache
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.dll
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\ref\TrialByFire.Tresearch.Exceptions.dll
+C:\Users\JeLaz\OneDrive\Documents\GitHub\Tresearch\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.pdb

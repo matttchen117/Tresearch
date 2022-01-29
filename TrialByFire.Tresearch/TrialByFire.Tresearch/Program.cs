@@ -86,7 +86,7 @@ namespace TrialByFire.Tresearch.Main
             bool isArchived = await archiveTask;
             Console.WriteLine(isArchived);*/
 
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            SqlDAO mssqlDAO = new SqlDAO();
             LogService logService = new LogService(mssqlDAO);
             AuthenticationService authenticationService = new AuthenticationService(mssqlDAO, logService);
             AccountManager accountManager = new AccountManager(mssqlDAO, logService);
@@ -491,7 +491,7 @@ namespace TrialByFire.Tresearch.Main
             }
         }
         
-        public static Account GetAccount(MSSQLDAO mssqlDAO, LogService logService, AuthenticationService authenticationService)
+        public static Account GetAccount(SqlDAO mssqlDAO, LogService logService, AuthenticationService authenticationService)
         {
             string username = "";
             string passphrase = "";
@@ -624,7 +624,7 @@ namespace TrialByFire.Tresearch.Main
             throw new NotImplementedException();
         }
 
-        public static bool VerifyAuthorization(Account account, string requiredAuthorizationLevel, MSSQLDAO mssqlDAO, 
+        public static bool VerifyAuthorization(Account account, string requiredAuthorizationLevel, SqlDAO mssqlDAO, 
             LogService logService)
         {
             try
@@ -639,7 +639,7 @@ namespace TrialByFire.Tresearch.Main
             }
         }
 
-        public static int ReadFile(string file, MSSQLDAO mssqlDAO, LogService logService)
+        public static int ReadFile(string file, SqlDAO mssqlDAO, LogService logService)
         {
             int successes = 0;
             int requests = 0;

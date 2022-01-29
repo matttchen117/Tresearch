@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using TrialByFire.Tresearch.DAL;
 using TrialByFire.Tresearch.DomainModels;
@@ -14,15 +15,14 @@ namespace TrialByFire.DAL.Tests
         string Destination = "D:\\Work";
 
         [Theory]
-        [InlineData("federer3@gmail.com", "swissCheese20", "federer@gmail.com", "swissCheese20", "User", false)]
-        [InlineData("gibbs@gmail.com", "likeClockwork", "gibbs@gmail.com", "likeClockwork", "User", true)]
-        public void GetTheAccount(string email, string passphrase, string expectedEmail, 
-            string expectedPassphrase, string expectedAuthorizationLevel, bool expectedResult)
+        /*[InlineData("federer3@gmail.com", "swissCheese20", "federer@gmail.com", "swissCheese20", "User", false)]
+        [InlineData("gibbs@gmail.com", "likeClockwork", "gibbs@gmail.com", "likeClockwork", "User", true)]*/
+        public void GetTheAccount(Account account)
         {
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            SqlDAO mssqlDAO = new SqlDAO(SqlConnectionString);
             var expected = new Account(expectedEmail, expectedPassphrase, expectedAuthorizationLevel);
 
             // Act
@@ -33,14 +33,14 @@ namespace TrialByFire.DAL.Tests
         }
 
         [Theory]
-        [InlineData("random@gmail.com", "myPassword", "User")]
-        [InlineData("myRandomUsername@gmail.com", "ooooopppppp", "System Admin")]
-        public void CreateTheAccount(string username, string passphrase, string authenticationLevel)
+        /*[InlineData("random@gmail.com", "myPassword", "User")]
+        [InlineData("myRandomUsername@gmail.com", "ooooopppppp", "System Admin")]*/
+        public void CreateTheAccount(List<Account> accounts)
         {
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            SqlDAO mssqlDAO = new SqlDAO(SqlConnectionString);
             Account account = new Account(username, passphrase, authenticationLevel);
 
             // Act
@@ -51,14 +51,14 @@ namespace TrialByFire.DAL.Tests
         }
 
         [Theory]
-        [InlineData("greg@gmail.com", "random@gmail.com", "myPassword", "User")]
-        [InlineData("greg@gmail.com", "myRandomUsername@gmail.com", "ooooopppppp", "System Admin")]
-        public void UpdateTheAccount(string username, string newEmail, string newPassphrase, string newLevel)
+        /*[InlineData("greg@gmail.com", "random@gmail.com", "myPassword", "User")]
+        [InlineData("greg@gmail.com", "myRandomUsername@gmail.com", "ooooopppppp", "System Admin")]*/
+        public void UpdateTheAccount(List<Account> accounts)
         {
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            SqlDAO mssqlDAO = new SqlDAO(SqlConnectionString);
 
 
             // Act
@@ -74,7 +74,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            SqlDAO mssqlDAO = new SqlDAO(SqlConnectionString);
 
 
             // Act
@@ -90,7 +90,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            SqlDAO mssqlDAO = new SqlDAO(SqlConnectionString);
 
 
             // Act
@@ -106,7 +106,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            SqlDAO mssqlDAO = new SqlDAO(SqlConnectionString);
 
 
             // Act
@@ -127,7 +127,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            SqlDAO mssqlDAO = new SqlDAO(SqlConnectionString);
             DateTime timeStamp = DateTime.Parse(timeString).ToUniversalTime();
             Log log = new Log(timeStamp, level, username, category, description);
             bool expected = true;
@@ -145,7 +145,7 @@ namespace TrialByFire.DAL.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO();
+            SqlDAO mssqlDAO = new SqlDAO();
 
             // Act
             var actual = mssqlDAO.Archive();

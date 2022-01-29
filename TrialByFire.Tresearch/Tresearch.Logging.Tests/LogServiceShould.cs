@@ -21,16 +21,16 @@ namespace Tresearch.Logging.Tests
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            SqlDAO mssqlDAO = new SqlDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
-            DateTime timeStamp = DateTime.Parse(timeString).ToUniversalTime();
-            bool expected = true;
+            string timeStamp = "Jan 28, 2022";
+            string expected = "success";
 
             // Act
             var actual = logService.CreateLog(timeStamp, level, username, category, description);
 
             // Assert
-            Assert.True(actual);
+            Assert.Equal(actual, expected);
         }
     }
 }

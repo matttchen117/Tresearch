@@ -8,11 +8,11 @@ namespace TrialByFire.Tresearch.Managers
 {
     public class AccountManager
     {
-        private MSSQLDAO mssqlDAO;
+        private SqlDAO mssqlDAO;
         private LogService logService;
         private Account userAccount;
 
-        public AccountManager(MSSQLDAO mssqlDAO, LogService logService)
+        public AccountManager(SqlDAO mssqlDAO, LogService logService)
         {
             this.mssqlDAO = mssqlDAO;
             this.logService = logService;

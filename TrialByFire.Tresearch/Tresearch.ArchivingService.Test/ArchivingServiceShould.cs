@@ -20,7 +20,7 @@ namespace Tresearch.Services.Test
             // Triple A Format
 
             // Arrange
-            MSSQLDAO mssqlDAO = new MSSQLDAO(SqlConnectionString);
+            SqlDAO mssqlDAO = new SqlDAO(SqlConnectionString);
             LogService logService = new LogService(mssqlDAO);
             ArchivingService archivingService = new ArchivingService(mssqlDAO, logService);
             bool expected = true;

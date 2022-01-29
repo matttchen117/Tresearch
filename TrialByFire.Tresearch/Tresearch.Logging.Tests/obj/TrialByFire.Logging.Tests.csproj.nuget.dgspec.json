@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\Tresearch.Logging.Tests\\TrialByFire.Logging.Tests.csproj": {}
+    "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\Tresearch.Logging.Tests\\TrialByFire.Logging.Tests.csproj": {}
   },
   "projects": {
-    "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\Tresearch.Logging.Tests\\TrialByFire.Logging.Tests.csproj": {
+    "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\Tresearch.Logging.Tests\\TrialByFire.Logging.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\Tresearch.Logging.Tests\\TrialByFire.Logging.Tests.csproj",
+        "projectUniqueName": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\Tresearch.Logging.Tests\\TrialByFire.Logging.Tests.csproj",
         "projectName": "TrialByFire.Logging.Tests",
-        "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\Tresearch.Logging.Tests\\TrialByFire.Logging.Tests.csproj",
-        "packagesPath": "C:\\Users\\pammy\\.nuget\\packages\\",
-        "outputPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\Tresearch.Logging.Tests\\obj\\",
+        "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\Tresearch.Logging.Tests\\TrialByFire.Logging.Tests.csproj",
+        "packagesPath": "C:\\Users\\JeLaz\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\Tresearch.Logging.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\pammy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\JeLaz\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -32,11 +32,11 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
-                "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
+              "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
+                "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
               },
-              "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj": {
-                "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj"
+              "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj": {
+                "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj"
               }
             }
           }
@@ -95,20 +95,20 @@
         }
       }
     },
-    "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
+    "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj",
+        "projectUniqueName": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj",
         "projectName": "TrialByFire.Tresearch.DAL",
-        "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj",
-        "packagesPath": "C:\\Users\\pammy\\.nuget\\packages\\",
-        "outputPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\obj\\",
+        "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj",
+        "packagesPath": "C:\\Users\\JeLaz\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\pammy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\JeLaz\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -123,8 +123,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj": {
-                "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj"
+              "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj": {
+                "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj"
               }
             }
           }
@@ -150,6 +150,10 @@
             "System.Data.SqlClient": {
               "target": "Package",
               "version": "[4.8.3, )"
+            },
+            "Z.Dapper.Plus": {
+              "target": "Package",
+              "version": "[4.0.22, )"
             }
           },
           "imports": [
@@ -171,20 +175,20 @@
         }
       }
     },
-    "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj": {
+    "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj",
+        "projectUniqueName": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj",
         "projectName": "TrialByFire.Tresearch.DomainModels",
-        "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj",
-        "packagesPath": "C:\\Users\\pammy\\.nuget\\packages\\",
-        "outputPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\obj\\",
+        "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj",
+        "packagesPath": "C:\\Users\\JeLaz\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\pammy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\JeLaz\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -235,20 +239,20 @@
         }
       }
     },
-    "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj": {
+    "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj",
+        "projectUniqueName": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj",
         "projectName": "TrialByFire.Tresearch.Logging",
-        "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj",
-        "packagesPath": "C:\\Users\\pammy\\.nuget\\packages\\",
-        "outputPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\obj\\",
+        "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\TrialByFire.Tresearch.Logging.csproj",
+        "packagesPath": "C:\\Users\\JeLaz\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Logging\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\pammy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\JeLaz\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -263,11 +267,11 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
-                "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
+              "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
+                "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
               },
-              "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj": {
-                "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj"
+              "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj": {
+                "projectPath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj"
               }
             }
           }

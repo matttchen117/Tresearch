@@ -1,16 +1,16 @@
 {
   "version": 2,
-  "dgSpecHash": "g929No2gklNmue8FGEYHAcJme/jCLezcLdbPrTGn8NXpqPAiEKmw8tF0EyWJBnh0X3m2UjqWr2JZQrGDXDK9KA==",
+  "dgSpecHash": "B9U30w8Mo8sKV93Yd+x5G4rs3K79hN85GLz2fzpMcavmj/gZPiAC0VY99EVILFLDr0DzXR/RD7XKV7vxA5IWhQ==",
   "success": true,
-  "projectFilePath": "D:\\Code\\Github Repositories\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\TrialByFire.Tresearch.Exceptions.csproj",
+  "projectFilePath": "C:\\Users\\JeLaz\\OneDrive\\Documents\\GitHub\\Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\TrialByFire.Tresearch.Exceptions.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\pammy\\.nuget\\packages\\microsoft.win32.systemevents\\6.0.0\\microsoft.win32.systemevents.6.0.0.nupkg.sha512",
-    "C:\\Users\\pammy\\.nuget\\packages\\system.configuration.configurationmanager\\6.0.0\\system.configuration.configurationmanager.6.0.0.nupkg.sha512",
-    "C:\\Users\\pammy\\.nuget\\packages\\system.drawing.common\\6.0.0\\system.drawing.common.6.0.0.nupkg.sha512",
-    "C:\\Users\\pammy\\.nuget\\packages\\system.security.accesscontrol\\6.0.0\\system.security.accesscontrol.6.0.0.nupkg.sha512",
-    "C:\\Users\\pammy\\.nuget\\packages\\system.security.cryptography.protecteddata\\6.0.0\\system.security.cryptography.protecteddata.6.0.0.nupkg.sha512",
-    "C:\\Users\\pammy\\.nuget\\packages\\system.security.permissions\\6.0.0\\system.security.permissions.6.0.0.nupkg.sha512",
-    "C:\\Users\\pammy\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512"
+    "C:\\Users\\JeLaz\\.nuget\\packages\\microsoft.win32.systemevents\\6.0.0\\microsoft.win32.systemevents.6.0.0.nupkg.sha512",
+    "C:\\Users\\JeLaz\\.nuget\\packages\\system.configuration.configurationmanager\\6.0.0\\system.configuration.configurationmanager.6.0.0.nupkg.sha512",
+    "C:\\Users\\JeLaz\\.nuget\\packages\\system.drawing.common\\6.0.0\\system.drawing.common.6.0.0.nupkg.sha512",
+    "C:\\Users\\JeLaz\\.nuget\\packages\\system.security.accesscontrol\\6.0.0\\system.security.accesscontrol.6.0.0.nupkg.sha512",
+    "C:\\Users\\JeLaz\\.nuget\\packages\\system.security.cryptography.protecteddata\\6.0.0\\system.security.cryptography.protecteddata.6.0.0.nupkg.sha512",
+    "C:\\Users\\JeLaz\\.nuget\\packages\\system.security.permissions\\6.0.0\\system.security.permissions.6.0.0.nupkg.sha512",
+    "C:\\Users\\JeLaz\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512"
   ],
   "logs": []
 }

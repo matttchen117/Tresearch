@@ -12,47 +12,49 @@ namespace TrialByFire.Tresearch.Managers
 {
     public class ArchivingManager
     {
-        private readonly MSSQLDAO _mssqlDAO;
+        private readonly ISqlDAO _sqlDAO;
         private readonly LogService _logService;
+        ArchivingService archivingService;
 
         public ArchivingManager()
         {
         }
 
-        public ArchivingManager(MSSQLDAO mssqlDAO, LogService logService)
+        public ArchivingManager(ISqlDAO sqlDAO, LogService logService)
         {
-            _mssqlDAO = mssqlDAO;
+            _sqlDAO = sqlDAO;
             _logService = logService;
+            archivingService = new ArchivingService(_sqlDAO, logService);
         }
-        public async Task<bool> ArchiveLogs()
+
+        public async Task<string> ArchiveLogs()
         {
             Task<bool> timeTask = CheckForAppropriateTime();
             bool isTime = await timeTask;
             try
             {
-                ArchivingService archivingService = new ArchivingService(_mssqlDAO, _logService);
-                return archivingService.Archive();
+                return archivingService.ArchiveLogs();
             }
             catch (Exception ex)
             {
-                return false;
+                return "Archive Logs failure";
             }
         }
 
-        public async Task<bool> ArchiveLogs(string sArchiveTime)
+        /*public async Task<string> ArchiveLogs(string sArchiveTime)
         {
             Task<bool> timeTask = CheckForAppropriateTime(sArchiveTime);
             bool isTime = await timeTask;
             try
             {
-                ArchivingService archivingService = new ArchivingService(_mssqlDAO, _logService);
-                return archivingService.Archive();
+                ArchivingService archivingService = new ArchivingService(_sqlDAO, _logService);
+                return archivingService.ArchiveLogs();
             }
             catch (Exception ex)
             {
                 return false;
             }
-        }
+        }*/
 
         public async Task<bool> CheckForAppropriateTime()
         {

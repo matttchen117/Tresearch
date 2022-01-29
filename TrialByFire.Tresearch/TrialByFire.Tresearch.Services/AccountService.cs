@@ -6,10 +6,10 @@ namespace TrialByFire.Tresearch.Services
 {
     public class AccountService
     {
-        MSSQLDAO mssqlDAO;
+        SqlDAO mssqlDAO;
         LogService logService;
 
-        public AccountService(MSSQLDAO mssqlDAO, LogService logService)
+        public AccountService(SqlDAO mssqlDAO, LogService logService)
         {
             this.mssqlDAO = mssqlDAO;
             this.logService = logService;
