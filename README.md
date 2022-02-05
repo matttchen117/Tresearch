@@ -7,9 +7,11 @@ Tresearch is an interactive mind mapping tool for documenting users' learning jo
 
 ### Contributors
 --------------------------------
+- Ian Ho-Sing-Loy
 - Jessie Lazo
 - Matthew Chen (Team Leader)
 - Pammy Poor
+- Ryan Harrison
 - Viet Nguyen
 
 ### Demo
