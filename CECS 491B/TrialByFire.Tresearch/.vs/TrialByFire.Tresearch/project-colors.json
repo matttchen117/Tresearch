@@ -1,0 +1,21 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "8dc889ba-68bf-43b6-a952-8f9d49f7f868": {
+      "ProjectGuid": "8dc889ba-68bf-43b6-a952-8f9d49f7f868",
+      "DisplayName": "TrialByFire.Tresearch.WebApi",
+      "ColorIndex": 0
+    },
+    "2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3": {
+      "ProjectGuid": "2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3",
+      "DisplayName": "TrialByFire.Tresearch.Services",
+      "ColorIndex": 1
+    },
+    "ab65ed53-f8ab-48c3-9d09-aef3db83be9f": {
+      "ProjectGuid": "ab65ed53-f8ab-48c3-9d09-aef3db83be9f",
+      "DisplayName": "TrialByFire.Tresearch.Managers",
+      "ColorIndex": 2
+    }
+  },
+  "NextColorIndex": 3
+}
