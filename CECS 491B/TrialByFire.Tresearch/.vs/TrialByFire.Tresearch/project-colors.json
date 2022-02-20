@@ -20,7 +20,12 @@
       "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
       "DisplayName": "Miscellaneous Files",
       "ColorIndex": -1
+    },
+    "cb93ded3-d97a-4346-be58-faf6cd5ce830": {
+      "ProjectGuid": "cb93ded3-d97a-4346-be58-faf6cd5ce830",
+      "DisplayName": "TrialByFire.Tresearch.Tests",
+      "ColorIndex": 3
     }
   },
-  "NextColorIndex": 3
+  "NextColorIndex": 4
 }
