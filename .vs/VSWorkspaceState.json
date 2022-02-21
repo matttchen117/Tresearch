@@ -1,10 +1,14 @@
 {
   "ExpandedNodes": [
     "",
-    "\\CECS 491A",
     "\\CECS 491A\\TrialByFire.Tresearch",
-    "\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Managers.Test"
+    "\\CECS 491A\\TrialByFire.Tresearch\\Tresearch.DAL.Tests",
+    "\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Managers.Test",
+    "\\CECS 491B",
+    "\\CECS 491B\\TrialByFire.Tresearch",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\AuthenticationTests"
   ],
-  "SelectedNode": "\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Managers.Test\\AccountManager.cs",
+  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\AuthenticationTests\\AuthenticationControllerShould.cs",
   "PreviewInSolutionExplorer": false
 }
