@@ -84,3 +84,9 @@ CREATE TABLE nodes_created(
 	node_creation_count INT,
 	
 );
+
+CREATE TABLE confirmation_links(
+	username VARCHAR(25) PRIMARY KEY,
+	GUID UNIQUEIDENTIFIER,
+	timestamp TIME
+);
