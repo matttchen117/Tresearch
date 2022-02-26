@@ -25,7 +25,12 @@
       "ProjectGuid": "cb93ded3-d97a-4346-be58-faf6cd5ce830",
       "DisplayName": "TrialByFire.Tresearch.Tests",
       "ColorIndex": 3
+    },
+    "eff69065-de0d-4648-9723-cd843356c208": {
+      "ProjectGuid": "eff69065-de0d-4648-9723-cd843356c208",
+      "DisplayName": "TrialByFire.Tresearch.Models",
+      "ColorIndex": 4
     }
   },
-  "NextColorIndex": 4
+  "NextColorIndex": 5
 }
