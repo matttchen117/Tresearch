@@ -2,15 +2,14 @@
   "ExpandedNodes": [
     "",
     "\\CECS 491A",
-    "\\CECS 491A\\TrialByFire.Tresearch",
-    "\\CECS 491A\\TrialByFire.Tresearch\\Tresearch.ArchivingService.Test",
     "\\CECS 491B",
     "\\CECS 491B\\TrialByFire.Tresearch",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\AuthenticationTests",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\OTPRequestTests",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\Controllers"
   ],
-  "SelectedNode": "\\CECS 491A\\TrialByFire.Tresearch\\Tresearch.ArchivingService.Test\\ArchivingServiceShould.cs",
+  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\OTPRequestTests\\OTPRequestControllerShould.cs",
   "PreviewInSolutionExplorer": false
 }
