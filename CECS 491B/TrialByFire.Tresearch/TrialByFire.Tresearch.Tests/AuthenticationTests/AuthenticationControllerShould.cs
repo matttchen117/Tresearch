@@ -9,52 +9,36 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests
 {
     internal class AuthenticationControllerShould
     {
-        public void ValidateTheInput(List<string> _input)
-        {
-            // Triple A Format
 
+        public void AuthenticateTheUser(string _username, string _otp)
+        {
             // Arrange
-            ISqlDAO _sqlDAO = new ISqlDAO();
-            ILogService _logService = new ILogService(_sqlDAO);
-            AuthenticationController _authenticationController = new AuthenticationController(_sqlDAO, _logService);
-            bool expected = true;
+            ISqlDAO _sqlDAO;
+            ILogService _logService;
+            IAuthenticationController _authenticationController = new AuthenticationController(_sqlDAO, _logService);
+            string expected = "success";
 
             // Act
-            bool result = _authenticationController.ValidateInput(_input);
+            List<string> results = _authenticationController.Authenticate(_username, _otp, DateTime.Now);
+
+            // Assert
+            Assert.Equal(expected, results[0]);
+        }
+
+        public void CreateTheCookie(string _jwtToken)
+        {
+            // Arrange
+            ISqlDAO _sqlDAO;
+            ILogService _logService;
+            IAuthenticationController _authenticationController = new AuthenticationController(_sqlDAO, _logService);
+            string expected = "success";
+
+            // Act
+            string result = _authenticationController.CreateCookie(_jwtToken);
 
             // Assert
             Assert.Equal(expected, result);
         }
 
-        public void RequestTheOTP(string _username, string _passphrase)
-        {
-
-        }
-
-        public void CreateTheCookie(string _jwtToken)
-        {
-
-        }
-
-
-        public void AuthenticateTheUser(string _username, string _otp)
-        {
-
-        }
-
-        public void VerifyTheJWTToken()
-        {
-
-        }
-
-        public void CreateThePrincipalObject(string _payload)
-        {
-
-        }
-
-        public void VerifyIsAuthenticated()
-        {
-
-        }
     }
 }

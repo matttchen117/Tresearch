@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Code\\Github Repositories\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj": {}
+    "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj": {}
   },
   "projects": {
-    "D:\\Code\\Github Repositories\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj": {
+    "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Code\\Github Repositories\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj",
+        "projectUniqueName": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj",
         "projectName": "TrialByFire.Tresearch.Services",
-        "projectPath": "D:\\Code\\Github Repositories\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj",
-        "packagesPath": "C:\\Users\\pammy\\.nuget\\packages\\",
-        "outputPath": "D:\\Code\\Github Repositories\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\obj\\",
+        "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj",
+        "packagesPath": "C:\\Users\\Matthew Chen\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\pammy\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\Matthew Chen\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -64,7 +60,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
         }
       }
     }
