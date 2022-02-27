@@ -14,4 +14,8 @@
     <Folder Include="Implementations\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TrialByFire.Tresearch.Models\TrialByFire.Tresearch.Models.csproj" />
+  </ItemGroup>
+
 </Project>
