@@ -57,35 +57,31 @@ CREATE TABLE views_webpage(
 	average_duration FLOAT
 );
 
--- Keep all of the registrations for a given date
+-- Keep number of registrations on a given date
 CREATE TABLE daily_registrations(
-	registration_date DATE,
-	registration_count INT,
-
-
+	registration_date DATE PRIMARY KEY,
+	registration_count INT
 );
 
 -- Keep all of the logins for a given date
 CREATE TABLE daily_login(
-	login_date DATE,
-	login_count INT,
-
-
+	login_date DATE PRIMARY KEY,
+	login_count INT
 );
 
 CREATE TABLE top_search(
-	top_search_date DATE,
+	top_search_date DATE PRIMARY KEY,
 	search_string VARCHAR(50),
 	search_count INT
 );
 
 CREATE TABLE nodes_created(
-	node_creation_date DATE,
+	node_creation_date DATE PRIMARY KEY,
 	node_creation_count INT,
 	
 );
 
-CREATE TABLE confirmation_links(
+CREATE TABLE email_confirmation_links(
 	username VARCHAR(25) PRIMARY KEY,
 	GUID UNIQUEIDENTIFIER,
 	timestamp TIME
