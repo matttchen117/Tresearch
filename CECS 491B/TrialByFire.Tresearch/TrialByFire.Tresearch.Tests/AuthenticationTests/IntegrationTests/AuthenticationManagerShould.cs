@@ -7,7 +7,7 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.AuthenticationTests
 {
-    internal class AuthenticationManagerShould
+    public class AuthenticationManagerShould
     {
 
         public void CreateTheOTPClaim(_username, _otp, now)

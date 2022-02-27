@@ -7,7 +7,7 @@ using TrialByFire.Tresearch.DAL.Contracts;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
-    internal class LogService : ILogService
+    public class LogService : ILogService
     {
         public ISqlDAO sqlDAO { get; }
 

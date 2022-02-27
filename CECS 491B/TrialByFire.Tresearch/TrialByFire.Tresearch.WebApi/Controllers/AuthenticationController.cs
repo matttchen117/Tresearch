@@ -6,6 +6,9 @@ namespace TrialByFire.Tresearch.WebApi.Controllers
     {
 
         public AuthenticationController(ISqlDAO a, ILogService q)
+        {
+
+        }
         public IActionResult Index()
         {
             return View();

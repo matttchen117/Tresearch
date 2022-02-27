@@ -7,7 +7,7 @@ using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Models.Implementations
 {
-    internal class Log : ILog
+    public class Log : ILog
     {
         public DateTime timestamp { get; }
         public string level { get; }

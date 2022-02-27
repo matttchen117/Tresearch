@@ -4,16 +4,37 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch.WebApi", "TrialByFire.Tresearch.WebApi\TrialByFire.Tresearch.WebApi.csproj", "{8DC889BA-68BF-43B6-A952-8F9D49F7F868}"
+	ProjectSection(ProjectDependencies) = postProject
+		{301E6944-AEDF-4E97-A10D-F5FB6C64D50A} = {301E6944-AEDF-4E97-A10D-F5FB6C64D50A}
+		{AB65ED53-F8AB-48C3-9D09-AEF3DB83BE9F} = {AB65ED53-F8AB-48C3-9D09-AEF3DB83BE9F}
+		{EFF69065-DE0D-4648-9723-CD843356C208} = {EFF69065-DE0D-4648-9723-CD843356C208}
+		{2CE8F2C1-5643-41F2-A76D-1E7A1CE9CFA3} = {2CE8F2C1-5643-41F2-A76D-1E7A1CE9CFA3}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch.Services", "TrialByFire.Tresearch.Services\TrialByFire.Tresearch.Services.csproj", "{2CE8F2C1-5643-41F2-A76D-1E7A1CE9CFA3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{301E6944-AEDF-4E97-A10D-F5FB6C64D50A} = {301E6944-AEDF-4E97-A10D-F5FB6C64D50A}
+		{EFF69065-DE0D-4648-9723-CD843356C208} = {EFF69065-DE0D-4648-9723-CD843356C208}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch.Managers", "TrialByFire.Tresearch.Managers\TrialByFire.Tresearch.Managers.csproj", "{AB65ED53-F8AB-48C3-9D09-AEF3DB83BE9F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{301E6944-AEDF-4E97-A10D-F5FB6C64D50A} = {301E6944-AEDF-4E97-A10D-F5FB6C64D50A}
+		{EFF69065-DE0D-4648-9723-CD843356C208} = {EFF69065-DE0D-4648-9723-CD843356C208}
+		{2CE8F2C1-5643-41F2-A76D-1E7A1CE9CFA3} = {2CE8F2C1-5643-41F2-A76D-1E7A1CE9CFA3}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch.Tests", "TrialByFire.Tresearch.Tests\TrialByFire.Tresearch.Tests.csproj", "{CB93DED3-D97A-4346-BE58-FAF6CD5CE830}"
+	ProjectSection(ProjectDependencies) = postProject
+		{301E6944-AEDF-4E97-A10D-F5FB6C64D50A} = {301E6944-AEDF-4E97-A10D-F5FB6C64D50A}
+		{AB65ED53-F8AB-48C3-9D09-AEF3DB83BE9F} = {AB65ED53-F8AB-48C3-9D09-AEF3DB83BE9F}
+		{EFF69065-DE0D-4648-9723-CD843356C208} = {EFF69065-DE0D-4648-9723-CD843356C208}
+		{2CE8F2C1-5643-41F2-A76D-1E7A1CE9CFA3} = {2CE8F2C1-5643-41F2-A76D-1E7A1CE9CFA3}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch.Models", "TrialByFire.Tresearch.Models\TrialByFire.Tresearch.Models.csproj", "{EFF69065-DE0D-4648-9723-CD843356C208}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrialByFire.Tresearch.DAL", "TrialByFire.Tresearch.DAL\TrialByFire.Tresearch.DAL.csproj", "{301E6944-AEDF-4E97-A10D-F5FB6C64D50A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch.DAL", "TrialByFire.Tresearch.DAL\TrialByFire.Tresearch.DAL.csproj", "{301E6944-AEDF-4E97-A10D-F5FB6C64D50A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

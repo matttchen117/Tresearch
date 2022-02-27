@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Models.Contracts
 {
-    internal interface ILog
+    public interface ILog
     {
         DateTime timestamp { get; }
         string level { get; }

@@ -1,0 +1,12 @@
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.deps.json
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.pdb
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.csproj.AssemblyReference.cache
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.AssemblyInfoInputs.cache
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.AssemblyInfo.cs
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.csproj.CoreCompileInputs.cache
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\refint\TrialByFire.Tresearch.DAL.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.pdb
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\ref\TrialByFire.Tresearch.DAL.dll

@@ -7,7 +7,7 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.OTPRequestTests
 {
-    internal class OTPRequestControllerShould
+    public class OTPRequestControllerShould
     {
         
     }

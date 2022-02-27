@@ -7,7 +7,7 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.AuthorizationTests
 {
-    internal class AuthorizationControllerShould
+    public class AuthorizationControllerShould
     {
         public void AuthorizeTheUser(IPrincipal _principal)
         {

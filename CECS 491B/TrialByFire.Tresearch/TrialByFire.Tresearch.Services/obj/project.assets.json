@@ -565,6 +565,26 @@
         "runtime": {
           "lib/netstandard1.3/System.Xml.XDocument.dll": {}
         }
+      },
+      "TrialByFire.Tresearch.DAL/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/TrialByFire.Tresearch.DAL.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/TrialByFire.Tresearch.DAL.dll": {}
+        }
+      },
+      "TrialByFire.Tresearch.Models/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/TrialByFire.Tresearch.Models.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/TrialByFire.Tresearch.Models.dll": {}
+        }
       }
     }
   },
@@ -2731,11 +2751,23 @@
         "system.xml.xdocument.4.0.11.nupkg.sha512",
         "system.xml.xdocument.nuspec"
       ]
+    },
+    "TrialByFire.Tresearch.DAL/1.0.0": {
+      "type": "project",
+      "path": "../TrialByFire.Tresearch.DAL/TrialByFire.Tresearch.DAL.csproj",
+      "msbuildProject": "../TrialByFire.Tresearch.DAL/TrialByFire.Tresearch.DAL.csproj"
+    },
+    "TrialByFire.Tresearch.Models/1.0.0": {
+      "type": "project",
+      "path": "../TrialByFire.Tresearch.Models/TrialByFire.Tresearch.Models.csproj",
+      "msbuildProject": "../TrialByFire.Tresearch.Models/TrialByFire.Tresearch.Models.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net6.0": [
-      "SendGrid >= 9.25.3"
+      "SendGrid >= 9.25.3",
+      "TrialByFire.Tresearch.DAL >= 1.0.0",
+      "TrialByFire.Tresearch.Models >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -2764,7 +2796,14 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
+            },
+            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

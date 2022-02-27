@@ -7,13 +7,15 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.AuthenticationTests
 {
-    internal class AuthenticationControllerShould
+    public class AuthenticationControllerShould
     {
 
         public void AuthenticateTheUser(string _username, string _otp)
         {
             // Arrange
             ISqlDAO _sqlDAO;
+            IDAO _inMemoryDAO = new InMemoryDAO()
+
             ILogService _logService;
             IAuthenticationController _authenticationController = new AuthenticationController(_sqlDAO, _logService);
             string expected = "success";

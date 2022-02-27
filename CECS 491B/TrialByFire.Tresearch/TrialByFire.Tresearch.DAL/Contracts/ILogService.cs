@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.DAL.Contracts
 {
-    internal interface ILogService
+    public interface ILogService
     {
         ISqlDAO sqlDAO { get; }
 

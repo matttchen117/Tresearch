@@ -11,7 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Implementations\" />
+    <ProjectReference Include="..\TrialByFire.Tresearch.DAL\TrialByFire.Tresearch.DAL.csproj" />
+    <ProjectReference Include="..\TrialByFire.Tresearch.Models\TrialByFire.Tresearch.Models.csproj" />
   </ItemGroup>
 
 </Project>

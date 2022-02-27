@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Models.Contracts
 {
-    internal interface IRoleIdentity : IIdentity
+    public interface IRoleIdentity : IIdentity
     {
         
     }

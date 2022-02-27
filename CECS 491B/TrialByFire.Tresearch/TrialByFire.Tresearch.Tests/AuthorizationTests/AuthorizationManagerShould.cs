@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Tests.AuthorizationTests
 {
-    internal class AuthorizationManagerShould
+    public class AuthorizationManagerShould
     {
         public void AuthorizeTheUser(IPrincipal _principal)
         {

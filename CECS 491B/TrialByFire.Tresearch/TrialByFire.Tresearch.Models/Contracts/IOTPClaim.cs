@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Models.Contracts
 {
-    internal interface IOTPClaim
+    public interface IOTPClaim
     {
         string username { get; }
         string otp { get; }

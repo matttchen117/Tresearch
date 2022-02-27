@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.AuthenticationTests
+namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
 {
-    internal class AuthenticationServiceShould
+    public class AuthenticationServiceShould
     { 
 
         public void CreateTheJWTToken(string _payload)

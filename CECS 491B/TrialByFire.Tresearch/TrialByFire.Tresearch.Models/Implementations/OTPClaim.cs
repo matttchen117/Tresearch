@@ -7,7 +7,7 @@ using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Models.Implementations
 {
-    internal class OTPClaim : IOTPClaim
+    public class OTPClaim : IOTPClaim
     {
         public string username { get; }
 

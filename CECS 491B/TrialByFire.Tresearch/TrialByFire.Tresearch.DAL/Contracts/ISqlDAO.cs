@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.DAL.Contracts
 {
-    internal interface ISqlDAO
+    public interface ISqlDAO
     {
         string sqlConnectionString { get; set; }
+
     }
 }

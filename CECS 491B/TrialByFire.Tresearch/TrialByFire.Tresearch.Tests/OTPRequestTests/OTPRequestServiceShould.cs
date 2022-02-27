@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Tests.OTPRequestTests
 {
-    internal class OTPRequestServiceShould
+    public class OTPRequestServiceShould
     {
         
     }
