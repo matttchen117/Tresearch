@@ -4,13 +4,13 @@
     "\\CECS 491B",
     "\\CECS 491B\\TrialByFire.Tresearch",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\Implementations",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\Contracts",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\AuthorizationTests",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\OTPRequestTests",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\Controllers"
   ],
-  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\Implementations\\SqlAuthenticationService.cs",
+  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\Contracts\\IAuthenticationService.cs",
   "PreviewInSolutionExplorer": false
 }
