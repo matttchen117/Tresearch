@@ -7,11 +7,11 @@ using TrialByFire.Tresearch.DAL.Contracts;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
-    public class LogService : ILogService
+    public class SqlLogService : ILogService
     {
         public ISqlDAO sqlDAO { get; }
 
-        public LogService(ISqlDAO sqlDAO)
+        public SqlLogService(ISqlDAO sqlDAO)
         {
             this.sqlDAO = sqlDAO;
         }

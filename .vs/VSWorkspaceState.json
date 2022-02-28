@@ -1,16 +1,16 @@
 {
   "ExpandedNodes": [
     "",
-    "\\CECS 491B",
+    "\\CECS 491A",
+    "\\CECS 491A\\TrialByFire.Tresearch",
+    "\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL",
+    "\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\Contracts",
     "\\CECS 491B\\TrialByFire.Tresearch",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\Contracts",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\AuthorizationTests",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\OTPRequestTests",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\Controllers"
   ],
-  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\Contracts\\IAuthenticationService.cs",
+  "SelectedNode": "\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\Contracts\\IRepository.cs",
   "PreviewInSolutionExplorer": false
 }

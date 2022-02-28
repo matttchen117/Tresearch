@@ -7,11 +7,11 @@ using TrialByFire.Tresearch.DAL.Contracts;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
-    public class SqlDAO : ISqlDAO
+    public class InMemorySqlDAO : ISqlDAO
     {
         public string sqlConnectionString { get; set; }
 
-        public SqlDAO()
+        public InMemorySqlDAO()
         {
         }
     }

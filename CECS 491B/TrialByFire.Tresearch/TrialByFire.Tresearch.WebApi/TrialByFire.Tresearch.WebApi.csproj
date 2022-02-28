@@ -10,4 +10,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TrialByFire.Tresearch.DAL\TrialByFire.Tresearch.DAL.csproj" />
+    <ProjectReference Include="..\TrialByFire.Tresearch.Managers\TrialByFire.Tresearch.Managers.csproj" />
+  </ItemGroup>
+
 </Project>
