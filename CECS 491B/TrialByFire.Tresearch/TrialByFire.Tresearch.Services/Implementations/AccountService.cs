@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TrialByFire.Tresearch.Models.Implementations;
+using TrialByFire.Tresearch.Services.Contracts;
+using TrialByFire.Tresearch.DAL.Contracts;
+using TrialByFire.Tresearch.Models.Contracts;
 
-namespace TrialByFire.Tresearch.Services
+namespace TrialByFire.Tresearch.Services.Implementations
 {
-    public class AccountService
+    public class AccountService : IAccountService
     {
-        public string CreatePreRegisteredAccount(Account account)
+        public ISqlDAO _sqlDAO { get; set; }
+        public ILogService _logService { get; set; }
+        public string CreatePreRegisteredAccount(IAccount account)
         {
             try
             {
@@ -23,12 +27,13 @@ namespace TrialByFire.Tresearch.Services
             return "Success - Account Created";
         }
 
-        public string SendConfirmation(string email, string username)
+        public string CreateConfirmation(string email, string username)
         {
             try
             {
 
-            }catch
+            }
+            catch
             {
 
             }
