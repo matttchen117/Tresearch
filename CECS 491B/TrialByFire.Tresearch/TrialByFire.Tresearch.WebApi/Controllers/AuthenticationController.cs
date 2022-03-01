@@ -32,6 +32,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers
                     return result;
                 }
             }
+
             // {category}: {error message}
             string[] error = result.Split(": ");
             _logService.CreateLog(DateTime.Now, error[0], username, "Error", error[1]);

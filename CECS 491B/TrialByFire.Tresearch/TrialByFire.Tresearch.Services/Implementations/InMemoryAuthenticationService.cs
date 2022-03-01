@@ -22,6 +22,7 @@ namespace TrialByFire.Tresearch.Services.Implentations
             // Do like this, when doing DI for tests, it will be for 
             _sqlDAO = new InMemorySqlDAO();
             _logService = new InMemoryLogService(_sqlDAO);
+            _payload = "";
         }
 
 

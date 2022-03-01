@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Models.Implementations
 {
-    public class Account
+    public class Account : IAccount
     {
         public string Email { get; set; }
 
@@ -19,8 +20,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public bool Status { get; set; }
 
         public bool Confirmed { get; set; }
-
-        public Account() { }
 
         public Account(string email, string username, string passphrase, string authorizationLevel)
         {
