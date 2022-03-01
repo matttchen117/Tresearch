@@ -1,0 +1,10 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "task-IDailyRegistration",
+      "appliesTo": "CECS 491B/TrialByFire.Tresearch/TrialByFire.Tresearch.Models/Contracts/IDailyRegistration.cs",
+      "type": "launch"
+    }
+  ]
+}
