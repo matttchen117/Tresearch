@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace TrialByFire.Tresearch.Models.Contracts
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
     public interface IAccount
 =======
     public class IAccount
@@ -14,3 +15,20 @@ namespace TrialByFire.Tresearch.Models.Contracts
     {
     }
 }
+=======
+    public interface IAccount
+    {
+        string email { get; set; }
+        
+        string username { get; set; }
+
+        string passphrase { get; set; }
+
+        string authorizationLevel { get; set; }
+
+        bool status { get; set; }
+
+        bool confirmed { get; set; }
+    }
+}
+>>>>>>> origin/Ian's-Branch

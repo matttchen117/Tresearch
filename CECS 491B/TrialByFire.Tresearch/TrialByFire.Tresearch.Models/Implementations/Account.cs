@@ -9,26 +9,26 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class Account : IAccount
     {
-        public string Email { get; set; }
+        public string email { get; set; }
 
-        public string Username { get; set; }
+        public string username { get; set; }
 
-        public string Passphrase { get; set; }
+        public string passphrase { get; set; }
 
-        public string AuthorizationLevel { get; set; }
+        public string authorizationLevel { get; set; }
 
-        public bool Status { get; set; }
+        public bool status { get; set; }
 
-        public bool Confirmed { get; set; }
+        public bool confirmed { get; set; }
 
         public Account(string email, string username, string passphrase, string authorizationLevel)
         {
-            Email = email;
-            Username = username;
-            Passphrase = passphrase;
-            AuthorizationLevel = authorizationLevel;
-            Status = false;
-            Confirmed = false;
+            this.email = email;
+            this.username = username;
+            this.passphrase = passphrase;
+            this.authorizationLevel = authorizationLevel;
+            this.status = false;
+            this.confirmed = false;
         }     
     }
 
