@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
+using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
-namespace TrialByFire.Tresearch.WebApi.Controllers
+namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
-    public class AuthenticationController : Controller
+    public class AuthenticationController : Controller, IAuthenticationController
     {
         private readonly ISqlDAO _sqlDAO;
         private readonly ILogService _logService;

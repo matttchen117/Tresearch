@@ -10,15 +10,15 @@ using TrialByFire.Tresearch.Services.Contracts;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
-    public class InMemoryOTPRequestService : IOTPRequestService
+    public class OTPRequestService : IOTPRequestService
     {
         private readonly ISqlDAO _sqlDAO;
         private readonly ILogService _logService;
 
-        public InMemoryOTPRequestService(ISqlDAO inMemorySqlDAO, ILogService inMemoryLogService)
+        public OTPRequestService(ISqlDAO sqlDAO, ILogService logService)
         {
-            _sqlDAO = inMemorySqlDAO;
-            _logService = inMemoryLogService;
+            _sqlDAO = sqlDAO;
+            _logService = logService;
         }
 
         public string RequestOTP(IAccount account)

@@ -19,7 +19,7 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
             // Arrange
             ISqlDAO _sqlDAO = new SqlDAO();
             ILogService _logService = new SqlLogService(_sqlDAO);
-            IAuthenticationManager _authenticationManager = new SqlAuthenticationManager(_sqlDAO, _logService);
+            IAuthenticationManager _authenticationManager = new AuthenticationManager(_sqlDAO, _logService);
             string expected = "success";
 
             // Act

@@ -13,16 +13,16 @@ using TrialByFire.Tresearch.Services.Implementations;
 
 namespace TrialByFire.Tresearch.Managers.Implementations
 {
-    public class SqlAuthenticationManager : IAuthenticationManager
+    public class AuthenticationManager : IAuthenticationManager
     {
         private readonly ISqlDAO _sqlDAO;
         private readonly ILogService _logService;
         private readonly IAuthenticationService _authenticationService;
-        public SqlAuthenticationManager(ISqlDAO sqlDAO, ILogService logService)
+        public AuthenticationManager(ISqlDAO sqlDAO, ILogService logService, IAuthenticationService authenticationService)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
-            _authenticationService = new SqlAuthenticationService(_sqlDAO, _logService);
+            _authenticationService = authenticationService;
         }
         public List<string> Authenticate(string username, string otp, DateTime now)
         {

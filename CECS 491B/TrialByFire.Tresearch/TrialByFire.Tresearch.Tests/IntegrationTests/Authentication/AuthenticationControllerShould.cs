@@ -8,7 +8,7 @@ using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
 using TrialByFire.Tresearch.WebApi.Controllers;
-using Xunit;
+using XUnit;
 
 namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
 {
@@ -20,7 +20,7 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
             // Arrange
             ISqlDAO _sqlDAO = new SqlDAO();
             ILogService _logService = new SqlLogService(_sqlDAO);
-            IAuthenticationManager _authenticationManager = new SqlAuthenticationManager(_sqlDAO, _logService);
+            IAuthenticationManager _authenticationManager = new AuthenticationManager(_sqlDAO, _logService);
             AuthenticationController _authenticationController = new AuthenticationController(_sqlDAO, _logService, _authenticationManager);
             string expected = "success";
 
@@ -36,7 +36,7 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
             // Arrange
             ISqlDAO _sqlDAO = new SqlDAO();
             ILogService _logService = new SqlLogService(_sqlDAO);
-            IAuthenticationManager _authenticationManager = new SqlAuthenticationManager(_sqlDAO, _logService);
+            IAuthenticationManager _authenticationManager = new AuthenticationManager(_sqlDAO, _logService);
             AuthenticationController _authenticationController = new AuthenticationController(_sqlDAO, _logService, _authenticationManager);
             string expected = "success";
 

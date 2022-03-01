@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace TrialByFire.Tresearch.WebApi.Controllers
+namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
     public class OTPRequestController : Controller
     {

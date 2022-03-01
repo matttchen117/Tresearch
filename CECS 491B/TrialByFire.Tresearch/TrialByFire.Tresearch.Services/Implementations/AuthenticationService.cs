@@ -10,14 +10,13 @@ using TrialByFire.Tresearch.Services.Contracts;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
-    public class SqlAuthenticationService : IAuthenticationService
+    public class AuthenticationService : IAuthenticationService
     {
         public ISqlDAO _sqlDAO { get; set;  }
         public ILogService _logService { get; set; }
-
         public string _payload { get; set; }
 
-        public SqlAuthenticationService(ISqlDAO _sqlDAO, ILogService _logService)
+        public AuthenticationService(ISqlDAO _sqlDAO, ILogService _logService)
         {
             this._sqlDAO = _sqlDAO;
             this._logService = _logService;
@@ -29,6 +28,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _payload = _sqlDAO.Authenticate(_otpClaim);
         }
 
+        // use microsoft built in jWT
+        // use default key, randomizer, replace every 3 months
+        // look into AES type 
         public List<string> CreateJwtToken(string _payload)
         {
             List<string> results = new List<string>();
@@ -37,13 +39,13 @@ namespace TrialByFire.Tresearch.Services.Implementations
             string header = "{\"alg\": \"HS256\",\"typ\": \"JWT\"}";
             //string _payload = "{\"Username\": \"Bob\",\"Role\": \"Admin\",\"iat\": \"now\"}";
 
-            // hash header and payload
             string key = "";
             using (HMACSHA256 hmac = new HMACSHA256(Encoding.UTF8.GetBytes(key)))
             {
-                //store header, payload, and signature in jwt
-                // encrypt the jwt
+                // hash header and payload into signature
                 var signature = hmac.ComputeHash(Encoding.UTF8.GetBytes(header + '.' + _payload));
+
+                // store header, payload, and signature in jwt
                 _jwtToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(header)) + '.' +
                     Convert.ToBase64String(Encoding.UTF8.GetBytes(_payload)) + '.' +
                     Convert.ToBase64String(signature);

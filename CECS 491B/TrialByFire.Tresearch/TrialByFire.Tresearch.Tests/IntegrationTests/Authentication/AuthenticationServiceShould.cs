@@ -20,7 +20,7 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
             // Arrange
             ISqlDAO _sqlDAO = new SqlDAO();
             ILogService _logService = new SqlLogService(_sqlDAO);
-            IAuthenticationService _authenticationService = new SqlAuthenticationService(_sqlDAO, _logService);
+            IAuthenticationService _authenticationService = new AuthenticationService(_sqlDAO, _logService);
             string expected = "success";
 
             // Act
@@ -35,7 +35,7 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
             // Arrange
             ISqlDAO _sqlDAO = new SqlDAO();
             ILogService _logService = new SqlLogService(_sqlDAO);
-            IAuthenticationService _authenticationService = new SqlAuthenticationService(_sqlDAO, _logService);
+            IAuthenticationService _authenticationService = new AuthenticationService(_sqlDAO, _logService);
             string expected = "success";
 
             // Act
