@@ -12,7 +12,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         string SqlConnectionString { get; set; }
 
         public bool CreateAccount(IAccount account);
-        public bool CreateConfirmationLink(IAccount account, string link);
+        public bool CreateConfirmationLink(IConfirmationLink _confirmationlink);
 
     }
 }

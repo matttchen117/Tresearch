@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
@@ -31,12 +32,13 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
         public string CreateConfirmation(IAccount account, string baseUrl)
         {
-            string activationGuid;
+            Guid activationGuid;
             try
             {
-                activationGuid = Guid.NewGuid().ToString();
+                activationGuid = Guid.NewGuid();
                 var linkUrl = $"{baseUrl}/Account/Verify?t={activationGuid}";
-                bool isAccountCreated = _sqlDAO.CreateConfirmationLink(account, baseUrl);
+                IConfirmationLink _confirmationLink= new ConfirmationLink(account.username, activationGuid, DateTime.Now);
+                bool isAccountCreated = _sqlDAO.CreateConfirmationLink(_confirmationLink);
                 if (!isAccountCreated)
                     return null;
             }
@@ -44,7 +46,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 return null;
             }
-            return activationGuid;
+            return activationGuid.ToString();
         }
 
         public string ConfirmAccount(string email)

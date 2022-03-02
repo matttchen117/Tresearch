@@ -2,6 +2,7 @@
 using System.Data.SqlClient;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
@@ -13,16 +14,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
         }
 
-        public bool CreateConfirmationLink(IAccount account, string link)
+        public bool CreateConfirmationLink(IConfirmationLink _confirmationlink)
         {
             try
             {
                 using (var connection = new SqlConnection(SqlConnectionString))
                 {
-                    // Check if account already has an link
-                    string email = account.email;
-                    var insertQuery = "INSERT INTO confirmation_links (Email, Link) VALUES (@Email, @Link)";
-                    int affectedRows = connection.Execute(insertQuery, new { Email = email, Link = link });
+                    var insertQuery = "INSERT INTO confirmation_links (Username, Link, Timestamp) VALUES (@Username, @Link, @Timestamp)";
+                    int affectedRows = connection.Execute(insertQuery, _confirmationlink);
 
                     if (affectedRows == 1)
                         return true;
@@ -34,6 +33,30 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return false;
             }  
         }
+
+        public IConfirmationLink GetConfirmationLink(string url)
+        {
+            string guidString = url.Substring(url.LastIndexOf('/')+1);
+            Guid guid = new Guid(url);
+            IConfirmationLink _confirmationLink;
+
+            try
+            {
+                using (var connection = new SqlConnection(SqlConnectionString))
+                {
+                    var readQuery = "SELECT * FROM confirmation_links WHERE GUID = @guid";
+                    _confirmationLink = connection.QuerySingle<ConfirmationLink>(readQuery, new { Guid = guid });
+
+                }
+            } catch
+            {
+                return null;
+            }
+
+            return _confirmationLink;
+        }
+
+      
 
         public bool CreateAccount(IAccount account)
         {
