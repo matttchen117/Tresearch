@@ -18,7 +18,20 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             
             
         }
+        [HttpGet]
+        public void SendConfirmation(string email, string passphrase)
+        {
+            string baseUrl = string.Format("{0}://{1}", HttpContext.Request.Scheme, HttpContext.Request.Host);
+            _accountManager.SendConfirmation(email, passphrase, baseUrl);
+        }
 
-
+        [HttpGet]
+        public void ConfirmAccount(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                // Return url is null or ""
+            }
+        }
     }
 }
