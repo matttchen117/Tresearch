@@ -17,7 +17,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             string code;
             try
             {
-                Account _account = new Account(email, passphrase, defaultAuthorization, true, false);
+                IAccount _account = new Account(email, passphrase, defaultAuthorization, true, false);
                 code = _accountService.CreatePreConfirmedAccount(_account);
 
             } catch
