@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Services.Contracts;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
@@ -31,47 +35,38 @@ namespace TrialByFire.Tresearch.Services.Implementations
         // use microsoft built in jWT
         // use default key, randomizer, replace every 3 months
         // look into AES type 
+        
         public List<string> CreateJwtToken(string _payload)
         {
             List<string> results = new List<string>();
-
-            string _jwtToken;
-            string header = "{\"alg\": \"HS256\",\"typ\": \"JWT\"}";
-            //string _payload = "{\"Username\": \"Bob\",\"Role\": \"Admin\",\"iat\": \"now\"}";
-
-            string key = "";
-            using (HMACSHA256 hmac = new HMACSHA256(Encoding.UTF8.GetBytes(key)))
+            
+            // break payload into parts
+            Dictionary<string, string> claimValuePairs = new Dictionary<string, string>();
+            string[] claimValue = _payload.Split(",");
+            foreach(string cV in claimValue)
             {
-                // hash header and payload into signature
-                var signature = hmac.ComputeHash(Encoding.UTF8.GetBytes(header + '.' + _payload));
-
-                // store header, payload, and signature in jwt
-                _jwtToken = Convert.ToBase64String(Encoding.UTF8.GetBytes(header)) + '.' +
-                    Convert.ToBase64String(Encoding.UTF8.GetBytes(_payload)) + '.' +
-                    Convert.ToBase64String(signature);
+                string[] pair = cV.Split(":");
+                claimValuePairs.Add(pair[0], pair[1]);
             }
 
-            // encrypt the jwt
-            string encrypted;
-            using (Aes aes = Aes.Create())
-            {
-                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-                using (MemoryStream msEncrypt = new MemoryStream())
-                {
-                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
-                        {
-                            swEncrypt.Write(_jwtToken);
-                        }
-                        encrypted = Convert.ToBase64String(msEncrypt.ToArray());
-                    }
-                }
-            }
+            // create identity to place into JWT
+            IRoleIdentity roleIdentity = new RoleIdentity(true, claimValuePairs["Username"], claimValuePairs["Role"]);
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity(roleIdentity);
 
-            // return the result and encrypted jwt if success
+            //create jwt and set values
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var keyValue = "default";
+            var key = Encoding.ASCII.GetBytes(keyValue);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = claimsIdentity,
+                Expires = DateTime.UtcNow.AddDays(7),
+                IssuedAt = DateTime.UtcNow,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
             results.Add("success");
-            results.Add(encrypted);
+            results.Add(tokenHandler.WriteToken(token));
             return results;
         }
     }
