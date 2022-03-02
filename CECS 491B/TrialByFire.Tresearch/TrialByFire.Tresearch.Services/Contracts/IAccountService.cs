@@ -15,7 +15,7 @@ namespace TrialByFire.Tresearch.Services.Contracts
         public ISqlDAO _sqlDAO { get; set; }
         public ILogService _logService { get; set; }
 
-        public string CreatePreRegisteredAccount(IAccount account);
+        public string CreatePreConfirmedAccount(IAccount account);
 
         public string CreateConfirmation(IAccount account, string baseUrl);
     }

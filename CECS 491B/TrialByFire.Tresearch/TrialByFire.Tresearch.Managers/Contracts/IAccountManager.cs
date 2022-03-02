@@ -15,5 +15,7 @@ namespace TrialByFire.Tresearch.Managers.Contracts
         private IAccountService _accountService { get; set; }
 
         public string SendConfirmation(IAccount account, string baseUrl);
+
+        public string CreatePreConfirmedAccount(string email, string passphrase);
     }
 }

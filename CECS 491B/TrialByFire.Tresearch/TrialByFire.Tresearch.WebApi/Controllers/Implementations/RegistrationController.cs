@@ -16,8 +16,16 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         private IAccountManager _accountManager;
         public void RegisterAccount(string email, string passphrase)
         {
-            
-            
+            string code ="";
+            try
+            {
+                code = _accountManager.CreatePreConfirmedAccount(email, passphrase);
+            } catch
+            {
+                
+            }
+            _logService.CreateLog(DateTime.Now, "Info", email, "Business", code);
+
         }
         [HttpGet]
         public void SendConfirmation(IAccount account)

@@ -13,17 +13,17 @@ namespace TrialByFire.Tresearch.Services.Implementations
     {
         public ISqlDAO _sqlDAO { get; set; }
         public ILogService _logService { get; set; }
-
-        private string baseUrl;
-        public string CreatePreRegisteredAccount(IAccount account)
+        public string CreatePreConfirmedAccount(IAccount account)
         {
             try
             {
-
+                Boolean isAccountCreated = _sqlDAO.CreateAccount(account);
+                if (!isAccountCreated)
+                    return "Failed - Cannot add account to database";
             }
             catch
             {
-
+                return "Failed - Account not created";
             }
 
             return "Success - Account Created";

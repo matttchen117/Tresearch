@@ -21,15 +21,24 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public bool confirmed { get; set; }
 
-        public Account(string email, string username, string passphrase, string authorizationLevel)
+        public Account(string email, string username, string passphrase, string authorizationLevel, bool status, bool confirmed)
         {
             this.email = email;
             this.username = username;
             this.passphrase = passphrase;
             this.authorizationLevel = authorizationLevel;
-            this.status = false;
-            this.confirmed = false;
-        }     
+            this.status = status;
+            this.confirmed = confirmed;
+        }  
+        
+        public Account(string email, string passphrase, string authorizationLevel, bool status, bool confirmed)
+        {
+            this.email = email;
+            this.passphrase = passphrase;
+            this.authorizationLevel = authorizationLevel;
+            this.status = status;
+            this.confirmed = confirmed;
+        }
     }
 
 
