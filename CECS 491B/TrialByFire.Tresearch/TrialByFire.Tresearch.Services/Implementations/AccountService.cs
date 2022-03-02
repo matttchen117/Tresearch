@@ -29,13 +29,16 @@ namespace TrialByFire.Tresearch.Services.Implementations
             return "Success - Account Created";
         }
 
-        public string CreateConfirmation(string baseUrl)
+        public string CreateConfirmation(IAccount account, string baseUrl)
         {
             string activationGuid;
             try
             {
                 activationGuid = Guid.NewGuid().ToString();
                 var linkUrl = $"{baseUrl}/Account/Verify?t={activationGuid}";
+                bool isAccountCreated = _sqlDAO.CreateConfirmationLink(account, baseUrl);
+                if (!isAccountCreated)
+                    return null;
             }
             catch
             {

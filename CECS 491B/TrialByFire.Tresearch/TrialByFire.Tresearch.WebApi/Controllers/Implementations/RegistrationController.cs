@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Runtime.dll;
 using TrialByFire.Tresearch.DAL.Contracts;
+using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
@@ -19,10 +20,10 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             
         }
         [HttpGet]
-        public void SendConfirmation(string email, string passphrase)
+        public void SendConfirmation(IAccount account)
         {
             string baseUrl = string.Format("{0}://{1}", HttpContext.Request.Scheme, HttpContext.Request.Host);
-            _accountManager.SendConfirmation(email, passphrase, baseUrl);
+            _accountManager.SendConfirmation(account, baseUrl);
         }
 
         [HttpGet]

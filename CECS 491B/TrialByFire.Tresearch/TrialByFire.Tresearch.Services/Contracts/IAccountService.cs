@@ -17,5 +17,6 @@ namespace TrialByFire.Tresearch.Services.Contracts
 
         public string CreatePreRegisteredAccount(IAccount account);
 
+        public string CreateConfirmation(IAccount account, string baseUrl);
     }
 }

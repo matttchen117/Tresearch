@@ -13,7 +13,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
         }
 
-        public bool CreateConfirmationlink(IAccount account, string link)
+        public bool CreateConfirmationLink(IAccount account, string link)
         {
             try
             {
