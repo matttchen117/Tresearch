@@ -93,7 +93,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     {
                         account.username = account.username.Insert(account.username.IndexOf('@'), accounts.ToString());
                     }
-                    var insertQuery = "INSERT INTO Accounts (Email, Username, Passphrase, AuthorizationLevel, Status) " +
+                    var insertQuery = "INSERT INTO user_accounts (Email, Username, Passphrase, AuthorizationLevel, Status) " +
                         "VALUES (@email, @username, @passphrase, @authorization_level, @Status)";
                     affectedRows = connection.Execute(insertQuery, account);
                 }
