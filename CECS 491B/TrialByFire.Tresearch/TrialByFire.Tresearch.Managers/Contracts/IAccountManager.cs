@@ -11,8 +11,8 @@ namespace TrialByFire.Tresearch.Managers.Contracts
 {
     public interface IAccountManager
     {
-        private IMailService _mailService { get; set; }
-        private IAccountService _accountService { get; set; }
+        public IMailService _mailService { get; set; }
+        public IAccountService _accountService { get; set; }
 
         public string SendConfirmation(IAccount account, string baseUrl);
 

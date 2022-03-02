@@ -1,13 +1,14 @@
 ﻿using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
+using TrialByFire.Tresearch.Managers.Contracts;
 
 namespace TrialByFire.Tresearch.Managers.Implementations
 {
-    public class AccountManager
+    public class AccountManager: IAccountManager
     {
-        private IMailService _mailService { get; set; }
-        private IAccountService _accountService { get; set; }
+        public IMailService _mailService { get; set; }
+        public IAccountService _accountService { get; set; }
 
         private string defaultAuthorization = "user";
 
