@@ -20,7 +20,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(SqlConnectionString))
                 {
-                    var insertQuery = "INSERT INTO confirmation_links (Username, Link, Timestamp) VALUES (@Username, @Link, @Timestamp)";
+                    var insertQuery = "INSERT INTO confirmation_links (Username, Guid, Timestamp) VALUES (@Username, @Guid, @Timestamp)";
                     int affectedRows = connection.Execute(insertQuery, _confirmationlink);
 
                     if (affectedRows == 1)
@@ -78,7 +78,30 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-      
+        public bool DeleteConfirmationLink(IConfirmationLink confirmationLink)
+        {
+            int affectedRows;
+            try
+            {
+                using (var connection = new SqlConnection(SqlConnectionString))
+                {
+                    var deleteQuery = "DELETE FROM confirmation_links WHERE @Username=username and @Guid=guid and @Timestamp=Timestamp";
+                    affectedRows = connection.Execute(deleteQuery, confirmationLink);
+                }
+                if (affectedRows == 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         public bool CreateAccount(IAccount account)
         {

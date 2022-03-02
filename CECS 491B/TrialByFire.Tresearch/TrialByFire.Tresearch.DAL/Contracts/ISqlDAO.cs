@@ -14,5 +14,6 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public bool CreateAccount(IAccount account);
         public bool CreateConfirmationLink(IConfirmationLink _confirmationlink);
 
+        public IConfirmationLink GetConfirmationLink(string url);
     }
 }

@@ -14,6 +14,8 @@ namespace TrialByFire.Tresearch.Services.Implementations
     {
         public ISqlDAO _sqlDAO { get; set; }
         public ILogService _logService { get; set; }
+
+        private int linkActivationLimit = 24;
         public string CreatePreConfirmedAccount(IAccount account)
         {
             try
@@ -62,5 +64,28 @@ namespace TrialByFire.Tresearch.Services.Implementations
             return "Success - Account Confirmed";
         }
 
+        public IConfirmationLink GetConfirmationLinkInfo(string url)
+        {
+            IConfirmationLink _confirmationLink = _sqlDAO.GetConfirmationLink(url);
+            return _confirmationLink;
+
+        }
+
+        public bool isConfirmationLinkValid(IConfirmationLink confirmationLink)
+        {
+            DateTime now = DateTime.Now;
+            if (confirmationLink.timestamp > now.AddHours(-linkActivationLimit) && confirmationLink.timestamp <= now)
+                return true;
+            else
+                return false;
+        }
+
+        public string removeConfirmationLink(IConfirmationLink confirmationLink)
+        {
+
+            return "Success - Confirmation link removed";
+        }
+
+       
     }
 }
