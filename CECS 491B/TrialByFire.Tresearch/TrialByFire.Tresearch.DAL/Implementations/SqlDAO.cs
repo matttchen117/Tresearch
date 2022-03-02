@@ -1,18 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Dapper;
+using System.Data.SqlClient;
 using TrialByFire.Tresearch.DAL.Contracts;
+using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
     public class SqlDAO : ISqlDAO
     {
-        public string sqlConnectionString { get; set; }
+        public string SqlConnectionString { get; set; }
 
         public SqlDAO()
         {
         }
+
+        public bool CreateConfirmationlink(IAccount account, string link)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(SqlConnectionString))
+                {
+                    // Check if account already has an link
+                    string email = account.email;
+                    var insertQuery = "INSERT INTO confirmation_links (Email, Link) VALUES (@Email, @Link)";
+                    int affectedRows = connection.Execute(insertQuery, new { Email = email, Link = link });
+
+                    if (affectedRows == 1)
+                        return true;
+                    else
+                        return false;
+                }
+            }  catch
+            {
+                return false;
+            }  
+        }
+
     }
 }

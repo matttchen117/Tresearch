@@ -13,6 +13,8 @@ namespace TrialByFire.Tresearch.Services.Implementations
     {
         public ISqlDAO _sqlDAO { get; set; }
         public ILogService _logService { get; set; }
+
+        private string baseUrl;
         public string CreatePreRegisteredAccount(IAccount account)
         {
             try
@@ -27,17 +29,19 @@ namespace TrialByFire.Tresearch.Services.Implementations
             return "Success - Account Created";
         }
 
-        public string CreateConfirmation(string email, string username)
+        public string CreateConfirmation(string baseUrl)
         {
+            string activationGuid;
             try
             {
-
+                activationGuid = Guid.NewGuid().ToString();
+                var linkUrl = $"{baseUrl}/Account/Verify?t={activationGuid}";
             }
             catch
             {
-
+                return null;
             }
-            return "Success - Confirmation Sent";
+            return activationGuid;
         }
 
         public string ConfirmAccount(string email)

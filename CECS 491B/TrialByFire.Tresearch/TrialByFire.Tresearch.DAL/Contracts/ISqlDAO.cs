@@ -8,7 +8,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 {
     public interface ISqlDAO
     {
-        string sqlConnectionString { get; set; }
+        string SqlConnectionString { get; set; }
 
     }
 }

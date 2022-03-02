@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace TrialByFire.Tresearch.Services.Contracts
 {
-    internal interface IMailService
+    public interface IMailService
     {
+        public string SendConfirmation(string email, string url);
     }
 }
