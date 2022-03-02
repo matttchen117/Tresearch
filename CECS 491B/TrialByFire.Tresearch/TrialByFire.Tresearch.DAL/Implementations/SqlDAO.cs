@@ -56,6 +56,28 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return _confirmationLink;
         }
 
+        public bool ConfirmAccount(IAccount account)
+        {
+            int affectedRows;
+            try
+            {
+                using (var connection = new SqlConnection(SqlConnectionString))
+                {
+                    var updateQuery = "UPDATE confirmation_links SET confirmed = 1 WHERE Username = @Username and Email = @Email";
+                    affectedRows = connection.Execute(updateQuery, new { Username = account.username, Email = account.email });
+
+                }
+                if (affectedRows == 1)
+                    return true;
+                else
+                    return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
       
 
         public bool CreateAccount(IAccount account)
