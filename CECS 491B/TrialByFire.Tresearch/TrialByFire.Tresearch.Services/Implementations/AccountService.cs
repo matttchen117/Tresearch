@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
@@ -13,31 +14,41 @@ namespace TrialByFire.Tresearch.Services.Implementations
     {
         public ISqlDAO _sqlDAO { get; set; }
         public ILogService _logService { get; set; }
-        public string CreatePreRegisteredAccount(IAccount account)
+
+        private int linkActivationLimit = 24;
+        public string CreatePreConfirmedAccount(IAccount account)
         {
             try
             {
-
+                Boolean isAccountCreated = _sqlDAO.CreateAccount(account);
+                if (!isAccountCreated)
+                    return "Failed - Cannot add account to database";
             }
             catch
             {
-
+                return "Failed - Account not created";
             }
 
             return "Success - Account Created";
         }
 
-        public string CreateConfirmation(string email, string username)
+        public string CreateConfirmation(IAccount account, string baseUrl)
         {
+            Guid activationGuid;
             try
             {
-
+                activationGuid = Guid.NewGuid();
+                var linkUrl = $"{baseUrl}/Account/Verify?t={activationGuid}";
+                IConfirmationLink _confirmationLink= new ConfirmationLink(account.username, activationGuid, DateTime.Now);
+                bool isAccountCreated = _sqlDAO.CreateConfirmationLink(_confirmationLink);
+                if (!isAccountCreated)
+                    return null;
             }
             catch
             {
-
+                return null;
             }
-            return "Success - Confirmation Sent";
+            return activationGuid.ToString();
         }
 
         public string ConfirmAccount(string email)
@@ -53,5 +64,28 @@ namespace TrialByFire.Tresearch.Services.Implementations
             return "Success - Account Confirmed";
         }
 
+        public IConfirmationLink GetConfirmationLinkInfo(string url)
+        {
+            IConfirmationLink _confirmationLink = _sqlDAO.GetConfirmationLink(url);
+            return _confirmationLink;
+
+        }
+
+        public bool isConfirmationLinkValid(IConfirmationLink confirmationLink)
+        {
+            DateTime now = DateTime.Now;
+            if (confirmationLink.timestamp > now.AddHours(-linkActivationLimit) && confirmationLink.timestamp <= now)
+                return true;
+            else
+                return false;
+        }
+
+        public string removeConfirmationLink(IConfirmationLink confirmationLink)
+        {
+
+            return "Success - Confirmation link removed";
+        }
+
+       
     }
 }

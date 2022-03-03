@@ -1,8 +1,8 @@
-﻿using System;
+﻿using TrialByFire.Tresearch.Models.Contracts;
 
-namespace TrialByFire.Tresearch.Models
+namespace TrialByFire.Tresearch.Models.Implementations
 {
-    public class ConfirmationLinks
+    public class ConfirmationLink : IConfirmationLink
     {
         public string username { get; set; }
 
@@ -10,7 +10,7 @@ namespace TrialByFire.Tresearch.Models
 
         public DateTime timestamp { get; set; }
 
-        public ConfirmationLinks(string username, Guid uniqueIdentifier, DateTime timestamp)
+        public ConfirmationLink(string username, Guid uniqueIdentifier, DateTime timestamp)
         {
             this.username = username;
             this.uniqueIdentifier = uniqueIdentifier;
