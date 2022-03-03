@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
@@ -12,38 +13,53 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
 {
-    public class InMemoryAuthenticationServiceShould
+    public class AuthenticationServiceShould
     { 
 
-        public void CreateTheJWTToken(string _payload)
+        public void CreateTheJWTToken(string payload)
         {
             // Arrange
-            ISqlDAO _sqlDAO = new SqlDAO();
-            ILogService _logService = new SqlLogService(_sqlDAO);
-            IAuthenticationService _authenticationService = new AuthenticationService(_sqlDAO, _logService);
+            ISqlDAO sqlDAO = new SqlDAO();
+            ILogService logService = new SqlLogService(sqlDAO);
+            IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService);
             string expected = "success";
 
             // Act
-            List<string> results = _authenticationService.CreateJwtToken(_payload);
+            List<string> results = authenticationService.CreateJwtToken(payload);
 
             // Assert
             Assert.Equal(expected, results[0]);
         }
 
-        public void AuthenticateTheUser(IOTPClaim _otpClaim)
+        public void AuthenticateTheUser(IOTPClaim otpClaim)
         {
             // Arrange
-            ISqlDAO _sqlDAO = new SqlDAO();
-            ILogService _logService = new SqlLogService(_sqlDAO);
-            IAuthenticationService _authenticationService = new AuthenticationService(_sqlDAO, _logService);
+            ISqlDAO sqlDAO = new SqlDAO();
+            ILogService logService = new SqlLogService(sqlDAO);
+            IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService);
             string expected = "success";
 
             // Act
-            List<string> results = _authenticationService.Authenticate(_otpClaim);
+            List<string> results = authenticationService.Authenticate(otpClaim);
 
             // Assert
             Assert.Equal(expected, results[0]);
 
+        }
+
+        public void VerifyThatTheUserIsAuthenticated(IPrincipal rolePrincipal)
+        {
+            // Arrange
+            ISqlDAO sqlDAO = new SqlDAO();
+            ILogService logService = new SqlLogService(sqlDAO);
+            IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService);
+            string expected = "success";
+
+            // Act
+            string result = authenticationService.VerifyAuthenticated(rolePrincipal);
+
+            // Assert
+            Assert.Equal(expected, result);
         }
     }
 }

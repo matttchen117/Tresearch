@@ -11,32 +11,34 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using TrialByFire.Tresearch.Models.Implementations;
+using System.Security.Principal;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
     public class AuthenticationService : IAuthenticationService
     {
-        public ISqlDAO _sqlDAO { get; set;  }
-        public ILogService _logService { get; set; }
-        public string _payload { get; set; }
+        private ISqlDAO _sqlDAO { get; }
+        private ILogService _logService { get; }
+        private string _payLoad { get; }
 
-        public AuthenticationService(ISqlDAO _sqlDAO, ILogService _logService)
+        public AuthenticationService(ISqlDAO sqlDAO, ILogService logService)
         {
-            this._sqlDAO = _sqlDAO;
-            this._logService = _logService;
+            _sqlDAO = sqlDAO;
+            _logService = logService;
+            _payLoad = "";
         }
-
 
         public List<string> Authenticate(IOTPClaim _otpClaim)
         {
-            _payload = _sqlDAO.Authenticate(_otpClaim);
+            List<string> results = _sqlDAO.Authenticate(_otpClaim);
+            return CreateJwtToken(results[1]);
         }
 
         // use microsoft built in jWT
         // use default key, randomizer, replace every 3 months
         // look into AES type 
         
-        public List<string> CreateJwtToken(string _payload)
+        private List<string> CreateJwtToken(string _payload)
         {
             List<string> results = new List<string>();
             
@@ -68,6 +70,16 @@ namespace TrialByFire.Tresearch.Services.Implementations
             results.Add("success");
             results.Add(tokenHandler.WriteToken(token));
             return results;
+        }
+
+        public string VerifyAuthenticated(IPrincipal rolePrincipal)
+        {
+            return _sqlDAO.VerifyAuthenticated(rolePrincipal);
+        }
+
+        public string VerifyNotAuthenticated(IPrincipal rolePrincipal)
+        {
+            return _sqlDAO.VerifyNotAuthenticated(rolePrincipal);
         }
     }
 }

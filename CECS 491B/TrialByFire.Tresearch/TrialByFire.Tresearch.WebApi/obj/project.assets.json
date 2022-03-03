@@ -710,6 +710,9 @@
       "TrialByFire.Tresearch.Models/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "TrialByFire.Tresearch.DAL": "1.0.0"
+        },
         "compile": {
           "bin/placeholder/TrialByFire.Tresearch.Models.dll": {}
         },

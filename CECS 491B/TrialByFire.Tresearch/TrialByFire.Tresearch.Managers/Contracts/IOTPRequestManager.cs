@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Managers.Contracts
 {
-    public interface IOtpRequestManager
+    public interface IOTPRequestManager
     {
         string RequestOTP(string username, string passphrase);
     }

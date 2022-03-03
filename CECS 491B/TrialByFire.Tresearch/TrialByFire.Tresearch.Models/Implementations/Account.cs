@@ -30,6 +30,16 @@ namespace TrialByFire.Tresearch.Models.Implementations
             this.status = false;
             this.confirmed = false;
         }     
+
+        public Account(string username, string passphrase)
+        {
+            this.email = "";
+            this.username = username;
+            this.passphrase = passphrase;
+            this.authorizationLevel = "";
+            this.status = false;
+            this.confirmed = false;
+        }
     }
 
 

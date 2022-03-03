@@ -7,41 +7,47 @@ using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
+using TrialByFire.Tresearch.Services.Contracts;
+using TrialByFire.Tresearch.Services.Implementations;
 using TrialByFire.Tresearch.WebApi.Controllers;
-using XUnit;
+using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
+using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
+using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
 {
-    public class InMemoryAuthenticationControllerShould
+    public class AuthenticationControllerShould
     {
 
-        public void AuthenticateTheUser(string _username, string _otp)
+        public void AuthenticateTheUser(string username, string otp)
         {
             // Arrange
-            ISqlDAO _sqlDAO = new SqlDAO();
-            ILogService _logService = new SqlLogService(_sqlDAO);
-            IAuthenticationManager _authenticationManager = new AuthenticationManager(_sqlDAO, _logService);
-            AuthenticationController _authenticationController = new AuthenticationController(_sqlDAO, _logService, _authenticationManager);
+            ISqlDAO sqlDAO = new SqlDAO();
+            ILogService logService = new SqlLogService(sqlDAO);
+            IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService);
+            IAuthenticationManager authenticationManager = new AuthenticationManager(sqlDAO, logService, authenticationService);
+            IAuthenticationController authenticationController = new AuthenticationController(sqlDAO, logService, authenticationManager);
             string expected = "success";
 
             // Act
-            List<string> results = _authenticationController.Authenticate(_username, _otp, DateTime.Now);
+            List<string> results = authenticationController.Authenticate(username, otp, DateTime.Now);
 
             // Assert
             Assert.Equal(expected, results[0]);
         }
 
-        public void CreateTheCookie(string _jwtToken)
+        public void CreateTheCookie(string jwtToken)
         {
             // Arrange
-            ISqlDAO _sqlDAO = new SqlDAO();
-            ILogService _logService = new SqlLogService(_sqlDAO);
-            IAuthenticationManager _authenticationManager = new AuthenticationManager(_sqlDAO, _logService);
-            AuthenticationController _authenticationController = new AuthenticationController(_sqlDAO, _logService, _authenticationManager);
+            ISqlDAO sqlDAO = new SqlDAO();
+            ILogService logService = new SqlLogService(sqlDAO);
+            IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService);
+            IAuthenticationManager authenticationManager = new AuthenticationManager(sqlDAO, logService, authenticationService);
+            IAuthenticationController authenticationController = new AuthenticationController(sqlDAO, logService, authenticationManager);
             string expected = "success";
 
             // Act
-            string result = _authenticationController.CreateCookie(_jwtToken);
+            string result = authenticationController.CreateCookie(jwtToken);
 
             // Assert
             Assert.Equal(expected, result);

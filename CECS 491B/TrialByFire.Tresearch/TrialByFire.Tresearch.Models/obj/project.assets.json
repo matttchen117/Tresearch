@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net6.0": {}
+    "net6.0": {
+      "TrialByFire.Tresearch.DAL/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/TrialByFire.Tresearch.DAL.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/TrialByFire.Tresearch.DAL.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "TrialByFire.Tresearch.DAL/1.0.0": {
+      "type": "project",
+      "path": "../TrialByFire.Tresearch.DAL/TrialByFire.Tresearch.DAL.csproj",
+      "msbuildProject": "../TrialByFire.Tresearch.DAL/TrialByFire.Tresearch.DAL.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net6.0": []
+    "net6.0": [
+      "TrialByFire.Tresearch.DAL >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\": {}
@@ -33,7 +52,11 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

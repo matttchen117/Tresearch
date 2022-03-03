@@ -8,18 +8,20 @@ using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Models.Implementations
 {
-    public class RolePrincipal
+    public class RolePrincipal : IPrincipal
     {
-        public IRoleIdentity _identity { get; }
+        private IRoleIdentity _roleIdentity;
 
-        public RolePrincipal(IRoleIdentity identity)
+        public IIdentity Identity { get { return _roleIdentity; } }
+
+        public RolePrincipal(IRoleIdentity roleIdentity)
         {
-            _identity = identity;
+            _roleIdentity = roleIdentity;
         }
 
         public bool IsInRole(string role)
         {
-            return _identity._role.Equals(role);
+            return _roleIdentity.Role.Equals(role);
         }
     }
 }

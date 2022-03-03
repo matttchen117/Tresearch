@@ -16,13 +16,13 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public string Name { get; }
 
-        public string _role { get; }
+        public string Role { get; }
 
         public RoleIdentity(bool isAuthenticated, string name, string role)
         {
             IsAuthenticated = isAuthenticated;
             Name = name;
-            _role = role;
+            Role = role;
         }
     }
 }

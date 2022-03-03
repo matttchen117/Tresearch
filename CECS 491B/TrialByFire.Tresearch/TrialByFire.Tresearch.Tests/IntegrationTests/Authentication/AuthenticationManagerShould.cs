@@ -14,16 +14,17 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
     public class AuthenticationManagerShould
     {
 
-        public void AuthenticateTheUser(string _username, string _otp, DateTime now)
+        public void AuthenticateTheUser(string username, string otp, DateTime now)
         {
             // Arrange
-            ISqlDAO _sqlDAO = new SqlDAO();
-            ILogService _logService = new SqlLogService(_sqlDAO);
-            IAuthenticationManager _authenticationManager = new AuthenticationManager(_sqlDAO, _logService);
+            ISqlDAO sqlDAO = new SqlDAO();
+            ILogService logService = new SqlLogService(sqlDAO);
+            IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService);
+            IAuthenticationManager authenticationManager = new AuthenticationManager(sqlDAO, logService, authenticationService);
             string expected = "success";
 
             // Act
-            List<string> results = _authenticationManager.Authenticate(_username, _otp, now);
+            List<string> results = authenticationManager.Authenticate(username, otp, now);
 
             // Assert
             Assert.Equal(expected, results[0]);

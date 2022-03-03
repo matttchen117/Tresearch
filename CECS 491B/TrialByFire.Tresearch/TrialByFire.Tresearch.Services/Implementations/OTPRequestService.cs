@@ -12,9 +12,8 @@ namespace TrialByFire.Tresearch.Services.Implementations
 {
     public class OTPRequestService : IOTPRequestService
     {
-        private readonly ISqlDAO _sqlDAO;
-        private readonly ILogService _logService;
-
+        private ISqlDAO _sqlDAO { get; }
+        private ILogService _logService { get; }
         public OTPRequestService(ISqlDAO sqlDAO, ILogService logService)
         {
             _sqlDAO = sqlDAO;

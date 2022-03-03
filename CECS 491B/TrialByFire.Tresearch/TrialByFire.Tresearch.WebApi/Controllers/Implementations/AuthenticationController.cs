@@ -7,9 +7,9 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
     public class AuthenticationController : Controller, IAuthenticationController
     {
-        private readonly ISqlDAO _sqlDAO;
-        private readonly ILogService _logService;
-        private IAuthenticationManager _authenticationManager;
+        private ISqlDAO _sqlDAO { get; }
+        private ILogService _logService { get; }
+        private IAuthenticationManager _authenticationManager { get; }
 
         public AuthenticationController(ISqlDAO sqlDAO, ILogService logService, IAuthenticationManager authenticationManager)
         {

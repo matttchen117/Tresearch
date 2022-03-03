@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
@@ -10,8 +11,10 @@ namespace TrialByFire.Tresearch.Services.Contracts
 {
     public interface IAuthenticationService
     {
-        List<string> Authenticate(IOTPClaim _otpClaim);
+        List<string> Authenticate(IOTPClaim otpClaim);
 
-        List<string> CreateJwtToken(string _payload);
+        string VerifyAuthenticated(IPrincipal rolePrincipal);
+
+        string VerifyNotAuthenticated(IPrincipal rolePrincipal);
     }
 }

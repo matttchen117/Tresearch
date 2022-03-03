@@ -8,6 +8,8 @@ using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
 using TrialByFire.Tresearch.WebApi.Controllers;
+using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
+using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
 using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.AuthenticationTests.UnitTests
@@ -15,34 +17,34 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.UnitTests
     public class InMemoryAuthenticationControllerShould
     {
 
-        public void AuthenticateTheUser(string _username, string _otp)
+        public void AuthenticateTheUser(string username, string otp)
         {
             // Arrange
-            ISqlDAO _inMemorySqlDAO = new InMemorySqlDAO();
-            ILogService _inMemoryLogService = new InMemoryLogService(_inMemorySqlDAO);
-            IAuthenticationManager _inMemoryAuthenticationManager = new InMemoryAuthenticationManager();
-            AuthenticationController _authenticationController = new AuthenticationController(_inMemorySqlDAO, _inMemoryLogService, _inMemoryAuthenticationManager);
+            ISqlDAO inMemorySqlDAO = new InMemorySqlDAO();
+            ILogService inMemoryLogService = new InMemoryLogService(inMemorySqlDAO);
+            IAuthenticationManager authenticationManager = new AuthenticationManager(inMemorySqlDAO, inMemoryLogService);
+            IAuthenticationController authenticationController = new AuthenticationController(inMemorySqlDAO, inMemoryLogService, authenticationManager);
             string expected = "success";
 
             // Act
-            IEnumerable<string> results = _authenticationController.Authenticate(_username, _otp);
+            string result = authenticationController.Authenticate(username, otp);
 
             // Assert
-            Assert.Equal(expected, results.ElementAt(0));
+            Assert.Equal(expected, result);
         }
 
         public void CreateTheCookie(string username, string otp)
         {
             // Arrange
-            ISqlDAO _inMemorySqlDAO = new InMemorySqlDAO();
-            ILogService _inMemoryLogService = new InMemoryLogService(_inMemorySqlDAO);
-            IAuthenticationManager _inMemoryAuthenticationManager = new InMemoryAuthenticationManager();
-            AuthenticationController _authenticationController = new AuthenticationController(_inMemorySqlDAO, _inMemoryLogService, _inMemoryAuthenticationManager);
-            string _jwtToken = _inMemoryAuthenticationManager.Authenticate(username, otp, DateTime.Now)[1];
+            ISqlDAO inMemorySqlDAO = new InMemorySqlDAO();
+            ILogService inMemoryLogService = new InMemoryLogService(inMemorySqlDAO);
+            IAuthenticationManager authenticationManager = new AuthenticationManager(inMemorySqlDAO, inMemoryLogService);
+            IAuthenticationController authenticationController = new AuthenticationController(inMemorySqlDAO, inMemoryLogService, authenticationManager);
+            string _jwtToken = authenticationManager.Authenticate(username, otp, DateTime.Now)[1];
             string expected = "success";
 
             // Act
-            string result = _authenticationController.CreateCookie(_jwtToken);
+            string result = authenticationController.CreateCookie(_jwtToken);
 
             // Assert
             Assert.Equal(expected, result);
