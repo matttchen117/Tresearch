@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
+namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
 {
-    public class RegistrationControllerShould
+    public class InMemoryOTPRequestManagerShould
     {
     }
 }

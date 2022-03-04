@@ -52,7 +52,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
 
             // create identity to place into JWT
-            IRoleIdentity roleIdentity = new RoleIdentity(true, claimValuePairs["Username"], claimValuePairs["Role"]);
+            IRoleIdentity roleIdentity = new RoleIdentity(true, claimValuePairs["username"], claimValuePairs["role"]);
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(roleIdentity);
 
             //create jwt and set values

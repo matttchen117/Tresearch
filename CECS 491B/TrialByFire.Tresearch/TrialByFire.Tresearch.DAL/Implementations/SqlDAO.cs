@@ -8,7 +8,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 {
     public class SqlDAO : ISqlDAO
     {
-        public string SqlConnectionString { get; set; }
+        private string SqlConnectionString { get; }
 
         public SqlDAO()
         {

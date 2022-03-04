@@ -18,8 +18,4 @@
     <ProjectReference Include="..\TrialByFire.Tresearch.WebApi\TrialByFire.Tresearch.WebApi.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="UnitTests\OTPRequest\" />
-  </ItemGroup>
-
 </Project>

@@ -8,7 +8,7 @@ using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Models.Implementations
 {
-    public class RolePrincipal : IPrincipal
+    public class RolePrincipal : IRolePrincipal
     {
         private IRoleIdentity _roleIdentity;
 

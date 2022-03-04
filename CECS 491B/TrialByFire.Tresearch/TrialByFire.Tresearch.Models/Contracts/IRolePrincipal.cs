@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
+namespace TrialByFire.Tresearch.Models.Contracts
 {
-    public class RegistrationControllerShould
+    public interface IRolePrincipal : IPrincipal
     {
     }
 }

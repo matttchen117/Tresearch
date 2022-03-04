@@ -9,50 +9,57 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class Account : IAccount
     {
-        public string email { get; set; }
+        public string? Email { get; }
 
-        public string username { get; set; }
+        private string? Username { get; }
 
-        public string passphrase { get; set; }
+        public string? Passphrase { get; }
 
-        public string authorizationLevel { get; set; }
+        public string? AuthorizationLevel { get; }
 
-        public bool status { get; set; }
+        public bool? Status { get; }
 
-        public bool confirmed { get; set; }
+        public bool? Confirmed { get; }
 
         public Account(string email, string username, string passphrase, string authorizationLevel, bool status, bool confirmed)
         {
-            this.email = email;
-            this.username = username;
-            this.passphrase = passphrase;
-            this.authorizationLevel = authorizationLevel;
-<<<<<<< HEAD
-            this.status = false;
-            this.confirmed = false;
+            Email = email;
+            Username = username;
+            Passphrase = passphrase;
+            AuthorizationLevel = authorizationLevel;
+            Status = false;
+            Confirmed = false;
         }     
-
-        public Account(string username, string passphrase)
-        {
-            this.email = "";
-            this.username = username;
-            this.passphrase = passphrase;
-            this.authorizationLevel = "";
-            this.status = false;
-            this.confirmed = false;
-=======
-            this.status = status;
-            this.confirmed = confirmed;
-        }  
         
         public Account(string email, string passphrase, string authorizationLevel, bool status, bool confirmed)
         {
-            this.email = email;
-            this.passphrase = passphrase;
-            this.authorizationLevel = authorizationLevel;
-            this.status = status;
-            this.confirmed = confirmed;
->>>>>>> f6d5c4b862e0619608144861e583cfd4d829f0fa
+            Email = email;
+            Passphrase = passphrase;
+            AuthorizationLevel = authorizationLevel;
+            Status = status;
+            Confirmed = confirmed;
+        }
+        public Account(string username, string passphrase)
+        {
+            Username = username;
+            Passphrase = passphrase;
+        }
+        public Account(string username)
+        {
+            Username = username;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if(!(obj == null))
+            {
+                if(obj is IAccount)
+                {
+                    IAccount account = (IAccount)obj;
+                    return Username.Equals(account.username) || Email.Equals(account.email);
+                }
+            }
+            return false;
         }
     }
 

@@ -5,6 +5,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
+using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Services.Contracts;
 
 namespace TrialByFire.Tresearch.Services.Implementations
@@ -19,9 +20,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _logService = logService;
         }
 
-        public string VerifyAuthorized(IPrincipal rolePrincipal, string requiredRole)
+        public string Authorize(IRolePrincipal rolePrincipal, string requiredRole)
         {
-            return _sqlDAO.VerifyAuthenticated(rolePrincipal, requiredRole);
+            return _sqlDAO.Authorize(rolePrincipal, requiredRole);
         }
     }
 }

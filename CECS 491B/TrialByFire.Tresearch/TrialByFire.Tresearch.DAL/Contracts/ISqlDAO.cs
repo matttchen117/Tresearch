@@ -9,8 +9,6 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 {
     public interface ISqlDAO
     {
-        string SqlConnectionString { get; set; }
-
         public bool CreateAccount(IAccount account);
         public bool CreateConfirmationLink(IConfirmationLink _confirmationlink);
 

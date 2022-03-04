@@ -10,24 +10,28 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class OTPClaim : IOTPClaim
     {
-        public string _username { get; }
+        public string Username { get; }
 
-        public string _otp { get; }
+        public string OTP { get; }
 
-        public DateTime _created { get; }
+        public DateTime TimeCreated { get; }
 
-        public OTPClaim(string username, string otp, DateTime created)
+        public int FailCount { get; set; }
+
+        public OTPClaim(string username, string otp, DateTime timeCreated)
         {
-            _username = username;
-            _otp = otp;
-            _created = created;
+            Username = username;
+            OTP = otp;
+            TimeCreated = timeCreated;
+            FailCount = 0;
         }
 
         public OTPClaim(IAccount account)
         {
-            _username = account.username;
-            _otp = GenerateRandomOTP();
-            _created = DateTime.Now;
+            Username = account.username;
+            OTP = GenerateRandomOTP();
+            TimeCreated = DateTime.Now;
+            FailCount = 0;
         }
 
         public string GenerateRandomOTP()

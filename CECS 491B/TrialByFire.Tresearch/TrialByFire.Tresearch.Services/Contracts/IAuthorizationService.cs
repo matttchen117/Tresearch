@@ -4,11 +4,12 @@ using System.Linq;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Services.Contracts
 {
     public interface IAuthorizationService
     {
-        string VerifyAuthorized(IPrincipal rolePrincipal, string requiredRole);
+        string Authorize(IRolePrincipal rolePrincipal, string requiredRole);
     }
 }
