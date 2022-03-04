@@ -11,7 +11,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
         private IOTPRequestManager _otpRequestManager { get; }
-        public OTPRequestController(ISqlDAO sqlDAO, ILogService logService, OTPRequestManager otpRequestManager)
+        public OTPRequestController(ISqlDAO sqlDAO, ILogService logService, IOTPRequestManager otpRequestManager)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
