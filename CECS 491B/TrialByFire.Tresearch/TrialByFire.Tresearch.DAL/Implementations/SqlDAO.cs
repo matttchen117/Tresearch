@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using System.Data.SqlClient;
+using System.Security.Principal;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
@@ -110,6 +111,20 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 return false;
             }
+        }
+
+
+        public bool DeleteAccount(IPrincipal _rolePrincipal)
+        {
+            int affectedRows;
+            try
+            {
+                using (var connection = new SqlConnection(SqlConnectionString))
+                {
+
+                }
+            }
+
         }
 
     }
