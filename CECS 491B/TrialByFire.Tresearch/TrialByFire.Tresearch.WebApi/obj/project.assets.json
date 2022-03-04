@@ -3729,12 +3729,6 @@
   },
   "logs": [
     {
-      "code": "Undefined",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Problem reading the cache file C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
-    },
-    {
       "code": "NU1108",
       "level": "Error",
       "message": "Cycle detected. \r\n  TrialByFire.Tresearch.WebApi -> TrialByFire.Tresearch.DAL -> TrialByFire.Tresearch.Models -> TrialByFire.Tresearch.DAL.",
