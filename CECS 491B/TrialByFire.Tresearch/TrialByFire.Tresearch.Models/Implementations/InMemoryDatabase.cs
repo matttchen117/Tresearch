@@ -22,6 +22,12 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public IList<ITopSearch> TopSearchesKPIs { get; set; }
         public IList<INodesCreated> NodesCreatedKPIs { get; set; }
         public IList<IConfirmationLink> ConfirmationLinks { get; set; }
+        public IList<ILoginKPI> LoginKPIs { get; set; }
+        public IList<INodeKPI> NodeKPIs { get; set; }
+        public IList<IRegistrationKPI> RegistrationKPIs { get; set; }
+        public IList<ISearchKPI> SearchKPIs { get; set; }
+        public IList<IViewKPI> ViewKPIs { get ; set; }
+        public IList<IViewDurationKPI> ViewDurationKPIs { get; set; }
         public IList<IRolePrincipal> RolePrincipals { get; set; }
 
 

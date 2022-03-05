@@ -135,5 +135,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+        public List<KPI> LoadKPIs(DateTime now)
+        {
+
+        }
+
     }
 }

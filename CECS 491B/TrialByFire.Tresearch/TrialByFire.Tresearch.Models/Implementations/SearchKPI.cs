@@ -5,13 +5,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
 	public class SearchKPI : ISearchKPI
 	{
-		List<string> searchNames { get; }
-		List<int> searchCount { get;  }
+		List<TopSearch> topSearches { get; }
 
-		public SearchKPI(List<string> searchNames, List<int> searchCount)
+		public SearchKPI(List<TopSearch> topSearches)
 		{
-			this.searchNames = searchNames;
-			this.searchCount = searchCount;
+			this.topSearches = topSearches;
 		}
 	}
 }

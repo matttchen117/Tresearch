@@ -21,7 +21,17 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 
         public void KPISFetched(DateTime now)
         {
+            // Arrange
+            ISqlDAO _inMemorySqlDAO = new InMemorySqlDAO();
+            ILogService _inMemoryLogService = new InMemoryLogService(_inMemorySqlDAO);
+            IUADManager _uadManager = new UADManager(_sqlDAO, _logService);
+            string expected = "success";
 
+            // Act
+            List<KPI> results = _uadManager.KPISFetched(now);
+
+            // Assert
+            Assert.Equal(expected, results[0]);
         }
     }
 }

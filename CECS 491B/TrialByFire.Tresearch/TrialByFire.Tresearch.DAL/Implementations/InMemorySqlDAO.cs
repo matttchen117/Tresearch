@@ -422,5 +422,16 @@ Values (@node_creation_date, @node_creation_count)";
             }
             return "Database: The account does not exist.";
         }
+
+        public List<KPI> LoadKPI(DateTime now)
+        {
+            List<KPI> kpiList; 
+        }
+
+        public string CreateLoginKPI()
+        {
+            //For sake of unit testing, assume that there are no duplicates and every instance of the 
+            //LoginKPI is a representation 
+        }
     }
 }
