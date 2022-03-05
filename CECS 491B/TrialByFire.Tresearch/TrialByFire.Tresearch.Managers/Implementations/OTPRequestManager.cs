@@ -50,7 +50,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     if(result.Equals("success"))
                     {
                         IAccount account = new Account(username, passphrase);
-                        result = _otpRequestService.RequestOTP(account);
+                        IOTPClaim otpClaim = new OTPClaim(account);
+                        result = _otpRequestService.RequestOTP(account, otpClaim);
                     }
                 }
             }

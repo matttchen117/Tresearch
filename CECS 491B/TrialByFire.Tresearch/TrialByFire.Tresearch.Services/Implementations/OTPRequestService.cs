@@ -20,12 +20,10 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _logService = logService;
         }
 
-        public string RequestOTP(IAccount account)
+        public string RequestOTP(IAccount account, IOTPClaim otpClaim)
         {
-            string result = _sqlDAO.VerifyAccount(account);
-            IOTPClaim otpClaim = new OTPClaim(account);
+            string result = _sqlDAO.VerifyAccountEnabled(account);
             result = _sqlDAO.StoreOTP(otpClaim);
-            return result;
         }
     }
 }

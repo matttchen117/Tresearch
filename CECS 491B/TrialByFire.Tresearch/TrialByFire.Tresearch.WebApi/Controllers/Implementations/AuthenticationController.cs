@@ -40,7 +40,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             return result;
         }
 
-        public string CreateCookie(string jwtToken)
+        private string CreateCookie(string jwtToken)
         {
             // unsure of what errors could actually occur here
             CookieOptions cookieOptions = new CookieOptions();

@@ -46,5 +46,18 @@ namespace TrialByFire.Tresearch.Models.Implementations
             }
             return otp;
         }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj != null)
+            {
+                if(obj is IOTPClaim claim)
+                {
+                    IOTPClaim dbOTPClaim = (IOTPClaim)obj;
+                    return this.Username == dbOTPClaim.Username;
+                }
+            }
+            return false;
+        }
     }
 }
