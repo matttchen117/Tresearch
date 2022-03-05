@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using TrialByFire.Tresearch.Models.Implementations;
 using System.Security.Principal;
+using TrialByFire.Tresearch.Exceptions;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
@@ -31,7 +32,11 @@ namespace TrialByFire.Tresearch.Services.Implementations
         public List<string> Authenticate(IOTPClaim _otpClaim)
         {
             List<string> results = _sqlDAO.Authenticate(_otpClaim);
-            return CreateJwtToken(results[1]);
+            if(results[0].Equals("success"))
+            {
+                return CreateJwtToken(results[1]);
+            }
+            return results;
         }
 
         // use microsoft built in jWT
@@ -52,34 +57,41 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
 
             // create identity to place into JWT
-            IRoleIdentity roleIdentity = new RoleIdentity(true, claimValuePairs["username"], claimValuePairs["role"]);
-            ClaimsIdentity claimsIdentity = new ClaimsIdentity(roleIdentity);
-
-            //create jwt and set values
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var keyValue = "default";
-            var key = Encoding.ASCII.GetBytes(keyValue);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            try
             {
-                Subject = claimsIdentity,
-                Expires = DateTime.UtcNow.AddDays(7),
-                IssuedAt = DateTime.UtcNow,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            results.Add("success");
-            results.Add(tokenHandler.WriteToken(token));
+                IRoleIdentity roleIdentity = new RoleIdentity(true, claimValuePairs["username"], claimValuePairs["role"]);
+                ClaimsIdentity claimsIdentity = new ClaimsIdentity(roleIdentity);
+
+                //create jwt and set values
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var keyValue = "default";
+                var key = Encoding.ASCII.GetBytes(keyValue);
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = claimsIdentity,
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    IssuedAt = DateTime.UtcNow,
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                results.Add("success");
+                results.Add(tokenHandler.WriteToken(token));
+            }catch(RoleIdentityCreationFailedException ricf)
+            {
+                results.Add(ricf.Message);
+                return results;
+            }
+            catch(ArgumentNullException ane)
+            {
+                results.Add("Server: " + ane.Message);
+                return results;
+            }
             return results;
         }
 
-        public string VerifyAuthenticated(IPrincipal rolePrincipal)
+        public string VerifyAuthenticated(IRolePrincipal rolePrincipal)
         {
             return _sqlDAO.VerifyAuthenticated(rolePrincipal);
-        }
-
-        public string VerifyNotAuthenticated(IPrincipal rolePrincipal)
-        {
-            return _sqlDAO.VerifyNotAuthenticated(rolePrincipal);
         }
     }
 }

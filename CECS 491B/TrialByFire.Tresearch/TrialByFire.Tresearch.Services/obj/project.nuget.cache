@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "LuaYy3p7jBOncrkiJnBJiUYf2C+uHf0IHiWmFyIq65z/+D+n0J1v9+ciny4D17oEHDkCe9Kmksxu5B5ZemqRpg==",
+  "dgSpecHash": "OFT9Mi6580ck4lVxnbDObLUR1Ru0QHHGDIUydQDyd85nQNPa8kHflrgqsSH5dUI1Q0jpKBy5LthzraMeo2Os5g==",
   "success": true,
   "projectFilePath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj",
   "expectedPackageFiles": [
@@ -57,12 +57,5 @@
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\system.xml.readerwriter\\4.0.11\\system.xml.readerwriter.4.0.11.nupkg.sha512",
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\system.xml.xdocument\\4.0.11\\system.xml.xdocument.4.0.11.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "Undefined",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Problem reading the cache file C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
-    }
-  ]
+  "logs": []
 }

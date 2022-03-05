@@ -21,36 +21,10 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
 
         public void AuthenticateTheUser(string username, string otp)
         {
-            // Arrange
-            ISqlDAO sqlDAO = new SqlDAO();
-            ILogService logService = new SqlLogService(sqlDAO);
-            IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService);
-            IAuthenticationManager authenticationManager = new AuthenticationManager(sqlDAO, logService, authenticationService);
-            IAuthenticationController authenticationController = new AuthenticationController(sqlDAO, logService, authenticationManager);
-            string expected = "success";
-
-            // Act
-            List<string> results = authenticationController.Authenticate(username, otp, DateTime.Now);
-
-            // Assert
-            Assert.Equal(expected, results[0]);
         }
 
         public void CreateTheCookie(string jwtToken)
         {
-            // Arrange
-            ISqlDAO sqlDAO = new SqlDAO();
-            ILogService logService = new SqlLogService(sqlDAO);
-            IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService);
-            IAuthenticationManager authenticationManager = new AuthenticationManager(sqlDAO, logService, authenticationService);
-            IAuthenticationController authenticationController = new AuthenticationController(sqlDAO, logService, authenticationManager);
-            string expected = "success";
-
-            // Act
-            string result = authenticationController.CreateCookie(jwtToken);
-
-            // Assert
-            Assert.Equal(expected, result);
         }
 
     }

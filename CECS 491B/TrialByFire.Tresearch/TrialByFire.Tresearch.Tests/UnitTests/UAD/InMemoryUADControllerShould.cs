@@ -9,13 +9,13 @@ using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
 using TrialByFire.Tresearch.WebApi.Controllers;
-using XUnit;
+using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 {
 	public class InMemoryUADControllerShould
 	{
-		public void LoadKPI(DateTime now)
+		/*public void LoadKPI(DateTime now)
 		{
 			// Arrange
 			ISqlDAO _inMemorySqlDAO = new InMemorySqlDAO();
@@ -30,7 +30,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 
 			// Assert
 			Assert.Equal(expected, results);
-		}
+		}*/
 	}
 }
 

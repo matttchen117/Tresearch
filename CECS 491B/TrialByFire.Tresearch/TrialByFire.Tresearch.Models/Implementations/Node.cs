@@ -14,8 +14,6 @@
 
         public string accountOwner { get; set; }
 
-        public Node() { }
-
         public Node(long nodeID, long parentNodeID, string nodeTitle, string summary, string mode, string accountOwner)
         {
             this.nodeID = nodeID;

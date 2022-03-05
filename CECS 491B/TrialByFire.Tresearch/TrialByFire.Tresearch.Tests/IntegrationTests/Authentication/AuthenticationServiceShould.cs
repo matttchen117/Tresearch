@@ -15,22 +15,6 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
 {
     public class AuthenticationServiceShould
     { 
-
-        public void CreateTheJWTToken(string payload)
-        {
-            // Arrange
-            ISqlDAO sqlDAO = new SqlDAO();
-            ILogService logService = new SqlLogService(sqlDAO);
-            IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService);
-            string expected = "success";
-
-            // Act
-            List<string> results = authenticationService.CreateJwtToken(payload);
-
-            // Assert
-            Assert.Equal(expected, results[0]);
-        }
-
         public void AuthenticateTheUser(IOTPClaim otpClaim)
         {
             // Arrange
@@ -47,7 +31,7 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
 
         }
 
-        public void VerifyThatTheUserIsAuthenticated(IPrincipal rolePrincipal)
+        public void VerifyThatTheUser(IRolePrincipal rolePrincipal)
         {
             // Arrange
             ISqlDAO sqlDAO = new SqlDAO();

@@ -39,11 +39,16 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 			});
             if (!t1.Wait(60000))
             {
-				List<KPI> result;
+				List<KPI> result = new List<KPI>();
 				result.Add(new KPI("Error 504: Timeout Error"));
-				return results;
+				return result;
             }
+			throw new NotImplementedException();
+		}
+        public bool KPISFetched()
+        {
+            throw new NotImplementedException();
         }
-	}
+    }
 }
 

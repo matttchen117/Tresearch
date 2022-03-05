@@ -27,7 +27,8 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
 		public List<KPI> LoadKPI(DateTime now)
 		{
-			return _sqlDAO.LoadKPI(DateTime now);
+			throw new NotImplementedException();
+			//return _sqlDAO.LoadKPI(now);
 		}
 	}
 }

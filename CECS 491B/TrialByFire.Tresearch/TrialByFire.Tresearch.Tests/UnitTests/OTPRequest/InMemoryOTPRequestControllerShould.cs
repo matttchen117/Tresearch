@@ -17,28 +17,42 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
 {
-    public class InMemoryOTPRequestControllerShould
+    public class InMemoryOTPRequestControllerShould : InMemoryTestDependencies
     {
-        public void RequestTheOTP(string username, string passphrase)
+        public InMemoryOTPRequestControllerShould() : base()
+        {
+        }
+
+        [Theory]
+        [InlineData("larry@gmail.com", "abcDEF123", "guest", "guest", "success")]
+        [InlineData("billy@yahoo.com", "abcDEF123", "billy@yahoo.com", "admin", "Server: User is already authenticated.")]
+        [InlineData("joe@outlook.com", "abcDEF123", "guest", "guest", "success")]
+        [InlineData("bob@yahoo.com", "abcDEF123", "guest", "guest", "Database: The account was not found or it " +
+            "has been disabled.")]
+        [InlineData("harry@yahoo.com", "abcDEF123", "guest", "guest", "Database: Please click on the confirmation link that " +
+            "we sent to your email in order to confirm your account.")]
+        public void RequestTheOTP(string username, string passphrase, string currentIdentity, string currentRole, 
+            string expected)
         {
             // Arrange
-            ISqlDAO inMemorySqlDAO = new InMemorySqlDAO();
-            ILogService inMemoryLogService = new InMemoryLogService(inMemorySqlDAO);
-            IValidationService validationService = new ValidationService();
-            IAuthenticationService authenticationService = new AuthenticationService(inMemorySqlDAO, inMemoryLogService);
-            IRoleIdentity roleIdentity = new RoleIdentity(true, "Bob", "User");
+            IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            IOTPRequestService otpRequestService = new OTPRequestService(inMemorySqlDAO, inMemoryLogService);
-            IOTPRequestManager otpRequestManager = new OTPRequestManager(inMemorySqlDAO, inMemoryLogService, validationService, 
+            IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService);
+            IOTPRequestManager otpRequestManager = new OTPRequestManager(sqlDAO, logService, validationService, 
                 authenticationService, rolePrincipal, otpRequestService);
-            IOTPRequestController otpRequestController = new OTPRequestController(inMemorySqlDAO, inMemoryLogService, otpRequestManager);
-            string expected = "success";
+            IOTPRequestController otpRequestController = new OTPRequestController(sqlDAO, logService, otpRequestManager);
 
             // Act
             string result = otpRequestController.RequestOTP(username, passphrase);
 
             // Assert
             Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void Test()
+        {
+            Assert.True(true);
         }
     }
 }

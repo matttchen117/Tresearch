@@ -3,7 +3,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 {
 	public class InMemoryUADServiceShould
 	{
-		public void LoadKPI(DateTime now)
+		/*public void LoadKPI(DateTime now)
 		{
 			// Arrange
 			ISqlDAO _inMemorySqlDAO = new InMemorySqlDAO();
@@ -17,7 +17,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 
 			// Assert
 			Assert.Equal(expected, results);
-		}
+		}*/
 	}
 }
 

@@ -16,21 +16,6 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
 
         public void AuthenticateTheUser(string username, string otp, DateTime now)
         {
-            // Arrange
-            ISqlDAO sqlDAO = new SqlDAO();
-            ILogService logService = new SqlLogService(sqlDAO);
-            IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService);
-            IAuthenticationManager authenticationManager = new AuthenticationManager(sqlDAO, logService, authenticationService);
-            string expected = "success";
-
-            // Act
-            List<string> results = authenticationManager.Authenticate(username, otp, now);
-
-            // Assert
-            Assert.Equal(expected, results[0]);
-
-            // Not unit test if connecting to outside db
-            // Unit test if using in memory/turn into unit with mocking
         }
 
     }

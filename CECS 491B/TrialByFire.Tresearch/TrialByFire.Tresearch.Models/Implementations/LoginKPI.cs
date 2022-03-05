@@ -5,9 +5,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
 	public class LoginKPI : ILoginKPI
 	{
-		List<int> loginCount { get; }
+		public List<int> loginCount { get; }
 
-		public LoginKPI(List<int> loginCount)
+        public LoginKPI(List<int> loginCount)
 		{
 			this.loginCount = loginCount;
 		}

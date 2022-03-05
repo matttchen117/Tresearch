@@ -13,19 +13,28 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
 {
-    public class InMemoryOTPRequestServiceShould
+    public class InMemoryOTPRequestServiceShould : InMemoryTestDependencies
     {
-        public void RequestTheOTP(string username, string passphrase)
+        public InMemoryOTPRequestServiceShould() : base()
+        {
+        }
+
+        [Theory]
+        [InlineData("larry@gmail.com", "abcDEF123", "success")]
+        [InlineData("billy@yahoo.com", "abcDEF123", "success")]
+        [InlineData("joe@outlook.com", "abcDEF123", "success")]
+        [InlineData("bob@yahoo.com", "abcDEF123", "Database: The account was not found or it has been disabled.")]
+        [InlineData("harry@yahoo.com", "abcDEF123", "Database: Please click on the confirmation link that " +
+            "we sent to your email in order to confirm your account.")]
+        public void RequestTheOTP(string username, string passphrase, string expected)
         {
             // Arrange
-            ISqlDAO inMemorySqlDAO = new InMemorySqlDAO();
-            ILogService inMemoryLogService = new InMemoryLogService(inMemorySqlDAO);
-            IOTPRequestService otpRequestService = new OTPRequestService(inMemorySqlDAO, inMemoryLogService);
+            IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService);
             IAccount account = new Account(username, passphrase);
-            string expected = "success";
+            IOTPClaim otpClaim = new OTPClaim(account);
 
             // Act
-            string result = otpRequestService.RequestOTP(account);
+            string result = otpRequestService.RequestOTP(account, otpClaim);
 
             // Assert
             Assert.Equal(expected, result);
