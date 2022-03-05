@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "x66rnhDdmajaT5kUV8zgTMwFe5bxf7paddm4K4ukruRC9PwJakeJ4AafUQAM4QgZ+yxlShbzggKT3Qe9jnfA9A==",
+  "dgSpecHash": "N8Qo406PfYadIPCHoLO31LCPdHiuWRf4cYFiQj+jm1pQQqCCQRrrn0TOr3OW7+8y2SmOWqMUTlSVIFbDZ9/OQg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\TrialByFire.Tresearch.WebApi.csproj",
+  "projectFilePath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\TrialByFire.Tresearch.WebApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",
