@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TrialByFire.Tresearch.Models
+namespace TrialByFire.Tresearch.Models.Contracts
 {
     public interface INodesCreated
     {

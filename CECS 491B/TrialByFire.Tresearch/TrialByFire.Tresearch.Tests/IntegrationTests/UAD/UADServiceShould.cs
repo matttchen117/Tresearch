@@ -16,7 +16,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.UAD
 	{
 		public void LoadKPI(DateTime now)
         {
-			// Arrange
+			/*// Arrange
 			ISqlDAO _sqlDAO = new SqlDAO();
 			ILogService _logService = new SqlLogService(_sqlDAO);
 			IUADService _uadService = new UADService(_sqlDAO, _logService);
@@ -27,7 +27,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.UAD
 			List<KPI> results = _uadService.LoadKPI(now);
 
 			// Assert
-			Assert.Equal(expected, results);
+			Assert.Equal(expected, results);*/
         }
 	}
 }

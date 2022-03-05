@@ -1,0 +1,395 @@
+﻿++Solution 'TrialByFire.Tresearch' ‎(6 of 6 projects)
+i:{00000000-0000-0000-0000-000000000000}:TrialByFire.Tresearch.sln
+++TrialByFire.Tresearch.Services
+i:{00000000-0000-0000-0000-000000000000}:TrialByFire.Tresearch.Services
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\trialbyfire.tresearch.services.csproj
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\trialbyfire.tresearch.services.csproj
+++Dependencies
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:>3310
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:>3499
+i:{eff69065-de0d-4648-9723-cd843356c208}:>3684
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:>3311
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:>3312
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:>2927
+++Contracts
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\contracts\
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\contracts\
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.dal\contracts\
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\controllers\contracts\
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.managers\contracts\
+++Implementations
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\implementations\
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.dal\implementations\
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\controllers\implementations\
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.managers\implementations\
+++AccountService.cs
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\implementations\accountservice.cs
+++AuthenticationService.cs
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\implementations\authenticationservice.cs
+++AuthorizationService.cs
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\implementations\authorizationservice.cs
+++MailService.cs
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\implementations\mailservice.cs
+++OTPRequestService.cs
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\implementations\otprequestservice.cs
+++UADService.cs
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\implementations\uadservice.cs
+++ValidationService.cs
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\implementations\validationservice.cs
+++Analyzers
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:analyzers
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:analyzers
+i:{eff69065-de0d-4648-9723-cd843356c208}:analyzers
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:analyzers
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:analyzers
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:analyzers
+++Frameworks
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:frameworks
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:frameworks
+i:{eff69065-de0d-4648-9723-cd843356c208}:frameworks
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:frameworks
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:frameworks
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:frameworks
+++Packages
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:packages
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:packages
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:packages
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:packages
+++Projects
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:projects
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:projects
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:projects
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:projects
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:projects
+++IAccountService.cs
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\contracts\iaccountservice.cs
+++IAuthenticationService.cs
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\contracts\iauthenticationservice.cs
+++IAuthorizationService.cs
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\contracts\iauthorizationservice.cs
+++IMailService.cs
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\contracts\imailservice.cs
+++IOTPRequestService.cs
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\contracts\iotprequestservice.cs
+++IUADService.cs
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\contracts\iuadservice.cs
+++IValidationService.cs
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\contracts\ivalidationservice.cs
+++Microsoft.CodeAnalysis.CSharp.NetAnalyzers
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk\analyzers\microsoft.codeanalysis.csharp.netanalyzers.dll
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk\analyzers\microsoft.codeanalysis.csharp.netanalyzers.dll
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk\analyzers\microsoft.codeanalysis.csharp.netanalyzers.dll
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk\analyzers\microsoft.codeanalysis.csharp.netanalyzers.dll
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk\analyzers\microsoft.codeanalysis.csharp.netanalyzers.dll
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk\analyzers\microsoft.codeanalysis.csharp.netanalyzers.dll
+++Microsoft.CodeAnalysis.NetAnalyzers
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk\analyzers\microsoft.codeanalysis.netanalyzers.dll
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk\analyzers\microsoft.codeanalysis.netanalyzers.dll
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk\analyzers\microsoft.codeanalysis.netanalyzers.dll
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk\analyzers\microsoft.codeanalysis.netanalyzers.dll
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk\analyzers\microsoft.codeanalysis.netanalyzers.dll
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk\analyzers\microsoft.codeanalysis.netanalyzers.dll
+++System.Text.Json.SourceGeneration
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\program files\dotnet\packs\microsoft.netcore.app.ref\6.0.2\analyzers\dotnet\cs\system.text.json.sourcegeneration.dll
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\program files\dotnet\packs\microsoft.netcore.app.ref\6.0.2\analyzers\dotnet\cs\system.text.json.sourcegeneration.dll
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\program files\dotnet\packs\microsoft.netcore.app.ref\6.0.2\analyzers\dotnet\cs\system.text.json.sourcegeneration.dll
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:c:\program files\dotnet\packs\microsoft.netcore.app.ref\6.0.2\analyzers\dotnet\cs\system.text.json.sourcegeneration.dll
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\program files\dotnet\packs\microsoft.netcore.app.ref\6.0.2\analyzers\dotnet\cs\system.text.json.sourcegeneration.dll
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\program files\dotnet\packs\microsoft.netcore.app.ref\6.0.2\analyzers\dotnet\cs\system.text.json.sourcegeneration.dll
+++Microsoft.NETCore.App
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.services\microsoft.netcore.app
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\microsoft.netcore.app
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\microsoft.netcore.app
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.dal\microsoft.netcore.app
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\microsoft.netcore.app
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.managers\microsoft.netcore.app
+++SendGrid (9.25.3)
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:>3718
+++System.IdentityModel.Tokens.Jwt (6.16.0)
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:>3717
+++TrialByFire.Tresearch.DAL
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.dal\trialbyfire.tresearch.dal.csproj
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.dal\trialbyfire.tresearch.dal.csproj
+i:{00000000-0000-0000-0000-000000000000}:TrialByFire.Tresearch.DAL
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.dal\trialbyfire.tresearch.dal.csproj
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.dal\trialbyfire.tresearch.dal.csproj
+++TrialByFire.Tresearch.Models
+i:{2ce8f2c1-5643-41f2-a76d-1e7a1ce9cfa3}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\trialbyfire.tresearch.models.csproj
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\trialbyfire.tresearch.models.csproj
+i:{00000000-0000-0000-0000-000000000000}:TrialByFire.Tresearch.Models
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\trialbyfire.tresearch.models.csproj
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\trialbyfire.tresearch.models.csproj
+++TrialByFire.Tresearch.Tests
+i:{00000000-0000-0000-0000-000000000000}:TrialByFire.Tresearch.Tests
+++IntegrationTests
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\
+++UnitTests
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\unittests\
+++Authentication
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\unittests\authentication\
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\authentication\
+++Authorization
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\unittests\authorization\
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\authorization\
+++OTPRequest
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\unittests\otprequest\
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\otprequest\
+++InMemoryOTPRequestControllerShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\unittests\otprequest\inmemoryotprequestcontrollershould.cs
+++InMemoryOTPRequestManagerShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\unittests\otprequest\inmemoryotprequestmanagershould.cs
+++InMemoryOTPRequestServiceShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\unittests\otprequest\inmemoryotprequestserviceshould.cs
+++UAD
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\unittests\uad\
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\uad\
+++CrossCuttingDependencies.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\crosscuttingdependencies.cs
+++InMemoryTestDependencies.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\inmemorytestdependencies.cs
+++IntegrationTestDependencies.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtestdependencies.cs
+++UniversalDependencies.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\universaldependencies.cs
+++ITest.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\contracts\itest.cs
+++Registration
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\registration\
+++InMemoryAuthenticationControllerShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\unittests\authentication\inmemoryauthenticationcontrollershould.cs
+++InMemoryAuthenticationManagerShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\unittests\authentication\inmemoryauthenticationmanagershould.cs
+++InMemoryAuthenticationServiceShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\unittests\authentication\inmemoryauthenticationserviceshould.cs
+++InMemoryAuthorizationServiceShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\unittests\authorization\inmemoryauthorizationserviceshould.cs
+++InMemoryUADControllerShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\unittests\uad\inmemoryuadcontrollershould.cs
+++InMemoryUADManagerShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\unittests\uad\inmemoryuadmanagershould.cs
+++InMemoryUADServiceShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\unittests\uad\inmemoryuadserviceshould.cs
+++Microsoft.AspNetCore.App.Analyzers
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\program files\dotnet\packs\microsoft.aspnetcore.app.ref\6.0.2\analyzers\dotnet\cs\microsoft.aspnetcore.app.analyzers.dll
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\program files\dotnet\packs\microsoft.aspnetcore.app.ref\6.0.2\analyzers\dotnet\cs\microsoft.aspnetcore.app.analyzers.dll
+++Microsoft.AspNetCore.App.CodeFixes
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\program files\dotnet\packs\microsoft.aspnetcore.app.ref\6.0.2\analyzers\dotnet\cs\microsoft.aspnetcore.app.codefixes.dll
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\program files\dotnet\packs\microsoft.aspnetcore.app.ref\6.0.2\analyzers\dotnet\cs\microsoft.aspnetcore.app.codefixes.dll
+++Microsoft.Extensions.Logging.Generators
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\program files\dotnet\packs\microsoft.aspnetcore.app.ref\6.0.2\analyzers\dotnet\roslyn4.0\cs\microsoft.extensions.logging.generators.dll
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\program files\dotnet\packs\microsoft.aspnetcore.app.ref\6.0.2\analyzers\dotnet\roslyn4.0\cs\microsoft.extensions.logging.generators.dll
+++xunit.analyzers
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\.nuget\packages\xunit.analyzers\0.10.0\analyzers\dotnet\cs\xunit.analyzers.dll
+++xunit (2.4.1)
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:>3733
+++TrialByFire.Tresearch.Managers
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.managers\trialbyfire.tresearch.managers.csproj
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.managers\trialbyfire.tresearch.managers.csproj
+i:{00000000-0000-0000-0000-000000000000}:TrialByFire.Tresearch.Managers
+++TrialByFire.Tresearch.WebApi
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\trialbyfire.tresearch.webapi.csproj
+i:{00000000-0000-0000-0000-000000000000}:TrialByFire.Tresearch.WebApi
+++AuthenticationControllerShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\authentication\authenticationcontrollershould.cs
+++AuthenticationManagerShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\authentication\authenticationmanagershould.cs
+++AuthenticationServiceShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\authentication\authenticationserviceshould.cs
+++AuthorizationServiceShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\authorization\authorizationserviceshould.cs
+++OTPRequestControllerShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\otprequest\otprequestcontrollershould.cs
+++OTPRequestManagerShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\otprequest\otprequestmanagershould.cs
+++OTPRequestServiceShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\otprequest\otprequestserviceshould.cs
+++AccountManagerShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\registration\accountmanagershould.cs
+++AccountServiceShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\registration\accountserviceshould.cs
+++MailServiceShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\registration\mailserviceshould.cs
+++RegistrationControllerShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\registration\registrationcontrollershould.cs
+++UADControllerShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\uad\uadcontrollershould.cs
+++UADManagerShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\uad\uadmanagershould.cs
+++UADServiceShould.cs
+i:{cb93ded3-d97a-4346-be58-faf6cd5ce830}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.tests\integrationtests\uad\uadserviceshould.cs
+++Account.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\account.cs
+++ConfirmationLink.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\confirmationlink.cs
+++DailyLogin.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\dailylogin.cs
+++DailyRegistration.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\dailyregistration.cs
+++InMemoryDatabase.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\inmemorydatabase.cs
+++KPI.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\kpi.cs
+++Log.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\log.cs
+++LoginKPI.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\loginkpi.cs
+++MessageBank.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\messagebank.cs
+++Node.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\node.cs
+++NodeKPI.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\nodekpi.cs
+++NodesCreated.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\nodescreated.cs
+++NodeTag.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\nodetag.cs
+++OTPClaim.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\otpclaim.cs
+++Rating.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\rating.cs
+++RegistrationKPI.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\registrationkpi.cs
+++RoleIdentity.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\roleidentity.cs
+++RolePrincipal.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\roleprincipal.cs
+++SearchKPI.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\searchkpi.cs
+++Tag.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\tag.cs
+++TopSearch.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\topsearch.cs
+++View.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\view.cs
+++ViewDurationKPI.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\viewdurationkpi.cs
+++ViewKPI.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\implementations\viewkpi.cs
+++IAccount.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\iaccount.cs
+++IConfirmationLink.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\iconfirmationlink.cs
+++IDailyLogin.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\idailylogin.cs
+++IDailyRegistration.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\idailyregistration.cs
+++IDatabase.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\idatabase.cs
+++IKPI.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\ikpi.cs
+++ILog.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\ilog.cs
+++ILoginKPI.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\iloginkpi.cs
+++IMessageBank.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\imessagebank.cs
+++INode.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\inode.cs
+++INodeKPI.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\inodekpi.cs
+++INodesCreated.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\inodescreated.cs
+++INodeTag.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\inodetag.cs
+++IOTPClaim.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\iotpclaim.cs
+++IRating.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\irating.cs
+++IRegistrationKPI.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\iregistrationkpi.cs
+++IRoleIdentity.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\iroleidentity.cs
+++IRolePrincipal.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\iroleprincipal.cs
+++ISearchKPI.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\isearchkpi.cs
+++ITag.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\itag.cs
+++ITopSearch.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\itopsearch.cs
+++IView.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\iview.cs
+++IViewDurationKPI.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\iviewdurationkpi.cs
+++IViewKPI.cs
+i:{eff69065-de0d-4648-9723-cd843356c208}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.models\contracts\iviewkpi.cs
+++InMemoryLogService.cs
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.dal\implementations\inmemorylogservice.cs
+++InMemorySqlDAO.cs
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.dal\implementations\inmemorysqldao.cs
+++SqlDAO.cs
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.dal\implementations\sqldao.cs
+++SqlLogService.cs
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.dal\implementations\sqllogservice.cs
+++ILogService.cs
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.dal\contracts\ilogservice.cs
+++ISqlDAO.cs
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.dal\contracts\isqldao.cs
+++Dapper (2.0.123)
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:>3691
+++System.Data.SqlClient (4.8.3)
+i:{301e6944-aedf-4e97-a10d-f5fb6c64d50a}:>3692
+++Connected Services 
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:>3308
+++Properties
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\properties\
+++Controllers
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\controllers\
+++appsettings.json
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\appsettings.json
+++Program.cs
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\program.cs
+++No service dependencies discovered
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:>3309
+++launchSettings.json
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\properties\launchsettings.json
+++appsettings.Development.json
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\appsettings.development.json
+++Microsoft.AspNetCore.Analyzers
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk.web\analyzers\cs\microsoft.aspnetcore.analyzers.dll
+++Microsoft.AspNetCore.Components.Analyzers
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk.web\analyzers\cs\microsoft.aspnetcore.components.analyzers.dll
+++Microsoft.AspNetCore.Mvc.Analyzers
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk.web\analyzers\cs\microsoft.aspnetcore.mvc.analyzers.dll
+++Microsoft.AspNetCore.Razor.SourceGenerator.Tooling.Internal
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk.razor\source-generators\microsoft.aspnetcore.razor.sourcegenerator.tooling.internal.dll
+++Microsoft.NET.Sdk.Razor.SourceGenerators
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\program files\dotnet\sdk\6.0.200\sdks\microsoft.net.sdk.razor\source-generators\microsoft.net.sdk.razor.sourcegenerators.dll
+++Microsoft.AspNetCore.App
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\microsoft.aspnetcore.app
+++Swashbuckle.AspNetCore (6.2.3)
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:>3721
+++IAuthenticationController.cs
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\controllers\contracts\iauthenticationcontroller.cs
+++IOTPRequestController.cs
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\controllers\contracts\iotprequestcontroller.cs
+++IRegistrationController.cs
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\controllers\contracts\iregistrationcontroller.cs
+++IUADController.cs
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\controllers\contracts\iuadcontroller.cs
+++AuthenticationController.cs
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\controllers\implementations\authenticationcontroller.cs
+++OTPRequestController.cs
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\controllers\implementations\otprequestcontroller.cs
+++RegistrationController.cs
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\controllers\implementations\registrationcontroller.cs
+++UADController.cs
+i:{8dc889ba-68bf-43b6-a952-8f9d49f7f868}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.webapi\controllers\implementations\uadcontroller.cs
+++IAccountManager.cs
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.managers\contracts\iaccountmanager.cs
+++IAuthenticationManager.cs
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.managers\contracts\iauthenticationmanager.cs
+++IOTPRequestManager.cs
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.managers\contracts\iotprequestmanager.cs
+++IUADManager.cs
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.managers\contracts\iuadmanager.cs
+++AccountManager.cs
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.managers\implementations\accountmanager.cs
+++AuthenticationManager.cs
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.managers\implementations\authenticationmanager.cs
+++OTPRequestManager.cs
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.managers\implementations\otprequestmanager.cs
+++UADManager.cs
+i:{ab65ed53-f8ab-48c3-9d09-aef3db83be9f}:c:\users\matthew chen\source\repos\tresearch\cecs 491b\trialbyfire.tresearch\trialbyfire.tresearch.managers\implementations\uadmanager.cs

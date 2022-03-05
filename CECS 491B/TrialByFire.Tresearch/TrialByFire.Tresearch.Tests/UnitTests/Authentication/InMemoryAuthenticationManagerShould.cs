@@ -10,10 +10,9 @@ using TrialByFire.Tresearch.Managers.Implementations;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
-using TrialByFire.Tresearch.Services.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.AuthenticationTests.UnitTests
+namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
 {
     public class InMemoryAuthenticationManagerShould : InMemoryTestDependencies
     {
@@ -39,13 +38,13 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.UnitTests
             "or it has been disabled.")]
         [InlineData("harry@yahoo.com", "user", "ABCdef123", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Database: Please confirm your " +
             "account before attempting to login.")]
-        public void AuthenticateTheUser(string username, string role, string otp, string currentIdentity, string currentRole, 
+        public void AuthenticateTheUser(string username, string role, string otp, string currentIdentity, string currentRole,
             int year, int month, int day, int hour, int minute, int second, string expected)
         {
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            IAuthenticationManager authenticationManager = new AuthenticationManager(sqlDAO, 
+            IAuthenticationManager authenticationManager = new AuthenticationManager(sqlDAO,
                 logService, validationService, authenticationService, rolePrincipal, messageBank);
             DateTime now = new DateTime(year, month, day, hour, minute, second);
 

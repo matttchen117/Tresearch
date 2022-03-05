@@ -140,11 +140,21 @@
           }
         }
       },
+      "TrialByFire.Tresearch.Exceptions/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/TrialByFire.Tresearch.Exceptions.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/TrialByFire.Tresearch.Exceptions.dll": {}
+        }
+      },
       "TrialByFire.Tresearch.Models/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
-          "TrialByFire.Tresearch.DAL": "1.0.0"
+          "TrialByFire.Tresearch.Exceptions": "1.0.0"
         },
         "compile": {
           "bin/placeholder/TrialByFire.Tresearch.Models.dll": {}
@@ -487,6 +497,11 @@
         "version.txt"
       ]
     },
+    "TrialByFire.Tresearch.Exceptions/1.0.0": {
+      "type": "project",
+      "path": "../TrialByFire.Tresearch.Exceptions/TrialByFire.Tresearch.Exceptions.csproj",
+      "msbuildProject": "../TrialByFire.Tresearch.Exceptions/TrialByFire.Tresearch.Exceptions.csproj"
+    },
     "TrialByFire.Tresearch.Models/1.0.0": {
       "type": "project",
       "path": "../TrialByFire.Tresearch.Models/TrialByFire.Tresearch.Models.csproj",
@@ -497,6 +512,7 @@
     "net6.0": [
       "Dapper >= 2.0.123",
       "System.Data.SqlClient >= 4.8.3",
+      "TrialByFire.Tresearch.Exceptions >= 1.0.0",
       "TrialByFire.Tresearch.Models >= 1.0.0"
     ]
   },
@@ -506,11 +522,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj",
+      "projectUniqueName": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj",
       "projectName": "TrialByFire.Tresearch.DAL",
-      "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj",
+      "projectPath": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj",
       "packagesPath": "C:\\Users\\Matthew Chen\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\obj\\",
+      "outputPath": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Matthew Chen\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -527,8 +543,11 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj": {
-              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj"
+            "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\TrialByFire.Tresearch.Exceptions.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\TrialByFire.Tresearch.Exceptions.csproj"
+            },
+            "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj"
             }
           }
         }
@@ -570,16 +589,5 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1108",
-      "level": "Error",
-      "message": "Cycle detected. \r\n  TrialByFire.Tresearch.DAL -> TrialByFire.Tresearch.Models -> TrialByFire.Tresearch.DAL.",
-      "libraryId": "TrialByFire.Tresearch.DAL",
-      "targetGraphs": [
-        "net6.0"
-      ]
-    }
-  ]
+  }
 }

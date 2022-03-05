@@ -6,7 +6,7 @@ using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
-namespace TrailByFire.Tresearch.WebApi.Controllers.Implementations
+namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
     public class UADController : Controller, IUADController
     {

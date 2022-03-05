@@ -6,15 +6,16 @@ using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
+using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Services.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.AuthorizationTests
+namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authorization
 {
     public class AuthorizationServiceShould
     {
-        public void VerifyThatTheUserIsAuthorized(IPrincipal rolePrincipal, string requiredRole)
+        public void VerifyThatTheUserIsAuthorized(IRolePrincipal rolePrincipal, string requiredRole)
         {
             // Arrange
             ISqlDAO sqlDAO = new SqlDAO();

@@ -9,14 +9,14 @@ using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
+namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
 {
     public class AuthenticationManagerShould
     {
 
         public void AuthenticateTheUser(string username, string otp, DateTime now)
         {
-            // Arrange
+            /*// Arrange
             ISqlDAO sqlDAO = new SqlDAO();
             ILogService logService = new SqlLogService(sqlDAO);
             IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService);
@@ -30,7 +30,7 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
             Assert.Equal(expected, results[0]);
 
             // Not unit test if connecting to outside db
-            // Unit test if using in memory/turn into unit with mocking
+            // Unit test if using in memory/turn into unit with mocking*/
         }
 
     }

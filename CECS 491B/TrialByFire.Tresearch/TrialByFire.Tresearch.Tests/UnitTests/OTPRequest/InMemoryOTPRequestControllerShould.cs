@@ -44,7 +44,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService);
+            IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService, messageBank);
             IOTPRequestManager otpRequestManager = new OTPRequestManager(sqlDAO, logService, validationService, 
                 authenticationService, rolePrincipal, otpRequestService, messageBank);
             IOTPRequestController otpRequestController = new OTPRequestController(sqlDAO, logService, 

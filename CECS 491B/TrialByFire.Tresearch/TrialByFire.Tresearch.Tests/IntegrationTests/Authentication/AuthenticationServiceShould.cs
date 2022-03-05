@@ -9,13 +9,12 @@ using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
-using TrialByFire.Tresearch.Services.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
+namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
 {
-    public class AuthenticationServiceShould : IntegrationTestDependences
-    { 
+    public class AuthenticationServiceShould : IntegrationTestDependencies
+    {
         public AuthenticationServiceShould() : base()
         {
         }

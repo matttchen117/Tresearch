@@ -37,7 +37,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
 		public List<KPI> LoadKPI(DateTime now)
         {
-			return _uadService.LoadKPI(now);
+			//return _uadService.LoadKPI(now);
+			throw new NotImplementedException();
         }
 
 		public List<KPI> KPIsFetched(DateTime now)
@@ -47,7 +48,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 			if(result == "success")
             {
 				string authorizeResult;
-				authorizeResult = _authorizationService.Authorize(_rolePrincipal, _role);
+				authorizeResult = _authorizationService.VerifyAuthorized(_rolePrincipal, _role);
 				if (authorizeResult == "success")
                 {
 					Task t1 = Task.Run(() =>

@@ -8,13 +8,12 @@ using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
-using TrialByFire.Tresearch.Services.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.AuthenticationTests.UnitTests
+namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
 {
     public class InMemoryAuthenticationServiceShould : InMemoryTestDependencies
-    { 
+    {
         public InMemoryAuthenticationServiceShould() : base()
         {
         }

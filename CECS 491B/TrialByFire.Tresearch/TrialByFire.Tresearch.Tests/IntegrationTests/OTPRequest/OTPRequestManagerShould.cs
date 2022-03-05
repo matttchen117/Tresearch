@@ -13,9 +13,9 @@ using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Services.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.OTPRequestTests
+namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
 {
-    public class OTPRequestManagerShould : IntegrationTestDependences
+    public class OTPRequestManagerShould : IntegrationTestDependencies
     {
         public OTPRequestManagerShould() : base()
         {
@@ -25,7 +25,7 @@ namespace TrialByFire.Tresearch.Tests.OTPRequestTests
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(true, "Bob", "User");
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService);
+            IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService, messageBank);
             IOTPRequestManager otpRequestManager = new OTPRequestManager(sqlDAO, logService, validationService,
                 authenticationService, rolePrincipal, otpRequestService, messageBank);
             string expected = "success";

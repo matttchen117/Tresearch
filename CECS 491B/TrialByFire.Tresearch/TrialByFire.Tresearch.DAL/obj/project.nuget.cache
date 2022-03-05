@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "C786IkkWUs0nbRI41qmiZaCV8H3PzXuJ1vywWV6gwD0rmyokYliFbkw2p+i+iq2qgV2kN7WYE9I39bjaXEan4A==",
-  "success": false,
-  "projectFilePath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj",
+  "dgSpecHash": "eqf6CdtAykqI/GJTkkij7ziCkZVelYeN31T8UPVTbkKQGGlst8bzToAFkkfcIvliD2OpNTfA4cWV04T8Hp0hZQ==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
@@ -15,15 +15,5 @@
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\system.security.accesscontrol\\4.7.0\\system.security.accesscontrol.4.7.0.nupkg.sha512",
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\system.security.principal.windows\\4.7.0\\system.security.principal.windows.4.7.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1108",
-      "level": "Error",
-      "message": "Cycle detected. \r\n  TrialByFire.Tresearch.DAL -> TrialByFire.Tresearch.Models -> TrialByFire.Tresearch.DAL.",
-      "libraryId": "TrialByFire.Tresearch.DAL",
-      "targetGraphs": [
-        "net6.0"
-      ]
-    }
-  ]
+  "logs": []
 }

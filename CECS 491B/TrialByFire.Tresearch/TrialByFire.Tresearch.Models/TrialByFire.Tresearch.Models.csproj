@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TrialByFire.Tresearch.DAL\TrialByFire.Tresearch.DAL.csproj" />
+    <ProjectReference Include="..\TrialByFire.Tresearch.Exceptions\TrialByFire.Tresearch.Exceptions.csproj" />
   </ItemGroup>
 
 </Project>

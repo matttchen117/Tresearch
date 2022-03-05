@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "1cykfPIHd2tVEQ+8YqydpFTmglQIdhWKTiqyQPRwiSk25aUJ6nXNFZV4Ex+BHHVEowWjWsIkqFl1AP4PGY7OPw==",
-  "success": false,
-  "projectFilePath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\TrialByFire.Tresearch.WebApi.csproj",
+  "dgSpecHash": "MWzNTvHWZu0Ngw8ycXE/AQ8xIiN4y9GgxpJ0tOSF14SGV03mAyPfXJZOVfFgEDauihfPbsrlFYQNqReFYvEK8Q==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\TrialByFire.Tresearch.WebApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",
@@ -63,15 +63,5 @@
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\system.xml.readerwriter\\4.0.11\\system.xml.readerwriter.4.0.11.nupkg.sha512",
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\system.xml.xdocument\\4.0.11\\system.xml.xdocument.4.0.11.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1108",
-      "level": "Error",
-      "message": "Cycle detected. \r\n  TrialByFire.Tresearch.WebApi -> TrialByFire.Tresearch.DAL -> TrialByFire.Tresearch.Models -> TrialByFire.Tresearch.DAL.",
-      "libraryId": "TrialByFire.Tresearch.DAL",
-      "targetGraphs": [
-        "net6.0"
-      ]
-    }
-  ]
+  "logs": []
 }

@@ -39,7 +39,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 activationGuid = Guid.NewGuid();
                 var linkUrl = $"{baseUrl}/Account/Verify?t={activationGuid}";
-                IConfirmationLink _confirmationLink= new ConfirmationLink(account.username, activationGuid, DateTime.Now);
+                IConfirmationLink _confirmationLink= new ConfirmationLink(account.Username, activationGuid, DateTime.Now);
                 bool isAccountCreated = _sqlDAO.CreateConfirmationLink(_confirmationLink);
                 if (!isAccountCreated)
                     return null;
@@ -86,6 +86,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
             return "Success - Confirmation link removed";
         }
 
-       
+        public string CreatePreRegisteredAccount(IAccount account)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

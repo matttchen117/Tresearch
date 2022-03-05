@@ -13,8 +13,6 @@ namespace TrialByFire.Tresearch.Services.Contracts
     {
         List<string> Authenticate(IOTPClaim otpClaim);
 
-        string VerifyAuthenticated(IPrincipal rolePrincipal);
-
-        string VerifyNotAuthenticated(IPrincipal rolePrincipal);
+        string VerifyAuthenticated(IRolePrincipal rolePrincipal);
     }
 }

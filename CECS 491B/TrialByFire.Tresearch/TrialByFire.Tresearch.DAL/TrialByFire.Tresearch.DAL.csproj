@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TrialByFire.Tresearch.Exceptions\TrialByFire.Tresearch.Exceptions.csproj" />
     <ProjectReference Include="..\TrialByFire.Tresearch.Models\TrialByFire.Tresearch.Models.csproj" />
   </ItemGroup>
 

@@ -3,7 +3,7 @@ using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Models.Implementations
 {
-	public class SearchKPI : ISearchKPI
+    public class SearchKPI : ISearchKPI
 	{
 		public List<TopSearch> topSearches { get; set; }
 

@@ -36,7 +36,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
         public void RequestTheOTP(string username, string passphrase, string expected)
         {
             // Arrange
-            IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService);
+            IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService, messageBank);
             IAccount account = new Account(username, passphrase);
             IOTPClaim otpClaim = new OTPClaim(account);
 

@@ -1,11 +1,12 @@
 ﻿using System;
+using Xunit;
 namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 {
 	public class InMemoryUADServiceShould
 	{
 		public void LoadKPI(DateTime now)
 		{
-			// Arrange
+			/*// Arrange
 			ISqlDAO _inMemorySqlDAO = new InMemorySqlDAO();
 			ILogService _inMemoryLogService = new InMemoryLogService(_inMemorySqlDAO);
 			IUADService _uadService = new UADService(_sqlDAO, _logService);
@@ -16,7 +17,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 			List<KPI> results = _uadService.LoadKPI(now);
 
 			// Assert
-			Assert.Equal(expected, results);
+			Assert.Equal(expected, results);*/
 		}
 	}
 }

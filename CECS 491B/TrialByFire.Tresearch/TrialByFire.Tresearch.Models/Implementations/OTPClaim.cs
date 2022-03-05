@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using TrialByFire.Tresearch.Exceptions;
 using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Models.Implementations
@@ -41,7 +42,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public OTPClaim(IAccount account)
         {
-            Username = account.username;
+            Username = account.Username;
             OTP = GenerateRandomOTP();
             TimeCreated = DateTime.Now;
             FailCount = 0;

@@ -9,7 +9,8 @@ using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
-using TrialByFire.Tresearch.Services.Implentations;
+using TrialByFire.Tresearch.Services.Implementations;
+using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.UAD
 {
@@ -17,7 +18,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.UAD
 	{
 		public void LoadKPI(DateTime now)
         {
-            // Arrange
+            /*// Arrange
             ISqlDAO _sqlDAO = new SqlDAO();
             ILogService _logService = new SqlLogService(_sqlDAO);
             IUADManager _uadManager = new UADManager(_sqlDAO, _logService);
@@ -28,7 +29,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.UAD
             List<KPI> results = _uadManager.LoadKPI(_sqlDAO, _logService, _uadService);
 
             // Assert
-            Assert.Equal(expected, results);
+            Assert.Equal(expected, results);*/
         }
 
         public void KPISFetched(DateTime now)

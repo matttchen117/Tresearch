@@ -10,13 +10,12 @@ using TrialByFire.Tresearch.Managers.Implementations;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
-using TrialByFire.Tresearch.Services.Implementations;
 using TrialByFire.Tresearch.WebApi.Controllers;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.AuthenticationTests.UnitTests
+namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
 {
     public class InMemoryAuthenticationControllerShould : InMemoryTestDependencies
     {
@@ -48,7 +47,7 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.UnitTests
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            IAuthenticationManager authenticationManager = new AuthenticationManager(sqlDAO, 
+            IAuthenticationManager authenticationManager = new AuthenticationManager(sqlDAO,
                 logService, validationService, authenticationService, rolePrincipal, messageBank);
             IAuthenticationController authenticationController = new AuthenticationController(sqlDAO,
                 logService, authenticationManager, messageBank);
@@ -61,22 +60,22 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.UnitTests
             Assert.Equal(expected, result);
         }
 
-/*        public void CreateTheCookie(string username, string otp)
-        {
-            // Arrange
-            ISqlDAO inMemorySqlDAO = new InMemorySqlDAO();
-            ILogService inMemoryLogService = new InMemoryLogService(inMemorySqlDAO);
-            IAuthenticationManager authenticationManager = new AuthenticationManager(inMemorySqlDAO, inMemoryLogService);
-            IAuthenticationController authenticationController = new AuthenticationController(inMemorySqlDAO, inMemoryLogService, authenticationManager);
-            string _jwtToken = authenticationManager.Authenticate(username, otp, DateTime.Now)[1];
-            string expected = "success";
+        /*        public void CreateTheCookie(string username, string otp)
+                {
+                    // Arrange
+                    ISqlDAO inMemorySqlDAO = new InMemorySqlDAO();
+                    ILogService inMemoryLogService = new InMemoryLogService(inMemorySqlDAO);
+                    IAuthenticationManager authenticationManager = new AuthenticationManager(inMemorySqlDAO, inMemoryLogService);
+                    IAuthenticationController authenticationController = new AuthenticationController(inMemorySqlDAO, inMemoryLogService, authenticationManager);
+                    string _jwtToken = authenticationManager.Authenticate(username, otp, DateTime.Now)[1];
+                    string expected = "success";
 
-            // Act
-            string result = authenticationController.CreateCookie(_jwtToken);
+                    // Act
+                    string result = authenticationController.CreateCookie(_jwtToken);
 
-            // Assert
-            Assert.Equal(expected, result);
-        }*/
+                    // Assert
+                    Assert.Equal(expected, result);
+                }*/
 
     }
 }

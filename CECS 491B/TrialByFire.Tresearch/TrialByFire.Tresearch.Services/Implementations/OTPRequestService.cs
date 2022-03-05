@@ -14,16 +14,18 @@ namespace TrialByFire.Tresearch.Services.Implementations
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
-        public OTPRequestService(ISqlDAO sqlDAO, ILogService logService)
+        private IMessageBank _messageBank { get; }
+        public OTPRequestService(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
+            _messageBank = messageBank;
         }
 
         public string RequestOTP(IAccount account, IOTPClaim otpClaim)
         {
             string result = _sqlDAO.VerifyAccount(account);
-            if(result.Equals("success"))
+            if(result.Equals(_messageBank.SuccessMessages["generic"]))
             {
                 result = _sqlDAO.StoreOTP(otpClaim);
             }

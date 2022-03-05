@@ -9,17 +9,17 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class Account : IAccount
     {
-        public string? Email { get; }
+        public string? Email { get; set; }
 
-        private string? Username { get; }
+        public string? Username { get; set; }
 
-        public string? Passphrase { get; }
+        public string? Passphrase { get; set; }
 
-        public string? AuthorizationLevel { get; }
+        public string? AuthorizationLevel { get; set; }
 
-        public bool? Status { get; }
+        public bool? Status { get; set; }
 
-        public bool? Confirmed { get; }
+        public bool? Confirmed { get; set; }
 
         public Account(string email, string username, string passphrase, string authorizationLevel, bool status, bool confirmed)
         {
@@ -56,7 +56,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 if(obj is IAccount)
                 {
                     IAccount account = (IAccount)obj;
-                    return Username.Equals(account.username) || Email.Equals(account.email);
+                    return Username.Equals(account.Username) || Email.Equals(account.Email);
                 }
             }
             return false;
