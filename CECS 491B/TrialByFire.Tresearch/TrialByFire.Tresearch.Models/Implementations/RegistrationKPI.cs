@@ -5,7 +5,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
 	public class RegistrationKPI : IRegistrationKPI
 	{
-		List<DailyRegistration> dailyRegistrations { get; }
+		public List<DailyRegistration> dailyRegistrations { get; set; }
 		public RegistrationKPI(List<DailyRegistration> dailyRegistrations)
 		{
 			this.dailyRegistrations = dailyRegistrations;

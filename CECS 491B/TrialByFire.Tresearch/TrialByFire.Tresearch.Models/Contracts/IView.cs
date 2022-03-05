@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Models.Contracts
 {
-	public interface ILoginKPI : IKPI
-	{
-		public List<DailyLogin> dailyLogins { get; set; }
-	}
+    public interface IView
+    {
+        public DateTime timestamp { get; }
+        public string viewName { get; }
+        public double averageDuration { get; }
+    }
 }
-

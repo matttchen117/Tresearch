@@ -3,7 +3,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
 {
 	public interface IRegistrationKPI : IKPI
 	{
-		List<int> registrationCount { get; }
+		List<DailyRegistration> dailyRegistrations { get; set; }
 	}
 }
 

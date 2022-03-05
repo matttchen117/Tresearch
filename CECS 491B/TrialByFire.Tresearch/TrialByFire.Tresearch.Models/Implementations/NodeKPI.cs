@@ -5,8 +5,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
 	public class NodeKPI : INodeKPI
 	{
-		List<NodesCreated> nodesCreated { get; }
-		public NodeKPI(List<Node> nodesCreated)
+		public List<NodesCreated> nodesCreated { get; set; }
+		public NodeKPI(List<NodesCreated> nodesCreated)
 		{
 			this.nodesCreated = nodesCreated;
 		}

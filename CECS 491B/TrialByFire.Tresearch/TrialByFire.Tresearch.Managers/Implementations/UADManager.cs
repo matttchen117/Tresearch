@@ -68,6 +68,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 			resultList.Add(new KPI("Error: Timeout"));
 			return resultList;
         }
-	}
+    }
 }
 

@@ -8,7 +8,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
 {
 	public interface INodeKPI : IKPI
 	{
-		List<NodesCreated> nodesCreated { get; }
+		public List<NodesCreated> nodesCreated { get; set; }
 	}
 }
 

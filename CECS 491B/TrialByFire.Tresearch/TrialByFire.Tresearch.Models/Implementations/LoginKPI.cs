@@ -5,7 +5,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
 	public class LoginKPI : ILoginKPI
 	{
-		List<DailyLogin> dailyLogins { get; }
+		public List<DailyLogin> dailyLogins { get; set;  }
 
 		public LoginKPI(List<DailyLogin> dailyLogins)
 		{

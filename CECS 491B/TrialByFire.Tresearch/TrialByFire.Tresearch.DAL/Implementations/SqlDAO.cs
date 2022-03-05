@@ -63,8 +63,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(SqlConnectionString))
                 {
-                    var updateQuery = "UPDATE confirmation_links SET confirmed = 1 WHERE Username = @Username and Email = @Email";
-                    affectedRows = connection.Execute(updateQuery, new { Username = account.username, Email = account.email });
+                    var updateQuery = "UPDATE confirmation_links SET confirmed = 1 WHERE Username = " +
+                        "@Username and Email = @Email";
+                    affectedRows = connection.Execute(updateQuery, new { Username = account.Username, 
+                        Email = account.Email });
 
                 }
                 if (affectedRows == 1)
@@ -111,10 +113,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 using (var connection = new SqlConnection(SqlConnectionString))
                 {
                     var readQuery = "SELECT COUNT(*) FROM Accounts WHERE Email = @Email";
-                    var accounts = connection.ExecuteScalar<int>(readQuery, new { Email = account.email });
+                    var accounts = connection.ExecuteScalar<int>(readQuery, new { Email = account.Email });
                     if (accounts > 0)
                     {
-                        account.username = account.username.Insert(account.username.IndexOf('@'), accounts.ToString());
+                        account.Username = account.Username.Insert(account.Username.IndexOf('@'), accounts.ToString());
                     }
                     var insertQuery = "INSERT INTO user_accounts (Email, Username, Passphrase, AuthorizationLevel, Status) " +
                         "VALUES (@email, @username, @passphrase, @authorization_level, @Status)";
@@ -135,10 +137,38 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public List<KPI> LoadKPIs(DateTime now)
+        public string VerifyAccountEnabled(IAccount account)
         {
-
+            throw new NotImplementedException();
         }
 
+        public List<string> Authenticate(IOTPClaim otpClaim)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string VerifyAuthenticated(IRolePrincipal rolePrincipal)
+        {
+            throw new NotImplementedException();
+        }
+        public string Authorize(IRolePrincipal rolePrincipal, string requiredRole)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IOTPClaim GetOTPClaim(IOTPClaim otpClaim)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string StoreOTP(IOTPClaim otpClaim)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<IKPI> LoadKPI(DateTime now)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

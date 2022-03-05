@@ -20,9 +20,9 @@ namespace TrailByFire.Tresearch.WebApi.Controllers.Implementations
             _uadManager = uadManager;
         }
 
-        public List<KPI> LoadKPI(DateTime now)
+        public List<IKPI> LoadKPI(DateTime now)
         {
-            List<KPI> results = _uadManager.LoadKPI(now);
+            List<IKPI> results = _uadManager.LoadKPI(now);
             return results;
         }
     }

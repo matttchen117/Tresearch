@@ -5,8 +5,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
 	public class ViewDurationKPI : IViewDurationKPI
 	{
-		List<string> viewNames { get; }
-		List<int> viewAverage { get;  }
+		public List<string> viewNames { get; }
+		public List<int> viewAverage { get;  }
 
 		public ViewDurationKPI(List<string> viewNames, List<int> viewAverage)
 		{
