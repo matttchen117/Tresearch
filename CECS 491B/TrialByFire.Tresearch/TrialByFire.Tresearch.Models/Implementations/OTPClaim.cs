@@ -5,7 +5,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.Models.Contracts;
-using TrialByFire.Tresearch.Exceptions;
 
 namespace TrialByFire.Tresearch.Models.Implementations
 {
@@ -21,11 +20,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public OTPClaim(string username, string otp, DateTime timeCreated)
         {
-            if ((username ?? otp) == null)
-            {
-                throw new OTPClaimCreationFailedException("Data: OTP Claim creation failed. Null argument passed in for" +
-                    "username or otp.");
-            }
             Username = username;
             OTP = otp;
             TimeCreated = timeCreated;
@@ -47,12 +41,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public OTPClaim(IAccount account)
         {
-            if((account) == null)
-            {
-                throw new OTPClaimCreationFailedException("Data: OTP Claim creation failed. Null argument passed in for" +
-                    "account.");
-            }
-            Username = account.Username;
+            Username = account.username;
             OTP = GenerateRandomOTP();
             TimeCreated = DateTime.Now;
             FailCount = 0;
@@ -69,19 +58,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 otp += validCharacters[random.Next(0, validCharacters.Length)];
             }
             return otp;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            if (obj != null)
-            {
-                if(obj is IOTPClaim claim)
-                {
-                    IOTPClaim dbOTPClaim = (IOTPClaim)obj;
-                    return this.Username == dbOTPClaim.Username;
-                }
-            }
-            return false;
         }
     }
 }

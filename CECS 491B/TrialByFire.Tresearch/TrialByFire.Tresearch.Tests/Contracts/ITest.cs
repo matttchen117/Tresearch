@@ -12,9 +12,9 @@ namespace TrialByFire.Tresearch.Tests.Contracts
     {
         public BaseTest()
         {
-            /*var services = new ServiceCollection();
+            var services = new ServiceCollection();
 
-            services.AddTransient<>();*/
+            services.AddTransient<>();
 
         }
     }

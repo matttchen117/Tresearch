@@ -15,15 +15,24 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 {
 	public class UADManager : IUADManager
 	{
-		private readonly ISqlDAO _sqlDAO;
-		private readonly ILogService _logService;
-		private readonly IUADService _uadService;
+		private ISqlDAO _sqlDAO { get; }
+		private ILogService _logService { get; }
 
-		public UADManager(ISqlDAO sqlDAO, ILogService logService, IUADService uadService)
+		private IUADService _uadService { get; }
+		private IAuthenticationService _authenticationService { get; }
+		private IAuthorizationService _authorizationService { get; }
+		
+		private IRolePrincipal _rolePrincipal { get; }
+		private IOTPRequestService _otpRequestService { get; }
+		private readonly string _role = "Admin";
+
+		public UADManager(ISqlDAO sqlDAO, ILogService logService, IUADService uadService, IAuthenticationService authenticationService, IAuthorizationService authorizationService)
         {
 			_sqlDAO = sqlDAO;
 			_logService = logService;
 			_uadService = uadService;
+			_authenticationService = authenticationService;
+			_authorizationService = authorizationService;
         }
 
 		public List<KPI> LoadKPI(DateTime now)
@@ -31,23 +40,33 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 			return _uadService.LoadKPI(now);
         }
 
-		public List<KPI> KPISFetched(DateTime now)
+		public List<KPI> KPIsFetched(DateTime now)
         {
-			Task t1 = Task.Run(() =>
-			{
-				 return _uadService.LoadKPI(now);
-			});
-            if (!t1.Wait(60000))
+			string result;
+			result = _authenticationService.VerifyAuthenticated(_rolePrincipal);
+			if(result == "success")
             {
-				List<KPI> result = new List<KPI>();
-				result.Add(new KPI("Error 504: Timeout Error"));
-				return result;
+				string authorizeResult;
+				authorizeResult = _authorizationService.Authorize(_rolePrincipal, _role);
+				if (authorizeResult == "success")
+                {
+					Task t1 = Task.Run(() =>
+					{
+						return _uadService.LoadKPI(now);
+					});
+
+                    if (!t1.Wait(60000))
+                    {
+						List<KPI> results = new List<KPI>();
+						KPI failureKPI = new KPI("Error 504; Timeout Error");
+						results.Add(failureKPI);
+						return results;
+                    }
+                }
             }
-			throw new NotImplementedException();
-		}
-        public bool KPISFetched()
-        {
-            throw new NotImplementedException();
+			List<KPI> resultList = new List<KPI>();
+			resultList.Add(new KPI("Error: Timeout"));
+			return resultList;
         }
     }
 }

@@ -5,10 +5,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
 	public class RegistrationKPI : IRegistrationKPI
 	{
-		public List<int> registrationCount { get; }
-		public RegistrationKPI(List<int> registrationCount)
+		public List<DailyRegistration> dailyRegistrations { get; set; }
+		public RegistrationKPI(List<DailyRegistration> dailyRegistrations)
 		{
-			this.registrationCount = registrationCount;
+			this.dailyRegistrations = dailyRegistrations;
 		}
 	}
 }

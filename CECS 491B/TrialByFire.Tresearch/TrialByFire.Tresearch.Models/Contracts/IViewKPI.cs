@@ -1,10 +1,10 @@
 ﻿using System;
+using TrialByFire.Tresearch.Models.Implementations;
 namespace TrialByFire.Tresearch.Models.Contracts
 {
 	public interface IViewKPI : IKPI
 	{
-		List<string> viewNames { get; }
-		List<int> viewCounts { get;  }
+		List<View> views { get; set; }
 	}
 }
 

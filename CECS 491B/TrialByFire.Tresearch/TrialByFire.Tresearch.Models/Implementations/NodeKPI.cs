@@ -5,10 +5,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
 	public class NodeKPI : INodeKPI
 	{
-		public List<int> nodeCount { get; }
-		public NodeKPI(List<int> nodeCount)
+		public List<NodesCreated> nodesCreated { get; set; }
+		public NodeKPI(List<NodesCreated> nodesCreated)
 		{
-			this.nodeCount = nodeCount;
+			this.nodesCreated = nodesCreated;
 		}
 	}
 }

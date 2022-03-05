@@ -25,5 +25,8 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         // Request OTP
         public IOTPClaim GetOTPClaim(IOTPClaim otpClaim);
         public string StoreOTP(IOTPClaim otpClaim);
+
+        // Usage Analysis Dashboard
+        public List<IKPI> LoadKPI(DateTime now);
     }
 }

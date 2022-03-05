@@ -5,13 +5,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
 	public class ViewKPI : IViewKPI
 	{
-		public List<string> viewNames { get; }
-		public List<int> viewCounts { get;  }
+		public List<View> views { get; set; }
 
-		public ViewKPI(List<string> viewNames, List<int> viewCounts)
+		public ViewKPI(List<View> views)
 		{
-			this.viewNames = viewNames;
-			this.viewCounts = viewCounts;
+			this.views = views; 
 		}
 	}
 }

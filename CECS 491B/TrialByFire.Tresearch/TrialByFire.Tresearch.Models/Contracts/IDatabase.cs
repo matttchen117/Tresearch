@@ -8,20 +8,19 @@ namespace TrialByFire.Tresearch.Models.Contracts
 {
     public interface IDatabase
     {
-        public IList<IOTPClaim> OTPClaims { get; set; }
-        public IList<IAccount> Accounts { get; set; }
-        public IList<INode> Nodes { get; set; }
-        public IList<ITag> Tags { get; set; }
-        public IList<INodeTag> NodeTags { get; set; }
-        public IList<IRating> Ratings { get; set; }
-        /*        public IList<ITreeHistory> TreeHistories { get; set; }
-                public IList<IWebPageKPI> WebPageKPIs { get; set; }
-                public IList<IDailyRegistrationKPI> DailyRegistrationKPIs { get; set; }*/
-        public IList<IDailyLogin> DailyLogins { get; set; }
-        public IList<ITopSearch> TopSearches { get; set; }
-        public IList<INodesCreated> NodesCreated { get; set; }
-        public IList<IConfirmationLink> ConfirmationLinks { get; set; }
-        public IList<IRolePrincipal> RolePrincipals { get; set; }
+        IList<IOTPClaim> _claims { get; set; }
+        IList<IAccount> _accounts { get; set; }
+        IList<INode> _nodes { get; set; }
+        IList<ITag> _tags { get; set; }
+        IList<INodeTag> _nodeTags { get; set; }
+        IList<IRating> _ratings { get; set; }
+        IList<ITreeHistory> _treeHistories { get; set; }
+        IList<IWebPageKPI> _webPageKPIs { get; set; }
+        IList<IDailyRegistrationKPI> _dailyRegistrationKPIs { get; set; }
+        IList<IDailyLogin> _dailyLoginKPIs { get; set; }
+        IList<ITopSearch> _topSearchesKPIs { get; set; }
+        IList<INodesCreated> _nodesCreatedKPIs { get; set; }
+        IList<IConfirmationLink> _confirmationLinks { get; set; }
 
     }
 }

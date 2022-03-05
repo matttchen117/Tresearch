@@ -18,8 +18,3 @@ C:\Users\pammy\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresear
 C:\Users\pammy\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.dll
 C:\Users\pammy\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\refint\TrialByFire.Tresearch.DAL.dll
 C:\Users\pammy\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.pdb
-C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\bin\Debug\net6.0\TrialByFire.Tresearch.Exceptions.dll
-C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\bin\Debug\net6.0\TrialByFire.Tresearch.Models.dll
-C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\bin\Debug\net6.0\TrialByFire.Tresearch.Models.pdb
-C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\bin\Debug\net6.0\TrialByFire.Tresearch.Exceptions.pdb
-C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.DAL\obj\Debug\net6.0\TrialByFire.Tresearch.DAL.csproj.CopyComplete

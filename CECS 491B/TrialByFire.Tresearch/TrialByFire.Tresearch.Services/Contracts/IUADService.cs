@@ -6,7 +6,7 @@ namespace TrialByFire.Tresearch.Services.Contracts
 {
 	public interface IUADService
 	{
-		List<KPI> LoadKPI(DateTime now);
+		List<IKPI> LoadKPI(DateTime now);
 	}
 }
 

@@ -6,17 +6,16 @@ using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
-using TrialByFire.Tresearch.Managers.Implementations;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
-using TrialByFire.Tresearch.Services.Implementations;
+using TrialByFire.Tresearch.Services.Implentations;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.UAD
 {
 	public class UADManagerShould
 	{
-		/*public void LoadKPI(DateTime now)
+		public void LoadKPI(DateTime now)
         {
             // Arrange
             ISqlDAO _sqlDAO = new SqlDAO();
@@ -30,7 +29,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.UAD
 
             // Assert
             Assert.Equal(expected, results);
-        }*/
+        }
 
         public void KPISFetched(DateTime now)
         {

@@ -8,16 +8,18 @@ namespace TrialByFire.Tresearch.Models.Contracts
 {
     public interface IAccount
     {
-        string? Email { get; set; }
+        string email { get; set; }
         
-        string? Username { get; set; }
+        string username { get; set; }
 
         public string? Passphrase { get; }
 
         string? AuthorizationLevel { get; set; }
 
-        bool? Status { get; set; }
+        string authorizationLevel { get; set; }
 
-        bool? Confirmed { get; set; }
+        bool status { get; set; }
+
+        bool confirmed { get; set; }
     }
 }

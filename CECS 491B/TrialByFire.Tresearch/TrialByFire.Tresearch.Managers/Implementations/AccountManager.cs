@@ -32,7 +32,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             try
             {
                 string linkUrl = _accountService.CreateConfirmation(account, baseUrl);
-                _mailService.SendConfirmation(account.Email, linkUrl);
+                _mailService.SendConfirmation(account.email, linkUrl);
             } catch
             {
                 return "Failed - Unable to send confirmation link";

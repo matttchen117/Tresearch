@@ -6,11 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
-using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
@@ -25,10 +25,11 @@ namespace TrialByFire.Tresearch.Services.Implementations
 			this._logService = _logService;
 		}
 
-		public List<KPI> LoadKPI(DateTime now)
+		public List<IKPI> LoadKPI(DateTime now)
 		{
-			throw new NotImplementedException();
-			//return _sqlDAO.LoadKPI(now);
+			List<IKPI> kpiList = new List<IKPI>();
+			kpiList = _sqlDAO.LoadKPI(now);
+			return _sqlDAO.LoadKPI(now);
 		}
 	}
 }

@@ -165,5 +165,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             throw new NotImplementedException();
         }
+
+        public List<IKPI> LoadKPI(DateTime now)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
