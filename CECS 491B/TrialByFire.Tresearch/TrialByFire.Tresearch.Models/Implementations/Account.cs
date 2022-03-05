@@ -56,7 +56,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 if(obj is IAccount)
                 {
                     IAccount account = (IAccount)obj;
-                    return (Username.Equals(account.Username) || Email.Equals(account.Email)) && AuthorizationLevel.Equals(account.AuthorizationLevel);
+                    return Username.Equals(account.Username) || Email.Equals(account.Email);
                 }
             }
             return false;
