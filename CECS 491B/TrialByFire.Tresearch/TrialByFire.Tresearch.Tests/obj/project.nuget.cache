@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "+Fh8OuYaXRY6bT7/Mv8K5ygXNSNDaFIuBdT9AEy8qnqMKVno1tL4o2R0ymPjTIKAIK3HW7IgqLTqC5Zs2TMK2g==",
+  "dgSpecHash": "b7P1j88ptKqIWp6qWhr9LfxcHhbACzlYXfviaQlS/n9Hi2uyB0qLKdZFVAT8lDJEIXOoWCKmi+UmeLXi7YvUkA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\TrialByFire.Tresearch.Tests.csproj",
+  "projectFilePath": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\TrialByFire.Tresearch.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\microsoft.codecoverage\\17.1.0\\microsoft.codecoverage.17.1.0.nupkg.sha512",

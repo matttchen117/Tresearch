@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "mlwkXClKwOTLgr1wVog02fxK4GDvsmFqZ0V2eSOPQ7UqXUPMow1fTzgORryUsbAbHGAjrhE/wNyoHE7dRUl5Vw==",
+  "dgSpecHash": "Ag7JK722en2ljC/DNsqPeJcFo4WzJki6s1TGKoYL6RHjVIW/zw6hor3RA+8e7asS/8zoruSpe/1LQEqNTzE6JQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj",
+  "projectFilePath": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
