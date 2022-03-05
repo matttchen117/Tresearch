@@ -137,7 +137,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public string VerifyAccountEnabled(IAccount account)
+        public string VerifyAccount(IAccount account)
         {
             throw new NotImplementedException();
         }
@@ -151,7 +151,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             throw new NotImplementedException();
         }
-        public string Authorize(IRolePrincipal rolePrincipal, string requiredRole)
+        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredRole)
         {
             throw new NotImplementedException();
         }

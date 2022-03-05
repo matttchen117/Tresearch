@@ -22,15 +22,17 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private IValidationService _validationService { get; }
         private IAuthenticationService _authenticationService { get; }
         private IRolePrincipal _rolePrincipal { get; }
+        private IMessageBank _messageBank { get; }
 
         public AuthenticationManager(ISqlDAO sqlDAO, ILogService logService, IValidationService validationService, 
-            IAuthenticationService authenticationService, IRolePrincipal rolePrincipal)
+            IAuthenticationService authenticationService, IRolePrincipal rolePrincipal, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
             _validationService = validationService;
             _authenticationService = authenticationService;
             _rolePrincipal = rolePrincipal;
+            _messageBank = messageBank;
         }
 
         public List<string> Authenticate(string username, string otp, DateTime now)
@@ -44,7 +46,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     keyValuePairs.Add("username", username);
                     keyValuePairs.Add("otp", otp);
                     string result = _validationService.ValidateInput(keyValuePairs);
-                    if(result.Equals("success"))
+                    if(result.Equals(_messageBank.SuccessMessages["generic"]))
                     {
                         IOTPClaim resultClaim = new OTPClaim(username, otp, now);
                         results = _authenticationService.Authenticate(resultClaim);
@@ -53,7 +55,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     results.Add(result);
                     return results;
                 }
-                results.Add("Server: Active session already found. Please logout and try again.");
+                results.Add(_messageBank.ErrorMessages["alreadyAuthenticated"]);
             }catch(OTPClaimCreationFailedException occfe)
             {
                 results.Add(occfe.Message);

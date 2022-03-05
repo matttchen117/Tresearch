@@ -9,7 +9,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 {
     public class InMemoryLogService : ILogService
     {
-        private readonly ISqlDAO _sqlDAO;
+        private ISqlDAO _sqlDAO { get; }
 
         public InMemoryLogService(ISqlDAO inMemorySqlDAO)
         {

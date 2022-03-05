@@ -25,12 +25,19 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
 
         [Theory]
         [InlineData("larry@gmail.com", "abcDEF123", "guest", "guest", "success")]
-        [InlineData("billy@yahoo.com", "abcDEF123", "billy@yahoo.com", "admin", "Server: User is already authenticated.")]
+        [InlineData("larry@gmail.com", "#$%", "guest", "guest", "Data: Invalid Username or " +
+            "Passphrase. Please try again.")]
+        [InlineData("larry@gmail.com", "abcdef#$%", "guest", "guest", "Data: Invalid Username or " +
+            "Passphrase. Please try again.")]
+        [InlineData("larry@gmail.com", "abcdEF123", "guest", "guest", "Data: Invalid Username or " +
+            "Passphrase. Please try again.")]
+        [InlineData("billy@yahoo.com", "abcDEF123", "billy@yahoo.com", "admin", "Server: Active session found. " +
+            "Please logout and try again.")]
         [InlineData("joe@outlook.com", "abcDEF123", "guest", "guest", "success")]
         [InlineData("bob@yahoo.com", "abcDEF123", "guest", "guest", "Database: The account was not found or it " +
             "has been disabled.")]
-        [InlineData("harry@yahoo.com", "abcDEF123", "guest", "guest", "Database: Please click on the confirmation link that " +
-            "we sent to your email in order to confirm your account.")]
+        [InlineData("harry@yahoo.com", "abcDEF123", "guest", "guest", "Database: Please confirm your " +
+            "account before attempting to login.")]
         public void RequestTheOTP(string username, string passphrase, string currentIdentity, string currentRole, 
             string expected)
         {
@@ -39,8 +46,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService);
             IOTPRequestManager otpRequestManager = new OTPRequestManager(sqlDAO, logService, validationService, 
-                authenticationService, rolePrincipal, otpRequestService);
-            IOTPRequestController otpRequestController = new OTPRequestController(sqlDAO, logService, otpRequestManager);
+                authenticationService, rolePrincipal, otpRequestService, messageBank);
+            IOTPRequestController otpRequestController = new OTPRequestController(sqlDAO, logService, 
+                otpRequestManager);
 
             // Act
             string result = otpRequestController.RequestOTP(username, passphrase);

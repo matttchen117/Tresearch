@@ -17,21 +17,21 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.OTPRequestTests
 {
-    public class OTPRequestControllerShould
+    public class OTPRequestControllerShould : IntegrationTestDependences
     {
+        public OTPRequestControllerShould() : base()
+        {
+        }
         public void RequestTheOTP(string username, string passphrase)
         {
             // Arrange
-            ISqlDAO sqlDAO = new InMemorySqlDAO();
-            ILogService logService = new InMemoryLogService(sqlDAO);
-            IValidationService validationService = new ValidationService();
-            IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService);
             IRoleIdentity roleIdentity = new RoleIdentity(true, "Bob", "User");
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService);
             IOTPRequestManager otpRequestManager = new OTPRequestManager(sqlDAO, logService, validationService,
-                authenticationService, rolePrincipal, otpRequestService);
-            IOTPRequestController otpRequestController = new OTPRequestController(sqlDAO, logService, otpRequestManager);
+                authenticationService, rolePrincipal, otpRequestService, messageBank);
+            IOTPRequestController otpRequestController = new OTPRequestController(sqlDAO, logService, 
+                otpRequestManager);
             string expected = "success";
 
             // Act

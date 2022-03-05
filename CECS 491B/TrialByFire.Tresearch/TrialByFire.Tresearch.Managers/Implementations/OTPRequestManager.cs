@@ -24,8 +24,11 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
         private IRolePrincipal _rolePrincipal { get; }
         private IOTPRequestService _otpRequestService { get; }
+        private IMessageBank _messageBank { get; }
 
-        public OTPRequestManager(ISqlDAO sqlDAO, ILogService logService, IValidationService validationService, IAuthenticationService authenticationService, IRolePrincipal rolePrincipal, IOTPRequestService otpRequestService)
+        public OTPRequestManager(ISqlDAO sqlDAO, ILogService logService, IValidationService validationService, 
+            IAuthenticationService authenticationService, IRolePrincipal rolePrincipal, 
+            IOTPRequestService otpRequestService, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
@@ -33,6 +36,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _authenticationService = authenticationService;
             _rolePrincipal = rolePrincipal;
             _otpRequestService = otpRequestService;
+            _messageBank = messageBank;
         }
 
         public string RequestOTP(string username, string passphrase)
@@ -46,7 +50,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     keyValuePairs.Add("username", username);
                     keyValuePairs.Add("passphrase", passphrase);
                     result = _validationService.ValidateInput(keyValuePairs);
-                    if (result.Equals("success"))
+                    if (result.Equals(_messageBank.SuccessMessages["generic"]))
                     {
                         IAccount account = new Account(username, passphrase);
                         IOTPClaim otpClaim = new OTPClaim(account);
@@ -56,7 +60,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 }
                 else
                 {
-                    return "Server: User is already authenticated.";
+                    return _messageBank.ErrorMessages["alreadyAuthenticated"];
                 }
             }catch(AccountCreationFailedException acfe)
             {

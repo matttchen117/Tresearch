@@ -4,14 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Services.Contracts;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
     public class ValidationService : IValidationService
     {
-        public ValidationService()
+        private IMessageBank _messageBank { get; }
+        public ValidationService(IMessageBank messageBank)
         {
+            _messageBank = messageBank;
         }
         public string ValidateInput(Dictionary<string, string> input)
         {
@@ -20,15 +23,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
             string passphrase = "";
             string otp = "";
             string email = "";
-            bool validUsername = false;
-            bool validPassphrase = false;
-            bool validOTP = false;
-            bool validEmail = false;
-            bool containsLower = false;
-            bool containsUpper = false;
-            bool containsNum = false;
-            bool containsSpecial = false;
+            int userSpecials = 0;
             char[] validSymbols = { '.', ',', '@', '!' };
+            char[] requiredSymbols = { '.', '@' };
             if (input.ContainsKey("username") && input.ContainsKey("passphrase"))
             {
                 username = input["username"];
@@ -39,15 +36,23 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     {
                         if (char.IsUpper(username[i]))
                         {
-                            return "Data: Invalid Username or Passphrase. Please try again.";
+                            return _messageBank.ErrorMessages["badNameOrPass"];
                         }
                         if (!char.IsLetterOrDigit(username[i]))
                         {
                             if(!validSymbols.Contains(username[i]))
                             {
-                                return "Data: Invalid Username or Passphrase. Please try again.";
+                                return _messageBank.ErrorMessages["badNameOrPass"];
+                            }
+                            else
+                            {
+                                userSpecials++;
                             }
                         }
+                    }
+                    if (userSpecials < 2)
+                    {
+                        return _messageBank.ErrorMessages["badNameOrPass"];
                     }
                     for (int j = 0; j < passphrase.Length; j++)
                     {
@@ -55,33 +60,41 @@ namespace TrialByFire.Tresearch.Services.Implementations
                         {
                             if (!validSymbols.Contains(passphrase[j]))
                             {
-                                return "Data: Invalid Username or Passphrase. Please try again.";
+                                return _messageBank.ErrorMessages["badNameOrPass"];
                             }
                         }
                     }
-                    return "success";
+                    return _messageBank.SuccessMessages["generic"];
                 }
-                return "Data: Invalid Username or Passphrase. Please try again.";
+                return _messageBank.ErrorMessages["badNameOrPass"];
             }
             if (input.ContainsKey("username") && input.ContainsKey("otp"))
             {
                 username = input["username"];
                 otp = input["otp"];
-                if (username.Length > 8 && passphrase.Length > 8)
+                if (username.Length > 8 && otp.Length > 8)
                 {
                     for (int i = 0; i < username.Length; i++)
                     {
                         if (char.IsUpper(username[i]))
                         {
-                            return "Data: Invalid Username or Passphrase. Please try again.";
+                            return _messageBank.ErrorMessages["badNameOrOTP"];
                         }
                         if (!char.IsLetterOrDigit(username[i]))
                         {
                             if (!validSymbols.Contains(username[i]))
                             {
-                                return "Data: Invalid Username or Passphrase. Please try again.";
+                                return _messageBank.ErrorMessages["badNameOrOTP"];
+                            }
+                            else
+                            {
+                                userSpecials++;
                             }
                         }
+                    }
+                    if (userSpecials < 2)
+                    {
+                        return _messageBank.ErrorMessages["badNameOrOTP"];
                     }
                     for (int j = 0; j < otp.Length; j++)
                     {
@@ -89,13 +102,13 @@ namespace TrialByFire.Tresearch.Services.Implementations
                         {
                             if (!validSymbols.Contains(otp[j]))
                             {
-                                return "Data: Invalid Username or Passphrase. Please try again.";
+                                return _messageBank.ErrorMessages["badNameOrOTP"];
                             }
                         }
                     }
-                    return "success";
+                    return _messageBank.SuccessMessages["generic"];
                 }
-                return "Data: Invalid Username or OTP. Please try again.";
+                return _messageBank.ErrorMessages["badNameOrOTP"];
             }
             if(input.ContainsKey("email"))
             {

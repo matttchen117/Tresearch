@@ -11,7 +11,7 @@ using TrialByFire.Tresearch.Services.Contracts;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
-    public class IntegrationTestDependences
+    public class InMemoryTestDependencies
     {
         public ISqlDAO sqlDAO { get; }
         public ILogService logService { get; }
@@ -22,10 +22,10 @@ namespace TrialByFire.Tresearch.Services.Implementations
         public IValidationService validationService { get; }
 
 
-        public IntegrationTestDependences()
+        public InMemoryTestDependencies()
         {
-            sqlDAO = new SqlDAO();
-            logService = new SqlLogService(sqlDAO);
+            sqlDAO = new InMemorySqlDAO();
+            logService = new InMemoryLogService(sqlDAO);
             messageBank = new MessageBank();
             authenticationService = new AuthenticationService(sqlDAO, logService, messageBank);
             authorizationService = new AuthorizationService(sqlDAO, logService);

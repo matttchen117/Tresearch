@@ -14,7 +14,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public string Username { get; set; }
 
-        private string? Passphrase { get; }
+        public string? Passphrase { get; }
 
         public string? AuthorizationLevel { get; set; }
 

@@ -9,11 +9,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 {
     public class SqlLogService : ILogService
     {
-        public ISqlDAO sqlDAO { get; }
+        private  ISqlDAO _sqlDAO { get; }
 
         public SqlLogService(ISqlDAO sqlDAO)
         {
-            this.sqlDAO = sqlDAO;
+            _sqlDAO = sqlDAO;
         }
 
         public string CreateLog(DateTime timestamp, string level, string username, string category, string description)

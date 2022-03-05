@@ -22,7 +22,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
         public string RequestOTP(IAccount account, IOTPClaim otpClaim)
         {
-            string result = _sqlDAO.VerifyAccountEnabled(account);
+            string result = _sqlDAO.VerifyAccount(account);
             if(result.Equals("success"))
             {
                 result = _sqlDAO.StoreOTP(otpClaim);

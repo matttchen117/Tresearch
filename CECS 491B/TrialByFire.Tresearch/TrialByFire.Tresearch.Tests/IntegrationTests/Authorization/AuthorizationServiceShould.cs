@@ -24,7 +24,7 @@ namespace TrialByFire.Tresearch.Tests.AuthorizationTests
             string expected = "success";
 
             // Act
-            string result = authorizationService.Authorize(rolePrincipal, requiredRole);
+            string result = authorizationService.VerifyAuthorized(rolePrincipal, requiredRole);
 
             // Assert
             Assert.Equal(expected, result);

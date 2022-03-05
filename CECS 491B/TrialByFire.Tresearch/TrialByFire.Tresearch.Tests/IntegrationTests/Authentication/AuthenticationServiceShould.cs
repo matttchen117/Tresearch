@@ -7,20 +7,22 @@ using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Services.Implementations;
 using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
 {
-    public class AuthenticationServiceShould
+    public class AuthenticationServiceShould : IntegrationTestDependences
     { 
+        public AuthenticationServiceShould() : base()
+        {
+        }
+
         public void AuthenticateTheUser(IOTPClaim otpClaim)
         {
             // Arrange
-            ISqlDAO sqlDAO = new SqlDAO();
-            ILogService logService = new SqlLogService(sqlDAO);
-            IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService);
             string expected = "success";
 
             // Act
@@ -34,9 +36,6 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.IntegrationTests
         public void VerifyThatTheUser(IRolePrincipal rolePrincipal)
         {
             // Arrange
-            ISqlDAO sqlDAO = new SqlDAO();
-            ILogService logService = new SqlLogService(sqlDAO);
-            IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService);
             string expected = "success";
 
             // Act

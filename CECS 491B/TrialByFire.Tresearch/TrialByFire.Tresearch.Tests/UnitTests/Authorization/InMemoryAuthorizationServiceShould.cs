@@ -22,10 +22,9 @@ namespace TrialByFire.Tresearch.Tests.AuthorizationTests
         [Theory]
         [InlineData("larry@gmail.com", "user", "user", "success")]
         [InlineData("billy@yahoo.com", "admin", "user", "success")]
-        [InlineData("joe@outlook.com", "user", "admin", "Data: You are not authorized to perform this operation.")]
-        [InlineData("bob@yahoo.com", "user", "user", "Database: No active session found. Please login and try again.")]
-        [InlineData("harry@yahoo.com", "user", "user", "Database: No active session found. Please login " +
-            "and try again.")]
+        [InlineData("joe@outlook.com", "user", "admin", "Database: You are not authorized to perform this operation.")]
+        [InlineData("bob@yahoo.com", "user", "user", "success")]
+        [InlineData("harry@yahoo.com", "user", "user", "success")]
         public void VerifyThatTheUserIsAuthorized(string username, string role, string requiredRole, string expected)
         {
             // Arrange
@@ -33,7 +32,7 @@ namespace TrialByFire.Tresearch.Tests.AuthorizationTests
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
 
             // Act
-            string result = authorizationService.Authorize(rolePrincipal, requiredRole);
+            string result = authorizationService.VerifyAuthorized(rolePrincipal, requiredRole);
 
             // Assert
             Assert.Equal(expected, result);

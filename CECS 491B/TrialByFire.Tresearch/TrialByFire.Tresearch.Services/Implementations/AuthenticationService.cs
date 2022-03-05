@@ -20,19 +20,22 @@ namespace TrialByFire.Tresearch.Services.Implementations
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
+        private IMessageBank _messageBank { get; }
         private string _payLoad { get; }
 
-        public AuthenticationService(ISqlDAO sqlDAO, ILogService logService)
+        public AuthenticationService(ISqlDAO sqlDAO, ILogService logService, 
+            IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
+            _messageBank = messageBank;
             _payLoad = "";
         }
 
         public List<string> Authenticate(IOTPClaim _otpClaim)
         {
             List<string> results = _sqlDAO.Authenticate(_otpClaim);
-            if(results[0].Equals("success"))
+            if(results[0].Equals(_messageBank.SuccessMessages["generic"]))
             {
                 return CreateJwtToken(results[1]);
             }
@@ -64,7 +67,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
                 //create jwt and set values
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var keyValue = "default";
+                var keyValue = "akxhBSian218c9pJA98912n4010409AMKLUHqjn2njwaj";
                 var key = Encoding.ASCII.GetBytes(keyValue);
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
@@ -74,7 +77,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
                 var token = tokenHandler.CreateToken(tokenDescriptor);
-                results.Add("success");
+                results.Add(_messageBank.SuccessMessages["generic"]);
                 results.Add(tokenHandler.WriteToken(token));
             }catch(RoleIdentityCreationFailedException ricf)
             {

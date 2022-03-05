@@ -15,12 +15,12 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public IConfirmationLink GetConfirmationLink(string url);
 
         // Authentication
-        public string VerifyAccountEnabled(IAccount account);
+        public string VerifyAccount(IAccount account);
         public List<string> Authenticate(IOTPClaim otpClaim);
         public string VerifyAuthenticated(IRolePrincipal rolePrincipal);
 
         // Authorization
-        public string Authorize(IRolePrincipal rolePrincipal, string requiredRole);
+        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredRole);
 
         // Request OTP
         public IOTPClaim GetOTPClaim(IOTPClaim otpClaim);

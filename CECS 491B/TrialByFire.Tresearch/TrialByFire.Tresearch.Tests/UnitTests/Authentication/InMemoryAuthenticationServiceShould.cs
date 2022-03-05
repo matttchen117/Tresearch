@@ -37,11 +37,12 @@ namespace TrialByFire.Tresearch.Tests.AuthenticationTests.UnitTests
             "Please try again.")]
         [InlineData("billy@yahoo.com", "abcdefghi", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +
             "Please try again.")]
-        [InlineData("joe@outlook.com", "ABCdef123", 2023, 3, 4, 5, 6, 0, "success")]
+        [InlineData("joe@outlook.com", "ABCdef123", 2023, 3, 4, 5, 6, 0, "Data: The OTP has expired. Please request " +
+            "a new one.")]
         [InlineData("bob@yahoo.com", "ABCdef123", 2022, 3, 4, 5, 6, 0, "Database: The account was not found or it " +
             "has been disabled.")]
-        [InlineData("harry@yahoo.com", "ABCdef123", 2022, 3, 4, 5, 6, 0, "Database: Please click on the confirmation " +
-            "link that we sent to your email in order to confirm your account.")]
+        [InlineData("harry@yahoo.com", "ABCdef123", 2022, 3, 4, 5, 6, 0, "Database: Please confirm your account " +
+            "before attempting to login.")]
         public void AuthenticateTheUser(string username, string otp, int year, int month, int day, int hour,
             int minute, int second, string expected)
         {

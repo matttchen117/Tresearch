@@ -21,11 +21,18 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
 
         [Theory]
         [InlineData("larry@gmail.com", "abcDEF123", "success")]
+        [InlineData("larry@gmail.com", "#$%", "Data: Invalid Username or " +
+            "Passphrase. Please try again.")]
+        [InlineData("larry@gmail.com", "abcdef#$%", "Data: Invalid Username or " +
+            "Passphrase. Please try again.")]
+        [InlineData("larry@gmail.com", "abcdEF123", "Data: Invalid Username or " +
+            "Passphrase. Please try again.")]
         [InlineData("billy@yahoo.com", "abcDEF123", "success")]
         [InlineData("joe@outlook.com", "abcDEF123", "success")]
-        [InlineData("bob@yahoo.com", "abcDEF123", "Database: The account was not found or it has been disabled.")]
-        [InlineData("harry@yahoo.com", "abcDEF123", "Database: Please click on the confirmation link that " +
-            "we sent to your email in order to confirm your account.")]
+        [InlineData("bob@yahoo.com", "abcDEF123", "Database: The account was not found or it " +
+            "has been disabled.")]
+        [InlineData("harry@yahoo.com", "abcDEF123", "Database: Please confirm your " +
+            "account before attempting to login.")]
         public void RequestTheOTP(string username, string passphrase, string expected)
         {
             // Arrange

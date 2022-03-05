@@ -15,20 +15,19 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.OTPRequestTests
 {
-    public class OTPRequestManagerShould
+    public class OTPRequestManagerShould : IntegrationTestDependences
     {
+        public OTPRequestManagerShould() : base()
+        {
+        }
         public void RequestTheOTP(string username, string passphrase)
         {
             // Arrange
-            ISqlDAO sqlDAO = new InMemorySqlDAO();
-            ILogService logService = new InMemoryLogService(sqlDAO);
-            IValidationService validationService = new ValidationService();
-            IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService);
             IRoleIdentity roleIdentity = new RoleIdentity(true, "Bob", "User");
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService);
             IOTPRequestManager otpRequestManager = new OTPRequestManager(sqlDAO, logService, validationService,
-                authenticationService, rolePrincipal, otpRequestService);
+                authenticationService, rolePrincipal, otpRequestService, messageBank);
             string expected = "success";
 
             // Act

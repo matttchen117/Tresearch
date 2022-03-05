@@ -32,6 +32,19 @@ namespace TrialByFire.Tresearch.Models.Implementations
             FailCount = 0;
         }
 
+        public OTPClaim(string username, string otp, DateTime timeCreated, int failCount)
+        {
+            if ((username ?? otp) == null)
+            {
+                throw new OTPClaimCreationFailedException("Data: OTP Claim creation failed. Null argument passed in for" +
+                    "username or otp.");
+            }
+            Username = username;
+            OTP = otp;
+            TimeCreated = timeCreated;
+            FailCount = failCount;
+        }
+
         public OTPClaim(IAccount account)
         {
             if((account) == null)

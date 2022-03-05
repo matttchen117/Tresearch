@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
+using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
@@ -10,14 +11,17 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
         private IAuthenticationManager _authenticationManager { get; }
+        private IMessageBank _messageBank { get; }
 
         private string _username { get; set; }
 
-        public AuthenticationController(ISqlDAO sqlDAO, ILogService logService, IAuthenticationManager authenticationManager)
+        public AuthenticationController(ISqlDAO sqlDAO, ILogService logService, 
+            IAuthenticationManager authenticationManager, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
             _authenticationManager = authenticationManager;
+            _messageBank = messageBank;
             _username = "guest";
         }
 
@@ -27,10 +31,10 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _username = username;
             List<string> results = _authenticationManager.Authenticate(username, otp, DateTime.Now);
             string result = results[0];
-            if(result.Equals("success"))
+            if(result.Equals(_messageBank.SuccessMessages["generic"]))
             {
                 result = CreateCookie(results[1]);
-                if(result.Equals("success"))
+                if(result.Equals(_messageBank.SuccessMessages["generic"]))
                 {
                     //_logService.CreateLog(DateTime.Now, "Server", username, "Info", "Authentication Succeeded");
                     return result;
@@ -47,10 +51,10 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _username = username;
             List<string> results = _authenticationManager.Authenticate(username, otp, now);
             string result = results[0];
-            if (result.Equals("success"))
+            if (result.Equals(_messageBank.SuccessMessages["generic"]))
             {
                 result = CreateCookie(results[1]);
-                if (result.Equals("success"))
+                if (result.Equals(_messageBank.SuccessMessages["generic"]))
                 {
                     //_logService.CreateLog(DateTime.Now, "Server", username, "Info", "Authentication Succeeded");
                     return result;
@@ -62,6 +66,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             return result;
         }
 
+        [HttpPost]
         private string CreateCookie(string jwtToken)
         {
             string result;

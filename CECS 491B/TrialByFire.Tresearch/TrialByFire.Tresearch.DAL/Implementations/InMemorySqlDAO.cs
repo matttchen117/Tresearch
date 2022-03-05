@@ -2,150 +2,184 @@
 using System;
 using System.Data.SqlClient;
 using TrialByFire.Tresearch.DAL.Contracts;
+using TrialByFire.Tresearch.Exceptions;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
     public class InMemorySqlDAO : ISqlDAO
-    { 
+    {
 
-        public InMemoryDatabase inMemoryDatabase;
+        public InMemoryDatabase InMemoryDatabase { get; set; }
+        private IMessageBank _messageBank { get; }
 
         public InMemorySqlDAO()
         {
-            inMemoryDatabase = new InMemoryDatabase();
+            InMemoryDatabase = new InMemoryDatabase();
+            _messageBank = new MessageBank();
         }
 
-        public string VerifyAccountEnabled(IAccount account)
+        public string VerifyAccount(IAccount account)
         {
-            int index = inMemoryDatabase.Accounts.IndexOf(account);
-            if(index != -1)
+            int index = InMemoryDatabase.Accounts.IndexOf(account);
+            if (index != -1)
             {
-                IAccount dbAccount = inMemoryDatabase.Accounts[index];
-                if (dbAccount.Confirmed != false)
+                IAccount dbAccount = InMemoryDatabase.Accounts[index];
+                if((account.Passphrase != null) && account.Passphrase.Equals(dbAccount.Passphrase))
                 {
-                    if (dbAccount.Status != false)
+                    if (dbAccount.Confirmed != false)
                     {
-                        return "success";
+                        if (dbAccount.Status != false)
+                        {
+                            return _messageBank.SuccessMessages["generic"];
+                        }
+                        return _messageBank.ErrorMessages["notFoundOrEnabled"];
                     }
-                    return "Database: The account was not found or it has been disabled.";
+                    return _messageBank.ErrorMessages["notConfirmed"];
                 }
-                return "Database: Please click on the confirmation link that we sent to your email in " +
-                    "order to confirm your account.";
+                return _messageBank.ErrorMessages["badNameOrPass"];
             }
-            return "Data: Invalid Username or Passphrase. Please try again.";
+            return _messageBank.ErrorMessages["notFoundOrEnabled"];
         }
 
         public List<string> Authenticate(IOTPClaim otpClaim)
         {
             List<string> results = new List<string>();
-            IAccount account = new Account(otpClaim.Username);
-            if (inMemoryDatabase.Accounts[inMemoryDatabase.Accounts.IndexOf(account)].Confirmed != false)
+            try
             {
-                if (inMemoryDatabase.Accounts[inMemoryDatabase.Accounts.IndexOf(account)].Status != false)
+                IAccount account = new Account(otpClaim.Username);
+                // Find account in db
+                int index = InMemoryDatabase.Accounts.IndexOf(account);
+                if (index != -1)
                 {
-                    IOTPClaim dbOTPClaim = inMemoryDatabase.OTPClaims[inMemoryDatabase.OTPClaims.IndexOf(otpClaim)];
-                    if (dbOTPClaim != null)
+                    IAccount dbAccount = InMemoryDatabase.Accounts[index];
+                    // check if confirmed
+                    if (dbAccount.Confirmed != false)
                     {
-                        if (otpClaim.OTP.Equals(dbOTPClaim.OTP))
+                        // check if enabled
+                        if (dbAccount.Status != false)
                         {
-                            if (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2))
+                            // find otp claim in db
+                            index = InMemoryDatabase.OTPClaims.IndexOf(otpClaim);
+                            if (index != -1)
                             {
-                                if (inMemoryDatabase.Accounts.Contains(account))
+                                IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[index];
+                                // check if otp is same
+                                if(otpClaim.OTP.Equals(dbOTPClaim.OTP))
                                 {
-                                    IRoleIdentity roleIdentity = new RoleIdentity(true, account.Username, account.AuthorizationLevel);
-                                    IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-                                    inMemoryDatabase.RolePrincipals.Add(rolePrincipal);
-                                    results.Add("success");
-                                    results.Add($"username:{roleIdentity.Name},role{roleIdentity.Role}");
-                                    return results;
+                                    if (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2))
+                                    {
+                                        IRoleIdentity roleIdentity = new RoleIdentity(true, dbAccount.Username, dbAccount.AuthorizationLevel);
+                                        IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+                                        InMemoryDatabase.RolePrincipals.Add(rolePrincipal);
+                                        results.Add(_messageBank.SuccessMessages["generic"]);
+                                        results.Add($"username:{roleIdentity.Name},role:{roleIdentity.Role}");
+                                        return results;
+                                    }
+                                    else
+                                    {
+                                        InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount++;
+                                        if (InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount >= 5)
+                                        {
+                                            InMemoryDatabase.Accounts[InMemoryDatabase.Accounts.IndexOf(account)].Status = false;
+                                            results.Add(_messageBank.ErrorMessages["tooManyFails"]);
+                                            return results;
+                                        }
+                                        else
+                                        {
+                                            results.Add(_messageBank.ErrorMessages["otpExpired"]);
+                                            return results;
+                                        }
+                                    }
                                 }
                                 else
                                 {
-                                    results.Add("Data: Invalid Username or OTP. Please try again.");
-                                }
+                                    results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
+                                    return results;
+                                }    
                             }
                             else
                             {
-                                inMemoryDatabase.OTPClaims[inMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount++;
-                                if (inMemoryDatabase.OTPClaims[inMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount >= 5)
-                                {
-                                    inMemoryDatabase.Accounts[inMemoryDatabase.Accounts.IndexOf(account)].Status = false;
-                                    results.Add("Data: Too many failed attempts have occurred. Account has been disabled.");
-                                }
-                                else
-                                {
-                                    results.Add("Data: The OTP has expired. Please request a new one.");
-                                }
+                                results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
+                                return results;
                             }
                         }
                         else
                         {
-                            results.Add("Data: Invalid Username or OTP. Please try again.");
+                            results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
+                            return results;
                         }
                     }
                     else
                     {
-                        results.Add("Database: No corresponding OTP Claim was found in the database.");
+                        results.Add(_messageBank.ErrorMessages["notConfirmed"]);
+                        return results;
                     }
                 }
-                else
-                {
-                    results.Add("Database: The account was not found or it has been disabled.");
-                }
+                results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
+                return results;
             }
-            else
+            catch (AccountCreationFailedException acfe)
             {
-                results.Add("Database: Please click on the confirmation link that we sent to your email in order to " +
-                    "confirm your account.");
+                results.Add(acfe.Message);
+                return results;
             }
-            return results;
+            catch (OTPClaimCreationFailedException ocfe)
+            {
+                results.Add(ocfe.Message);
+                return results;
+            }
+            catch (RoleIdentityCreationFailedException ricfe)
+            {
+                results.Add(ricfe.Message);
+                return results;
+            }
+            catch (RolePrincipalCreationFailedException rpcfe)
+            {
+                results.Add(rpcfe.Message);
+                return results;
+            }
         }
 
         public string VerifyAuthenticated(IRolePrincipal rolePrincipal)
         {
-            if(inMemoryDatabase.RolePrincipals.Contains(rolePrincipal))
+            if(InMemoryDatabase.RolePrincipals.Contains(rolePrincipal))
             {
-                return "success";
+                return _messageBank.SuccessMessages["generic"];
             }
-            return "Database: No active session found. Please login and try again.";
+            return _messageBank.ErrorMessages["notAuthenticated"];
         }
-        public string Authorize(IRolePrincipal rolePrincipal, string requiredRole)
+        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredRole)
         {
-            string result = VerifyAuthenticated(rolePrincipal);
-            if (result.Equals("success"))
+            if(rolePrincipal.IsInRole("admin") || rolePrincipal.IsInRole(requiredRole))
             {
-                if(rolePrincipal.IsInRole("admin") || rolePrincipal.IsInRole(requiredRole))
-                {
-                    return result;
-                }
-                return "Data: You are not authorized to perform this operation.";
+                return _messageBank.SuccessMessages["generic"];
             }
-            return result;
+            return _messageBank.ErrorMessages["notAuthorized"];
         }
 
         public IOTPClaim GetOTPClaim(IOTPClaim otpClaim)
         {
-            return inMemoryDatabase.OTPClaims[inMemoryDatabase.OTPClaims.IndexOf(otpClaim)];
+            return InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)];
         }
 
         public string StoreOTP(IOTPClaim otpClaim)
         {
             string result;
-            int index = inMemoryDatabase.OTPClaims.IndexOf(otpClaim);
+            int index = InMemoryDatabase.OTPClaims.IndexOf(otpClaim);
             if(index >= 0)
             {
-                IOTPClaim dbOTPClaim = inMemoryDatabase.OTPClaims[inMemoryDatabase.OTPClaims.IndexOf(otpClaim)];
+                IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)];
                 IAccount account = new Account(dbOTPClaim.Username);
                 if (!(otpClaim.TimeCreated >= dbOTPClaim.TimeCreated.AddDays(1)))
                 {
                     otpClaim.FailCount = dbOTPClaim.FailCount;
                 }
-                inMemoryDatabase.OTPClaims[index] = otpClaim;
-                return "success";
+                InMemoryDatabase.OTPClaims[index] = otpClaim;
+                return _messageBank.SuccessMessages["generic"];
             }
-            return "Database: The account was not found or it has been disabled.";
+            return _messageBank.ErrorMessages["notFoundOrEnabled"];
         }
 
         public bool CreateAccount(IAccount account)
