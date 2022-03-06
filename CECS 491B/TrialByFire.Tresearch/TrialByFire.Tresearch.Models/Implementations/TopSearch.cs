@@ -11,6 +11,12 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public int searchCount { get; set; }
 
+        public TopSearch() { 
+            topSearchDate = DateTime.Now;
+            searchCount = 0;
+            searchString = "";
+        }
+
         public TopSearch(DateTime topSearchDate, string searchString, int searchCount)
         {
             this.topSearchDate = topSearchDate;
