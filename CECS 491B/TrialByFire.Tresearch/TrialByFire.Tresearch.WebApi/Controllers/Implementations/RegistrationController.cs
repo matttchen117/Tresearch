@@ -42,10 +42,11 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
 
         [HttpPost("register")]
-        public string RegisterAccount(string email, string passphrase)
+        public string RegisterAccount([FromBody]IAccount account)
         {
             List<string> results = new List<string>();
-
+            string email = account.Email;
+            string passphrase = account.Passphrase;
             try
             {
                 results.AddRange(_registrationManager.CreatePreConfirmedAccount(email, passphrase));
