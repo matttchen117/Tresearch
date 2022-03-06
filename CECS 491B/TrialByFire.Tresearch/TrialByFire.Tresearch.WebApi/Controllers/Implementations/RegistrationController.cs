@@ -12,8 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
-
-
+    [ApiController]
     [Route("[controller]")]
     public class RegistrationController : Controller, IRegistrationController
     {
@@ -42,7 +41,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
 
 
-
+        [HttpPost("register")]
         public string RegisterAccount(string email, string passphrase)
         {
             List<string> results = new List<string>();
@@ -64,9 +63,13 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 Console.WriteLine(results[i]);
             }
 
+            SendConfirmation(email);
+
             _logService.CreateLog(DateTime.Now, "Info", email, "Business", results.Last());
             return results.Last();
         }
+
+        [HttpPost("confirmation")]
         public string SendConfirmation(string email)
         {
             IAccount account = new Account();
@@ -105,6 +108,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         }
 
+        [HttpPost("confirm")]
         public string ConfirmAccount(string url)
         {
             List<string> results = new List<string>();
