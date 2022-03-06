@@ -127,25 +127,42 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 results.Add(ocfe.Message);
                 return results;
             }
-            catch (RoleIdentityCreationFailedException ricfe)
-            {
-                results.Add(ricfe.Message);
-                return results;
-            }
-            catch (RolePrincipalCreationFailedException rpcfe)
-            {
-                results.Add(rpcfe.Message);
-                return results;
-            }
         }
 
         public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredRole)
         {
-            if(rolePrincipal.IsInRole("admin") || rolePrincipal.IsInRole(requiredRole))
+            try
             {
-                return _messageBank.SuccessMessages["generic"];
+                IAccount account = new Account(rolePrincipal.RoleIdentity.Name, rolePrincipal.RoleIdentity.Role);
+                // Find account in db
+                int index = InMemoryDatabase.Accounts.IndexOf(account);
+                if (index != -1)
+                {
+                    IAccount dbAccount = InMemoryDatabase.Accounts[index];
+                    // check if confirmed
+                    if (dbAccount.Confirmed != false)
+                    {
+                        // check if enabled
+                        if (dbAccount.Status != false)
+                        {
+                            return _messageBank.SuccessMessages["generic"];
+                        }
+                        else
+                        {
+                            return _messageBank.ErrorMessages["notFoundOrEnabled"]; 
+                        }
+                    }
+                    else
+                    {
+                        return _messageBank.ErrorMessages["notConfirmed"];
+                    }
+                }
+                return _messageBank.ErrorMessages["notFoundOrEnabled"];
             }
-            return _messageBank.ErrorMessages["notAuthorized"];
+            catch (AccountCreationFailedException acfe)
+            {
+                return acfe.Message;
+            }
         }
 
         public IOTPClaim GetOTPClaim(IOTPClaim otpClaim)
