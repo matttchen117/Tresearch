@@ -10,6 +10,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public DateTime timestamp { get; set; }
 
+        public ConfirmationLink()
+        {
+
+        }
         public ConfirmationLink(string username, Guid uniqueIdentifier, DateTime timestamp)
         {
             this.username = username;

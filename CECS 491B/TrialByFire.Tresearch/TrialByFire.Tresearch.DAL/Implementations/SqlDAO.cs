@@ -23,72 +23,84 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = messageBank;
         }
 
-        public bool CreateConfirmationLink(IConfirmationLink confirmationlink)
+        public List<string> CreateConfirmationLink(IConfirmationLink _confirmationlink)
         {
+            List<string> result = new List<string>();
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var insertQuery = "INSERT INTO confirmation_links (Username, Guid, Timestamp) VALUES (@Username, @Guid, @Timestamp)";
-                    int affectedRows = connection.Execute(insertQuery, confirmationlink);
+                    var insertQuery = "INSERT INTO dbo.confirmation_links (username, GUID, datetime) VALUES (@username, @uniqueIdentifier, @timestamp)";
+                    int affectedRows = connection.Execute(insertQuery, _confirmationlink);
 
                     if (affectedRows == 1)
-                        return true;
+                        result.Add("Success - Confirmation Link added to database");
                     else
-                        return false;
+                        result.Add("Failed - Email already has confirmation link");
                 }
-            }  catch
+            }
+            catch
             {
-                return false;
-            }  
+                result.Add("Failed - Unable to add confirmation link to database");
+            }
+            return result;
         }
 
         public IConfirmationLink GetConfirmationLink(string url)
         {
-            string guidString = url.Substring(url.LastIndexOf('/')+1);
-            Guid guid = new Guid(url);
-            IConfirmationLink _confirmationLink;
+
+            string guidString = url.Substring(url.LastIndexOf('=')+1);
+            //Guid guid = new Guid(guidString);
+
+
+            IConfirmationLink _confirmationLink = new ConfirmationLink();
 
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var readQuery = "SELECT * FROM confirmation_links WHERE GUID = @guid";
-                    _confirmationLink = connection.QuerySingle<IConfirmationLink>(readQuery, new { Guid = guid });
 
+                    var readQuery = "SELECT username FROM dbo.confirmation_links WHERE GUID = @guid";
+                    _confirmationLink.username = connection.ExecuteScalar<string>(readQuery, new { guid = guidString });
+                    readQuery = "SELECT GUID FROM dbo.confirmation_links WHERE GUID = @guid";
+                    _confirmationLink.uniqueIdentifier = connection.ExecuteScalar<Guid>(readQuery, new { guid = guidString });
+                    readQuery = "SELECT datetime FROM dbo.confirmation_links WHERE GUID = @guid";
+                    _confirmationLink.timestamp = connection.ExecuteScalar<DateTime>(readQuery, new { guid = guidString });
                 }
-            } catch
+            }
+            catch (Exception ex)
             {
-                return null;
+                Console.WriteLine(ex);
+                return _confirmationLink;
             }
 
             return _confirmationLink;
         }
 
-        public bool ConfirmAccount(IAccount account)
+
+        public List<string> ConfirmAccount(IAccount account)
         {
+            List<string> results = new List<string>();
             int affectedRows;
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var updateQuery = "UPDATE confirmation_links SET confirmed = 1 WHERE Username = " +
-                        "@Username and Email = @Email";
-                    affectedRows = connection.Execute(updateQuery, new { Username = account.Username, 
-                        Email = account.Email });
+                    var updateQuery = "UPDATE dbo.user_accounts SET confirmation = 1 WHERE email = @email and username = @username";
+                    affectedRows = connection.Execute(updateQuery, account);
 
                 }
                 if (affectedRows == 1)
-                    return true;
+                    results.Add("Success - Account confirmed in database");
                 else
-                    return false;
+                    results.Add("Failed - Account doesn't exist in database");
             }
             catch
             {
-                return false;
+                results.Add("Failed - SQLDAO  could not be confirm account in database");
             }
+            return results;
         }
-
         public bool DeleteConfirmationLink(IConfirmationLink confirmationLink)
         {
             int affectedRows;
@@ -114,39 +126,88 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public bool CreateAccount(IAccount account)
+        public List<string> CreateAccount(IAccount account)
         {
+            List<string> results = new List<string>();
             int affectedRows;
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var readQuery = "SELECT COUNT(*) FROM Accounts WHERE Email = @Email";
+                    var readQuery = "SELECT COUNT(*) FROM dbo.user_accounts WHERE email = @Email";
                     var accounts = connection.ExecuteScalar<int>(readQuery, new { Email = account.Email });
+
                     if (accounts > 0)
                     {
-                        account.Username = account.Username.Insert(account.Username.IndexOf('@'), accounts.ToString());
+                        results.Add("Failed - Account already exists in database");
+                        return results;
                     }
-                    var insertQuery = "INSERT INTO user_accounts (Email, Username, Passphrase, AuthorizationLevel, AccountStatus) " +
-                        "VALUES (@email, @username, @passphrase, @authorization_level, @AccountStatus)";
+                    var insertQuery = "INSERT INTO dbo.user_accounts (username, email, passphrase, authorization_level, account_status, confirmation) " +
+                        "VALUES (@username, @email, @passphrase, @authorizationLevel, @status, @confirmed)";
+
                     affectedRows = connection.Execute(insertQuery, account);
                 }
                 if (affectedRows == 1)
-                {
-                    return true;
-                }
+                    results.Add("Success - Account created in database");
                 else
+                    results.Add("Failed - Account not created in database");
+            }
+            catch (Exception ex)
+            {
+                results.Add("Failed - " + ex);
+            }
+            return results;
+        }
+
+        public IAccount GetUnconfirmedAccount(string email)
+        {
+            IAccount account = new Account();
+            try
+            {
+                using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    return false;
+                    var readQuery = "SELECT username FROM dbo.user_accounts WHERE email = @Email and authorization_level = 'User'";
+                    string username = connection.ExecuteScalar<string>(readQuery, new { Email = email });
+                    readQuery = "SELECT passphrase FROM dbo.user_accounts WHERE email = @Email and authorization_level = 'User'";
+                    string passphrase = connection.ExecuteScalar<string>(readQuery, new { Email = email });
+                    readQuery = "SELECT account_status FROM dbo.user_accounts WHERE email = @Email and authorization_level = 'User'";
+                    bool status = connection.ExecuteScalar<bool>(readQuery, new { Email = email });
+                    account = new Account(email, username, passphrase, "User", status, false);
+                    return account;
                 }
             }
             catch (Exception ex)
             {
-                return false;
+                Console.Write(ex);
+                return null;
             }
+
         }
 
 
+        public List<string> RemoveConfirmationLink(IConfirmationLink confirmationLink)
+        {
+            List<string> results = new List<string>();
+            int affectedRows;
+
+            try
+            {
+                using (var connection = new SqlConnection(_sqlConnectionString))
+                {
+                    var deleteQuery = "DELETE FROM dbo.confirmation_links WHERE GUID = @guid";
+                    affectedRows = connection.Execute(deleteQuery, new { guid = confirmationLink.uniqueIdentifier });
+                }
+                if (affectedRows == 1)
+                    results.Add("Success - Confirmation Link removed from database");
+                else
+                    results.Add("Failed - Confirmation link unable to be removed from database");
+            }
+            catch (Exception ex)
+            {
+                results.Add("Failed - Confirmation link not removed in database" + ex);
+            }
+            return results;
+        }
         public string DeleteAccount(IRolePrincipal rolePrincipal)
         {
 

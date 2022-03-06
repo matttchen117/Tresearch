@@ -9,10 +9,15 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 {
     public interface ISqlDAO
     {
-        public bool CreateAccount(IAccount account);
-        public bool CreateConfirmationLink(IConfirmationLink _confirmationlink);
+        public List<string> CreateAccount(IAccount account);
+        public List<string> CreateConfirmationLink(IConfirmationLink _confirmationlink);
 
+        public List<string> ConfirmAccount(IAccount account);
+
+        public List<string> RemoveConfirmationLink(IConfirmationLink confirmationLink);
         public IConfirmationLink GetConfirmationLink(string url);
+
+        public IAccount GetUnconfirmedAccount(string email);
 
         // Authentication
         public string VerifyAccount(IAccount account);
