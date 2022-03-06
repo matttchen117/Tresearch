@@ -4,7 +4,7 @@ CREATE TABLE Accounts(
 	Passphrase VARCHAR(40),
 	AuthorizationLevel VARCHAR(40),
 	AccountStatus BIT,
-	COnfirmed BIT,
+	Confirmed BIT,
 
 	CONSTRAINT user_account_pk PRIMARY KEY(Username, AuthorizationLevel)
 );
