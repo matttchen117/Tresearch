@@ -20,24 +20,26 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
         }
 
         [Theory]
-        [InlineData("larry@gmail.com", "abcDEF123", "success")]
-        [InlineData("larry@gmail.com", "#$%", "Data: Invalid Username or " +
+        [InlineData("larry@gmail.com", "abcDEF123", "user", "success")]
+        [InlineData("larry@gmail.com", "#$%", "user", "Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("larry@gmail.com", "abcdef#$%", "Data: Invalid Username or " +
+        [InlineData("larry@gmail.com", "abcdef#$%", "user", "Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("larry@gmail.com", "abcdEF123", "Data: Invalid Username or " +
+        [InlineData("larry@gmail.com", "abcdEF123", "user", "Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("billy@yahoo.com", "abcDEF123", "success")]
-        [InlineData("joe@outlook.com", "abcDEF123", "success")]
-        [InlineData("bob@yahoo.com", "abcDEF123", "Database: The account was not found or it " +
+        [InlineData("larry@gmail.com", "abcDEF123", "admin", "Database: The account was not found or it " +
             "has been disabled.")]
-        [InlineData("harry@yahoo.com", "abcDEF123", "Database: Please confirm your " +
+        [InlineData("billy@yahoo.com", "abcDEF123", "admin", "success")]
+        [InlineData("joe@outlook.com", "abcDEF123", "user", "success")]
+        [InlineData("bob@yahoo.com", "abcDEF123", "user", "Database: The account was not found or it " +
+            "has been disabled.")]
+        [InlineData("harry@yahoo.com", "abcDEF123", "user", "Database: Please confirm your " +
             "account before attempting to login.")]
-        public void RequestTheOTP(string username, string passphrase, string expected)
+        public void RequestTheOTP(string username, string passphrase, string role, string expected)
         {
             // Arrange
             IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService, messageBank);
-            IAccount account = new Account(username, passphrase);
+            IAccount account = new Account(username, passphrase, role);
             IOTPClaim otpClaim = new OTPClaim(account);
 
             // Act

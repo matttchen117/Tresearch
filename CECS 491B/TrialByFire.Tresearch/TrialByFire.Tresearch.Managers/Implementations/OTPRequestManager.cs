@@ -39,7 +39,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _messageBank = messageBank;
         }
 
-        public string RequestOTP(string username, string passphrase)
+        public string RequestOTP(string username, string passphrase, string role)
         {
             string result;
             try
@@ -52,7 +52,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     result = _validationService.ValidateInput(keyValuePairs);
                     if (result.Equals(_messageBank.SuccessMessages["generic"]))
                     {
-                        IAccount account = new Account(username, passphrase);
+                        IAccount account = new Account(username, passphrase, role);
                         IOTPClaim otpClaim = new OTPClaim(account);
                         result = _otpRequestService.RequestOTP(account, otpClaim);
                     }

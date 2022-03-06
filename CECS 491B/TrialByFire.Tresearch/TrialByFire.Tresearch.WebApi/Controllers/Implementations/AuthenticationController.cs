@@ -26,10 +26,10 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         }
 
         // IEnumerable may be faster than using lists, gives compiler chance to defer work to later, possibly optimizing in the process
-        public string Authenticate(string username, string otp)
+        public string Authenticate(string username, string otp, string role)
         {
             _username = username;
-            List<string> results = _authenticationManager.Authenticate(username, otp, DateTime.Now);
+            List<string> results = _authenticationManager.Authenticate(username, otp, role, DateTime.Now);
             string result = results[0];
             if(result.Equals(_messageBank.SuccessMessages["generic"]))
             {
@@ -46,10 +46,10 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             return result;
         }
 
-        public string Authenticate(string username, string otp, DateTime now)
+        public string Authenticate(string username, string otp, string role, DateTime now)
         {
             _username = username;
-            List<string> results = _authenticationManager.Authenticate(username, otp, now);
+            List<string> results = _authenticationManager.Authenticate(username, otp, role, now);
             string result = results[0];
             if (result.Equals(_messageBank.SuccessMessages["generic"]))
             {

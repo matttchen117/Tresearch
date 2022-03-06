@@ -31,22 +31,26 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
                 }*/
 
         [Theory]
-        [InlineData("larry@gmail.com", "ABCdef123", 2022, 3, 4, 5, 6, 0, "success")]
-        [InlineData("billy@yahoo.com", "abcdef123", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +
+        [InlineData("larry@gmail.com", "ABCdef123", "user", 2022, 3, 4, 5, 6, 0, "success")]
+        [InlineData("larry@gmail.com", "ABCdef123", "admin", 2022, 3, 4, 5, 6, 0, "Database: The account was not found " +
+            "or it has been disabled.")]
+        [InlineData("billy@yahoo.com", "abcdef123", "admin", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +
             "Please try again.")]
-        [InlineData("billy@yahoo.com", "abcdefghi", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +
+        [InlineData("billy@yahoo.com", "abcdefghi", "admin", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +
             "Please try again.")]
-        [InlineData("joe@outlook.com", "ABCdef123", 2023, 3, 4, 5, 6, 0, "Data: The OTP has expired. Please request " +
+        [InlineData("joe@outlook.com", "ABCdef123", "user", 2023, 3, 4, 5, 6, 0, "Data: The OTP has expired. Please request " +
             "a new one.")]
-        [InlineData("bob@yahoo.com", "ABCdef123", 2022, 3, 4, 5, 6, 0, "Database: The account was not found or it " +
+        [InlineData("bob@yahoo.com", "ABCdef123", "user", 2022, 3, 4, 5, 6, 0, "Database: The account was not found or it " +
             "has been disabled.")]
-        [InlineData("harry@yahoo.com", "ABCdef123", 2022, 3, 4, 5, 6, 0, "Database: Please confirm your account " +
+        [InlineData("harry@yahoo.com", "ABCdef123", "user", 2022, 3, 4, 5, 6, 0, "Database: Please confirm your account " +
             "before attempting to login.")]
-        public void AuthenticateTheUser(string username, string otp, int year, int month, int day, int hour,
+        [InlineData("barry@yahoo.com", "abcdef123", "user", 2022, 3, 4, 5, 6, 0, "Database: Too many fails have occurred. " +
+            "The account has been disabled.")]
+        public void AuthenticateTheUser(string username, string otp, string role, int year, int month, int day, int hour,
             int minute, int second, string expected)
         {
             // Arrange
-            IOTPClaim otpClaim = new OTPClaim(username, otp, new DateTime(year, month, day, hour, minute, second));
+            IOTPClaim otpClaim = new OTPClaim(username, otp, role, new DateTime(year, month, day, hour, minute, second));
 
             // Act
             List<string> results = authenticationService.Authenticate(otpClaim);

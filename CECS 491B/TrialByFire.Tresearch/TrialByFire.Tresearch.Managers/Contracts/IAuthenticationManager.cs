@@ -10,6 +10,6 @@ namespace TrialByFire.Tresearch.Managers.Contracts
 {
     public interface IAuthenticationManager
     {
-        List<string> Authenticate(string username, string otp, DateTime now);
+        List<string> Authenticate(string username, string otp, string role, DateTime now);
     }
 }

@@ -32,9 +32,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _payLoad = "";
         }
 
-        public List<string> Authenticate(IOTPClaim _otpClaim)
+        public List<string> Authenticate(IOTPClaim otpClaim)
         {
-            List<string> results = _sqlDAO.Authenticate(_otpClaim);
+            List<string> results = _sqlDAO.Authenticate(otpClaim);
             if(results[0].Equals(_messageBank.SuccessMessages["generic"]))
             {
                 return CreateJwtToken(results[1]);

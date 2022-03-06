@@ -23,7 +23,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public IList<INodesCreated> NodesCreated { get; set; }
         public IList<IConfirmationLink> ConfirmationLinks { get; set; }
 
-
         public InMemoryDatabase()
         {
             OTPClaims = InitializeOTPClaims();
@@ -41,11 +40,12 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<IOTPClaim> InitializeOTPClaims()
         {
             List<IOTPClaim> otpClaims = new List<IOTPClaim>();
-            otpClaims.Add(new OTPClaim("larry@gmail.com", "ABCdef123", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("billy@yahoo.com", "ABCdef123", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("joe@outlook.com", "ABCdef123", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("bob@yahoo.com", "ABCdef123", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("harry@yahoo.com", "ABCdef123", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("larry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("billy@yahoo.com", "ABCdef123", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("joe@outlook.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("bob@yahoo.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("harry@yahoo.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("barry@yahoo.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0), 4));
             return otpClaims;
         }
 
@@ -57,6 +57,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             accounts.Add(new Account("joe@outlook.com", "joe@outlook.com", "abcDEF123", "user", true, true));
             accounts.Add(new Account("bob@yahoo.com", "bob@yahoo.com", "abcDEF123", "user", false, true));
             accounts.Add(new Account("harry@yahoo.com", "harry@yahoo.com", "abcDEF123", "user", false, false));
+            accounts.Add(new Account("barry@yahoo.com", "barry@yahoo.com", "abcDEF123", "user", true, true));
             return accounts;
         }
 

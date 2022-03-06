@@ -48,7 +48,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             List<string> results = new List<string>();
             try
             {
-                IAccount account = new Account(otpClaim.Username);
+                IAccount account = new Account(otpClaim.Username, otpClaim.Role);
                 // Find account in db
                 int index = InMemoryDatabase.Accounts.IndexOf(account);
                 if (index != -1)
@@ -76,24 +76,24 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                                     }
                                     else
                                     {
-                                        InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount++;
-                                        if (InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount >= 5)
-                                        {
-                                            InMemoryDatabase.Accounts[InMemoryDatabase.Accounts.IndexOf(account)].Status = false;
-                                            results.Add(_messageBank.ErrorMessages["tooManyFails"]);
-                                            return results;
-                                        }
-                                        else
-                                        {
-                                            results.Add(_messageBank.ErrorMessages["otpExpired"]);
-                                            return results;
-                                        }
+                                        results.Add(_messageBank.ErrorMessages["otpExpired"]);
+                                        return results;
                                     }
                                 }
                                 else
                                 {
-                                    results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
-                                    return results;
+                                    InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount++;
+                                    if (InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount >= 5)
+                                    {
+                                        InMemoryDatabase.Accounts[InMemoryDatabase.Accounts.IndexOf(account)].Status = false;
+                                        results.Add(_messageBank.ErrorMessages["tooManyFails"]);
+                                        return results;
+                                    }
+                                    else
+                                    {
+                                        results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
+                                        return results;
+                                    }
                                 }    
                             }
                             else
@@ -160,7 +160,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             if(index >= 0)
             {
                 IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)];
-                IAccount account = new Account(dbOTPClaim.Username);
                 if (!(otpClaim.TimeCreated >= dbOTPClaim.TimeCreated.AddDays(1)))
                 {
                     otpClaim.FailCount = dbOTPClaim.FailCount;
