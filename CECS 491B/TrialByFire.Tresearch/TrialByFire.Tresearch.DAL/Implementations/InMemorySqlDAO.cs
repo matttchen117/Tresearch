@@ -200,7 +200,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             bool accountExists = false;
             string accountName = rolePrincipal.RoleIdentity.Name;
-            string accountRole = rolePrincipal.RoleIdentity.Role;
+            string accountRole = rolePrincipal.RoleIdentity.AuthorizationLevel;
             foreach(Account ac in InMemoryDatabase.Accounts)
             {
                 if(ac.Username.Equals(accountName) && ac.AuthorizationLevel.Equals(accountRole))
@@ -258,10 +258,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             throw new NotImplementedException();
         }
 
-        public string DeleteAccount(IRolePrincipal authorizationLevel)
-        {
-            throw new NotImplementedException();
-        }
 
         public bool CreateConfirmationLink(IConfirmationLink _confirmationlink)
         {
@@ -278,9 +274,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             throw new NotImplementedException();
         }
 
-<<<<<<< HEAD
 
-=======
         /*
             Ian's Methods
          */
@@ -473,6 +467,5 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
             return "Daily Registration does not exist to be updated";
         }
->>>>>>> 2a0e2ed4086cc82e06a35de64dc75cd95d4972c2
     }
 }
