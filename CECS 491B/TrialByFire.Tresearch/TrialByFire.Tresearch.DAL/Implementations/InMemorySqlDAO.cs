@@ -70,11 +70,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                                 {
                                     if (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2))
                                     {
-                                        IRoleIdentity roleIdentity = new RoleIdentity(true, dbAccount.Username, dbAccount.AuthorizationLevel);
-                                        IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-                                        InMemoryDatabase.RolePrincipals.Add(rolePrincipal);
                                         results.Add(_messageBank.SuccessMessages["generic"]);
-                                        results.Add($"username:{roleIdentity.Name},role:{roleIdentity.Role}");
+                                        results.Add($"username:{dbAccount.Username},role:{dbAccount.AuthorizationLevel}");
                                         return results;
                                     }
                                     else
@@ -142,14 +139,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public string VerifyAuthenticated(IRolePrincipal rolePrincipal)
-        {
-            if(InMemoryDatabase.RolePrincipals.Contains(rolePrincipal))
-            {
-                return _messageBank.SuccessMessages["generic"];
-            }
-            return _messageBank.ErrorMessages["notAuthenticated"];
-        }
         public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredRole)
         {
             if(rolePrincipal.IsInRole("admin") || rolePrincipal.IsInRole(requiredRole))

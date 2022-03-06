@@ -91,10 +91,5 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             return results;
         }
-
-        public string VerifyAuthenticated(IRolePrincipal rolePrincipal)
-        {
-            return _sqlDAO.VerifyAuthenticated(rolePrincipal);
-        }
     }
 }

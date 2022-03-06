@@ -12,7 +12,5 @@ namespace TrialByFire.Tresearch.Services.Contracts
     public interface IAuthenticationService
     {
         List<string> Authenticate(IOTPClaim otpClaim);
-
-        string VerifyAuthenticated(IRolePrincipal rolePrincipal);
     }
 }

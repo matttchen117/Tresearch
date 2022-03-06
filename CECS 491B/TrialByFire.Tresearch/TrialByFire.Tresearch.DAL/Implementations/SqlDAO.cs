@@ -194,11 +194,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             throw new NotImplementedException();
         }
-
-        public string VerifyAuthenticated(IRolePrincipal rolePrincipal)
-        {
-            throw new NotImplementedException();
-        }
         public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredRole)
         {
             throw new NotImplementedException();

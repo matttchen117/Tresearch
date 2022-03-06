@@ -14,20 +14,13 @@ namespace TrialByFire.Tresearch.Models.Contracts
         public IList<ITag> Tags { get; set; }
         public IList<INodeTag> NodeTags { get; set; }
         public IList<IRating> Ratings { get; set; }
-        // IList<ITreeHistory> TreeHistories { get; set; }
-        //public IList<IWebPageKPI> WebPageKPIs { get; set; }
-        //public IList<IDailyRegistrationKPI> DailyRegistrationKPIs { get; set; }
-        public IList<IDailyLogin> DailyLoginKPIs { get; set; }
-        public IList<ITopSearch> TopSearchesKPIs { get; set; }
-        public IList<INodesCreated> NodesCreatedKPIs { get; set; }
+        /*        public IList<ITreeHistory> TreeHistories { get; set; }
+                public IList<IWebPageKPI> WebPageKPIs { get; set; }
+                public IList<IDailyRegistrationKPI> DailyRegistrationKPIs { get; set; }*/
+        public IList<IDailyLogin> DailyLogins { get; set; }
+        public IList<ITopSearch> TopSearches { get; set; }
+        public IList<INodesCreated> NodesCreated { get; set; }
         public IList<IConfirmationLink> ConfirmationLinks { get; set; }
-        public IList<ILoginKPI> LoginKPIs { get; set; }
-        public IList<INodeKPI> NodeKPIs { get; set; }
-        public IList<IRegistrationKPI> RegistrationKPIs { get; set; }
-        public IList<ISearchKPI> SearchKPIs { get; set; }
-        public IList<IViewKPI> ViewKPIs { get; set; }
-        public IList<IViewDurationKPI> ViewDurationKPIs { get; set; }
-        public IList<IRolePrincipal> RolePrincipals { get; set; }
 
     }
 }
