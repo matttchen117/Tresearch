@@ -1908,7 +1908,8 @@
           "Dapper": "2.0.123",
           "System.Data.SqlClient": "4.8.3",
           "TrialByFire.Tresearch.Exceptions": "1.0.0",
-          "TrialByFire.Tresearch.Models": "1.0.0"
+          "TrialByFire.Tresearch.Models": "1.0.0",
+          "xunit": "2.4.1"
         },
         "compile": {
           "bin/placeholder/TrialByFire.Tresearch.DAL.dll": {}

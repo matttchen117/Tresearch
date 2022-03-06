@@ -145,13 +145,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// <returns></returns>
         public string DeleteAccount(IRolePrincipal rolePrincipal)
         {
+
             int affectedRows;
             try
             {
                 using (var connection = new SqlConnection(SqlConnectionString))
                 {
-                    var readQuery = "SELECT * FROM user_accounts WHERE username = @username AND role = @role";
-                    var account = connection.ExecuteScalar<int>(readQuery, rolePrincipal.Identity.Name);
+                    var readQuery = "SELECT * FROM Accounts WHERE Username = @username AND AuthorizationLevel = @role";
+                    var account = connection.ExecuteScalar<int>(readQuery, new { username = rolePrincipal.RoleIdentity.Name, role = rolePrincipal.RoleIdentity.Role });
                     if (account == 0)
                     {
                         //meaning that there wasn't an account to delete
@@ -160,19 +161,15 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         return "No associated account was found.";
                     }
                     var storedProcedure = "CREATE PROCEDURE dbo.deleteAccount @username varchar(25) AS BEGIN" +
-                        "DELETE FROM user_accounts WHERE username = @username;" +
-                        "DELETE FROM otp_claims WHERE username = @username;" +
-                        "DELETE FROM nodes WHERE account_own = @username;" +
-                        "DELETE FROM user_ratings WHERE username = @username;" +
-                        "DELETE FROM email_confirmation_links WHERE username = @username;" +
+                        "DELETE FROM Accounts WHERE Username = @username;" +
+                        "DELETE FROM OTPClaims WHERE Username = @username;" +
+                        "DELETE FROM Nodes WHERE account_own = @username;" +
+                        "DELETE FROM UserRatings WHERE Username = @username;" +
+                        "DELETE FROM EmailConfirmationLinks WHERE username = @username;" +
                         "END";
 
-                    affectedRows = connection.Execute(storedProcedure, rolePrincipal.Identity.Name);
-                    //primary key of account is of role, and 
-                    //everything should have the account role, if theres both a default vs admin account,
-                    //primary key of everything else will include role, not only username
-                    //instead of searching username = username ANd role = @role
-                    //check identity again cuz ideneity has role as param
+                    affectedRows = connection.Execute(storedProcedure, rolePrincipal.RoleIdentity.Name);
+
                 }
 
                 if (affectedRows >= 1)

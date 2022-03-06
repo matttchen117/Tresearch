@@ -171,11 +171,62 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
 
-        public string DeleteAccount(IRolePrincipal principal)
+        public string DeleteAccount(IRolePrincipal rolePrincipal)
         {
-            throw new NotImplementedException();
-            
+            bool accountExists = false;
+            string accountName = rolePrincipal.RoleIdentity.Name;
+            string accountRole = rolePrincipal.RoleIdentity.Role;
+            foreach(Account ac in InMemoryDatabase.Accounts)
+            {
+                if(ac.Username.Equals(accountName) && ac.AuthorizationLevel.Equals(accountRole))
+                {
+                    accountExists = true; 
+                    InMemoryDatabase.Accounts.Remove(ac);   
+                }
+            }
+            if(accountExists)
+            {
+                for(int i = 0; i < InMemoryDatabase.OTPClaims.Count; i++)
+                {
+                    if (InMemoryDatabase.OTPClaims[i].Equals(accountName))
+                    {
+                        InMemoryDatabase.OTPClaims.RemoveAt(i);
+                        break;
+                    }
+                }
+                for (int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
+                {
+                    if (InMemoryDatabase.Nodes[i].accountOwner.Equals(accountName))
+                    {
+                        InMemoryDatabase.Nodes.RemoveAt(i);
+                    }
+                }
+                for (int i = 0; i < InMemoryDatabase.Ratings.Count; i++)
+                {
+                    if (InMemoryDatabase.Ratings[i].username.Equals(accountName))
+                    {
+                        InMemoryDatabase.Ratings.RemoveAt(i);
+                    }
+                }
+                for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count; i++)
+                {
+                    if (InMemoryDatabase.ConfirmationLinks[i].Equals(accountName))
+                    {
+                        InMemoryDatabase.ConfirmationLinks.RemoveAt(i);
+                        break;
+                    }
+                }
+                return _messageBank.SuccessMessages["generic"];
+            }
+            else
+            {
+                return _messageBank.ErrorMessages["notFoundOrEnabled"];
+            }
+
         }
+
+
+
 
         public bool CreateAccount(IAccount account)
         {

@@ -27,3 +27,11 @@ C:\Users\Matthew Chen\source\repos\Tresearch\CECS 491B\TrialByFire.Tresearch\Tri
 C:\Users\Matthew Chen\source\repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\bin\Debug\net6.0\TrialByFire.Tresearch.Services.pdb
 C:\Users\Matthew Chen\source\repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\bin\Debug\net6.0\TrialByFire.Tresearch.Exceptions.pdb
 C:\Users\Matthew Chen\source\repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\obj\Debug\net6.0\TrialByFire.Tresearch.Managers.csproj.CopyComplete
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\obj\Debug\net6.0\TrialByFire.Tresearch.Managers.csproj.AssemblyReference.cache
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\obj\Debug\net6.0\TrialByFire.Tresearch.Managers.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\obj\Debug\net6.0\TrialByFire.Tresearch.Managers.AssemblyInfoInputs.cache
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\obj\Debug\net6.0\TrialByFire.Tresearch.Managers.AssemblyInfo.cs
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\obj\Debug\net6.0\TrialByFire.Tresearch.Managers.csproj.CoreCompileInputs.cache
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\obj\Debug\net6.0\TrialByFire.Tresearch.Managers.dll
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\obj\Debug\net6.0\ref\TrialByFire.Tresearch.Managers.dll
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\obj\Debug\net6.0\TrialByFire.Tresearch.Managers.pdb

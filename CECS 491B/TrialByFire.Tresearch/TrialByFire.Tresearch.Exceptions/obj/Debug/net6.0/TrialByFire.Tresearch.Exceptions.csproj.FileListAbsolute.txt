@@ -10,3 +10,15 @@ C:\Users\Matthew Chen\source\repos\Tresearch\CECS 491B\TrialByFire.Tresearch\Tri
 C:\Users\Matthew Chen\source\repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\refint\TrialByFire.Tresearch.Exceptions.dll
 C:\Users\Matthew Chen\source\repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.pdb
 C:\Users\Matthew Chen\source\repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\ref\TrialByFire.Tresearch.Exceptions.dll
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\bin\Debug\net6.0\TrialByFire.Tresearch.Exceptions.deps.json
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\bin\Debug\net6.0\TrialByFire.Tresearch.Exceptions.dll
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\bin\Debug\net6.0\ref\TrialByFire.Tresearch.Exceptions.dll
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\bin\Debug\net6.0\TrialByFire.Tresearch.Exceptions.pdb
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.csproj.AssemblyReference.cache
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.AssemblyInfoInputs.cache
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.AssemblyInfo.cs
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.csproj.CoreCompileInputs.cache
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.dll
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\ref\TrialByFire.Tresearch.Exceptions.dll
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Exceptions\obj\Debug\net6.0\TrialByFire.Tresearch.Exceptions.pdb
