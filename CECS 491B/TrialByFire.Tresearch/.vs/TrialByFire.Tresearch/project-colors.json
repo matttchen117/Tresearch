@@ -30,7 +30,17 @@
       "ProjectGuid": "eff69065-de0d-4648-9723-cd843356c208",
       "DisplayName": "TrialByFire.Tresearch.Models",
       "ColorIndex": 4
+    },
+    "301e6944-aedf-4e97-a10d-f5fb6c64d50a": {
+      "ProjectGuid": "301e6944-aedf-4e97-a10d-f5fb6c64d50a",
+      "DisplayName": "TrialByFire.Tresearch.DAL",
+      "ColorIndex": 5
+    },
+    "b98dc29d-5008-48df-a58e-7ed9047860e0": {
+      "ProjectGuid": "b98dc29d-5008-48df-a58e-7ed9047860e0",
+      "DisplayName": "TrialByFire.Tresearch.Exceptions",
+      "ColorIndex": 6
     }
   },
-  "NextColorIndex": 5
+  "NextColorIndex": 7
 }
