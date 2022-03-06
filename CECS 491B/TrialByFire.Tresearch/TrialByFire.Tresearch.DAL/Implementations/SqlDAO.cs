@@ -137,6 +137,54 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+
+        public string DeleteAccount(IRolePrincipal rolePrincipal)
+        {
+            int affectedRows;
+            try
+            {
+                using (var connection = new SqlConnection(SqlConnectionString))
+                {
+                    var readQuery = "SELECT * FROM user_accounts WHERE username = @username";
+                    var account = connection.ExecuteScalar<int>(readQuery, rolePrincipal.Identity.Name);
+                    if (account == 0)
+                    {
+                        //meaning that there wasn't an account to delete
+                        Console.WriteLine("There wasn't an account found with associated username.");
+                        //check for result to equal this
+                        return "No associated account was found.";
+                    }
+                    var storedProcedure = "CREATE PROCEDURE dbo.deleteAccount @username varchar(25) AS BEGIN" +
+                        "DELETE FROM user_accounts WHERE username = @username;" +
+                        "DELETE FROM otp_claims WHERE username = @username;" +
+                        "DELETE FROM nodes WHERE account_own = @username;" +
+                        "DELETE FROM user_ratings WHERE username = @username;" +
+                        "DELETE FROM email_confirmation_links WHERE username = @username;" +
+                        "END";
+
+                    affectedRows = connection.Execute(storedProcedure, rolePrincipal.Identity.Name);
+
+
+                }
+                if (affectedRows >= 1)
+                {
+                    return "success";
+                }
+                else
+                {
+                    Console.WriteLine("Couldn't delete account.");
+                    return "Error, could not delete account.";
+                }
+            }
+            catch (Exception ex)
+            {
+                return "Exception occurred";
+            }
+
+        }
+
+
+
         public string VerifyAccount(IAccount account)
         {
             throw new NotImplementedException();

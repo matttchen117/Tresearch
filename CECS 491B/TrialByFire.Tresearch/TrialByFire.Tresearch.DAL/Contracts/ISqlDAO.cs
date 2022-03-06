@@ -27,5 +27,8 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         // Usage Analysis Dashboard
         public List<IKPI> LoadKPI(DateTime now);
+
+        // Delete account
+        public string DeleteAccount(IRolePrincipal principal);
     }
 }

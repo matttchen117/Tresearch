@@ -1,17 +1,7 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\CECS 491B",
-    "\\CECS 491B\\TrialByFire.Tresearch",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\Implementations",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\bin",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\bin\\Debug\\net6.0\\ref",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\Contracts",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\Implementations",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\OTPRequestTests"
+    ""
   ],
-  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\Contracts\\IAccount.cs",
+  "SelectedNode": "\\TrialByFire.Tresearch.sln (CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.sln)",
   "PreviewInSolutionExplorer": false
 }
