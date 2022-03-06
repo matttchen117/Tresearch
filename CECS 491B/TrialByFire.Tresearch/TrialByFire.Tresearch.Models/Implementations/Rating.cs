@@ -1,8 +1,9 @@
 ﻿using System;
+using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Models.Implementations
 {
-    public class Rating
+    public class Rating : IRating
     {
         public string username { get; set; }
         public long nodeID { get; set; }

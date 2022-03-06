@@ -44,13 +44,13 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             "has been disabled.")]
         [InlineData("harry@yahoo.com", "ABCdef123", "user", 2022, 3, 4, 5, 6, 0, "Database: Please confirm your account " +
             "before attempting to login.")]
-        [InlineData("barry@yahoo.com", "abcdef123", "user", 2022, 3, 4, 5, 6, 0, "Database: Too many fails have occurred. " +
+        [InlineData("barry@yahoo.com", "ABCdef123", "user", 2022, 3, 4, 5, 10, 0, "Database: Too many fails have occurred. " +
             "The account has been disabled.")]
-        public void AuthenticateTheUser(string username, string otp, string role, int year, int month, int day, int hour,
+        public void AuthenticateTheUser(string username, string otp, string authorizationLevel, int year, int month, int day, int hour,
             int minute, int second, string expected)
         {
             // Arrange
-            IOTPClaim otpClaim = new OTPClaim(username, otp, role, new DateTime(year, month, day, hour, minute, second));
+            IOTPClaim otpClaim = new OTPClaim(username, otp, authorizationLevel, new DateTime(year, month, day, hour, minute, second));
 
             // Act
             List<string> results = authenticationService.Authenticate(otpClaim);

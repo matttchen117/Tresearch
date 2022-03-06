@@ -24,7 +24,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 		
 		private IRolePrincipal _rolePrincipal { get; }
 		private IOTPRequestService _otpRequestService { get; }
-		private readonly string _role = "Admin";
+		private readonly string _authorizationLevel = "Admin";
 
 		public UADManager(ISqlDAO sqlDAO, ILogService logService, IUADService uadService, IAuthenticationService authenticationService, IAuthorizationService authorizationService)
         {
@@ -45,7 +45,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         {
 			string result;
 			string authorizeResult;
-			authorizeResult = _authorizationService.VerifyAuthorized(_rolePrincipal, _role);
+			authorizeResult = _authorizationService.VerifyAuthorized(_rolePrincipal, _authorizationLevel);
 			if (authorizeResult == "success")
 			{
 				Task t1 = Task.Run(() =>

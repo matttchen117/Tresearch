@@ -38,17 +38,18 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             "has been disabled.")]
         [InlineData("harry@yahoo.com", "abcDEF123", "user", "guest", "guest", "Database: Please confirm your " +
             "account before attempting to login.")]
-        public void RequestTheOTP(string username, string passphrase, string role, string currentIdentity, string currentRole, string expected)
+        public void RequestTheOTP(string username, string passphrase, string authorizationLevel, string currentIdentity, string currentRole, string expected)
         {
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+            IMailService mailService = new MailService(messageBank);
             IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService, messageBank);
             IOTPRequestManager otpRequestManager = new OTPRequestManager(sqlDAO, logService, validationService,
-                authenticationService, rolePrincipal, otpRequestService, messageBank);
+                authenticationService, rolePrincipal, otpRequestService, messageBank, mailService);
 
             // Act
-            string result = otpRequestManager.RequestOTP(username, passphrase, role);
+            string result = otpRequestManager.RequestOTP(username, passphrase, authorizationLevel);
 
             // Assert
             Assert.Equal(expected, result);

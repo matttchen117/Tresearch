@@ -26,9 +26,11 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private IOTPRequestService _otpRequestService { get; }
         private IMessageBank _messageBank { get; }
 
+        private IMailService _mailService { get; }
+
         public OTPRequestManager(ISqlDAO sqlDAO, ILogService logService, IValidationService validationService, 
             IAuthenticationService authenticationService, IRolePrincipal rolePrincipal, 
-            IOTPRequestService otpRequestService, IMessageBank messageBank)
+            IOTPRequestService otpRequestService, IMessageBank messageBank, IMailService mailService)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
@@ -37,9 +39,10 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _rolePrincipal = rolePrincipal;
             _otpRequestService = otpRequestService;
             _messageBank = messageBank;
+            _mailService = mailService;
         }
 
-        public string RequestOTP(string username, string passphrase, string role)
+        public string RequestOTP(string username, string passphrase, string authorizationLevel)
         {
             string result;
             try
@@ -52,7 +55,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     result = _validationService.ValidateInput(keyValuePairs);
                     if (result.Equals(_messageBank.SuccessMessages["generic"]))
                     {
-                        IAccount account = new Account(username, passphrase, role);
+                        IAccount account = new Account(username, passphrase, authorizationLevel);
                         IOTPClaim otpClaim = new OTPClaim(account);
                         result = _otpRequestService.RequestOTP(account, otpClaim);
                     }

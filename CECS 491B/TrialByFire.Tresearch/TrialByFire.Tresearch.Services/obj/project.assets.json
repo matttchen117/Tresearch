@@ -5673,19 +5673,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\viet\\.nuget\\packages\\": {}
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\viet\\source\\repos\\Drakat7\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj",
+      "projectUniqueName": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj",
       "projectName": "TrialByFire.Tresearch.Services",
-      "projectPath": "C:\\Users\\viet\\source\\repos\\Drakat7\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj",
-      "packagesPath": "C:\\Users\\viet\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\viet\\source\\repos\\Drakat7\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\obj\\",
+      "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj",
+      "packagesPath": "C:\\Users\\Matthew Chen\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\viet\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Matthew Chen\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -5699,11 +5699,11 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\viet\\source\\repos\\Drakat7\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
-              "projectPath": "C:\\Users\\viet\\source\\repos\\Drakat7\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
+            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
             },
-            "C:\\Users\\viet\\source\\repos\\Drakat7\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj": {
-              "projectPath": "C:\\Users\\viet\\source\\repos\\Drakat7\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj"
+            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj"
             }
           }
         }
@@ -5742,7 +5742,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.101\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
       }
     }
   }

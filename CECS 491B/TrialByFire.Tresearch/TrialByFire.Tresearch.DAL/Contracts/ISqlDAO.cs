@@ -19,10 +19,9 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public List<string> Authenticate(IOTPClaim otpClaim);
 
         // Authorization
-        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredRole);
+        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredAuthLevel);
 
         // Request OTP
-        public IOTPClaim GetOTPClaim(IOTPClaim otpClaim);
         public string StoreOTP(IOTPClaim otpClaim);
 
         // Usage Analysis Dashboard
@@ -30,5 +29,37 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         // Delete account
         public string DeleteAccount(IRolePrincipal principal);
+
+        /*
+            Ian's Methods
+         */
+
+        public string CreateNodesCreated(INodesCreated nodesCreated);
+
+        public INodesCreated GetNodesCreated(DateTime nodeCreationDate);
+
+        public string UpdateNodesCreated(INodesCreated nodesCreated);
+
+
+
+        public string CreateDailyLogin(IDailyLogin dailyLogin);
+
+        public IDailyLogin GetDailyLogin(DateTime nodeCreationDate);
+
+        public string UpdateDailyLogin(IDailyLogin dailyLogin);
+
+
+        public string CreateTopSearch(ITopSearch topSearch);
+
+        public ITopSearch GetTopSearch(DateTime nodeCreationDate);
+
+        public string UpdateTopSearch(ITopSearch topSearch);
+
+
+        public string CreateDailyRegistration(IDailyRegistration dailyRegistration);
+
+        public IDailyRegistration GetDailyRegistration(DateTime nodeCreationDate);
+
+        public string UpdateDailyRegistration(IDailyRegistration dailyRegistration);
     }
 }

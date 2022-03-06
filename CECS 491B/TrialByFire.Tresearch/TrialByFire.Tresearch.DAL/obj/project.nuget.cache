@@ -1,9 +1,14 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "dgSpecHash": "fO4fsmmznF+inpSRg36DoLPm89pS2qfGWyrcLeKFByAM+ONzyJ+YQrKk6Ebc/NaSzuVHbGrqIbs7wfyMlf7kQw==",
+=======
+  "dgSpecHash": "NuEHdLOSHU4XVrdWlqlta5yNScFUzDhvGAII4wt6SzwOc4rZN0F7N4gW9aZ3CQqiGgngze11YsoZLkAqpQTuHQ==",
+>>>>>>> 2a0e2ed4086cc82e06a35de64dc75cd95d4972c2
   "success": true,
-  "projectFilePath": "C:\\Users\\viet\\source\\repos\\Drakat7\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj",
+  "projectFilePath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj",
   "expectedPackageFiles": [
+<<<<<<< HEAD
     "C:\\Users\\viet\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\viet\\.nuget\\packages\\microsoft.codecoverage\\17.1.0\\microsoft.codecoverage.17.1.0.nupkg.sha512",
     "C:\\Users\\viet\\.nuget\\packages\\microsoft.csharp\\4.0.1\\microsoft.csharp.4.0.1.nupkg.sha512",
@@ -104,6 +109,18 @@
     "C:\\Users\\viet\\.nuget\\packages\\xunit.extensibility.core\\2.4.1\\xunit.extensibility.core.2.4.1.nupkg.sha512",
     "C:\\Users\\viet\\.nuget\\packages\\xunit.extensibility.execution\\2.4.1\\xunit.extensibility.execution.2.4.1.nupkg.sha512",
     "C:\\Users\\viet\\.nuget\\packages\\xunit.runner.visualstudio\\2.4.3\\xunit.runner.visualstudio.2.4.3.nupkg.sha512"
+=======
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\runtime.native.system.data.sqlclient.sni\\4.7.0\\runtime.native.system.data.sqlclient.sni.4.7.0.nupkg.sha512",
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\runtime.win-arm64.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-arm64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\runtime.win-x64.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-x64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\runtime.win-x86.runtime.native.system.data.sqlclient.sni\\4.4.0\\runtime.win-x86.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\system.data.sqlclient\\4.8.3\\system.data.sqlclient.4.8.3.nupkg.sha512",
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\system.security.accesscontrol\\4.7.0\\system.security.accesscontrol.4.7.0.nupkg.sha512",
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\system.security.principal.windows\\4.7.0\\system.security.principal.windows.4.7.0.nupkg.sha512"
+>>>>>>> 2a0e2ed4086cc82e06a35de64dc75cd95d4972c2
   ],
   "logs": []
 }

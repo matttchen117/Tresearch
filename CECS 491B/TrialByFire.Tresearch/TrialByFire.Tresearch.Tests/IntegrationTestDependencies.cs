@@ -22,12 +22,14 @@ namespace TrialByFire.Tresearch.Tests
 
         public IValidationService validationService { get; }
 
+        private string _connectionString = "Source = tresearchstudentserver.database.windows.net; Initial Catalog = tresearchStudentServer; User ID = tresearchadmin; Password=********;Connect Timeout = 30; Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+
 
         public IntegrationTestDependencies()
         {
-            sqlDAO = new SqlDAO();
-            logService = new SqlLogService(sqlDAO);
             messageBank = new MessageBank();
+            sqlDAO = new SqlDAO(_connectionString, messageBank);
+            logService = new SqlLogService(sqlDAO);
             authenticationService = new AuthenticationService(sqlDAO, logService, messageBank);
             authorizationService = new AuthorizationService(sqlDAO, logService);
             validationService = new ValidationService(messageBank);

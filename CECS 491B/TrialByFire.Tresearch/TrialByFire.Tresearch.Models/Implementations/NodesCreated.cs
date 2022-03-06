@@ -1,12 +1,19 @@
 ﻿using System;
+using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Models.Implementations
 {
-    public class NodesCreated
+    public class NodesCreated : INodesCreated
     {
         public DateTime nodeCreationDate { get; set; }
 
         public int nodeCreationCount { get; set; }
+
+        public NodesCreated()
+        {
+            nodeCreationDate = DateTime.Now;
+            nodeCreationCount = 0;
+        }
 
         public NodesCreated(DateTime nodeCreationDate, int nodeCreationCount)
         {

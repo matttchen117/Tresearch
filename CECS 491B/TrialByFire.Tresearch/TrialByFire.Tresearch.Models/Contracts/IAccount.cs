@@ -16,7 +16,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
 
         public string? AuthorizationLevel { get; set; }
 
-        public bool? Status { get; set; }
+        public bool? AccountStatus { get; set; }
 
         public bool? Confirmed { get; set; }
 

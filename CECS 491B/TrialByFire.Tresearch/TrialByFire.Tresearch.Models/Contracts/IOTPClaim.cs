@@ -10,7 +10,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
     {
         string Username { get; }
 
-        string Role { get; }
+        string AuthorizationLevel { get; }
         string OTP { get; }
         DateTime TimeCreated { get; }
 

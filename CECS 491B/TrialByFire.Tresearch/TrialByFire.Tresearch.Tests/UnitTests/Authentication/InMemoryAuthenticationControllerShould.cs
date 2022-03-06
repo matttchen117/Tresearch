@@ -24,7 +24,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
         }
 
         [Theory]
-        [InlineData("larry@gmail.com", "ABCdef123", "user", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Server: Authentication Cookie creation failed")]
+        [InlineData("larry@gmail.com", "ABCdef123", "user", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Server: Authentication Cookie creation failed.")]
         [InlineData("billy@yahoo.com", "abcdef123", "admin", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +
             "Please try again.")]
         [InlineData("billy@yahoo.com", "abc", "admin", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +
@@ -41,9 +41,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             "or it has been disabled.")]
         [InlineData("harry@yahoo.com", "ABCdef123", "user", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Database: Please confirm your " +
             "account before attempting to login.")]
-        [InlineData("barry@yahoo.com", "abcdef123", "user", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Database: Too many fails have occurred. " +
+        [InlineData("barry@yahoo.com", "ABCdef123", "user", "guest", "guest", 2022, 3, 4, 5, 10, 0, "Database: Too many fails have occurred. " +
             "The account has been disabled.")]
-        public void AuthenticateTheUser(string username, string otp, string role, string currentIdentity, string currentRole,
+        public void AuthenticateTheUser(string username, string otp, string authorizationLevel, string currentIdentity, string currentRole,
             int year, int month, int day, int hour, int minute, int second, string expected)
         {
             // Arrange
@@ -56,28 +56,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             DateTime now = new DateTime(year, month, day, hour, minute, second);
 
             // Act
-            string result = authenticationController.Authenticate(username, otp, role, now);
+            string result = authenticationController.Authenticate(username, otp, authorizationLevel, now);
 
             // Assert
             Assert.Equal(expected, result);
         }
-
-        /*        public void CreateTheCookie(string username, string otp)
-                {
-                    // Arrange
-                    ISqlDAO inMemorySqlDAO = new InMemorySqlDAO();
-                    ILogService inMemoryLogService = new InMemoryLogService(inMemorySqlDAO);
-                    IAuthenticationManager authenticationManager = new AuthenticationManager(inMemorySqlDAO, inMemoryLogService);
-                    IAuthenticationController authenticationController = new AuthenticationController(inMemorySqlDAO, inMemoryLogService, authenticationManager);
-                    string _jwtToken = authenticationManager.Authenticate(username, otp, DateTime.Now)[1];
-                    string expected = "success";
-
-                    // Act
-                    string result = authenticationController.CreateCookie(_jwtToken);
-
-                    // Assert
-                    Assert.Equal(expected, result);
-                }*/
-
     }
 }

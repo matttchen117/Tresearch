@@ -1,28 +1,33 @@
 ﻿using SendGrid;
 using SendGrid.Helpers.Mail;
+using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Services.Contracts;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
    public  class MailService: IMailService 
     {
-        private string APIKey = "";
-        private string sender = "no-reply@tresearch.systems";
-        private string senderName = "Tresearch Support";
-        private string confirmationTemplate = "";
-        private string OTPTemplate = "";
+        private IMessageBank _messageBank { get; }
+        private string _APIKey = "";
+        private string _sender = "no-reply@tresearch.systems";
+        private string _senderName = "Tresearch Support";
+        private string _confirmationTemplate = "";
+        private string _OTPTemplate = "";
 
-        public MailService() { }
+        public MailService(IMessageBank messageBank) 
+        { 
+            _messageBank = messageBank;
+        }
 
         public string SendConfirmation(string email, string url)
         {
             try
             {
-                var client = new SendGridClient(APIKey);
+                var client = new SendGridClient(_APIKey);
                 var confirmation = new SendGridMessage();
-                confirmation.SetFrom(sender, senderName);
+                confirmation.SetFrom(_sender, _senderName);
                 confirmation.AddTo(email);
-                confirmation.SetTemplateId(confirmationTemplate);
+                confirmation.SetTemplateId(_confirmationTemplate);
                 confirmation.SetTemplateData(new
                 {
                     url = url
@@ -33,6 +38,22 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 return "Failed - Couldn't send confirmation email";
             }
             return "Success - Confirmation email sent";
+        }
+
+        public string SendOTP(string email, string subject, string plainBody, string htmlBody)
+        {
+            try
+            {
+                var client = new SendGridClient(_APIKey);
+                var from = new EmailAddress(_sender, _senderName);
+                var to = new EmailAddress(email);
+                var msg = MailHelper.CreateSingleEmail(from, to, subject, plainBody, htmlBody);
+                var response = client.SendEmailAsync(msg);
+            } catch
+            {
+                return _messageBank.ErrorMessages["sendEmailFail"];
+            }
+            return _messageBank.SuccessMessages["generic"];
         }
     }
 }

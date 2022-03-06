@@ -7,24 +7,33 @@ using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Services.Implementations;
 using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authorization
 {
-    public class AuthorizationServiceShould
+    public class AuthorizationServiceShould : IntegrationTestDependencies
     {
-        public void VerifyThatTheUserIsAuthorized(IRolePrincipal rolePrincipal, string requiredRole)
+        public AuthorizationServiceShould() : base()
+        {
+        }
+
+        [Theory]
+        [InlineData("larry@gmail.com", "user", "user", "success")]
+        [InlineData("billy@yahoo.com", "admin", "user", "success")]
+        [InlineData("joe@outlook.com", "user", "admin", "Database: You are not authorized to perform this operation.")]
+        [InlineData("bob@yahoo.com", "user", "user", "success")]
+        [InlineData("harry@yahoo.com", "user", "user", "success")]
+        public void VerifyThatTheUserIsAuthorized(string username, string authorizationLevel, string requiredAuthLevel, string expected)
         {
             // Arrange
-            ISqlDAO sqlDAO = new SqlDAO();
-            ILogService logService = new SqlLogService(sqlDAO);
-            IAuthorizationService authorizationService = new AuthorizationService(sqlDAO, logService);
-            string expected = "success";
+            IRoleIdentity roleIdentity = new RoleIdentity(true, username, authorizationLevel);
+            IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
 
             // Act
-            string result = authorizationService.VerifyAuthorized(rolePrincipal, requiredRole);
+            string result = authorizationService.VerifyAuthorized(rolePrincipal, requiredAuthLevel);
 
             // Assert
             Assert.Equal(expected, result);

@@ -35,7 +35,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _messageBank = messageBank;
         }
 
-        public List<string> Authenticate(string username, string otp, string role, DateTime now)
+        public List<string> Authenticate(string username, string otp, string authorizationLevel, DateTime now)
         {
             List<string> results = new List<string>();
             try
@@ -48,7 +48,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     string result = _validationService.ValidateInput(keyValuePairs);
                     if(result.Equals(_messageBank.SuccessMessages["generic"]))
                     {
-                        IOTPClaim resultClaim = new OTPClaim(username, otp, role, now);
+                        IOTPClaim resultClaim = new OTPClaim(username, otp, authorizationLevel, now);
                         results = _authenticationService.Authenticate(resultClaim);
                         return results;
                     }
