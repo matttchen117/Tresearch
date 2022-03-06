@@ -77,10 +77,10 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 cookieOptions.Expires = DateTime.Now.AddDays(5);
                 cookieOptions.Secure = true;
                 Response.Cookies.Append("AuthN", jwtToken, cookieOptions);
-                result = "success";
+                result = _messageBank.SuccessMessages["generic"];
             }catch(Exception ex)
             {
-                result = "Server: Authentication Cookie creation failed";
+                result = _messageBank.ErrorMessages["cookieFail"];
                 /*_logService.CreateLog(DateTime.Now, "Error", _username, "Server", "Authentication Cookie " +
                     "creation failed");*/
             }

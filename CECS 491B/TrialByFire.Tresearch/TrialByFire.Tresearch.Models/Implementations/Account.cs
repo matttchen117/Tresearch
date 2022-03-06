@@ -27,8 +27,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
             Username = username;
             Passphrase = passphrase;
             AuthorizationLevel = authorizationLevel;
-            Status = false;
-            Confirmed = false;
+            Status = status;
+            Confirmed = confirmed;
         }     
         
         public Account(string email, string passphrase, string authorizationLevel, bool status, bool confirmed)

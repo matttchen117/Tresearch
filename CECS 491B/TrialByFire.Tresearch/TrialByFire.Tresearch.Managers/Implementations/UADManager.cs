@@ -44,27 +44,23 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 		public List<KPI> KPIsFetched(DateTime now)
         {
 			string result;
-			result = _authenticationService.VerifyAuthenticated(_rolePrincipal);
-			if(result == "success")
-            {
-				string authorizeResult;
-				authorizeResult = _authorizationService.VerifyAuthorized(_rolePrincipal, _role);
-				if (authorizeResult == "success")
-                {
-					Task t1 = Task.Run(() =>
-					{
-						return _uadService.LoadKPI(now);
-					});
+			string authorizeResult;
+			authorizeResult = _authorizationService.VerifyAuthorized(_rolePrincipal, _role);
+			if (authorizeResult == "success")
+			{
+				Task t1 = Task.Run(() =>
+				{
+					return _uadService.LoadKPI(now);
+				});
 
-                    if (!t1.Wait(60000))
-                    {
-						List<KPI> results = new List<KPI>();
-						KPI failureKPI = new KPI("Error 504; Timeout Error");
-						results.Add(failureKPI);
-						return results;
-                    }
-                }
-            }
+				if (!t1.Wait(60000))
+				{
+					List<KPI> results = new List<KPI>();
+					KPI failureKPI = new KPI("Error 504; Timeout Error");
+					results.Add(failureKPI);
+					return results;
+				}
+			}
 			List<KPI> resultList = new List<KPI>();
 			resultList.Add(new KPI("Error: Timeout"));
 			return resultList;

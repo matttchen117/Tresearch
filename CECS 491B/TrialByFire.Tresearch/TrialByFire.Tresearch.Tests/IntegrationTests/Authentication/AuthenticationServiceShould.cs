@@ -31,17 +31,5 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
             Assert.Equal(expected, results[0]);
 
         }
-
-        public void VerifyThatTheUser(IRolePrincipal rolePrincipal)
-        {
-            // Arrange
-            string expected = "success";
-
-            // Act
-            string result = authenticationService.VerifyAuthenticated(rolePrincipal);
-
-            // Assert
-            Assert.Equal(expected, result);
-        }
     }
 }

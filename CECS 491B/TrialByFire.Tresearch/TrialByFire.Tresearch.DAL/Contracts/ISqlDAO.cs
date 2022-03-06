@@ -17,7 +17,6 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         // Authentication
         public string VerifyAccount(IAccount account);
         public List<string> Authenticate(IOTPClaim otpClaim);
-        public string VerifyAuthenticated(IRolePrincipal rolePrincipal);
 
         // Authorization
         public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredRole);
