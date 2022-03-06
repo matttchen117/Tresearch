@@ -8,17 +8,22 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 {
     public class SqlDAO : ISqlDAO
     {
-        private string SqlConnectionString { get; }
+        private string _sqlConnectionString { get; }
 
         public SqlDAO()
         {
+        }
+
+        public SqlDAO(string sqlConnectionString)
+        {
+            _sqlConnectionString = sqlConnectionString;
         }
 
         public bool CreateConfirmationLink(IConfirmationLink _confirmationlink)
         {
             try
             {
-                using (var connection = new SqlConnection(SqlConnectionString))
+                using (var connection = new SqlConnection(_sqlConnectionString))
                 {
                     var insertQuery = "INSERT INTO confirmation_links (Username, Guid, Timestamp) VALUES (@Username, @Guid, @Timestamp)";
                     int affectedRows = connection.Execute(insertQuery, _confirmationlink);
@@ -42,7 +47,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
             try
             {
-                using (var connection = new SqlConnection(SqlConnectionString))
+                using (var connection = new SqlConnection(_sqlConnectionString))
                 {
                     var readQuery = "SELECT * FROM confirmation_links WHERE GUID = @guid";
                     _confirmationLink = connection.QuerySingle<ConfirmationLink>(readQuery, new { Guid = guid });
@@ -61,7 +66,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(SqlConnectionString))
+                using (var connection = new SqlConnection(_sqlConnectionString))
                 {
                     var updateQuery = "UPDATE confirmation_links SET confirmed = 1 WHERE Username = " +
                         "@Username and Email = @Email";
@@ -85,7 +90,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(SqlConnectionString))
+                using (var connection = new SqlConnection(_sqlConnectionString))
                 {
                     var deleteQuery = "DELETE FROM confirmation_links WHERE @Username=username and @Guid=guid and @Timestamp=Timestamp";
                     affectedRows = connection.Execute(deleteQuery, confirmationLink);
@@ -110,7 +115,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(SqlConnectionString))
+                using (var connection = new SqlConnection(_sqlConnectionString))
                 {
                     var readQuery = "SELECT COUNT(*) FROM Accounts WHERE Email = @Email";
                     var accounts = connection.ExecuteScalar<int>(readQuery, new { Email = account.Email });
@@ -143,7 +148,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(SqlConnectionString))
+                using (var connection = new SqlConnection(_sqlConnectionString))
                 {
                     var readQuery = "SELECT * FROM user_accounts WHERE username = @username";
                     var account = connection.ExecuteScalar<int>(readQuery, rolePrincipal.Identity.Name);

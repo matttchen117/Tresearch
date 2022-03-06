@@ -11,27 +11,47 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
 {
-    public class AuthenticationManagerShould
+    public class AuthenticationManagerShould : IntegrationTestDependencies
     {
-
-        public void AuthenticateTheUser(string username, string otp, DateTime now)
+        public AuthenticationManagerShould() : base()
         {
-            /*// Arrange
-            ISqlDAO sqlDAO = new SqlDAO();
-            ILogService logService = new SqlLogService(sqlDAO);
-            IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService);
-            IAuthenticationManager authenticationManager = new AuthenticationManager(sqlDAO, logService, authenticationService);
-            string expected = "success";
+        }
+
+        [Theory]
+        [InlineData("larry@gmail.com", "ABCdef123", "user", "guest", "guest", 2022, 3, 4, 5, 6, 0, "success")]
+        [InlineData("billy@yahoo.com", "abcdef123", "admin", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +
+            "Please try again.")]
+        [InlineData("billy@yahoo.com", "abc", "admin", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +
+            "Please try again.")]
+        [InlineData("billy@yahoo.com", "abcdef#$%", "admin", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +
+            "Please try again.")]
+        [InlineData("billy@yahoo.com", "abcdefghi", "admin", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +
+            "Please try again.")]
+        [InlineData("billyyahoocom", "ABCdef123", "guest", "admin", "guest", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +
+            "Please try again.")]
+        [InlineData("joe@outlook.com", "ABCdef123", "user", "guest", "guest", 2023, 3, 4, 5, 6, 0, "Data: The OTP has expired. Please request " +
+            "a new one.")]
+        [InlineData("bob@yahoo.com", "ABCdef123", "user", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Database: The account was not found " +
+            "or it has been disabled.")]
+        [InlineData("harry@yahoo.com", "ABCdef123", "user", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Database: Please confirm your " +
+            "account before attempting to login.")]
+        [InlineData("barry@yahoo.com", "abcdef123", "user", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Database: Too many fails have occurred. " +
+            "The account has been disabled.")]
+        public void AuthenticateTheUser(string username, string otp, string role, string currentIdentity, string currentRole,
+            int year, int month, int day, int hour, int minute, int second, string expected)
+        {
+            // Arrange
+            IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
+            IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+            IAuthenticationManager authenticationManager = new AuthenticationManager(sqlDAO,
+                logService, validationService, authenticationService, rolePrincipal, messageBank);
+            DateTime now = new DateTime(year, month, day, hour, minute, second);
 
             // Act
-            List<string> results = authenticationManager.Authenticate(username, otp, now);
+            List<string> results = authenticationManager.Authenticate(username, otp, role, now);
 
             // Assert
             Assert.Equal(expected, results[0]);
-
-            // Not unit test if connecting to outside db
-            // Unit test if using in memory/turn into unit with mocking*/
         }
-
     }
 }

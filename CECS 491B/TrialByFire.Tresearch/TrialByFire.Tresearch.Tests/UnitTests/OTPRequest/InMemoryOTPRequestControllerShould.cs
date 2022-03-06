@@ -46,9 +46,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+            IMailService mailService = new MailService(messageBank);
             IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService, messageBank);
             IOTPRequestManager otpRequestManager = new OTPRequestManager(sqlDAO, logService, validationService, 
-                authenticationService, rolePrincipal, otpRequestService, messageBank);
+                authenticationService, rolePrincipal, otpRequestService, messageBank, mailService);
             IOTPRequestController otpRequestController = new OTPRequestController(sqlDAO, logService, 
                 otpRequestManager);
 
@@ -57,12 +58,6 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
 
             // Assert
             Assert.Equal(expected, result);
-        }
-
-        [Fact]
-        public void Test()
-        {
-            Assert.True(true);
         }
     }
 }

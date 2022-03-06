@@ -36,7 +36,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("notFoundOrEnabled", "Database: The account was not found or it has been disabled.");
             errorMessages.Add("otpExpired", "Data: The OTP has expired. Please request a new one.");
             errorMessages.Add("tooManyFails", "Database: Too many fails have occurred. The account has been disabled.");
-            errorMessages.Add("cookieFail", "Server: Authentication Cookie creation failed");
+            errorMessages.Add("cookieFail", "Server: Authentication Cookie creation failed.");
+            errorMessages.Add("sendEmailFail", "Server: Email failed to send.");
             return errorMessages;
         }
     }
