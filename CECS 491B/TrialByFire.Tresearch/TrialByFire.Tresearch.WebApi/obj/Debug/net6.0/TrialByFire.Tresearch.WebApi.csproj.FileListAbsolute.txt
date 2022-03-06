@@ -55,3 +55,13 @@ C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\Tri
 C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\TrialByFire.Tresearch.WebApi.genruntimeconfig.cache
 C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\ref\TrialByFire.Tresearch.WebApi.dll
 C:\Users\Matthew Chen\source\repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\TrialByFire.Tresearch.WebApi.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\TrialByFire.Tresearch.WebApi.csproj.AssemblyReference.cache
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\TrialByFire.Tresearch.WebApi.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\TrialByFire.Tresearch.WebApi.AssemblyInfoInputs.cache
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\TrialByFire.Tresearch.WebApi.AssemblyInfo.cs
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\TrialByFire.Tresearch.WebApi.csproj.CoreCompileInputs.cache
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\TrialByFire.Tresearch.WebApi.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\TrialByFire.Tresearch.WebApi.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\TrialByFire.Tresearch.WebApi.dll
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\ref\TrialByFire.Tresearch.WebApi.dll
+C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\TrialByFire.Tresearch.WebApi.pdb

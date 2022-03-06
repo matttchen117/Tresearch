@@ -28,7 +28,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public List<IKPI> LoadKPI(DateTime now);
 
         // Delete account
-        public string DeleteAccount(IRolePrincipal principal);
+        public string DeleteAccount(IRolePrincipal rolePrincipal);
 
         /*
             Ian's Methods

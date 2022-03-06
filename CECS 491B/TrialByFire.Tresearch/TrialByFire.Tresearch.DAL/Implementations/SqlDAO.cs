@@ -146,42 +146,44 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+
         public string DeleteAccount(IRolePrincipal rolePrincipal)
         {
+
             int affectedRows;
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var readQuery = "SELECT * FROM user_accounts WHERE username = @username";
-                    var account = connection.ExecuteScalar<int>(readQuery, rolePrincipal.Identity.Name);
+                    var readQuery = "SELECT * FROM Accounts WHERE Username = @username AND AuthorizationLevel = @role";
+                    var account = connection.ExecuteScalar<int>(readQuery, new { username = rolePrincipal.RoleIdentity.Name, role = rolePrincipal.RoleIdentity.AuthorizationLevel });
                     if (account == 0)
                     {
-                        //meaning that there wasn't an account to delete
-                        Console.WriteLine("There wasn't an account found with associated username.");
-                        //check for result to equal this
-                        return "No associated account was found.";
+                        return _messageBank.ErrorMessages["notFoundOrAuthorized"];
                     }
-                    var storedProcedure = "CREATE PROCEDURE dbo.deleteAccount @username varchar(25) AS BEGIN" +
-                        "DELETE FROM user_accounts WHERE username = @username;" +
-                        "DELETE FROM otp_claims WHERE username = @username;" +
-                        "DELETE FROM nodes WHERE account_own = @username;" +
-                        "DELETE FROM user_ratings WHERE username = @username;" +
-                        "DELETE FROM email_confirmation_links WHERE username = @username;" +
-                        "END";
+                    else
+                    {
+                        var storedProcedure = "CREATE PROCEDURE dbo.deleteAccount @username varchar(25) AS BEGIN" +
+                            "DELETE FROM Accounts WHERE Username = @username;" +
+                            "DELETE FROM OTPClaims WHERE Username = @username;" +
+                            "DELETE FROM Nodes WHERE account_own = @username;" +
+                            "DELETE FROM UserRatings WHERE Username = @username;" +
+                            "DELETE FROM EmailConfirmationLinks WHERE username = @username;" +
+                            "END";
 
-                    affectedRows = connection.Execute(storedProcedure, rolePrincipal.Identity.Name);
+                        affectedRows = connection.Execute(storedProcedure, rolePrincipal.RoleIdentity.Name);
+                    }
 
 
                 }
+
                 if (affectedRows >= 1)
                 {
-                    return "success";
+                    return _messageBank.SuccessMessages["generic"];
                 }
                 else
                 {
-                    Console.WriteLine("Couldn't delete account.");
-                    return "Error, could not delete account.";
+                    return _messageBank.ErrorMessages["notFoundOrAuthorized"];
                 }
             }
             catch (Exception ex)
