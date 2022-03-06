@@ -126,8 +126,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     {
                         account.Username = account.Username.Insert(account.Username.IndexOf('@'), accounts.ToString());
                     }
-                    var insertQuery = "INSERT INTO user_accounts (Email, Username, Passphrase, AuthorizationLevel, Status) " +
-                        "VALUES (@email, @username, @passphrase, @authorization_level, @Status)";
+                    var insertQuery = "INSERT INTO user_accounts (Email, Username, Passphrase, AuthorizationLevel, AccountStatus) " +
+                        "VALUES (@email, @username, @passphrase, @authorization_level, @AccountStatus)";
                     affectedRows = connection.Execute(insertQuery, account);
                 }
                 if (affectedRows == 1)
@@ -196,17 +196,17 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    string query = "SELECT * FROM Accounts WHERE Username = @Username AND Role = @Role";
+                    string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                     IAccount dbAccount = connection.QueryFirst(query, new
                     {
                         Username = account.Username,
-                        Role = account.AuthorizationLevel
+                        AuthorizationLevel = account.AuthorizationLevel
                     });
                     if (dbAccount == null)
                     {
                         return _messageBank.ErrorMessages["notFoundOrAuthorized"];
                     }
-                    else if (dbAccount.Status == false)
+                    else if (dbAccount.AccountStatus == false)
                     {
                         return _messageBank.ErrorMessages["notFoundOrEnabled"];
                     }
@@ -238,11 +238,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    string query = "SELECT * FROM OTPClaims WHERE Username = @Username AND Role = @Role";
+                    string query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                     IOTPClaim dbOTPClaim = connection.QueryFirst(query, new 
                     { 
                         Username = otpClaim.Username, 
-                        Role = otpClaim.Role 
+                        AuthorizationLevel = otpClaim.AuthorizationLevel 
                     });
                     if(dbOTPClaim == null)
                     {
@@ -254,12 +254,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         int failCount = dbOTPClaim.FailCount++;
                         if(failCount >= 5)
                         {
-                            query = "UPDATE * FROM Accounts SET Status = false WHERE " +
-                            "Username = @Username AND Role = @Role";
+                            query = "UPDATE * FROM Accounts SET AccountStatus = false WHERE " +
+                            "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                             affectedRows = connection.Execute(query, new
                             {
                                 Username = otpClaim.Username,
-                                Role = otpClaim.Role,
+                                AuthorizationLevel = otpClaim.AuthorizationLevel,
                             });
                             if (affectedRows != 1)
                             {
@@ -273,11 +273,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             }
                         }
                         query = "UPDATE * FROM OTPClaims SET FailCount = @FailCount WHERE " +
-                        "Username = @Username AND Role = @Role";
+                        "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                         affectedRows = connection.Execute(query, new
                         {
                             Username = otpClaim.Username,
-                            Role = otpClaim.Role,
+                            AuthorizationLevel = otpClaim.AuthorizationLevel,
                             FailCount = dbOTPClaim.FailCount++
                         });
                         if (affectedRows != 1)
@@ -313,23 +313,23 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return results;
             }
         }
-        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredRole)
+        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredAuthLevel)
         {
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    string query = "SELECT * FROM Accounts WHERE Username = @Username AND Role = @Role";
+                    string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                     IAccount dbAccount = connection.QueryFirst(query, new
                     {
                         Username = rolePrincipal.RoleIdentity.Name,
-                        Role = rolePrincipal.RoleIdentity.Role
+                        AuthorizationLevel = rolePrincipal.RoleIdentity.AuthorizationLevel
                     });
                     if (dbAccount == null)
                     {
                         return _messageBank.ErrorMessages["notFoundOrAuthorized"];
                     }
-                    else if(dbAccount.Status == false)
+                    else if(dbAccount.AccountStatus == false)
                     {
                         return _messageBank.ErrorMessages["notFoundOrEnabled"];
                     }
@@ -359,11 +359,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    string query = "SELECT * FROM OTPClaims WHERE Username = @Username AND Role = @Role";
+                    string query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                     IOTPClaim dbOTPClaim = connection.QueryFirst(query, new
                     {
                         Username = otpClaim.Username,
-                        Role = otpClaim.Role
+                        AuthorizationLevel = otpClaim.AuthorizationLevel
                     });
                     if (dbOTPClaim == null)
                     {
@@ -377,11 +377,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             failCount = 0;
                         }
                         query = "UPDATE * FROM OTPClaims SET OTP = @OTP AND TimeCreated = @TimeCreated AND " +
-                        "FailCount = @FailCount WHERE Username = @Username AND Role = @Role";
+                        "FailCount = @FailCount WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                         var affectedRows = connection.Execute(query, new
                         {
                             Username = otpClaim.Username,
-                            Role = otpClaim.Role,
+                            AuthorizationLevel = otpClaim.AuthorizationLevel,
                             OTP = otpClaim.OTP,
                             TimeCreated = otpClaim.TimeCreated,
                             FailCount = otpClaim.FailCount
@@ -662,6 +662,11 @@ Values (@node_creation_date, @node_creation_count)";
             }
 
             return "Daily Registration Update Successful";
+        }
+
+        public string CreateDailyLogin(IDailyLogin dailyLogin)
+        {
+            throw new NotImplementedException();
         }
     }
 }

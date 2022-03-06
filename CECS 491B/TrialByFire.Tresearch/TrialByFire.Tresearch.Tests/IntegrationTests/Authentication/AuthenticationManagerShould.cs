@@ -7,6 +7,8 @@ using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
+using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
@@ -37,7 +39,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
             "account before attempting to login.")]
         [InlineData("barry@yahoo.com", "abcdef123", "user", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Database: Too many fails have occurred. " +
             "The account has been disabled.")]
-        public void AuthenticateTheUser(string username, string otp, string role, string currentIdentity, string currentRole,
+        public void AuthenticateTheUser(string username, string otp, string authorizationLevel, string currentIdentity, string currentRole,
             int year, int month, int day, int hour, int minute, int second, string expected)
         {
             // Arrange
@@ -48,7 +50,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
             DateTime now = new DateTime(year, month, day, hour, minute, second);
 
             // Act
-            List<string> results = authenticationManager.Authenticate(username, otp, role, now);
+            List<string> results = authenticationManager.Authenticate(username, otp, authorizationLevel, now);
 
             // Assert
             Assert.Equal(expected, results[0]);

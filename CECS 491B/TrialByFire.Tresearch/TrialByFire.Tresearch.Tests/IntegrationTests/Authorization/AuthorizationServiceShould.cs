@@ -26,14 +26,14 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authorization
         [InlineData("joe@outlook.com", "user", "admin", "Database: You are not authorized to perform this operation.")]
         [InlineData("bob@yahoo.com", "user", "user", "success")]
         [InlineData("harry@yahoo.com", "user", "user", "success")]
-        public void VerifyThatTheUserIsAuthorized(string username, string role, string requiredRole, string expected)
+        public void VerifyThatTheUserIsAuthorized(string username, string authorizationLevel, string requiredAuthLevel, string expected)
         {
             // Arrange
-            IRoleIdentity roleIdentity = new RoleIdentity(true, username, role);
+            IRoleIdentity roleIdentity = new RoleIdentity(true, username, authorizationLevel);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
 
             // Act
-            string result = authorizationService.VerifyAuthorized(rolePrincipal, requiredRole);
+            string result = authorizationService.VerifyAuthorized(rolePrincipal, requiredAuthLevel);
 
             // Assert
             Assert.Equal(expected, result);

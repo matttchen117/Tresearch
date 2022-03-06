@@ -10,19 +10,19 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class RoleIdentity : IRoleIdentity
     {
-        public string AuthenticationType => "Role";
+        public string AuthenticationType => "AuthorizationLevel";
 
         public bool IsAuthenticated { get; }
 
         public string Name { get; }
 
-        public string Role { get; }
+        public string AuthorizationLevel { get; }
 
-        public RoleIdentity(bool isAuthenticated, string name, string role)
+        public RoleIdentity(bool isAuthenticated, string name, string authorizationLevel)
         {
             IsAuthenticated = isAuthenticated;
             Name = name;
-            Role = role;
+            AuthorizationLevel = authorizationLevel;
         }
     }
 }

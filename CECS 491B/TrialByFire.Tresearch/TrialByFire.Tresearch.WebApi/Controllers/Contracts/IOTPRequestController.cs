@@ -2,6 +2,6 @@
 {
     public interface IOTPRequestController
     {
-        public string RequestOTP(string username, string passphrase, string role);
+        public string RequestOTP(string username, string passphrase, string authorizationLevel);
     }
 }

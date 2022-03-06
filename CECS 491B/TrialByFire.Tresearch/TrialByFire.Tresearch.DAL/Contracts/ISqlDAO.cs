@@ -19,7 +19,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public List<string> Authenticate(IOTPClaim otpClaim);
 
         // Authorization
-        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredRole);
+        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredAuthLevel);
 
         // Request OTP
         public string StoreOTP(IOTPClaim otpClaim);

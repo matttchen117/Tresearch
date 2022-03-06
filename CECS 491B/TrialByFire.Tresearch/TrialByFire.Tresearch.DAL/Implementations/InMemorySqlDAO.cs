@@ -30,7 +30,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     if (dbAccount.Confirmed != false)
                     {
-                        if (dbAccount.Status != false)
+                        if (dbAccount.AccountStatus != false)
                         {
                             return _messageBank.SuccessMessages["generic"];
                         }
@@ -48,7 +48,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             List<string> results = new List<string>();
             try
             {
-                IAccount account = new Account(otpClaim.Username, otpClaim.Role);
+                IAccount account = new Account(otpClaim.Username, otpClaim.AuthorizationLevel);
                 // Find account in db
                 int index = InMemoryDatabase.Accounts.IndexOf(account);
                 if (index != -1)
@@ -58,7 +58,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     if (dbAccount.Confirmed != false)
                     {
                         // check if enabled
-                        if (dbAccount.Status != false)
+                        if (dbAccount.AccountStatus != false)
                         {
                             // find otp claim in db
                             index = InMemoryDatabase.OTPClaims.IndexOf(otpClaim);
@@ -71,7 +71,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                                     if (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2))
                                     {
                                         results.Add(_messageBank.SuccessMessages["generic"]);
-                                        results.Add($"username:{dbAccount.Username},role:{dbAccount.AuthorizationLevel}");
+                                        results.Add($"username:{dbAccount.Username},authorizationLevel:{dbAccount.AuthorizationLevel}");
                                         return results;
                                     }
                                     else
@@ -79,7 +79,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                                         InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount++;
                                         if (InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount >= 5)
                                         {
-                                            InMemoryDatabase.Accounts[InMemoryDatabase.Accounts.IndexOf(account)].Status = false;
+                                            InMemoryDatabase.Accounts[InMemoryDatabase.Accounts.IndexOf(account)].AccountStatus = false;
                                             results.Add(_messageBank.ErrorMessages["tooManyFails"]);
                                             return results;
                                         }
@@ -129,11 +129,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredRole)
+        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredAuthLevel)
         {
             try
             {
-                IAccount account = new Account(rolePrincipal.RoleIdentity.Name, rolePrincipal.RoleIdentity.Role);
+                IAccount account = new Account(rolePrincipal.RoleIdentity.Name, rolePrincipal.RoleIdentity.AuthorizationLevel);
                 // Find account in db
                 int index = InMemoryDatabase.Accounts.IndexOf(account);
                 if (index != -1)
@@ -143,9 +143,16 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     if (dbAccount.Confirmed != false)
                     {
                         // check if enabled
-                        if (dbAccount.Status != false)
+                        if (dbAccount.AccountStatus != false)
                         {
-                            return _messageBank.SuccessMessages["generic"];
+                            if(dbAccount.AuthorizationLevel.Equals("admin") || dbAccount.AuthorizationLevel.Equals(requiredAuthLevel))
+                            {
+                                return _messageBank.SuccessMessages["generic"];
+                            }
+                            else
+                            {
+                                return _messageBank.ErrorMessages["notAuthorized"];
+                            }
                         }
                         else
                         {
@@ -177,7 +184,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             if(index >= 0)
             {
                 IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)];
-                IAccount account = new Account(dbOTPClaim.Username, dbOTPClaim.Role);
+                IAccount account = new Account(dbOTPClaim.Username, dbOTPClaim.AuthorizationLevel);
                 if (!(otpClaim.TimeCreated >= dbOTPClaim.TimeCreated.AddDays(1)))
                 {
                     otpClaim.FailCount = dbOTPClaim.FailCount;
@@ -193,7 +200,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             throw new NotImplementedException();
         }
 
-        public string DeleteAccount(IRolePrincipal role)
+        public string DeleteAccount(IRolePrincipal authorizationLevel)
         {
             throw new NotImplementedException();
         }
