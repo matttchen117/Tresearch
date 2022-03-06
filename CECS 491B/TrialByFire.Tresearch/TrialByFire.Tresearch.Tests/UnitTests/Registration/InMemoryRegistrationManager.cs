@@ -41,18 +41,18 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
 
         [Theory]
         [InlineData("28HoursAgo@gmail.com", -1)]
-        [InlineData("12HoursAgo@gmail.com", 0)]
+        [InlineData("no@gmail.com", 0)]
         [InlineData("2DaysAgo@gmail.com", -2)]
         public void CheckConfirmationLinkValidity(string username, int daySubtraction)
         {
             //Act
-            DateTime time = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day + daySubtraction, DateTime.Now.Hour, DateTime.Now.Minute-2, 0);
+            DateTime time = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day + daySubtraction, DateTime.Now.Hour, DateTime.Now.Minute, 0);
             IConfirmationLink link = new ConfirmationLink(username, Guid.NewGuid(), time);
             _sqlDAO.CreateConfirmationLink(link);
             bool expected;
 
             int hours = (-daySubtraction * 24);
-            if (hours > 24)
+            if (hours >= 24)
                 expected = false;
             else
                 expected = true;

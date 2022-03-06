@@ -147,7 +147,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         public bool IsConfirmationLinkValid(IConfirmationLink confirmationLink)
         {
             DateTime now = DateTime.Now;
-            if (confirmationLink.Datetime > now.AddHours(-linkActivationLimit) && confirmationLink.Datetime <= now)
+            DateTime yesterday = now.AddDays(-1);
+            if (confirmationLink.Datetime <= now && confirmationLink.Datetime >= yesterday)
                 return true;
             else
                 return false;
