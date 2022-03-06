@@ -1,8 +1,9 @@
 ﻿using System;
+using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Models.Implementations
 {
-    public class DailyRegistration
+    public class DailyRegistration : IDailyRegistration
     {
         public DateTime registrationDate { get; set; }
 
