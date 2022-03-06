@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "OXHYkcmJPaFAOUX4BwJVtAhMDBrfYSCz7wJb9tWng9aOtS0CxSati4/u255s5c03kalK7k1uoVI7/MQI7Fm1RA==",
+  "dgSpecHash": "JedOKfTAQNf6FR2JMk005cYVv7hKiZUwFv1USwbJ4r4u/3HUggDvqCxKWJEWQstR9j2WFadjAiBWq43ta12Aww==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\TrialByFire.Tresearch.Exceptions.csproj",
+  "projectFilePath": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\TrialByFire.Tresearch.Exceptions.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\microsoft.win32.systemevents\\6.0.0\\microsoft.win32.systemevents.6.0.0.nupkg.sha512",
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\system.configuration.configurationmanager\\6.0.0\\system.configuration.configurationmanager.6.0.0.nupkg.sha512",

@@ -51,6 +51,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
             AuthorizationLevel = authorizationLevel;
         }
 
+        public Account()
+        {
+        }
+
         public override bool Equals(object? obj)
         {
             if(!(obj == null))

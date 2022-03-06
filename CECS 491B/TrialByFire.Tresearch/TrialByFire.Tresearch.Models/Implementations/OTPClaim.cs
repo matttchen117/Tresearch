@@ -21,19 +21,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public int FailCount { get; set; }
 
-        public OTPClaim(string username, string otp, string authorizationLevel, DateTime timeCreated)
-        {
-            if ((username ?? otp) == null)
-            {
-                throw new OTPClaimCreationFailedException("Data: OTP Claim creation failed. Null argument passed in for" +
-                    "username or otp.");
-            }
-            Username = username;
-            AuthorizationLevel = authorizationLevel;
-            OTP = otp;
-            TimeCreated = timeCreated;
-            FailCount = 0;
-        }
         public OTPClaim(string username, string otp, string authorizationLevel, DateTime timeCreated, int failCount)
         {
             if ((username ?? otp) == null)
@@ -48,6 +35,20 @@ namespace TrialByFire.Tresearch.Models.Implementations
             FailCount = failCount;
         }
 
+        public OTPClaim(string username, string otp, string authorizationLevel, DateTime timeCreated)
+        {
+            if ((username ?? otp) == null)
+            {
+                throw new OTPClaimCreationFailedException("Data: OTP Claim creation failed. Null argument passed in for" +
+                    "username or otp.");
+            }
+            Username = username;
+            AuthorizationLevel = authorizationLevel;
+            OTP = otp;
+            TimeCreated = timeCreated;
+            FailCount = 0;
+        }
+
         public OTPClaim(IAccount account)
         {
             Username = account.Username;
@@ -57,6 +58,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             FailCount = 0;
         }
 
+        public OTPClaim() { }
         public string GenerateRandomOTP()
         {
             string validCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";

@@ -6736,11 +6736,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\Tresearch.DAL.Tests\\TrialByFire.DAL.Tests.csproj",
+      "projectUniqueName": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\Tresearch.DAL.Tests\\TrialByFire.DAL.Tests.csproj",
       "projectName": "TrialByFire.DAL.Tests",
-      "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\Tresearch.DAL.Tests\\TrialByFire.DAL.Tests.csproj",
+      "projectPath": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\Tresearch.DAL.Tests\\TrialByFire.DAL.Tests.csproj",
       "packagesPath": "C:\\Users\\Matthew Chen\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\Tresearch.DAL.Tests\\obj\\",
+      "outputPath": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\Tresearch.DAL.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Matthew Chen\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -6757,11 +6757,11 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
-              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
+            "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
             },
-            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj": {
-              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj"
+            "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DomainModels\\TrialByFire.Tresearch.DomainModels.csproj"
             }
           }
         }
