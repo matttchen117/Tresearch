@@ -40,18 +40,18 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
 
 
         [Theory]
-        [InlineData("28HoursAgo@gmail.com", -1, -4)]
-        [InlineData("12HoursAgo@gmail.com", 0, -12)]
-        [InlineData("2DaysAgo@gmail.com", -2, 0)]
-        public void CheckConfirmationLinkValidity(string username, int daySubtraction, int hourSubtraction)
+        [InlineData("28HoursAgo@gmail.com", -1)]
+        [InlineData("12HoursAgo@gmail.com", 0)]
+        [InlineData("2DaysAgo@gmail.com", -2)]
+        public void CheckConfirmationLinkValidity(string username, int daySubtraction)
         {
             //Act
-            DateTime time = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day + daySubtraction, DateTime.Now.Hour + hourSubtraction, DateTime.Now.Minute, 0);
+            DateTime time = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day + daySubtraction, DateTime.Now.Hour, DateTime.Now.Minute-2, 0);
             IConfirmationLink link = new ConfirmationLink(username, Guid.NewGuid(), time);
             _sqlDAO.CreateConfirmationLink(link);
             bool expected;
 
-            int hours = (-daySubtraction * 24) + (-hourSubtraction);
+            int hours = (-daySubtraction * 24);
             if (hours > 24)
                 expected = false;
             else
@@ -104,7 +104,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
 
             _sqlDAO.CreateConfirmationLink(_confirmationLink);
 
-            string link = baseUrl + _confirmationLink.uniqueIdentifier;
+            string link = baseUrl + _confirmationLink.UniqueIdentifier;
 
             List<string> results = new List<string>();
 

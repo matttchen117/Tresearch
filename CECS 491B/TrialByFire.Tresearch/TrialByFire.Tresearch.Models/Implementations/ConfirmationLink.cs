@@ -4,11 +4,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class ConfirmationLink : IConfirmationLink
     {
-        public string username { get; set; }
+        public string Username { get; set; }
 
-        public Guid uniqueIdentifier { get; set; }
+        public Guid UniqueIdentifier { get; set; }
 
-        public DateTime timestamp { get; set; }
+        public DateTime Datetime { get; set; }
 
         public ConfirmationLink()
         {
@@ -16,9 +16,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
         }
         public ConfirmationLink(string username, Guid uniqueIdentifier, DateTime timestamp)
         {
-            this.username = username;
-            this.uniqueIdentifier = uniqueIdentifier;
-            this.timestamp = timestamp;
+            this.Username = username;
+            this.UniqueIdentifier = uniqueIdentifier;
+            this.Datetime = timestamp;
         }
     }
 }

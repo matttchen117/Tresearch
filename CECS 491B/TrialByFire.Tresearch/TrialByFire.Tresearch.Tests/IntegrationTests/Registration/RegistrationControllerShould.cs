@@ -25,7 +25,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public void RegisterTheUser(string _username, string passphrase)
         {
             // Arrange
-            IMessageBank _messageBank = new MessageBank;
+            IMessageBank _messageBank = new MessageBank();
             ISqlDAO _sqlDAO = new SqlDAO(_messageBank);
             ILogService _logService = new SqlLogService(_sqlDAO);
             IRegistrationService _accountService = new RegistrationService(_sqlDAO, _logService);

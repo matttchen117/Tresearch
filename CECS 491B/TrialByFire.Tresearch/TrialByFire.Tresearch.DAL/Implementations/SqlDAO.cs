@@ -30,7 +30,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var insertQuery = "INSERT INTO dbo.confirmation_links (username, GUID, datetime) VALUES (@username, @uniqueIdentifier, @timestamp)";
+                    var insertQuery = "INSERT INTO dbo.confirmation_links (username, GUID, datetime) VALUES (@Username, @UniqueIdentifier, @Datetime)";
                     int affectedRows = connection.Execute(insertQuery, _confirmationlink);
 
                     if (affectedRows == 1)
@@ -61,11 +61,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
 
                     var readQuery = "SELECT username FROM dbo.confirmation_links WHERE GUID = @guid";
-                    _confirmationLink.username = connection.ExecuteScalar<string>(readQuery, new { guid = guidString });
+                    _confirmationLink.Username = connection.ExecuteScalar<string>(readQuery, new { guid = guidString });
                     readQuery = "SELECT GUID FROM dbo.confirmation_links WHERE GUID = @guid";
-                    _confirmationLink.uniqueIdentifier = connection.ExecuteScalar<Guid>(readQuery, new { guid = guidString });
+                    _confirmationLink.UniqueIdentifier = connection.ExecuteScalar<Guid>(readQuery, new { guid = guidString });
                     readQuery = "SELECT datetime FROM dbo.confirmation_links WHERE GUID = @guid";
-                    _confirmationLink.timestamp = connection.ExecuteScalar<DateTime>(readQuery, new { guid = guidString });
+                    _confirmationLink.Datetime = connection.ExecuteScalar<DateTime>(readQuery, new { guid = guidString });
                 }
             }
             catch (Exception ex)
@@ -86,7 +86,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var updateQuery = "UPDATE dbo.user_accounts SET confirmation = 1 WHERE email = @email and username = @username";
+                    var updateQuery = "UPDATE dbo.user_accounts SET confirmation = 1 WHERE email = @Email and username = @Username";
                     affectedRows = connection.Execute(updateQuery, account);
 
                 }
@@ -195,7 +195,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
                     var deleteQuery = "DELETE FROM dbo.confirmation_links WHERE GUID = @guid";
-                    affectedRows = connection.Execute(deleteQuery, new { guid = confirmationLink.uniqueIdentifier });
+                    affectedRows = connection.Execute(deleteQuery, new { guid = confirmationLink.UniqueIdentifier });
                 }
                 if (affectedRows == 1)
                     results.Add("Success - Confirmation Link removed from database");

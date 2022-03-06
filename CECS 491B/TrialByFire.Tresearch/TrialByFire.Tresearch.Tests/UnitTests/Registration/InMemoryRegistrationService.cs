@@ -79,7 +79,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             IConfirmationLink _expected = new ConfirmationLink(username, Guid.NewGuid(), DateTime.Now);
             _sqlDAO.CreateConfirmationLink(_expected);
 
-            string linkUrl = linkUrl = $"{url}/Account/Verify?t={_expected.uniqueIdentifier}";
+            string linkUrl = linkUrl = $"{url}/Account/Verify?t={_expected.UniqueIdentifier}";
 
             //Act
             IConfirmationLink _confirmationLink = _registrationService.GetConfirmationLink(linkUrl);

@@ -326,7 +326,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             string guidString = url.Substring(url.LastIndexOf('=')+1);
             Guid guid = new Guid(guidString);
             for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count(); i++)
-                if (guid.Equals(InMemoryDatabase.ConfirmationLinks[i].uniqueIdentifier))
+                if (guid.Equals(InMemoryDatabase.ConfirmationLinks[i].UniqueIdentifier))
                     return InMemoryDatabase.ConfirmationLinks[i];
             return null;
         }
