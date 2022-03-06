@@ -9,6 +9,12 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public int nodeCreationCount { get; set; }
 
+        public NodesCreated()
+        {
+            nodeCreationDate = DateTime.Now;
+            nodeCreationCount = 0;
+        }
+
         public NodesCreated(DateTime nodeCreationDate, int nodeCreationCount)
         {
             this.nodeCreationDate = nodeCreationDate;

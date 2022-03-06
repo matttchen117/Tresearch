@@ -9,6 +9,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public int registrationCount { get; set; }
 
+        public DailyRegistration()
+        {
+            registrationDate = DateTime.Now;
+            registrationCount = 0;
+        }
         public DailyRegistration(DateTime registrationDate, int registrationCount)
         {
             this.registrationDate = registrationDate;

@@ -9,6 +9,12 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public int loginCount { get; set; }
 
+        public DailyLogin()
+        {
+            loginDate = DateTime.Now;
+            loginCount = 0;
+        }
+
         public DailyLogin(DateTime loginDate, int loginCount)
         {
             this.loginDate = loginDate;

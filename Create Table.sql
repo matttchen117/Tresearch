@@ -1,12 +1,14 @@
 --CREATE TABLE user_profiles();
 
 CREATE TABLE user_accounts(
-	username VARCHAR(25) PRIMARY KEY,
+	username VARCHAR(25),
 	email VARCHAR(40),
 	passphrase VARCHAR(40),
 	authorization_level VARCHAR,
 	account_status BIT,
-	confirmation BIT
+	confirmation BIT,
+
+	CONSTRAINT user_account_pk PRIMARY KEY(username, authorization_level)
 );
 
 CREATE TABLE otp_claims(
@@ -22,7 +24,6 @@ CREATE TABLE nodes(
 	node_title VARCHAR(50),
 	summary VARCHAR(300),
 	mode VARCHAR,
-	rating INT,
 
 	account_own VARCHAR(25) FOREIGN KEY REFERENCES user_accounts(username)
 );

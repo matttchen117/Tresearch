@@ -21,6 +21,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public IList<IDailyLogin> DailyLogins { get; set; }
         public IList<ITopSearch> TopSearches { get; set; }
         public IList<INodesCreated> NodesCreated { get; set; }
+
+        public IList<IDailyRegistration> DailyRegistrations { get; set; }
+
         public IList<IConfirmationLink> ConfirmationLinks { get; set; }
 
         public InMemoryDatabase()
@@ -30,12 +33,17 @@ namespace TrialByFire.Tresearch.Models.Implementations
             Nodes = InitializeNodes();
             Tags = InitializeTags();
             NodeTags = InitializeNodeTags();
-            Ratings = InitializeRatings();
+            Ratings = InitializeUserRatings();
             DailyLogins = InitializeDailyLogins();
             TopSearches = InitializeTopSearches();
             NodesCreated = InitializeNodesCreated();
+            DailyRegistrations = InitializeDailyRegistrations();
             ConfirmationLinks = InitializeConfirmationLinks();
         }
+
+        /*
+            In memory database initialization methods
+         */
 
         private List<IOTPClaim> InitializeOTPClaims()
         {
@@ -64,25 +72,61 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<INode> InitializeNodes()
         {
             List<INode> nodes = new List<INode>();
+            nodes.Add(new Node(100000, 100001, "Title 1", "Summary 1", "Private", "larry@gmail.com"));
+            nodes.Add(new Node(100001, 100002, "Title 2", "Summary 2", "Private", "larry@gmail.com"));
+            nodes.Add(new Node(100002, 100003, "Title 3", "Summary 3", "Private", "larry@gmail.com"));
+            nodes.Add(new Node(100003, 100004, "Title 4", "Summary 4", "Public", "larry@gmail.com"));
+            nodes.Add(new Node(100004, 100004, "Title 5", "Summary 5", "Public", "larry@gmail.com"));
+
+            nodes.Add(new Node(200000, 200001, "Title 1", "Summary 1", "Private", "billy@yahoo.com"));
+            nodes.Add(new Node(200001, 200002, "Title 2", "Summary 2", "Private", "billy@yahoo.com"));
+            nodes.Add(new Node(200002, 200003, "Title 3", "Summary 3", "Private", "billy@yahoo.com"));
+            nodes.Add(new Node(200003, 200004, "Title 4", "Summary 4", "Public", "billy@yahoo.com"));
+            nodes.Add(new Node(200004, 200004, "Title 5", "Summary 5", "Public", "billy@yahoo.com"));
+
             return nodes;
         }
 
         private List<ITag> InitializeTags()
         {
             List<ITag> tags = new List<ITag>();
+            tags.Add(new Tag("Easy"));
+            tags.Add(new Tag("Intermediate"));
+            tags.Add(new Tag("Hard"));
+
             return tags;
         }
 
         private List<INodeTag> InitializeNodeTags()
         {
             List<INodeTag> nodeTags = new List<INodeTag>();
+            nodeTags.Add(new NodeTag(100000, "Easy"));
+            nodeTags.Add(new NodeTag(100001, "Intermediate"));
+            nodeTags.Add(new NodeTag(100002, "Hard"));
+            nodeTags.Add(new NodeTag(100003, "Easy"));
+            nodeTags.Add(new NodeTag(100004, "Intermediate"));
+            nodeTags.Add(new NodeTag(200000, "Easy"));
+            nodeTags.Add(new NodeTag(200001, "Intermediate"));
+            nodeTags.Add(new NodeTag(200002, "Hard"));
+            nodeTags.Add(new NodeTag(200003, "Intermediate"));
+            nodeTags.Add(new NodeTag(200004, "Easy"));
             return nodeTags;
         }
 
-        private List<IRating> InitializeRatings()
+        private List<IRating> InitializeUserRatings()
         {
-            List<IRating> ratings = new List<IRating>();
-            return ratings;
+            List<IRating> userRatings = new List<IRating>();
+            userRatings.Add(new Rating("larry@gmail.com", 200000, 4));
+            userRatings.Add(new Rating("larry@gmail.com", 200001, 5));
+            userRatings.Add(new Rating("larry@gmail.com", 200002, 5));
+            userRatings.Add(new Rating("larry@gmail.com", 200003, 5));
+
+            userRatings.Add(new Rating("billy@gmail.com", 100000, 4));
+            userRatings.Add(new Rating("billy@gmail.com", 100001, 5));
+            userRatings.Add(new Rating("billy@gmail.com", 100002, 5));
+            userRatings.Add(new Rating("billy@gmail.com", 100003, 5));
+
+            return userRatings;
         }
 
         private List<IDailyLogin> InitializeDailyLogins()
@@ -101,6 +145,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
         {
             List<INodesCreated> nodesCreated = new List<INodesCreated>();
             return nodesCreated;
+        }
+
+        private List<IDailyRegistration> InitializeDailyRegistrations()
+        {
+            return new List<IDailyRegistration>();
         }
 
         private List<IConfirmationLink> InitializeConfirmationLinks()
