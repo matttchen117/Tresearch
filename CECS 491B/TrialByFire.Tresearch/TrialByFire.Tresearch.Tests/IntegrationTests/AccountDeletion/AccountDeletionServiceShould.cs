@@ -12,7 +12,7 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
 {
-    public class AccountDeletionControllerShould
+/*    public class AccountDeletionControllerShould
     {
         public void DeleteTheUser(IRolePrincipal principal)
         {
@@ -28,5 +28,5 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
             // Assert
             Assert.Equal(expected, result);
         }
-    }
+    }*/
 }
