@@ -119,8 +119,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
             Guid guid = Guid.NewGuid();
             DateTime now = DateTime.Now;
-            IAccount expected = new Account(email, passphrase);
-            IConfirmationLink link = new ConfirmationLink(expected.Username, guid, now);
+            IAccount expected = new Account(email, email, passphrase, "User", true, false);
+            IConfirmationLink link = new ConfirmationLink(email, guid, now);
 
             _sqlDAO.CreateAccount(expected);
             _sqlDAO.CreateConfirmationLink(link);

@@ -83,7 +83,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 else
                 {
                     error = true;
-                    results.Add("Failed - Registration Manager could not create account");
+                    results.Add("Failed - Registration Controller could not create account");
 
                 }
 
@@ -117,7 +117,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 else
                 {
                     error = true;
-                    results.Add("Failed - Registration Manager could not confirm account");
+                    results.Add("Failed - Registration Controller could not confirm account");
                 }
 
             }

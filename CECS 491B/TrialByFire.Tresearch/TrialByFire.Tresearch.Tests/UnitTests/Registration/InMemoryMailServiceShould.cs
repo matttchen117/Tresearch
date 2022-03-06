@@ -12,10 +12,11 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
 
         public IMessageBank _messageBank;
 
-        public InMemoryMailServiceShould(IMailService mailService, IMessageBank messageBank)
+        public InMemoryMailServiceShould()
         {
-            _mailService = mailService;
-            _messageBank = messageBank;
+            
+            _messageBank = new MessageBank();
+            _mailService = new MailService(_messageBank);
         }
 
         [Theory]

@@ -71,7 +71,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 IConfirmationLink _confirmationLink = _registrationService.GetConfirmationLink(url);
                 if (_confirmationLink == null)
                 {
-                    results.Add("Failed - Account Manager unable to create confirmation link object");
+                    results.Add("Failed - Registration Manager unable to create confirmation link object");
                     return results;
                 }
 

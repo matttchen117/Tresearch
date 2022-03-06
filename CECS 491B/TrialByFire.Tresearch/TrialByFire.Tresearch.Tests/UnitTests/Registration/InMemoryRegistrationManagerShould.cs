@@ -101,7 +101,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public void ConfirmAccount(string email, string passphrase, string baseUrl, string date)
         {
             IConfirmationLink _confirmationLink = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Parse(date));
+            IAccount _account = new Account(email, email, passphrase, "User", true, false);
 
+            _sqlDAO.CreateAccount(_account);
             _sqlDAO.CreateConfirmationLink(_confirmationLink);
 
             string link = baseUrl + _confirmationLink.UniqueIdentifier;
