@@ -4,7 +4,7 @@ CREATE TABLE user_accounts(
 	username VARCHAR(25),
 	email VARCHAR(40),
 	passphrase VARCHAR(40),
-	authorization_level VARCHAR,
+	authorization_level VARCHAR(40),
 	account_status BIT,
 	confirmation BIT,
 
