@@ -13,21 +13,15 @@ namespace TrialByFire.Tresearch.Models.Implementations
     {
         public string Username { get; }
 
+        public string Role { get; }
+
         public string OTP { get; }
 
         public DateTime TimeCreated { get; }
 
         public int FailCount { get; set; }
 
-        public OTPClaim(string username, string otp, DateTime timeCreated)
-        {
-            Username = username;
-            OTP = otp;
-            TimeCreated = timeCreated;
-            FailCount = 0;
-        }
-
-        public OTPClaim(string username, string otp, DateTime timeCreated, int failCount)
+        public OTPClaim(string username, string otp, string role, DateTime timeCreated)
         {
             if ((username ?? otp) == null)
             {
@@ -35,6 +29,20 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     "username or otp.");
             }
             Username = username;
+            Role = role;
+            OTP = otp;
+            TimeCreated = timeCreated;
+            FailCount = 0;
+        }
+        public OTPClaim(string username, string otp, string role, DateTime timeCreated, int failCount)
+        {
+            if ((username ?? otp) == null)
+            {
+                throw new OTPClaimCreationFailedException("Data: OTP Claim creation failed. Null argument passed in for" +
+                    "username or otp.");
+            }
+            Username = username;
+            Role = role;
             OTP = otp;
             TimeCreated = timeCreated;
             FailCount = failCount;
@@ -43,6 +51,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public OTPClaim(IAccount account)
         {
             Username = account.Username;
+            Role = account.AuthorizationLevel;
             OTP = GenerateRandomOTP();
             TimeCreated = DateTime.Now;
             FailCount = 0;
@@ -67,8 +76,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
             {
                 if (obj is IOTPClaim)
                 {
-                    IOTPClaim account = (IOTPClaim)obj;
-                    return Username.Equals(account.Username);
+                    IOTPClaim otpClaim = (IOTPClaim)obj;
+                    return Username.Equals(otpClaim.Username) && Role.Equals(otpClaim.Role);
                 }
             }
             return false;

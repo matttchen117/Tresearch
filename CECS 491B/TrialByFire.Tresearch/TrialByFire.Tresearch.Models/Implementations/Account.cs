@@ -39,14 +39,16 @@ namespace TrialByFire.Tresearch.Models.Implementations
             Status = status;
             Confirmed = confirmed;
         }
-        public Account(string username, string passphrase)
+        public Account(string username, string passphrase, string authorizationLevel)
         {
             Username = username;
             Passphrase = passphrase;
+            AuthorizationLevel = authorizationLevel;
         }
-        public Account(string username)
+        public Account(string username, string authorizationLevel)
         {
             Username = username;
+            AuthorizationLevel = authorizationLevel;
         }
 
         public override bool Equals(object? obj)
@@ -56,7 +58,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 if(obj is IAccount)
                 {
                     IAccount account = (IAccount)obj;
-                    return Username.Equals(account.Username) || Email.Equals(account.Email);
+                    return (Username.Equals(account.Username) || Email.Equals(account.Email)) && 
+                        AuthorizationLevel.Equals(account.AuthorizationLevel);
                 }
             }
             return false;

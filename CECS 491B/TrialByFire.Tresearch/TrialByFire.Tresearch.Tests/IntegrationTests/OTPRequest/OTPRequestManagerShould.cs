@@ -20,7 +20,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
         public OTPRequestManagerShould() : base()
         {
         }
-        public void RequestTheOTP(string username, string passphrase)
+        public void RequestTheOTP(string username, string passphrase, string role)
         {
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(true, "Bob", "User");
@@ -31,7 +31,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
             string expected = "success";
 
             // Act
-            string result = otpRequestManager.RequestOTP(username, passphrase);
+            string result = otpRequestManager.RequestOTP(username, passphrase, role);
 
             // Assert
             Assert.Equal(expected, result);

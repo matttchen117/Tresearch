@@ -9,6 +9,8 @@ namespace TrialByFire.Tresearch.Models.Contracts
     public interface IOTPClaim
     {
         string Username { get; }
+
+        string Role { get; }
         string OTP { get; }
         DateTime TimeCreated { get; }
 

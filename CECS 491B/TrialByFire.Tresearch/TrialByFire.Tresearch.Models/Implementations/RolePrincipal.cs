@@ -14,6 +14,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public IIdentity Identity { get { return _roleIdentity; } }
 
+        public IRoleIdentity RoleIdentity { get { return _roleIdentity; } }
+
         public RolePrincipal(IRoleIdentity roleIdentity)
         {
             _roleIdentity = roleIdentity;

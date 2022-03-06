@@ -18,9 +18,9 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _otpRequestManager = otpRequestManager;
         }
 
-        public string RequestOTP(string username, string passphrase)
+        public string RequestOTP(string username, string passphrase, string role)
         {
-            return _otpRequestManager.RequestOTP(username, passphrase);
+            return _otpRequestManager.RequestOTP(username, passphrase, role);
         }
     }
 }
