@@ -171,6 +171,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return _messageBank.ErrorMessages["notFoundOrEnabled"];
         }
 
+
+        public string DeleteAccount(IRolePrincipal principal)
+        {
+            throw new NotImplementedException();
+            
+        }
+
         public bool CreateAccount(IAccount account)
         {
             throw new NotImplementedException();
@@ -190,5 +197,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             throw new NotImplementedException();
         }
+
+
     }
 }

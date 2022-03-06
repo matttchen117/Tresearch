@@ -138,6 +138,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
 
+        /// <summary>
+        /// need to fix up so that query looks for role too
+        /// </summary>
+        /// <param name="rolePrincipal"></param>
+        /// <returns></returns>
         public string DeleteAccount(IRolePrincipal rolePrincipal)
         {
             int affectedRows;
@@ -145,7 +150,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(SqlConnectionString))
                 {
-                    var readQuery = "SELECT * FROM user_accounts WHERE username = @username";
+                    var readQuery = "SELECT * FROM user_accounts WHERE username = @username AND role = @role";
                     var account = connection.ExecuteScalar<int>(readQuery, rolePrincipal.Identity.Name);
                     if (account == 0)
                     {
@@ -163,9 +168,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         "END";
 
                     affectedRows = connection.Execute(storedProcedure, rolePrincipal.Identity.Name);
-
-
+                    //primary key of account is of role, and 
+                    //everything should have the account role, if theres both a default vs admin account,
+                    //primary key of everything else will include role, not only username
+                    //instead of searching username = username ANd role = @role
+                    //check identity again cuz ideneity has role as param
                 }
+
                 if (affectedRows >= 1)
                 {
                     return "success";
