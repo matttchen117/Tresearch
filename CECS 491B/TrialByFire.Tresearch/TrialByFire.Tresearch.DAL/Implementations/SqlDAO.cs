@@ -478,7 +478,7 @@ Values (@node_creation_date, @node_creation_count)";
 
 
 
-        public string CreateDailyLogins(IDailyLogin dailyLogin)
+        public string CreateDailyLogin(IDailyLogin dailyLogin)
         {
             int affectedRows;
             try
