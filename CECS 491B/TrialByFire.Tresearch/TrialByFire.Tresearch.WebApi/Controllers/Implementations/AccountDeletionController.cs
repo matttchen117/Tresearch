@@ -26,9 +26,9 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             
         }
         
-        public string DeleteAccount(IRolePrincipal principal)
+        public string DeleteAccount(IRolePrincipal rolePrincipal)
         {
-            string result = AccountDeletionManager.DeleteAccount(principal);
+            string result = AccountDeletionManager.DeleteAccount(rolePrincipal);
             if (result.Equals("success"))
             {
                 //LogService.CreateLog(DateTime.Now, "Server", principal.Identity.Name, "Account Deletion Successful");

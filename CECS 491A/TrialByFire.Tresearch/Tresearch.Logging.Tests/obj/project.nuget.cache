@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Uk1d7YiftKhogalb/MogPxkIzgXR3Z2152pibWQL8m34sMSni2fkFqzsq/5EawBuKegA4QeiAUF4xLTT4Nf+lw==",
+  "dgSpecHash": "XrhIDFIOCuJiSPlN0XkW13t2NT81Jz2ihtFgUpq6PkUqjGHdVsg/wFtStxTLCJ2gV0MxpopWS7msXx+w8AIrUA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\Tresearch.Logging.Tests\\TrialByFire.Logging.Tests.csproj",
+  "projectFilePath": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\Tresearch.Logging.Tests\\TrialByFire.Logging.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\coverlet.collector\\3.1.0\\coverlet.collector.3.1.0.nupkg.sha512",
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",

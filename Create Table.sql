@@ -10,12 +10,13 @@ CREATE TABLE Accounts(
 );
 
 CREATE TABLE OTPClaims(
-	Username VARCHAR(25) FOREIGN KEY REFERENCES Accounts(Username),
+	Username VARCHAR(25),
 	OTP VARCHAR(100),
-	AuthorizationLevel VARCHAR(40) FOREIGN KEY REFERENCES Accounts(AuthorizationLevel),
+	AuthorizationLevel VARCHAR(40),
 	TimeCreated DATETIME,
 	FailCount INT,
 
+	CONSTRAINT otp_claims_fk_01 FOREIGN KEY (Username, AuthorizationLevel) REFERENCES Accounts(Username, AuthorizationLevel),
 	CONSTRAINT otp_claims_pk PRIMARY KEY(Username, AuthorizationLevel)
 );
 

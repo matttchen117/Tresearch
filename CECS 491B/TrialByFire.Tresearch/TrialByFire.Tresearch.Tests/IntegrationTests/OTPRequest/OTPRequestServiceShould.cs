@@ -5,7 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
+using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
+using TrialByFire.Tresearch.Services.Implementations;
 using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
@@ -32,11 +35,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
             "has been disabled.")]
         [InlineData("harry@yahoo.com", "abcDEF123", "user", "Database: Please confirm your " +
             "account before attempting to login.")]
-        public void RequestTheOTP(string username, string passphrase, string role, string expected)
+        public void RequestTheOTP(string username, string passphrase, string authorizationLevel, string expected)
         {
             // Arrange
             IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService, messageBank);
-            IAccount account = new Account(username, passphrase, role);
+            IAccount account = new Account(username, passphrase, authorizationLevel);
             IOTPClaim otpClaim = new OTPClaim(account);
 
             // Act

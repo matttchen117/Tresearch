@@ -1906,9 +1906,11 @@
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
           "Dapper": "2.0.123",
+          "Microsoft.NET.Test.Sdk": "17.1.0",
           "System.Data.SqlClient": "4.8.3",
           "TrialByFire.Tresearch.Exceptions": "1.0.0",
-          "TrialByFire.Tresearch.Models": "1.0.0"
+          "TrialByFire.Tresearch.Models": "1.0.0",
+          "xunit": "2.4.1"
         },
         "compile": {
           "bin/placeholder/TrialByFire.Tresearch.DAL.dll": {}
@@ -6970,5 +6972,13 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }

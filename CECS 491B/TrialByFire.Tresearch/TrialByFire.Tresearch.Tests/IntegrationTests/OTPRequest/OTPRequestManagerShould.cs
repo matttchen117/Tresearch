@@ -37,7 +37,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
             "has been disabled.")]
         [InlineData("harry@yahoo.com", "abcDEF123", "user", "guest", "guest", "Database: Please confirm your " +
             "account before attempting to login.")]
-        public void RequestTheOTP(string username, string passphrase, string role, string currentIdentity, string currentRole, string expected)
+        public void RequestTheOTP(string username, string passphrase, string authorizationLevel, string currentIdentity, string currentRole, string expected)
         {
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
@@ -48,7 +48,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
                 authenticationService, rolePrincipal, otpRequestService, messageBank, mailService);
 
             // Act
-            string result = otpRequestManager.RequestOTP(username, passphrase, role);
+            string result = otpRequestManager.RequestOTP(username, passphrase, authorizationLevel);
 
             // Assert
             Assert.Equal(expected, result);

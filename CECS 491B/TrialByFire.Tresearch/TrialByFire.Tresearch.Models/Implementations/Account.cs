@@ -17,26 +17,26 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public string? AuthorizationLevel { get; set; }
 
-        public bool? Status { get; set; }
+        public bool? AccountStatus { get; set; }
 
         public bool? Confirmed { get; set; }
 
-        public Account(string email, string username, string passphrase, string authorizationLevel, bool status, bool confirmed)
+        public Account(string email, string username, string passphrase, string authorizationLevel, bool accountStatus, bool confirmed)
         {
             Email = email;
             Username = username;
             Passphrase = passphrase;
             AuthorizationLevel = authorizationLevel;
-            Status = status;
+            AccountStatus = accountStatus;
             Confirmed = confirmed;
         }     
         
-        public Account(string email, string passphrase, string authorizationLevel, bool status, bool confirmed)
+        public Account(string email, string passphrase, string authorizationLevel, bool accountStatus, bool confirmed)
         {
             Email = email;
             Passphrase = passphrase;
             AuthorizationLevel = authorizationLevel;
-            Status = status;
+            AccountStatus = accountStatus;
             Confirmed = confirmed;
         }
         public Account(string username, string passphrase, string authorizationLevel)
@@ -49,6 +49,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
         {
             Username = username;
             AuthorizationLevel = authorizationLevel;
+        }
+
+        public Account()
+        {
         }
 
         public override bool Equals(object? obj)

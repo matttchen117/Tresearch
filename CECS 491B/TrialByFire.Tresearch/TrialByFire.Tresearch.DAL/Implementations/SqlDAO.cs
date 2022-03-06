@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Exceptions;
 using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
@@ -22,72 +23,84 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = messageBank;
         }
 
-        public bool CreateConfirmationLink(IConfirmationLink confirmationlink)
+        public List<string> CreateConfirmationLink(IConfirmationLink _confirmationlink)
         {
+            List<string> result = new List<string>();
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var insertQuery = "INSERT INTO confirmation_links (Username, Guid, Timestamp) VALUES (@Username, @Guid, @Timestamp)";
-                    int affectedRows = connection.Execute(insertQuery, confirmationlink);
+                    var insertQuery = "INSERT INTO dbo.confirmation_links (username, GUID, datetime) VALUES (@Username, @UniqueIdentifier, @Datetime)";
+                    int affectedRows = connection.Execute(insertQuery, _confirmationlink);
 
                     if (affectedRows == 1)
-                        return true;
+                        result.Add("Success - Confirmation Link added to database");
                     else
-                        return false;
+                        result.Add("Failed - Email already has confirmation link");
                 }
-            }  catch
+            }
+            catch
             {
-                return false;
-            }  
+                result.Add("Failed - Unable to add confirmation link to database");
+            }
+            return result;
         }
 
         public IConfirmationLink GetConfirmationLink(string url)
         {
-            string guidString = url.Substring(url.LastIndexOf('/')+1);
-            Guid guid = new Guid(url);
-            IConfirmationLink _confirmationLink;
+
+            string guidString = url.Substring(url.LastIndexOf('=')+1);
+            //Guid guid = new Guid(guidString);
+
+
+            IConfirmationLink _confirmationLink = new ConfirmationLink();
 
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var readQuery = "SELECT * FROM confirmation_links WHERE GUID = @guid";
-                    _confirmationLink = connection.QuerySingle<IConfirmationLink>(readQuery, new { Guid = guid });
 
+                    var readQuery = "SELECT username FROM dbo.confirmation_links WHERE GUID = @guid";
+                    _confirmationLink.Username = connection.ExecuteScalar<string>(readQuery, new { guid = guidString });
+                    readQuery = "SELECT GUID FROM dbo.confirmation_links WHERE GUID = @guid";
+                    _confirmationLink.UniqueIdentifier = connection.ExecuteScalar<Guid>(readQuery, new { guid = guidString });
+                    readQuery = "SELECT datetime FROM dbo.confirmation_links WHERE GUID = @guid";
+                    _confirmationLink.Datetime = connection.ExecuteScalar<DateTime>(readQuery, new { guid = guidString });
                 }
-            } catch
+            }
+            catch (Exception ex)
             {
-                return null;
+                Console.WriteLine(ex);
+                return _confirmationLink;
             }
 
             return _confirmationLink;
         }
 
-        public bool ConfirmAccount(IAccount account)
+
+        public List<string> ConfirmAccount(IAccount account)
         {
+            List<string> results = new List<string>();
             int affectedRows;
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var updateQuery = "UPDATE confirmation_links SET confirmed = 1 WHERE Username = " +
-                        "@Username and Email = @Email";
-                    affectedRows = connection.Execute(updateQuery, new { Username = account.Username, 
-                        Email = account.Email });
+                    var updateQuery = "UPDATE dbo.user_accounts SET confirmation = 1 WHERE email = @Email and username = @Username";
+                    affectedRows = connection.Execute(updateQuery, account);
 
                 }
                 if (affectedRows == 1)
-                    return true;
+                    results.Add("Success - Account confirmed in database");
                 else
-                    return false;
+                    results.Add("Failed - Account doesn't exist in database");
             }
             catch
             {
-                return false;
+                results.Add("Failed - SQLDAO  could not be confirm account in database");
             }
+            return results;
         }
-
         public bool DeleteConfirmationLink(IConfirmationLink confirmationLink)
         {
             int affectedRows;
@@ -113,74 +126,125 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public bool CreateAccount(IAccount account)
+        public List<string> CreateAccount(IAccount account)
         {
+            List<string> results = new List<string>();
             int affectedRows;
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var readQuery = "SELECT COUNT(*) FROM Accounts WHERE Email = @Email";
+                    var readQuery = "SELECT COUNT(*) FROM dbo.user_accounts WHERE email = @Email";
                     var accounts = connection.ExecuteScalar<int>(readQuery, new { Email = account.Email });
+
                     if (accounts > 0)
                     {
-                        account.Username = account.Username.Insert(account.Username.IndexOf('@'), accounts.ToString());
+                        results.Add("Failed - Account already exists in database");
+                        return results;
                     }
-                    var insertQuery = "INSERT INTO user_accounts (Email, Username, Passphrase, AuthorizationLevel, Status) " +
-                        "VALUES (@email, @username, @passphrase, @authorization_level, @Status)";
+                    var insertQuery = "INSERT INTO dbo.user_accounts (username, email, passphrase, authorization_level, account_status, confirmation) " +
+                        "VALUES (@username, @email, @passphrase, @authorizationLevel, @status, @confirmed)";
+
                     affectedRows = connection.Execute(insertQuery, account);
                 }
                 if (affectedRows == 1)
-                {
-                    return true;
-                }
+                    results.Add("Success - Account created in database");
                 else
+                    results.Add("Failed - Account not created in database");
+            }
+            catch (Exception ex)
+            {
+                results.Add("Failed - " + ex);
+            }
+            return results;
+        }
+
+        public IAccount GetUnconfirmedAccount(string email)
+        {
+            IAccount account = new Account();
+            try
+            {
+                using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    return false;
+                    var readQuery = "SELECT username FROM dbo.user_accounts WHERE email = @Email and authorization_level = 'User'";
+                    string username = connection.ExecuteScalar<string>(readQuery, new { Email = email });
+                    readQuery = "SELECT passphrase FROM dbo.user_accounts WHERE email = @Email and authorization_level = 'User'";
+                    string passphrase = connection.ExecuteScalar<string>(readQuery, new { Email = email });
+                    readQuery = "SELECT account_status FROM dbo.user_accounts WHERE email = @Email and authorization_level = 'User'";
+                    bool status = connection.ExecuteScalar<bool>(readQuery, new { Email = email });
+                    account = new Account(email, username, passphrase, "User", status, false);
+                    return account;
                 }
             }
             catch (Exception ex)
             {
-                return false;
+                Console.Write(ex);
+                return null;
             }
+
         }
 
+
+        public List<string> RemoveConfirmationLink(IConfirmationLink confirmationLink)
+        {
+            List<string> results = new List<string>();
+            int affectedRows;
+
+            try
+            {
+                using (var connection = new SqlConnection(_sqlConnectionString))
+                {
+                    var deleteQuery = "DELETE FROM dbo.confirmation_links WHERE GUID = @guid";
+                    affectedRows = connection.Execute(deleteQuery, new { guid = confirmationLink.UniqueIdentifier });
+                }
+                if (affectedRows == 1)
+                    results.Add("Success - Confirmation Link removed from database");
+                else
+                    results.Add("Failed - Confirmation link unable to be removed from database");
+            }
+            catch (Exception ex)
+            {
+                results.Add("Failed - Confirmation link not removed in database" + ex);
+            }
+            return results;
+        }
         public string DeleteAccount(IRolePrincipal rolePrincipal)
         {
+
             int affectedRows;
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var readQuery = "SELECT * FROM user_accounts WHERE username = @username";
-                    var account = connection.ExecuteScalar<int>(readQuery, rolePrincipal.Identity.Name);
+                    var readQuery = "SELECT * FROM Accounts WHERE Username = @username AND AuthorizationLevel = @role";
+                    var account = connection.ExecuteScalar<int>(readQuery, new { username = rolePrincipal.RoleIdentity.Name, role = rolePrincipal.RoleIdentity.AuthorizationLevel });
                     if (account == 0)
                     {
-                        //meaning that there wasn't an account to delete
-                        Console.WriteLine("There wasn't an account found with associated username.");
-                        //check for result to equal this
-                        return "No associated account was found.";
+                        return _messageBank.ErrorMessages["notFoundOrAuthorized"];
                     }
-                    var storedProcedure = "CREATE PROCEDURE dbo.deleteAccount @username varchar(25) AS BEGIN" +
-                        "DELETE FROM user_accounts WHERE username = @username;" +
-                        "DELETE FROM otp_claims WHERE username = @username;" +
-                        "DELETE FROM nodes WHERE account_own = @username;" +
-                        "DELETE FROM user_ratings WHERE username = @username;" +
-                        "DELETE FROM email_confirmation_links WHERE username = @username;" +
-                        "END";
+                    else
+                    {
+                        var storedProcedure = "CREATE PROCEDURE dbo.deleteAccount @username varchar(25) AS BEGIN" +
+                            "DELETE FROM Accounts WHERE Username = @username;" +
+                            "DELETE FROM OTPClaims WHERE Username = @username;" +
+                            "DELETE FROM Nodes WHERE account_own = @username;" +
+                            "DELETE FROM UserRatings WHERE Username = @username;" +
+                            "DELETE FROM EmailConfirmationLinks WHERE username = @username;" +
+                            "END";
 
-                    affectedRows = connection.Execute(storedProcedure, rolePrincipal.Identity.Name);
+                        affectedRows = connection.Execute(storedProcedure, rolePrincipal.RoleIdentity.Name);
+                    }
 
 
                 }
+
                 if (affectedRows >= 1)
                 {
-                    return "success";
+                    return _messageBank.SuccessMessages["generic"];
                 }
                 else
                 {
-                    Console.WriteLine("Couldn't delete account.");
-                    return "Error, could not delete account.";
+                    return _messageBank.ErrorMessages["notFoundOrAuthorized"];
                 }
             }
             catch (Exception ex)
@@ -196,33 +260,44 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    string query = "SELECT * FROM Accounts WHERE Username = @Username AND Role = @Role";
-                    IAccount dbAccount = connection.QueryFirst(query, new
+                    string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
+                    IAccount dbAccount = connection.QueryFirst<Account>(query, new
                     {
                         Username = account.Username,
-                        Role = account.AuthorizationLevel
+                        AuthorizationLevel = account.AuthorizationLevel
                     });
                     if (dbAccount == null)
                     {
                         return _messageBank.ErrorMessages["notFoundOrAuthorized"];
                     }
-                    else if (dbAccount.Status == false)
-                    {
-                        return _messageBank.ErrorMessages["notFoundOrEnabled"];
-                    }
                     else if (dbAccount.Confirmed == false)
                     {
                         return _messageBank.ErrorMessages["notConfirmed"];
                     }
+                    else if (dbAccount.AccountStatus == false)
+                    {
+                        return _messageBank.ErrorMessages["notFoundOrEnabled"];
+                    }
                     else
                     {
-                        return _messageBank.SuccessMessages["generic"];
+                        if (account.Passphrase.Equals(dbAccount.Passphrase))
+                        {
+                            return _messageBank.SuccessMessages["generic"];
+                        }
+                        else
+                        {
+                            return _messageBank.ErrorMessages["badNameOrPass"];
+                        }
                     }
                 }
             }
             catch (AccountCreationFailedException acfe)
             {
                 return acfe.Message;
+            }
+            catch(InvalidOperationException ioe)
+            {
+                return _messageBank.ErrorMessages["notFoundOrEnabled"];
             }
             catch (Exception ex)
             {
@@ -238,11 +313,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    string query = "SELECT * FROM OTPClaims WHERE Username = @Username AND Role = @Role";
-                    IOTPClaim dbOTPClaim = connection.QueryFirst(query, new 
+                    string query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
+                    IOTPClaim dbOTPClaim = connection.QueryFirst<OTPClaim>(query, new 
                     { 
                         Username = otpClaim.Username, 
-                        Role = otpClaim.Role 
+                        AuthorizationLevel = otpClaim.AuthorizationLevel 
                     });
                     if(dbOTPClaim == null)
                     {
@@ -254,12 +329,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         int failCount = dbOTPClaim.FailCount++;
                         if(failCount >= 5)
                         {
-                            query = "UPDATE * FROM Accounts SET Status = false WHERE " +
-                            "Username = @Username AND Role = @Role";
+                            query = "UPDATE Accounts SET AccountStatus = false WHERE " +
+                            "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                             affectedRows = connection.Execute(query, new
                             {
                                 Username = otpClaim.Username,
-                                Role = otpClaim.Role,
+                                AuthorizationLevel = otpClaim.AuthorizationLevel,
                             });
                             if (affectedRows != 1)
                             {
@@ -272,12 +347,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                                 return results;
                             }
                         }
-                        query = "UPDATE * FROM OTPClaims SET FailCount = @FailCount WHERE " +
-                        "Username = @Username AND Role = @Role";
+                        query = "UPDATE OTPClaims SET FailCount = @FailCount WHERE " +
+                        "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                         affectedRows = connection.Execute(query, new
                         {
                             Username = otpClaim.Username,
-                            Role = otpClaim.Role,
+                            AuthorizationLevel = otpClaim.AuthorizationLevel,
                             FailCount = dbOTPClaim.FailCount++
                         });
                         if (affectedRows != 1)
@@ -307,29 +382,34 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 results.Add(occfe.Message);
                 return results;
             }
+            catch (InvalidOperationException ioe)
+            {
+                results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
+                return results;
+            }
             catch (Exception ex)
             {
                 results.Add("Database: " + ex.Message);
                 return results;
             }
         }
-        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredRole)
+        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredAuthLevel)
         {
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    string query = "SELECT * FROM Accounts WHERE Username = @Username AND Role = @Role";
-                    IAccount dbAccount = connection.QueryFirst(query, new
+                    string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
+                    IAccount dbAccount = connection.QueryFirst<Account>(query, new
                     {
                         Username = rolePrincipal.RoleIdentity.Name,
-                        Role = rolePrincipal.RoleIdentity.Role
+                        AuthorizationLevel = rolePrincipal.RoleIdentity.AuthorizationLevel
                     });
                     if (dbAccount == null)
                     {
                         return _messageBank.ErrorMessages["notFoundOrAuthorized"];
                     }
-                    else if(dbAccount.Status == false)
+                    else if(dbAccount.AccountStatus == false)
                     {
                         return _messageBank.ErrorMessages["notFoundOrEnabled"];
                     }
@@ -347,6 +427,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 return acfe.Message;
             }
+            catch (InvalidOperationException ioe)
+            {
+                return _messageBank.ErrorMessages["notFoundOrEnabled"];
+            }
             catch (Exception ex)
             {
                 return "Database: " + ex.Message;
@@ -359,11 +443,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    string query = "SELECT * FROM OTPClaims WHERE Username = @Username AND Role = @Role";
-                    IOTPClaim dbOTPClaim = connection.QueryFirst(query, new
+                    string query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
+                    IOTPClaim dbOTPClaim = connection.QueryFirst<OTPClaim>(query, new
                     {
                         Username = otpClaim.Username,
-                        Role = otpClaim.Role
+                        AuthorizationLevel = otpClaim.AuthorizationLevel
                     });
                     if (dbOTPClaim == null)
                     {
@@ -376,12 +460,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         {
                             failCount = 0;
                         }
-                        query = "UPDATE * FROM OTPClaims SET OTP = @OTP AND TimeCreated = @TimeCreated AND " +
-                        "FailCount = @FailCount WHERE Username = @Username AND Role = @Role";
+                        query = "UPDATE OTPClaims SET OTP = @OTP,TimeCreated = @TimeCreated, " +
+                        "FailCount = @FailCount WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                         var affectedRows = connection.Execute(query, new
                         {
                             Username = otpClaim.Username,
-                            Role = otpClaim.Role,
+                            AuthorizationLevel = otpClaim.AuthorizationLevel,
                             OTP = otpClaim.OTP,
                             TimeCreated = otpClaim.TimeCreated,
                             FailCount = otpClaim.FailCount
@@ -400,6 +484,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             catch (OTPClaimCreationFailedException occfe)
             {
                 return occfe.Message;
+            }
+            catch (InvalidOperationException ioe)
+            {
+                return _messageBank.ErrorMessages["notFoundOrEnabled"];
             }
             catch (Exception ex)
             {
@@ -662,6 +750,11 @@ Values (@node_creation_date, @node_creation_count)";
             }
 
             return "Daily Registration Update Successful";
+        }
+
+        public string CreateDailyLogin(IDailyLogin dailyLogin)
+        {
+            throw new NotImplementedException();
         }
     }
 }

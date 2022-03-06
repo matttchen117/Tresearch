@@ -9,17 +9,22 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 {
     public interface ISqlDAO
     {
-        public bool CreateAccount(IAccount account);
-        public bool CreateConfirmationLink(IConfirmationLink _confirmationlink);
+        public List<string> CreateAccount(IAccount account);
+        public List<string> CreateConfirmationLink(IConfirmationLink _confirmationlink);
 
+        public List<string> ConfirmAccount(IAccount account);
+
+        public List<string> RemoveConfirmationLink(IConfirmationLink confirmationLink);
         public IConfirmationLink GetConfirmationLink(string url);
+
+        public IAccount GetUnconfirmedAccount(string email);
 
         // Authentication
         public string VerifyAccount(IAccount account);
         public List<string> Authenticate(IOTPClaim otpClaim);
 
         // Authorization
-        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredRole);
+        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredAuthLevel);
 
         // Request OTP
         public string StoreOTP(IOTPClaim otpClaim);
@@ -28,7 +33,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public List<IKPI> LoadKPI(DateTime now);
 
         // Delete account
-        public string DeleteAccount(IRolePrincipal principal);
+        public string DeleteAccount(IRolePrincipal rolePrincipal);
 
         /*
             Ian's Methods

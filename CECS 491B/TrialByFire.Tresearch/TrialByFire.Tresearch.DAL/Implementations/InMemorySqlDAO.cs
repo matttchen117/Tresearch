@@ -30,7 +30,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     if (dbAccount.Confirmed != false)
                     {
-                        if (dbAccount.Status != false)
+                        if (dbAccount.AccountStatus != false)
                         {
                             return _messageBank.SuccessMessages["generic"];
                         }
@@ -48,7 +48,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             List<string> results = new List<string>();
             try
             {
-                IAccount account = new Account(otpClaim.Username, otpClaim.Role);
+                IAccount account = new Account(otpClaim.Username, otpClaim.AuthorizationLevel);
                 // Find account in db
                 int index = InMemoryDatabase.Accounts.IndexOf(account);
                 if (index != -1)
@@ -58,7 +58,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     if (dbAccount.Confirmed != false)
                     {
                         // check if enabled
-                        if (dbAccount.Status != false)
+                        if (dbAccount.AccountStatus != false)
                         {
                             // find otp claim in db
                             index = InMemoryDatabase.OTPClaims.IndexOf(otpClaim);
@@ -71,7 +71,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                                     if (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2))
                                     {
                                         results.Add(_messageBank.SuccessMessages["generic"]);
-                                        results.Add($"username:{dbAccount.Username},role:{dbAccount.AuthorizationLevel}");
+                                        results.Add($"username:{dbAccount.Username},authorizationLevel:{dbAccount.AuthorizationLevel}");
                                         return results;
                                     }
                                     else
@@ -79,7 +79,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                                         InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount++;
                                         if (InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount >= 5)
                                         {
-                                            InMemoryDatabase.Accounts[InMemoryDatabase.Accounts.IndexOf(account)].Status = false;
+                                            InMemoryDatabase.Accounts[InMemoryDatabase.Accounts.IndexOf(account)].AccountStatus = false;
                                             results.Add(_messageBank.ErrorMessages["tooManyFails"]);
                                             return results;
                                         }
@@ -129,11 +129,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredRole)
+        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredAuthLevel)
         {
             try
             {
-                IAccount account = new Account(rolePrincipal.RoleIdentity.Name, rolePrincipal.RoleIdentity.Role);
+                IAccount account = new Account(rolePrincipal.RoleIdentity.Name, rolePrincipal.RoleIdentity.AuthorizationLevel);
                 // Find account in db
                 int index = InMemoryDatabase.Accounts.IndexOf(account);
                 if (index != -1)
@@ -143,9 +143,16 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     if (dbAccount.Confirmed != false)
                     {
                         // check if enabled
-                        if (dbAccount.Status != false)
+                        if (dbAccount.AccountStatus != false)
                         {
-                            return _messageBank.SuccessMessages["generic"];
+                            if(dbAccount.AuthorizationLevel.Equals("admin") || dbAccount.AuthorizationLevel.Equals(requiredAuthLevel))
+                            {
+                                return _messageBank.SuccessMessages["generic"];
+                            }
+                            else
+                            {
+                                return _messageBank.ErrorMessages["notAuthorized"];
+                            }
                         }
                         else
                         {
@@ -177,7 +184,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             if(index >= 0)
             {
                 IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)];
-                IAccount account = new Account(dbOTPClaim.Username, dbOTPClaim.Role);
+                IAccount account = new Account(dbOTPClaim.Username, dbOTPClaim.AuthorizationLevel);
                 if (!(otpClaim.TimeCreated >= dbOTPClaim.TimeCreated.AddDays(1)))
                 {
                     otpClaim.FailCount = dbOTPClaim.FailCount;
@@ -188,30 +195,147 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return _messageBank.ErrorMessages["notFoundOrEnabled"];
         }
 
-        public bool CreateAccount(IAccount account)
+
+        public string DeleteAccount(IRolePrincipal rolePrincipal)
         {
-            throw new NotImplementedException();
+            bool accountExists = false;
+            string accountName = rolePrincipal.RoleIdentity.Name;
+            string accountRole = rolePrincipal.RoleIdentity.AuthorizationLevel;
+            foreach(Account ac in InMemoryDatabase.Accounts)
+            {
+                if(ac.Username.Equals(accountName) && ac.AuthorizationLevel.Equals(accountRole))
+                {
+                    accountExists = true; 
+                    InMemoryDatabase.Accounts.Remove(ac);   
+                }
+            }
+            if(accountExists)
+            {
+                for(int i = 0; i < InMemoryDatabase.OTPClaims.Count; i++)
+                {
+                    if (InMemoryDatabase.OTPClaims[i].Equals(accountName))
+                    {
+                        InMemoryDatabase.OTPClaims.RemoveAt(i);
+                        break;
+                    }
+                }
+                for (int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
+                {
+                    if (InMemoryDatabase.Nodes[i].accountOwner.Equals(accountName))
+                    {
+                        InMemoryDatabase.Nodes.RemoveAt(i);
+                    }
+                }
+                for (int i = 0; i < InMemoryDatabase.Ratings.Count; i++)
+                {
+                    if (InMemoryDatabase.Ratings[i].username.Equals(accountName))
+                    {
+                        InMemoryDatabase.Ratings.RemoveAt(i);
+                    }
+                }
+                for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count; i++)
+                {
+                    if (InMemoryDatabase.ConfirmationLinks[i].Equals(accountName))
+                    {
+                        InMemoryDatabase.ConfirmationLinks.RemoveAt(i);
+                        break;
+                    }
+                }
+                return _messageBank.SuccessMessages["generic"];
+            }
+            else
+            {
+                return _messageBank.ErrorMessages["notFoundOrEnabled"];
+            }
+
         }
 
-        public string DeleteAccount(IRolePrincipal role)
+
+
+
+        public List<string> CreateAccount(IAccount account)
         {
-            throw new NotImplementedException();
+            List<string> results = new List<string>();
+            int numberOfConfirmationsInDatabase = InMemoryDatabase.Accounts.Count();
+            InMemoryDatabase.Accounts.Add(account);
+            int affectedRows = InMemoryDatabase.Accounts.Count() - numberOfConfirmationsInDatabase;
+
+            if (affectedRows == 1)
+                results.Add("Success - Account added to in memomry database");
+            else
+                results.Add("Failed - Could not add account to in memory database");
+
+            return results;
+
         }
 
-        public bool CreateConfirmationLink(IConfirmationLink _confirmationlink)
+        public IAccount GetUnconfirmedAccount(string email)
         {
-            throw new NotImplementedException();
+            List<string> results = new List<string>();
+            for (int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
+                if (email.Equals(InMemoryDatabase.Accounts[i].Email))
+                    return InMemoryDatabase.Accounts[i];
+            return null;
+
+        }
+
+        public List<string> RemoveConfirmationLink(IConfirmationLink _confirmationLink)
+        {
+            List<string> results = new List<string>();
+            int numberOfConfirmationsInDatabase = InMemoryDatabase.ConfirmationLinks.Count();
+            InMemoryDatabase.ConfirmationLinks.Remove(_confirmationLink);
+            int affectedRows = InMemoryDatabase.ConfirmationLinks.Count() - numberOfConfirmationsInDatabase;
+            if (affectedRows == -1)
+                results.Add("Success - Confirmation link removed from in memory database");
+            else
+                results.Add("Failed - Confirmation link could not be removed from in memory database");
+            return results;
+        }
+
+        public List<string> ConfirmAccount(IAccount account)
+        {
+            List<string> results = new List<string>();
+            int indexOfAccount = InMemoryDatabase.Accounts.IndexOf(account);
+            if (indexOfAccount == -1)
+                results.Add("Failed - Account not found in database");
+            else
+            {
+                InMemoryDatabase.Accounts[indexOfAccount].Confirmed = true;
+                results.Add("Success - Account confirmed in database");
+            }
+            return results;
+        }
+        public List<string> CreateConfirmationLink(IConfirmationLink _confirmationlink)
+        {
+            List<string> results = new List<string>();
+
+            int numberOfConfirmationsInDatabase = InMemoryDatabase.ConfirmationLinks.Count();
+            InMemoryDatabase.ConfirmationLinks.Add(_confirmationlink);
+            int affectedRows = InMemoryDatabase.ConfirmationLinks.Count() - numberOfConfirmationsInDatabase;
+
+            if (affectedRows == 1)
+                results.Add("Success - Confirmation link added to in memomry database");
+            else
+                results.Add("Failed - Could not add confirmation link to in memory database");
+
+            return results;
         }
 
         public IConfirmationLink GetConfirmationLink(string url)
         {
-            throw new NotImplementedException();
+            string guidString = url.Substring(url.LastIndexOf('=')+1);
+            Guid guid = new Guid(guidString);
+            for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count(); i++)
+                if (guid.Equals(InMemoryDatabase.ConfirmationLinks[i].UniqueIdentifier))
+                    return InMemoryDatabase.ConfirmationLinks[i];
+            return null;
         }
 
         public List<IKPI> LoadKPI(DateTime now)
         {
             throw new NotImplementedException();
         }
+
 
         /*
             Ian's Methods

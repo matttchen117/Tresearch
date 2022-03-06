@@ -22,7 +22,7 @@ namespace TrialByFire.Tresearch.Tests
 
         public IValidationService validationService { get; }
 
-        private string _connectionString = "Source = tresearchstudentserver.database.windows.net; Initial Catalog = tresearchStudentServer; User ID = tresearchadmin; Password=********;Connect Timeout = 30; Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        private string _connectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true";
 
 
         public IntegrationTestDependencies()

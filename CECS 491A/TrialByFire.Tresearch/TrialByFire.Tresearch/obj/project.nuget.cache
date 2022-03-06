@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "TFfhNZZo7G/n3IPHk8hvrAay2h9yMvrYNqcEE9WXutN8WscGL1qlt1TOM3rm/paGdbIF/T1AhrePqnlf4+npZA==",
+  "dgSpecHash": "GuMzK6THupMtrbItfglkdWuUu6VlUGsFtNyHbxqtbzmy3/MgUQLKOihh2mKkGPgw0slPF2RK0g+9K4YuO4pqmg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Main.csproj",
+  "projectFilePath": "C:\\Users\\Matthew Chen\\source\\repos\\Tresearch\\CECS 491A\\TrialByFire.Tresearch\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Main.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\Matthew Chen\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",

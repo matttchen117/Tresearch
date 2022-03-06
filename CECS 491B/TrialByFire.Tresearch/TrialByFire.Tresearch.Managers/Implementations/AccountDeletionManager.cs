@@ -16,21 +16,21 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private ISqlDAO SqlDAO { get; }
         private ILogService LogService { get; }
         private IAccountDeletionService AccountDeletionService { get; }
-        private IRolePrincipal Principal { get; }
+        private IRolePrincipal RolePrincipal { get; }
 
 
-        public AccountDeletionManager(ISqlDAO sqlDAO, ILogService logService, IAccountDeletionService accountDeletionService, IRolePrincipal principal)
+        public AccountDeletionManager(ISqlDAO sqlDAO, ILogService logService, IAccountDeletionService accountDeletionService, IRolePrincipal rolePrincipal)
         {
             SqlDAO = sqlDAO;
             LogService = logService;
             AccountDeletionService = accountDeletionService;
-            Principal = principal;
+            RolePrincipal = rolePrincipal;
         }
 
 
-        public string DeleteAccount(IRolePrincipal principal)
+        public string DeleteAccount(IRolePrincipal rolePrincipal)
         {
-            string results = this.AccountDeletionService.DeleteAccount(principal);
+            string results = this.AccountDeletionService.DeleteAccount(rolePrincipal);
             return results;
         }
 

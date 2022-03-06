@@ -21,9 +21,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
             _roleIdentity = roleIdentity;
         }
 
-        public bool IsInRole(string role)
+        public bool IsInRole(string authorizationLevel)
         {
-            return _roleIdentity.Role.Equals(role);
+            return _roleIdentity.AuthorizationLevel.Equals(authorizationLevel);
         }
     }
 }

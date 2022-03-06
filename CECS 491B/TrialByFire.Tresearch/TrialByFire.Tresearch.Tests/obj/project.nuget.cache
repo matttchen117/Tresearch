@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "k8tb7i5krEjmm5jZrionl/+DB4mH8IEkXeR0IT5RPLdIpQ+/p5PiYrloNyzXSXo7zeytcsUh8nppHw010k7pBA==",
+  "dgSpecHash": "TLU4bWh7F4Hgc3s9pAw32FT3UsRMYS37f8xOaH2KhUJDrSxIwtphfwn/gTJ3ad1kNxO8RkFHFh4fKfxthjprIA==",
   "success": true,
   "projectFilePath": "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\TrialByFire.Tresearch.Tests.csproj",
   "expectedPackageFiles": [
@@ -117,5 +117,12 @@
     "C:\\Users\\ianho\\.nuget\\packages\\xunit.extensibility.execution\\2.4.1\\xunit.extensibility.execution.2.4.1.nupkg.sha512",
     "C:\\Users\\ianho\\.nuget\\packages\\xunit.runner.visualstudio\\2.4.3\\xunit.runner.visualstudio.2.4.3.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }
