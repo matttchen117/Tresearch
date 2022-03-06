@@ -24,7 +24,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
         }
 
         [Theory]
-        [InlineData("larry@gmail.com", "ABCdef123", "user", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Server: Authentication Cookie creation failed")]
+        [InlineData("larry@gmail.com", "ABCdef123", "user", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Server: Authentication Cookie creation failed.")]
         [InlineData("billy@yahoo.com", "abcdef123", "admin", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +
             "Please try again.")]
         [InlineData("billy@yahoo.com", "abc", "admin", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +
@@ -61,23 +61,5 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             // Assert
             Assert.Equal(expected, result);
         }
-
-        /*        public void CreateTheCookie(string username, string otp)
-                {
-                    // Arrange
-                    ISqlDAO inMemorySqlDAO = new InMemorySqlDAO();
-                    ILogService inMemoryLogService = new InMemoryLogService(inMemorySqlDAO);
-                    IAuthenticationManager authenticationManager = new AuthenticationManager(inMemorySqlDAO, inMemoryLogService);
-                    IAuthenticationController authenticationController = new AuthenticationController(inMemorySqlDAO, inMemoryLogService, authenticationManager);
-                    string _jwtToken = authenticationManager.Authenticate(username, otp, DateTime.Now)[1];
-                    string expected = "success";
-
-                    // Act
-                    string result = authenticationController.CreateCookie(_jwtToken);
-
-                    // Assert
-                    Assert.Equal(expected, result);
-                }*/
-
     }
 }

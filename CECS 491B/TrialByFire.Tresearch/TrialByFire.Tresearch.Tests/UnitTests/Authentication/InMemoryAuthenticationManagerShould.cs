@@ -55,9 +55,6 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
 
             // Assert
             Assert.Equal(expected, results[0]);
-
-            // Not unit test if connecting to outside db
-            // Unit test if using in memory/turn into unit with mocking
         }
 
     }

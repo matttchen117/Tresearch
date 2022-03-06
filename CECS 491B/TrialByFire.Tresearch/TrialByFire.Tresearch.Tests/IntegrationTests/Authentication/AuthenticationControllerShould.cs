@@ -22,7 +22,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
         {
         }
         [Theory]
-        [InlineData("larry@gmail.com", "ABCdef123", "user", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Server: Authentication Cookie creation failed")]
+        [InlineData("larry@gmail.com", "ABCdef123", "user", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Server: Authentication Cookie creation failed.")]
         [InlineData("billy@yahoo.com", "abcdef123", "admin", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +
             "Please try again.")]
         [InlineData("billy@yahoo.com", "abc", "admin", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +

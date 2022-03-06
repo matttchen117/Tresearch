@@ -399,7 +399,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (OTPClaimCreationFailedException occfe)
             {
-                return ocfe.Message;
+                return occfe.Message;
             }
             catch (Exception ex)
             {
@@ -478,7 +478,7 @@ Values (@node_creation_date, @node_creation_count)";
 
 
 
-        public string CreateDailyLogin(IDailyLogin dailyLogin)
+        public string CreateDailyLogins(IDailyLogin dailyLogin)
         {
             int affectedRows;
             try
