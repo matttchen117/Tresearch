@@ -18,7 +18,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public string CreateLog(DateTime timestamp, string level, string username, string category, string description)
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

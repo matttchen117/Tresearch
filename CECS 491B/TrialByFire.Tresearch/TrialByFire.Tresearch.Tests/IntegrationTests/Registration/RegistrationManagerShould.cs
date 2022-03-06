@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 {
-    public class AccountServiceShould
+    public class RegistrationManagerShould
     {
     }
 }
