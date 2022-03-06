@@ -35,3 +35,11 @@ C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\Tri
 C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\obj\Debug\net6.0\TrialByFire.Tresearch.Managers.dll
 C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\obj\Debug\net6.0\ref\TrialByFire.Tresearch.Managers.dll
 C:\Users\viet\source\repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\obj\Debug\net6.0\TrialByFire.Tresearch.Managers.pdb
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.deps.json
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.runtimeconfig.json
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\bin\Debug\net6.0\testhost.exe
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\bin\Debug\net6.0\testhost.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\bin\Debug\net6.0\Microsoft.TestPlatform.PlatformAbstractions.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\bin\Debug\net6.0\xunit.runner.visualstudio.dotnetcore.testadapter.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\bin\Debug\net6.0\xunit.runner.reporters.netcoreapp10.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Managers\bin\Debug\net6.0\xunit.runner.utility.netcoreapp10.dll

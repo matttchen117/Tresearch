@@ -136,3 +136,5 @@ C:\Users\Matthew Chen\source\repos\Tresearch\CECS 491B\TrialByFire.Tresearch\Tri
 C:\Users\Matthew Chen\source\repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Tests\bin\Debug\net6.0\runtimes\win-x86\native\sni.dll
 C:\Users\Matthew Chen\source\repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Tests\bin\Debug\net6.0\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
 C:\Users\Matthew Chen\source\repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Tests\bin\Debug\net6.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Tests\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.deps.json
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Tests\bin\Debug\net6.0\TrialByFire.Tresearch.DAL.runtimeconfig.json
