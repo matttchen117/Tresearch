@@ -1,6 +1,9 @@
-﻿namespace TrialByFire.Tresearch.Models.Implementations
+﻿using System;
+using TrialByFire.Tresearch.Models.Contracts;
+
+namespace TrialByFire.Tresearch.Models.Implementations
 {
-    public class Tag
+    public class Tag : ITag
     {
         public string tagName { get; set; }
 

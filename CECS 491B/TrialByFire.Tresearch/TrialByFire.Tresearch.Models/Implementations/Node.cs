@@ -1,6 +1,9 @@
-﻿namespace TrialByFire.Tresearch.Models.Implementations
+﻿using System;
+using TrialByFire.Tresearch.Models.Contracts;
+
+namespace TrialByFire.Tresearch.Models.Implementations
 {
-    public class Node
+    public class Node : INode
     {
         public long nodeID { get; set; }
 

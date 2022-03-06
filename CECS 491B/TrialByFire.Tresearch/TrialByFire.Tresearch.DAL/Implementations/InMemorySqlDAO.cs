@@ -76,24 +76,24 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                                     }
                                     else
                                     {
-                                        results.Add(_messageBank.ErrorMessages["otpExpired"]);
-                                        return results;
+                                        InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount++;
+                                        if (InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount >= 5)
+                                        {
+                                            InMemoryDatabase.Accounts[InMemoryDatabase.Accounts.IndexOf(account)].Status = false;
+                                            results.Add(_messageBank.ErrorMessages["tooManyFails"]);
+                                            return results;
+                                        }
+                                        else
+                                        {
+                                            results.Add(_messageBank.ErrorMessages["otpExpired"]);
+                                            return results;
+                                        }
                                     }
                                 }
                                 else
                                 {
-                                    InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount++;
-                                    if (InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount >= 5)
-                                    {
-                                        InMemoryDatabase.Accounts[InMemoryDatabase.Accounts.IndexOf(account)].Status = false;
-                                        results.Add(_messageBank.ErrorMessages["tooManyFails"]);
-                                        return results;
-                                    }
-                                    else
-                                    {
-                                        results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
-                                        return results;
-                                    }
+                                    results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
+                                    return results;
                                 }    
                             }
                             else
@@ -160,6 +160,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             if(index >= 0)
             {
                 IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)];
+                IAccount account = new Account(dbOTPClaim.Username, dbOTPClaim.Role);
                 if (!(otpClaim.TimeCreated >= dbOTPClaim.TimeCreated.AddDays(1)))
                 {
                     otpClaim.FailCount = dbOTPClaim.FailCount;
@@ -171,6 +172,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
         public bool CreateAccount(IAccount account)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string DeleteAccount(IRolePrincipal role)
         {
             throw new NotImplementedException();
         }
@@ -189,5 +195,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             throw new NotImplementedException();
         }
+
+        /*
+            Ian's Methods
+         */
+
+
     }
 }
