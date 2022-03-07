@@ -51,7 +51,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                         return results;
                     }
                 }
-
             }
             catch
             {
@@ -74,8 +73,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     results.Add("Failed - Registration Manager unable to create confirmation link object");
                     return results;
                 }
-
-
 
                 IAccount account = _registrationService.GetUserFromConfirmationLink(_confirmationLink);
                 if (account.Email == null)
@@ -138,7 +135,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             {
                 results.Add("Failed - Account Manager" + ex);
             }
-
             return results;
         }
 

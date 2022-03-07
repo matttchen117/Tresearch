@@ -406,3 +406,5 @@ C:\Users\viet\Source\Repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\Tri
 C:\Users\viet\Source\Repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\scopedcss\bundle\TrialByFire.Tresearch.WebApi.styles.css
 C:\Users\viet\Source\Repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\TrialByFire.Tresearch.WebApi.csproj.CopyComplete
 C:\Users\viet\Source\Repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\TrialByFire.Tresearch.WebApi.genruntimeconfig.cache
+C:\Users\pammy\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\bin\Debug\net6.0\TrialByFire.Tresearch.Middlewares.dll
+C:\Users\pammy\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\bin\Debug\net6.0\TrialByFire.Tresearch.Middlewares.pdb

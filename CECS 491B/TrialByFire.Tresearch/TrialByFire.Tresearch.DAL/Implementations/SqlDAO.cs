@@ -14,6 +14,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public SqlDAO(IMessageBank messageBank)
         {
+            _sqlConnectionString = "Data Source=tresearchstudentserver.database.windows.net;Initial Catalog=tresearchStudentServer;User ID=tresearchadmin;Password=CECS491B!;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+
             _messageBank = messageBank;
         }
 
@@ -30,7 +32,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var insertQuery = "INSERT INTO dbo.confirmation_links (username, GUID, datetime) VALUES (@Username, @UniqueIdentifier, @Datetime)";
+                    var insertQuery = "INSERT INTO dbo.EmailConfirmationLinks (username, GUID, timestamp) VALUES (@Username, @UniqueIdentifier, @Datetime)";
                     int affectedRows = connection.Execute(insertQuery, _confirmationlink);
 
                     if (affectedRows == 1)
@@ -39,9 +41,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         result.Add("Failed - Email already has confirmation link");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                result.Add("Failed - Unable to add confirmation link to database");
+                result.Add("Failed - SQLDAO " + ex);
             }
             return result;
         }
@@ -60,11 +62,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
 
-                    var readQuery = "SELECT username FROM dbo.confirmation_links WHERE GUID = @guid";
+                    var readQuery = "SELECT username FROM dbo.EmailConfirmationLinks WHERE GUID = @guid";
                     _confirmationLink.Username = connection.ExecuteScalar<string>(readQuery, new { guid = guidString });
-                    readQuery = "SELECT GUID FROM dbo.confirmation_links WHERE GUID = @guid";
+                    readQuery = "SELECT GUID FROM dbo.EmailConfirmationLinks WHERE GUID = @guid";
                     _confirmationLink.UniqueIdentifier = connection.ExecuteScalar<Guid>(readQuery, new { guid = guidString });
-                    readQuery = "SELECT datetime FROM dbo.confirmation_links WHERE GUID = @guid";
+                    readQuery = "SELECT datetime FROM dbo.EmailConfirmationLinks WHERE GUID = @guid";
                     _confirmationLink.Datetime = connection.ExecuteScalar<DateTime>(readQuery, new { guid = guidString });
                 }
             }
@@ -86,7 +88,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var updateQuery = "UPDATE dbo.user_accounts SET confirmation = 1 WHERE email = @Email and username = @Username";
+                    var updateQuery = "UPDATE dbo.Accounts SET confirmation = 1 WHERE email = @Email and username = @Username";
                     affectedRows = connection.Execute(updateQuery, account);
 
                 }
@@ -108,7 +110,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var deleteQuery = "DELETE FROM confirmation_links WHERE @Username=username and @Guid=guid and @Timestamp=Timestamp";
+                    var deleteQuery = "DELETE FROM dbo.EmailConfirmationLinks WHERE @Username=username and @Guid=guid and @Timestamp=Timestamp";
                     affectedRows = connection.Execute(deleteQuery, confirmationLink);
                 }
                 if (affectedRows == 1)
@@ -134,7 +136,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var readQuery = "SELECT COUNT(*) FROM dbo.user_accounts WHERE email = @Email";
+                    var readQuery = "SELECT COUNT(*) FROM dbo.Accounts WHERE Email = @Email";
                     var accounts = connection.ExecuteScalar<int>(readQuery, new { Email = account.Email });
 
                     if (accounts > 0)
@@ -142,8 +144,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         results.Add("Failed - Account already exists in database");
                         return results;
                     }
-                    var insertQuery = "INSERT INTO dbo.user_accounts (username, email, passphrase, authorization_level, account_status, confirmation) " +
-                        "VALUES (@username, @email, @passphrase, @authorizationLevel, @status, @confirmed)";
+                    var insertQuery = "INSERT INTO dbo.Accounts (Username, Email, Passphrase, AuthorizationLevel, AccountStatus, Confirmed) " +
+                        "VALUES (@Username, @Email, @Passphrase, @AuthorizationLevel, @AccountStatus, @Confirmed)";
 
                     affectedRows = connection.Execute(insertQuery, account);
                 }

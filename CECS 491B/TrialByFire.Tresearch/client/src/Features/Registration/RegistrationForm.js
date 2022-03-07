@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import {useNavigate} from 'react-router-dom';
+import axios from 'axios';
 
 import "./RegistrationForm.css";
 
@@ -8,9 +10,16 @@ const RegistrationForm = () => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [checked, setChecked] = useState(false);
 
+    const navigate = useNavigate();
+
     const errors = {
         credentials: "Invalid username or password"
     };
+
+    const [data, setData] = useState({
+        email: "pammypoor@gmail.com",
+        passphrase: "myPassword123"
+    });
 
     const renderErrorMessage = (name) =>
         name === errorMessages.name && (
@@ -19,8 +28,26 @@ const RegistrationForm = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        var { username, password } = document.forms[0];
-        alert("TEST");
+        
+        
+        var bodyFormData = new FormData();
+        bodyFormData.append('pammypoor@gmail.com', 'testPassword');
+
+        axios.post('https://localhost:7010/Registration/register?email=' + data.email + '&passphrase=' + data.passphrase
+            ).then(response => {
+                navigate("/Register/InactiveLink");
+                console.log(response.data)
+            }).catch(err => console.log("api Erorr: ", err.message))
+        
+            try{
+                axios.post('https://localhost:7010/Registration/confirmation?email=' + data.email
+                    ).then(response => {
+                        navigate('/Registration/ConfirmationSent');
+                    }).catch(err => console.log("api Erorr: ", err.message))
+            }catch(error){
+
+            }
+        
     };
 
     const handleCheck = () => {
@@ -30,8 +57,6 @@ const RegistrationForm = () => {
     const renderForm = (
         <div className="form-container">
             <div className="form-components">
-                
-
                 <form onSubmit={handleSubmit}>
                     <div className="input-container">
                         <input type="username" name="uname" required placeholder="Email Address" />
@@ -57,9 +82,6 @@ const RegistrationForm = () => {
 
     return (
         <div className="form">
-            <button type="button" className="form-close-btn" onclick="handleRegClick()">
-                <span className="icon-close">x</span>
-            </button>
             <div className="title-text">
                 <h1 className="register-title">Registration</h1>
             </div>

@@ -11,7 +11,6 @@ using TrialByFire.Tresearch.Services.Implementations;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddTransient<IMessageBank, MessageBank>();
 builder.Services.AddTransient<ISqlDAO, SqlDAO>();
 builder.Services.AddTransient<ILogService, SqlLogService>();
@@ -40,7 +39,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       builder =>
                       {
-                          builder.WithOrigins("http://localhost:7010/%22")
+                          builder.WithOrigins("http://localhost:3000")
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                       });

@@ -42,11 +42,9 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
 
         [HttpPost("register")]
-        public string RegisterAccount([FromBody]IAccount account)
+        public string RegisterAccount(string email, string passphrase)
         {
             List<string> results = new List<string>();
-            string email = account.Email;
-            string passphrase = account.Passphrase;
             try
             {
                 results.AddRange(_registrationManager.CreatePreConfirmedAccount(email, passphrase));
@@ -59,12 +57,14 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             {
                 results.Add("Failed - Registration Manager " + ex);
             }
+            string r = "";
             for (int i = 0; i < results.Count(); i++)
             {
-                Console.WriteLine(results[i]);
+                r += "\t" + results[i];
             }
 
-            SendConfirmation(email);
+            results.Add(r);
+            //SendConfirmation(email);
 
             _logService.CreateLog(DateTime.Now, "Info", email, "Business", results.Last());
             return results.Last();
@@ -78,7 +78,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             account.Username = email;
             List<string> results = new List<string>();
             bool error = false;
-            string baseUrl = "www.tresearch.systems/RegistrationController";
+            string baseUrl = "https://localhost:7010/Registration/confirmation?";
             try
             {
                 results.AddRange(_registrationManager.SendConfirmation(account.Email, baseUrl));
@@ -97,10 +97,14 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 error = true;
                 results.Add("Failed - Registration Controller " + ex);
             }
+            string r = "";
             for (int i = 0; i < results.Count(); i++)
             {
-                Console.WriteLine(results[i]);
+                r += "\t" + results[i];
             }
+
+            results.Add(r);
+
             if (!error)
                 _logService.CreateLog(DateTime.Now, "Info", email, "Business", results.Last());
             else
