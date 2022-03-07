@@ -246,20 +246,82 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
 
 
-        public bool CreateAccount(IAccount account)
+        public List<string> CreateAccount(IAccount account)
         {
-            throw new NotImplementedException();
+            List<string> results = new List<string>();
+            int numberOfConfirmationsInDatabase = InMemoryDatabase.Accounts.Count();
+            InMemoryDatabase.Accounts.Add(account);
+            int affectedRows = InMemoryDatabase.Accounts.Count() - numberOfConfirmationsInDatabase;
+
+            if (affectedRows == 1)
+                results.Add("Success - Account added to in memomry database");
+            else
+                results.Add("Failed - Could not add account to in memory database");
+
+            return results;
+
         }
 
-
-        public bool CreateConfirmationLink(IConfirmationLink _confirmationlink)
+        public IAccount GetUnconfirmedAccount(string email)
         {
-            throw new NotImplementedException();
+            List<string> results = new List<string>();
+            for (int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
+                if (email.Equals(InMemoryDatabase.Accounts[i].Email))
+                    return InMemoryDatabase.Accounts[i];
+            return null;
+
+        }
+
+        public List<string> RemoveConfirmationLink(IConfirmationLink _confirmationLink)
+        {
+            List<string> results = new List<string>();
+            int numberOfConfirmationsInDatabase = InMemoryDatabase.ConfirmationLinks.Count();
+            InMemoryDatabase.ConfirmationLinks.Remove(_confirmationLink);
+            int affectedRows = InMemoryDatabase.ConfirmationLinks.Count() - numberOfConfirmationsInDatabase;
+            if (affectedRows == -1)
+                results.Add("Success - Confirmation link removed from in memory database");
+            else
+                results.Add("Failed - Confirmation link could not be removed from in memory database");
+            return results;
+        }
+
+        public List<string> ConfirmAccount(IAccount account)
+        {
+            List<string> results = new List<string>();
+            int indexOfAccount = InMemoryDatabase.Accounts.IndexOf(account);
+            if (indexOfAccount == -1)
+                results.Add("Failed - Account not found in database");
+            else
+            {
+                InMemoryDatabase.Accounts[indexOfAccount].Confirmed = true;
+                results.Add("Success - Account confirmed in database");
+            }
+            return results;
+        }
+        public List<string> CreateConfirmationLink(IConfirmationLink _confirmationlink)
+        {
+            List<string> results = new List<string>();
+
+            int numberOfConfirmationsInDatabase = InMemoryDatabase.ConfirmationLinks.Count();
+            InMemoryDatabase.ConfirmationLinks.Add(_confirmationlink);
+            int affectedRows = InMemoryDatabase.ConfirmationLinks.Count() - numberOfConfirmationsInDatabase;
+
+            if (affectedRows == 1)
+                results.Add("Success - Confirmation link added to in memomry database");
+            else
+                results.Add("Failed - Could not add confirmation link to in memory database");
+
+            return results;
         }
 
         public IConfirmationLink GetConfirmationLink(string url)
         {
-            throw new NotImplementedException();
+            string guidString = url.Substring(url.LastIndexOf('=')+1);
+            Guid guid = new Guid(guidString);
+            for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count(); i++)
+                if (guid.Equals(InMemoryDatabase.ConfirmationLinks[i].UniqueIdentifier))
+                    return InMemoryDatabase.ConfirmationLinks[i];
+            return null;
         }
 
         public List<IKPI> LoadKPI(DateTime now)
