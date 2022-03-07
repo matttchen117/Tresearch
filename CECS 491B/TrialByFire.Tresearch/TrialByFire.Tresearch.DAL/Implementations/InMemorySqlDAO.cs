@@ -98,7 +98,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     }
                 }
                 // check that the otp was entered within 2 minutes of being created
-                if (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2))
+                if ((otpClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
                 {
                     results.Add(_messageBank.SuccessMessages["generic"]);
                     results.Add($"username:{dbAccount.Username},authorizationLevel:{dbAccount.AuthorizationLevel}");

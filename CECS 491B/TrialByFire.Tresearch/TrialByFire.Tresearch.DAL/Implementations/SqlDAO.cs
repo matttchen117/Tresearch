@@ -15,6 +15,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public SqlDAO(IMessageBank messageBank)
         {
             _messageBank = messageBank;
+            _sqlConnectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true";
         }
 
         public SqlDAO(string sqlConnectionString, IMessageBank messageBank)
@@ -397,7 +398,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         }
                     }
                     // check that otp was entered within 2 minutes of being created
-                    else if(otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2))
+                    else if((otpClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
                     {
                         results.Add(_messageBank.SuccessMessages["generic"]);
                         results.Add($"username:{otpClaim.Username},authorizationLevel:{otpClaim.AuthorizationLevel}");
@@ -416,8 +417,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return results;
             }
             catch (InvalidOperationException ioe)
-            {
-                results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
+            { 
+                results.Add("Database: " + ioe.Message);
+                //results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
                 return results;
             }
             catch (Exception ex)
