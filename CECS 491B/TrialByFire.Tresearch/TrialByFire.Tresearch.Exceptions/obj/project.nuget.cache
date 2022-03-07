@@ -1,8 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "KnyPZpqeYOWT61lky26/MVffQUaz/x1Gu8hYUBPhUP99CRKkGs6Fays7Q6sFFBSSMpRfIYZYKge7VatUMCJ56A==",
+  "dgSpecHash": "SivtGKVSh8YoeUxiBeWbNti+/YRlFnw2XPzyZmv1iJU/H3TVGu/C2C3bQ6VfpAWKzSn9njCfNZZLwvUtHOxjkQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\TrialByFire.Tresearch.Exceptions.csproj",
+  "projectFilePath": "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\TrialByFire.Tresearch.Exceptions.csproj",
   "expectedPackageFiles": [],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }

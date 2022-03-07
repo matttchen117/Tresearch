@@ -575,16 +575,16 @@ Values (@node_creation_date, @node_creation_count)";
             }
         }
 
-        public INodesCreated GetNodesCreated(DateTime nodeCreationDate)
+        public IList<INodesCreated> GetNodesCreated(DateTime nodeCreationDate)
         {
-            INodesCreated nodesCreated;
+            IList<INodesCreated> nodesCreated;
 
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
                 var selectQuery = "SELECT * FROM Tresearch.nodes_created" +
                                   "WHERE _node_creation_date >= @node_creation_date - 30";
 
-                nodesCreated = connection.QuerySingle<INodesCreated>(selectQuery, new {node_creation_date = nodeCreationDate});
+                nodesCreated = (List<INodesCreated>)connection.Query<INodesCreated>(selectQuery, new {node_creation_date = nodeCreationDate});
             }
 
             return nodesCreated;
@@ -609,7 +609,7 @@ Values (@node_creation_date, @node_creation_count)";
 
 
 
-        public string CreateDailyLogins(IDailyLogin dailyLogin)
+        public string CreateDailyLogin(IDailyLogin dailyLogin)
         {
             int affectedRows;
             try
@@ -638,16 +638,16 @@ Values (@node_creation_date, @node_creation_count)";
             }
         }
 
-        public IDailyLogin GetDailyLogin(DateTime loginDate)
+        public IList<IDailyLogin> GetDailyLogin(DateTime loginDate)
         {
-            IDailyLogin dailyLogin;
+            IList<IDailyLogin> dailyLogin;
 
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
                 var selectQuery = "SELECT * FROM Tresearch.daily_logins" +
                                     "WHERE _loginDate >= @login_date - 30";
 
-                dailyLogin = connection.QuerySingle<IDailyLogin>(selectQuery, new { login_date = loginDate });
+                dailyLogin = (List<IDailyLogin>)connection.Query<IDailyLogin>(selectQuery, new { login_date = loginDate });
             }
 
             return dailyLogin;
@@ -702,15 +702,15 @@ Values (@node_creation_date, @node_creation_count)";
             }
         }
 
-        public ITopSearch GetTopSearch(DateTime topSearchDate)
+        public IList<ITopSearch> GetTopSearch(DateTime topSearchDate)
         {
-            ITopSearch topSearch;
+            IList<ITopSearch> topSearch;
             
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
                 var selectQuery = "SELECT * FROM Tresearch.top_search" +
                                     "WHERE topSearchDate >= @top_search_date - 30";
-                topSearch = connection.QuerySingle<ITopSearch>(selectQuery, new {top_search_date = topSearchDate});
+                topSearch = (List<ITopSearch>)connection.Query<ITopSearch>(selectQuery, new {top_search_date = topSearchDate});
             }
 
             return topSearch;
@@ -766,16 +766,16 @@ Values (@node_creation_date, @node_creation_count)";
             }
         }
 
-        public IDailyRegistration GetDailyRegistration(DateTime dailyRegistrationDate)
+        public IList<IDailyRegistration> GetDailyRegistration(DateTime dailyRegistrationDate)
         {
-            IDailyRegistration dailyRegistration;
+            IList<IDailyRegistration> dailyRegistration;
 
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
                 var selectQuery = "SELECT * FROM Tresearch.daily_registrations" +
                                     "WHERE _registrationDate >= @registration_date - 30";
 
-                dailyRegistration = connection.QuerySingle<IDailyRegistration>(selectQuery, new { registration_date = dailyRegistrationDate });
+                dailyRegistration = (List<IDailyRegistration>)connection.Query<IDailyRegistration>(selectQuery, new { registration_date = dailyRegistrationDate });
             }
 
             return dailyRegistration;
@@ -793,11 +793,6 @@ Values (@node_creation_date, @node_creation_count)";
             }
 
             return "Daily Registration Update Successful";
-        }
-
-        public string CreateDailyLogin(IDailyLogin dailyLogin)
-        {
-            throw new NotImplementedException();
         }
     }
 }
