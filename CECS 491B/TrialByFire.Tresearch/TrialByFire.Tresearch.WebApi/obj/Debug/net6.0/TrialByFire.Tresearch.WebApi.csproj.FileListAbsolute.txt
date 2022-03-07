@@ -280,3 +280,5 @@ C:\Users\pammy\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresear
 C:\Users\pammy\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\TrialByFire.Tresearch.WebApi.pdb
 C:\Users\pammy\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\TrialByFire.Tresearch.WebApi.genruntimeconfig.cache
 C:\Users\pammy\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Debug\net6.0\ref\TrialByFire.Tresearch.WebApi.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\bin\Debug\net6.0\TrialByFire.Tresearch.Middlewares.dll
+C:\Users\Matthew Chen\Source\Repos\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\bin\Debug\net6.0\TrialByFire.Tresearch.Middlewares.pdb

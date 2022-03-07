@@ -39,7 +39,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch.DAL",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch.Exceptions", "TrialByFire.Tresearch.Exceptions\TrialByFire.Tresearch.Exceptions.csproj", "{B98DC29D-5008-48DF-A58E-7ED9047860E0}"
 EndProject
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "TrialByFire.Tresearch.FrontEnd", "TrialByFire.Tresearch.FrontEnd\TrialByFire.Tresearch.FrontEnd.esproj", "{A1173A87-CB9F-4340-B996-FE74C23FE472}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrialByFire.Tresearch.Middlewares", "TrialByFire.Tresearch.Middlewares\TrialByFire.Tresearch.Middlewares.csproj", "{D5119C66-EB4A-4165-A3C5-9073027EBBBF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,12 +75,10 @@ Global
 		{B98DC29D-5008-48DF-A58E-7ED9047860E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B98DC29D-5008-48DF-A58E-7ED9047860E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B98DC29D-5008-48DF-A58E-7ED9047860E0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A1173A87-CB9F-4340-B996-FE74C23FE472}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A1173A87-CB9F-4340-B996-FE74C23FE472}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A1173A87-CB9F-4340-B996-FE74C23FE472}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{A1173A87-CB9F-4340-B996-FE74C23FE472}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A1173A87-CB9F-4340-B996-FE74C23FE472}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A1173A87-CB9F-4340-B996-FE74C23FE472}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{D5119C66-EB4A-4165-A3C5-9073027EBBBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5119C66-EB4A-4165-A3C5-9073027EBBBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5119C66-EB4A-4165-A3C5-9073027EBBBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5119C66-EB4A-4165-A3C5-9073027EBBBF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

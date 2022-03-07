@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TrialByFire.Tresearch.DAL\TrialByFire.Tresearch.DAL.csproj" />
     <ProjectReference Include="..\TrialByFire.Tresearch.Managers\TrialByFire.Tresearch.Managers.csproj" />
+    <ProjectReference Include="..\TrialByFire.Tresearch.Middlewares\TrialByFire.Tresearch.Middlewares.csproj" />
   </ItemGroup>
 
 </Project>
