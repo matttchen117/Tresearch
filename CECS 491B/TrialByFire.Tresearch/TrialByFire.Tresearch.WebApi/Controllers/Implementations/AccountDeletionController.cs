@@ -8,7 +8,7 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
-    public class AccountDeletionController: Controller, IAccountDeletionController
+    public class AccountDeletionController: ControllerBase, IAccountDeletionController
     {
         private ISqlDAO SqlDAO { get; }
         private ILogService LogService { get; }
@@ -26,6 +26,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             
         }
         
+
         public string DeleteAccount(IRolePrincipal rolePrincipal)
         {
             string result = AccountDeletionManager.DeleteAccount(rolePrincipal);

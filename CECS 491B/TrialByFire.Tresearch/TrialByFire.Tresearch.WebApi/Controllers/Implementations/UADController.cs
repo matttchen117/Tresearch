@@ -8,7 +8,7 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
-    public class UADController : Controller, IUADController
+    public class UADController : ControllerBase, IUADController
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }

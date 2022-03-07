@@ -48,24 +48,48 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<IOTPClaim> InitializeOTPClaims()
         {
             List<IOTPClaim> otpClaims = new List<IOTPClaim>();
+            // for otp request tests
+            otpClaims.Add(new OTPClaim("aarry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("barry@gmail.com", "ABCdef123", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("carry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("darry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("earry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("farry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0), 4));
+            // for authentication tests
+            otpClaims.Add(new OTPClaim("garry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("harry@gmail.com", "ABCdef123", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("iarry@gmail.com", "ABCdef123", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("jarry@gmail.com", "ABCdef123", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("karry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
             otpClaims.Add(new OTPClaim("larry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("billy@yahoo.com", "ABCdef123", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("joe@outlook.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("bob@yahoo.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("harry@yahoo.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("barry@yahoo.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0), 4));
+            otpClaims.Add(new OTPClaim("marry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("narry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0), 4));
+            otpClaims.Add(new OTPClaim("oarry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0), 4));
+            otpClaims.Add(new OTPClaim("parry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0), 4));
             return otpClaims;
         }
 
         private List<IAccount> InitializeAccounts()
         {
             List<IAccount> accounts = new List<IAccount>();
-            accounts.Add(new Account("larry@gmail.com", "larry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new Account("billy@yahoo.com", "billy@yahoo.com", "abcDEF123", "admin", true, true));
-            accounts.Add(new Account("joe@outlook.com", "joe@outlook.com", "abcDEF123", "user", true, true));
-            accounts.Add(new Account("bob@yahoo.com", "bob@yahoo.com", "abcDEF123", "user", false, true));
-            accounts.Add(new Account("harry@yahoo.com", "harry@yahoo.com", "abcDEF123", "user", false, false));
-            accounts.Add(new Account("barry@yahoo.com", "barry@yahoo.com", "abcDEF123", "user", true, true));
+            // for otp request tests
+            accounts.Add(new Account("aarry@gmail.com", "aarry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new Account("barry@gmail.com", "barry@gmail.com", "abcDEF123", "admin", true, true));
+            accounts.Add(new Account("carry@gmail.com", "carry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new Account("darry@gmail.com", "darry@gmail.com", "abcDEF123", "user", false, true));
+            accounts.Add(new Account("earry@gmail.com", "earry@gmail.com", "abcDEF123", "user", false, false));
+            accounts.Add(new Account("farry@gmail.com", "farry@gmail.com", "abcDEF123", "user", true, true));
+            // for authentication tests
+            accounts.Add(new Account("garry@gmail.com", "garry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new Account("harry@gmail.com", "harry@gmail.com", "abcDEF123", "admin", true, true));
+            accounts.Add(new Account("iarry@gmail.com", "iarry@gmail.com", "abcDEF123", "admin", true, true));
+            accounts.Add(new Account("jarry@gmail.com", "jarry@gmail.com", "abcDEF123", "admin", true, true));
+            accounts.Add(new Account("karry@gmail.com", "karry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new Account("larry@gmail.com", "larry@gmail.com", "abcDEF123", "user", false, true));
+            accounts.Add(new Account("marry@gmail.com", "marry@gmail.com", "abcDEF123", "user", false, false));
+            accounts.Add(new Account("narry@gmail.com", "narry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new Account("oarry@gmail.com", "oarry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new Account("parry@gmail.com", "parry@gmail.com", "abcDEF123", "user", true, true));
             return accounts;
         }
 

@@ -6,7 +6,7 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
-    public class OTPRequestController : Controller, IOTPRequestController
+    public class OTPRequestController : ControllerBase, IOTPRequestController
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }

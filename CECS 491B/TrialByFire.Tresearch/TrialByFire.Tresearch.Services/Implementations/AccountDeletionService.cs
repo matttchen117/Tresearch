@@ -20,7 +20,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
 
 
-        public AccountDeletionService(SqlDAO sqlDAO, ILogService logService, IRolePrincipal rolePrincipal)
+        public AccountDeletionService(ISqlDAO sqlDAO, ILogService logService, IRolePrincipal rolePrincipal)
         {
             this.SqlDAO = sqlDAO;
             this.LogService = logService;

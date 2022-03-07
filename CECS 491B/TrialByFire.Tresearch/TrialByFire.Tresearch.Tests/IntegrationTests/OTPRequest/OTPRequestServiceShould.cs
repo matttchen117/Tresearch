@@ -17,23 +17,22 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
     {
         public OTPRequestServiceShould() : base()
         {
-
         }
         [Theory]
-        [InlineData("larry@gmail.com", "abcDEF123", "user", "success")]
-        [InlineData("larry@gmail.com", "#$%", "user", "Data: Invalid Username or " +
+        [InlineData("aarry@gmail.com", "abcDEF123", "user", "success")]
+        [InlineData("aarry@gmail.com", "#$%", "user", "Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("larry@gmail.com", "abcdef#$%", "user", "Data: Invalid Username or " +
+        [InlineData("aarry@gmail.com", "abcdef#$%", "user", "Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("larry@gmail.com", "abcdEF123", "user", "Data: Invalid Username or " +
+        [InlineData("aarry@gmail.com", "abcdEF123", "user", "Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("larry@gmail.com", "abcDEF123", "admin", "Database: The account was not found or it " +
+        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "Database: The account was not found or it " +
             "has been disabled.")]
-        [InlineData("billy@yahoo.com", "abcDEF123", "admin", "success")]
-        [InlineData("joe@outlook.com", "abcDEF123", "user", "success")]
-        [InlineData("bob@yahoo.com", "abcDEF123", "user", "Database: The account was not found or it " +
+        [InlineData("barry@gmail.com", "abcDEF123", "admin", "success")]
+        [InlineData("carry@gmail.com", "abcDEF123", "user", "success")]
+        [InlineData("darry@gmail.com", "abcDEF123", "user", "Database: The account was not found or it " +
             "has been disabled.")]
-        [InlineData("harry@yahoo.com", "abcDEF123", "user", "Database: Please confirm your " +
+        [InlineData("earry@gmail.com", "abcDEF123", "user", "Database: Please confirm your " +
             "account before attempting to login.")]
         public void RequestTheOTP(string username, string passphrase, string authorizationLevel, string expected)
         {

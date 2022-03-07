@@ -15,6 +15,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public SqlDAO(IMessageBank messageBank)
         {
             _messageBank = messageBank;
+            _sqlConnectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true";
         }
 
         public SqlDAO(string sqlConnectionString, IMessageBank messageBank)
@@ -311,31 +312,74 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             int affectedRows = 0;
             try
             {
+                // create connection to database
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    string query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
+                    // query to select account
+                    string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
+                    IAccount dbAccount = connection.QueryFirst<Account>(query, new
+                    {
+                        Username = otpClaim.Username,
+                        AuthorizationLevel = otpClaim.AuthorizationLevel
+                    });
+                    // check if account exists, if it is confirmed, and if it is enabled
+                    if (dbAccount == null)
+                    {
+                        results.Add(_messageBank.ErrorMessages["accountNotFound"]);
+                        return results;
+                    }else if(dbAccount.Confirmed == false)
+                    {
+                        results.Add(_messageBank.ErrorMessages["notConfirmed"]);
+                        return results;
+                    }else if(dbAccount.AccountStatus == false)
+                    {
+                        results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
+                        return results;
+                    }
+                    // query to select otp claim
+                    query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                     IOTPClaim dbOTPClaim = connection.QueryFirst<OTPClaim>(query, new 
                     { 
                         Username = otpClaim.Username, 
                         AuthorizationLevel = otpClaim.AuthorizationLevel 
                     });
+                    // check if null
                     if(dbOTPClaim == null)
                     {
                         results.Add(_messageBank.ErrorMessages["accountNotFound"]);
                         return results;
                     }
+                    // if otps do not match
                     if(!otpClaim.OTP.Equals(dbOTPClaim.OTP))
                     {
-                        int failCount = dbOTPClaim.FailCount++;
-                        if(failCount >= 5)
+                        // increment fail count
+                        int failCount = ++dbOTPClaim.FailCount;
+                        // update fail count in db
+                        query = "UPDATE OTPClaims SET FailCount = @FailCount WHERE " +
+                        "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
+                        affectedRows = connection.Execute(query, new
                         {
-                            query = "UPDATE Accounts SET AccountStatus = false WHERE " +
+                            Username = otpClaim.Username,
+                            AuthorizationLevel = otpClaim.AuthorizationLevel,
+                            FailCount = dbOTPClaim.FailCount
+                        });
+                        // update failed
+                        if (affectedRows != 1)
+                        {
+                            results.Add(_messageBank.ErrorMessages["accountNotFound"]);
+                            return results;
+                        }
+                        // if fail count is 5 or more, attempt to disable account
+                        if (failCount >= 5)
+                        {
+                            query = "UPDATE Accounts SET AccountStatus = 0 WHERE " +
                             "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                             affectedRows = connection.Execute(query, new
                             {
                                 Username = otpClaim.Username,
                                 AuthorizationLevel = otpClaim.AuthorizationLevel,
                             });
+                            // disable failed
                             if (affectedRows != 1)
                             {
                                 results.Add(_messageBank.ErrorMessages["accountDisableFail"]);
@@ -347,32 +391,22 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                                 return results;
                             }
                         }
-                        query = "UPDATE OTPClaims SET FailCount = @FailCount WHERE " +
-                        "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                        affectedRows = connection.Execute(query, new
-                        {
-                            Username = otpClaim.Username,
-                            AuthorizationLevel = otpClaim.AuthorizationLevel,
-                            FailCount = dbOTPClaim.FailCount++
-                        });
-                        if (affectedRows != 1)
-                        {
-                            results.Add(_messageBank.ErrorMessages["accountNotFound"]);
-                            return results;
-                        }
                         else
                         {
                             results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
                             return results;
                         }
-                    }else if(otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2))
+                    }
+                    // check that otp was entered within 2 minutes of being created
+                    else if((otpClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
                     {
-                        results.Add(_messageBank.ErrorMessages["otpExpired"]);
+                        results.Add(_messageBank.SuccessMessages["generic"]);
+                        results.Add($"username:{otpClaim.Username},authorizationLevel:{otpClaim.AuthorizationLevel}");
                         return results;
                     }
                     else
                     {
-                        results.Add(_messageBank.SuccessMessages["generic"]);
+                        results.Add(_messageBank.ErrorMessages["otpExpired"]);
                         return results;
                     }
                 } 
@@ -383,8 +417,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return results;
             }
             catch (InvalidOperationException ioe)
-            {
-                results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
+            { 
+                results.Add("Database: " + ioe.Message);
+                //results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
                 return results;
             }
             catch (Exception ex)
@@ -409,17 +444,25 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     {
                         return _messageBank.ErrorMessages["notFoundOrAuthorized"];
                     }
-                    else if(dbAccount.AccountStatus == false)
-                    {
-                        return _messageBank.ErrorMessages["notFoundOrEnabled"];
-                    }
-                    else if(dbAccount.Confirmed == false)
+                    else if (dbAccount.Confirmed == false)
                     {
                         return _messageBank.ErrorMessages["notConfirmed"];
                     }
+                    else if (dbAccount.AccountStatus == false)
+                    {
+                        return _messageBank.ErrorMessages["notFoundOrEnabled"];
+                    }
                     else
                     {
-                        return _messageBank.SuccessMessages["generic"];
+                        if (rolePrincipal.RoleIdentity.AuthorizationLevel.Equals("admin") || 
+                            rolePrincipal.RoleIdentity.AuthorizationLevel.Equals(requiredAuthLevel))
+                        {
+                            return _messageBank.SuccessMessages["generic"];
+                        }
+                        else
+                        {
+                            return _messageBank.ErrorMessages["notAuthorized"];
+                        }
                     }
                 }
             }
