@@ -7,14 +7,9 @@ import "./RegistrationForm.css";
 const RegistrationForm = () => {
     // States
     const [errorMessages, setErrorMessages] = useState({});
-    const [isSubmitted, setIsSubmitted] = useState(false);
     const [checked, setChecked] = useState(false);
 
     const navigate = useNavigate();
-
-    const errors = {
-        credentials: "Invalid username or password"
-    };
 
     const [data, setData] = useState({
         email: "pammypoor@gmail.com",
@@ -29,10 +24,6 @@ const RegistrationForm = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
         
-        
-        var bodyFormData = new FormData();
-        bodyFormData.append('pammypoor@gmail.com', 'testPassword');
-
         axios.post('https://localhost:7010/Registration/register?email=' + data.email + '&passphrase=' + data.passphrase
             ).then(response => {
                 navigate("/Register/InactiveLink");
@@ -44,15 +35,10 @@ const RegistrationForm = () => {
                     ).then(response => {
                         navigate('/Registration/ConfirmationSent');
                     }).catch(err => console.log("api Erorr: ", err.message))
-            }catch(error){
+            }catch{
 
-            }
-        
+            }   
     };
-
-    const handleCheck = () => {
-        setChecked(!checked);
-    }
 
     const renderForm = (
         <div className="form-container">
@@ -67,7 +53,7 @@ const RegistrationForm = () => {
                         {renderErrorMessage("pass")}
                     </div>
                     <div className="checkbox-container">
-                        <input type="checkbox" checked={checked} onChange={handleCheck} />
+                        <input type="checkbox" checked={checked} />
                         <label for="agree">I am 15 years or older </label>
                     </div>
 
