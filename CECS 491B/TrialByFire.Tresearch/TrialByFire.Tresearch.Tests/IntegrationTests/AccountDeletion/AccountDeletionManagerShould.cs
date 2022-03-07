@@ -8,31 +8,41 @@ using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
 using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
+using TrialByFire.Tresearch.Services.Implementations;
+using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
+using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
+namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
 {
-/*    public class AccountDeletionManagerShould
+    public class AccountDeletionManagerShould : IntegrationTestDependencies
     {
-        public void DeleteTheUser(IRolePrincipal principal)
+        public AccountDeletionManagerShould() : base()
         {
+        }
 
+        [Theory]
+        [InlineData("trizip@gmail.com", "user", "success")]
+        [InlineData("switchblade@gmail.com", "admin", "success")]
+        [InlineData("greenKeyCard@gmail.com", "user", "Database: The account was not found.")]
+
+        public void DeleteTheUser(string currentIdentity, string currentRole, string expected)
+        {
             // Arrange
-            ISqlDAO _sqlDAO = new SqlDAO();
-            ILogService _logService = new SqlLogService(_sqlDAO);
-            IAccountDeletionService _accountDeletionService = new AccountDeletionService();
-            IAccountDeletionManager _accountDeletionManager = new AccountDeletionManager();
-            string expected = "success";
-            
+            IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
+            IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+            IAccountDeletionManager accountDeletionManager = new AccountDeletionManager(sqlDAO, logService, accountDeletionService, rolePrincipal);
+
             // Act
-            string _result = _accountDeletionManager.DeleteAccount(principal);
+            string result = accountDeletionManager.DeleteAccount(rolePrincipal);
 
             // Assert
-            Assert.Equal(expected, _result);
+            Assert.Equal(expected, result);
 
-            // Not unit test if connecting to outside db
-            // Unit test if using in memory/turn into unit with mocking
         }
-    }*/
+
+
+    }
 }
