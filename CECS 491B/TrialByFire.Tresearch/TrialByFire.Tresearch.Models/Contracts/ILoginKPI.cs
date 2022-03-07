@@ -9,7 +9,8 @@ namespace TrialByFire.Tresearch.Models.Contracts
 {
     public interface ILoginKPI : IKPI
 	{
-		public List<DailyLogin> dailyLogins { get; set; }
+		string result { get; set; }
+		public List<IDailyLogin> dailyLogins { get; set; }
 	}
 }
 

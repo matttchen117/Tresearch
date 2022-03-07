@@ -6,29 +6,42 @@ using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Services.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.IntegrationTests.UAD
+namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 {
-	public class UADServiceShould
+	public class UADServiceShould : IntegrationTestDependencies
 	{
-		public void LoadKPI(DateTime now)
-        {
-			/*// Arrange
-			ISqlDAO _sqlDAO = new SqlDAO();
-			ILogService _logService = new SqlLogService(_sqlDAO);
-			IUADService _uadService = new UADService(_sqlDAO, _logService);
-			List<KPI> expected;
-			expected.Add(new KPI("success"));
+		public UADServiceShould() : base()
+		{
+		}
+
+		[Theory]
+		[InlineData(2022, 3, 6, "success")]
+		[InlineData(2021, 1, 1, "Error")]
+		public void LoadKPI(int year, int month, int day, string expected)
+		{
+			// Arrange
+			IUADService uadService = new UADService(sqlDAO, logService);
 
 			// Act
-			List<KPI> results = _uadService.LoadKPI(now);
+			List<IKPI> results = new List<IKPI>();
+			results = uadService.LoadKPI(new DateTime(year, month, day));
 
 			// Assert
-			Assert.Equal(expected, results);*/
-        }
+			string ex = "success";
+			for (int i = 0; i < 6; i++)
+			{
+				if (results[i].result != "success")
+				{
+					Console.WriteLine(i);
+					ex = "Error";
+				}
+			}
+			Assert.Equal(expected, ex);
+		}
 	}
 }
-

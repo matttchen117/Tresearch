@@ -51,7 +51,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             //Arrange
             IAccount account = new Account(email, email, passphrase, "User", true, false);
             //Act
-            string result = _registrationController.RegisterAccount(account);
+            string result = _registrationController.RegisterAccount(email, passphrase);
 
             //Assert
             Assert.Equal('S', result[0]);

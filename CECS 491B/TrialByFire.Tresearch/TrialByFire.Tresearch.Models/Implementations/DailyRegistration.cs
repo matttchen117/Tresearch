@@ -12,7 +12,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public DailyRegistration()
         {
             registrationDate = DateTime.Now;
-            registrationCount = 0;
+            registrationCount = -1;
         }
         public DailyRegistration(DateTime registrationDate, int registrationCount)
         {
