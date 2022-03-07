@@ -143,7 +143,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         return results;
                     }
                     var insertQuery = "INSERT INTO dbo.user_accounts (username, email, passphrase, authorization_level, account_status, confirmation) " +
-                        "VALUES (@username, @email, @passphrase, @authorizationLevel, @status, @confirmed)";
+                        "VALUES (@Username, @Email, @Passphrase, @AuthorizationLevel, @AccountStatus, @Confirmed)";
 
                     affectedRows = connection.Execute(insertQuery, account);
                 }
