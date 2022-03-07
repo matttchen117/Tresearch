@@ -2,6 +2,7 @@ using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
+using TrialByFire.Tresearch.Middlewares;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
@@ -45,6 +46,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors();
+
 app.UseCookieAuthentication();
 
 app.UseAuthorization();
@@ -53,9 +56,8 @@ app.Run();
 
 public static class AuthExtensions
 {
-    // Refer UseRouting, just passing Host
     public static IApplicationBuilder UseCookieAuthentication(this IApplicationBuilder host)
     {
-        throw new NotImplementedException();
+        return host.UseMiddleware<CookieAuthentication>();
     }
 }

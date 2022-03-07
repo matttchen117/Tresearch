@@ -41,6 +41,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch.Excep
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "TrialByFire.Tresearch.FrontEnd", "TrialByFire.Tresearch.FrontEnd\TrialByFire.Tresearch.FrontEnd.esproj", "{A1173A87-CB9F-4340-B996-FE74C23FE472}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrialByFire.Tresearch.Middlewares", "TrialByFire.Tresearch.Middlewares\TrialByFire.Tresearch.Middlewares.csproj", "{9B3BABED-C1EA-49DF-B632-DC7D1FABBF40}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{A1173A87-CB9F-4340-B996-FE74C23FE472}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1173A87-CB9F-4340-B996-FE74C23FE472}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A1173A87-CB9F-4340-B996-FE74C23FE472}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{9B3BABED-C1EA-49DF-B632-DC7D1FABBF40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B3BABED-C1EA-49DF-B632-DC7D1FABBF40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B3BABED-C1EA-49DF-B632-DC7D1FABBF40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B3BABED-C1EA-49DF-B632-DC7D1FABBF40}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
