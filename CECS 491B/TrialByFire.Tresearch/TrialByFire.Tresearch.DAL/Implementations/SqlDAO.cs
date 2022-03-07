@@ -544,6 +544,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
 
+        /*
+            Ian's Methods
+         */
+
+        
 
         public string CreateNodesCreated(INodesCreated nodesCreated)
         {
@@ -562,16 +567,17 @@ Values (@node_creation_date, @node_creation_count)";
                 }
                 if (affectedRows == 1)
                 {
-                    return "Created Nodes Successfully Inserted";
+                    return _messageBank.SuccessMessages["generic"];
                 }
                 else
                 {
-                    return "Created Nodes Not Inserted";
+                    return _messageBank.ErrorMessages["createdNodeNotInserted"];
                 }
             }
             catch (Exception ex)
             {
-                return "Fail";
+                Console.WriteLine(ex.Message);
+                return null;
             }
         }
 
@@ -592,19 +598,34 @@ Values (@node_creation_date, @node_creation_count)";
 
         public string UpdateNodesCreated(INodesCreated nodesCreated)
         {
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            try
             {
-                var updateQuery = @"UPDATE Tresearch.nodes_created (nodes_created_date, nodes_created_count)" +
-                                    "VALUES (@nodes_created_date, @nodes_created_count)";
+                using (var connection = new SqlConnection(_sqlConnectionString))
+                {
+                    var updateQuery = @"UPDATE Tresearch.nodes_created (nodes_created_date, nodes_created_count)" +
+                                        "VALUES (@nodes_created_date, @nodes_created_count)";
 
-                var _result = connection.Execute(updateQuery,
-                            new { nodes_created_date = nodesCreated.nodeCreationDate,
-                                  nodes_created_count = nodesCreated.nodeCreationCount
-                            }
-                            );
+                    var result = connection.Execute(updateQuery,
+                                new
+                                {
+                                    nodes_created_date = nodesCreated.nodeCreationDate,
+                                    nodes_created_count = nodesCreated.nodeCreationCount
+                                }
+                                );
+
+                    if (result == 1)
+                    {
+                        return _messageBank.SuccessMessages["generic"];
+                    }
+                    else
+                    {
+                        return _messageBank.ErrorMessages["createdNodeNotExist"];
+                    }
+                }
+            } catch(Exception ex) {
+                Console.WriteLine(ex.Message);
+                return null;
             }
-
-            return "Node Created Successfully Updated";
         }
 
 
@@ -625,16 +646,17 @@ Values (@node_creation_date, @node_creation_count)";
                 }
                 if (affectedRows == 1)
                 {
-                    return "Daily Login Successfully Created";
+                    return _messageBank.SuccessMessages["generic"];
                 }
                 else
                 {
-                    return "Daily Login Creation Failed";
+                    return _messageBank.ErrorMessages["dailyLoginNotInserted"];
                 }
             }
             catch (Exception ex)
             {
-                return "Fail";
+                Console.WriteLine(ex.Message);
+                return null;
             }
         }
 
@@ -655,19 +677,34 @@ Values (@node_creation_date, @node_creation_count)";
 
         public string UpdateDailyLogin(IDailyLogin dailyLogin)
         {
-            IDailyLogin logins;
-
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            try
             {
-                var updateQuery = @"UPDATE Tresearch.daily_logins (login_date, login_count) " + 
-                                    "VALUES (@login_date, @login_count)";
+                using (var connection = new SqlConnection(_sqlConnectionString))
+                {
+                    var updateQuery = @"UPDATE Tresearch.daily_logins (login_date, login_count) " +
+                                        "VALUES (@login_date, @login_count)";
 
-                logins = connection.QuerySingle<IDailyLogin>(updateQuery, new {login_date = dailyLogin.loginDate, 
-                                                                              login_count = dailyLogin.loginCount
-                                                                          });
+                    var result = connection.Execute(updateQuery, new
+                    {
+                        login_date = dailyLogin.loginDate,
+                        login_count = dailyLogin.loginCount
+                    });
+
+                    if (result == 1)
+                    {
+                        return _messageBank.SuccessMessages["generic"];
+                    } else
+                    {
+                        return _messageBank.ErrorMessages["dailyLoginNotExist"];
+                    }
+                }
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
             }
 
-            return "Daily Login Update Successful";
+                return "Daily Login Update Successful";
         }
 
 
@@ -689,16 +726,17 @@ Values (@node_creation_date, @node_creation_count)";
                 }
                 if (affectedRows == 1)
                 {
-                    return "Top Search Creation Successful";
+                    return _messageBank.SuccessMessages["generic"];
                 }
                 else
                 {
-                    return "Top Search Creation Failed";
+                    return _messageBank.ErrorMessages["topSearchNotInserted"];
                 }
             }
             catch (Exception ex)
             {
-                return "Fail";
+                Console.WriteLine(ex.Message);
+                return null;
             }
         }
 
@@ -718,19 +756,35 @@ Values (@node_creation_date, @node_creation_count)";
 
         public string UpdateTopSearch(ITopSearch topSearch)
         {
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            try
             {
-                var updateQuery = @"UPDATE Tresearch.top_search (top_search_date, search_string, search_count)" +
-                                    "VALUES (@top_search_date, @search_string, @search_count)";
+                using (var connection = new SqlConnection(_sqlConnectionString))
+                {
+                    var updateQuery = @"UPDATE Tresearch.top_search (top_search_date, search_string, search_count)" +
+                                        "VALUES (@top_search_date, @search_string, @search_count)";
 
-                var _result = connection.Execute(updateQuery,
-                                                    new{ top_search_date = topSearch.topSearchDate,
-                                                         search_string = topSearch.searchCount,
-                                                         search_count = topSearch.searchCount
-                                                    });
+                    var result = connection.Execute(updateQuery,
+                                                        new
+                                                        {
+                                                            top_search_date = topSearch.topSearchDate,
+                                                            search_string = topSearch.searchCount,
+                                                            search_count = topSearch.searchCount
+                                                        });
+
+                    if (result == 1)
+                    {
+                        return _messageBank.SuccessMessages["generic"];
+                    }
+                    else
+                    {
+                        return _messageBank.ErrorMessages["topSearchNotExist"];
+                    }
+                }
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
             }
-
-            return "Top Search Update Successful";
         }
 
 
@@ -753,16 +807,17 @@ Values (@node_creation_date, @node_creation_count)";
                 }
                 if (affectedRows == 1)
                 {
-                    return "Daily Registration Creation Successful";
+                    return _messageBank.SuccessMessages["generic"];
                 }
                 else
                 {
-                    return "Daily Registration Creation Failed";
+                    return _messageBank.ErrorMessages["dailyRegistrationNotInserted"];
                 }
             }
             catch (Exception ex)
             {
-                return "Fail";
+                Console.WriteLine(ex.Message);
+                return null;
             }
         }
 
@@ -783,16 +838,29 @@ Values (@node_creation_date, @node_creation_count)";
 
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration)
         {
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            try
             {
-                var updateQuery = @"UPDATE Tresearch.daily_registrations (registration_date, registration_count)" +
-                                    "VALUES (@registration_date, @registration_count)";
+                using (var connection = new SqlConnection(_sqlConnectionString))
+                {
+                    var updateQuery = @"UPDATE Tresearch.daily_registrations (registration_date, registration_count)" +
+                                        "VALUES (@registration_date, @registration_count)";
 
-                var result = connection.Execute(updateQuery,
-                                new { registration_date = dailyRegistration.registrationDate });
-            }
+                    var result = connection.Execute(updateQuery,
+                                    new { registration_date = dailyRegistration.registrationDate });
 
-            return "Daily Registration Update Successful";
+                    if(result == 1)
+                    {
+                        return _messageBank.SuccessMessages["generic"];
+                    } else
+                    {
+                        return _messageBank.ErrorMessages["dailyRegistrationNotExist"];
+                    }
+                }
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }  
         }
     }
 }

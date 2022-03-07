@@ -48,6 +48,22 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("tooManyFails", "Database: Too many fails have occurred. The account has been disabled.");
 
 
+            errorMessages.Add("createdNodesExists", "Fail - Created Nodes Already Exists");
+            errorMessages.Add("createdNodeNotExist", "Fail - Created Nodes to Update Does Not Exist in Database");
+            errorMessages.Add("createdNodeNotInserted", "Fail - Created Nodes Not Inserted");
+
+            errorMessages.Add("dailyLoginsExists", "Fail - Daily Logins Already Exists");
+            errorMessages.Add("dailyLoginNotInserted", "Fail - Daily Logins Not Inserted");
+            errorMessages.Add("dailyLoginNotExist", "Fail - Daily Logins to Update Does Not Exist in Database");
+
+            errorMessages.Add("topSearchExists", "Fail - Top Search Already Exists");
+            errorMessages.Add("topSearchNotInserted", "Fail - Top Search Not Inserted");
+            errorMessages.Add("topSearchNotExist", "Fail - Top Search to Update Does Not Exist");
+
+            errorMessages.Add("dailyRegistrationExists", "Fail - Daily Registration Already Exists");
+            errorMessages.Add("dailyRegistrationNotInserted", "Fail - Daily Registration Not Inserted");
+            errorMessages.Add("dailyRegistrationNotExist", "Fail - Daily Registration to Update Does Not Exist");
+
             return errorMessages;
         }
     }
