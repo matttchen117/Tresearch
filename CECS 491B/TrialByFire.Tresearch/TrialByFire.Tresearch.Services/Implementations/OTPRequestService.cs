@@ -25,7 +25,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         public string RequestOTP(IAccount account, IOTPClaim otpClaim)
         {
             string result = _sqlDAO.VerifyAccount(account);
-            if(result.Equals(_messageBank.SuccessMessages["generic"]))
+            if (result.Equals(_messageBank.SuccessMessages["generic"]))
             {
                 result = _sqlDAO.StoreOTP(otpClaim);
             }

@@ -51,71 +51,64 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 IAccount account = new Account(otpClaim.Username, otpClaim.AuthorizationLevel);
                 // Find account in db
                 int index = InMemoryDatabase.Accounts.IndexOf(account);
-                if (index != -1)
+                // no account found
+                if (index == -1)
                 {
-                    IAccount dbAccount = InMemoryDatabase.Accounts[index];
-                    // check if confirmed
-                    if (dbAccount.Confirmed != false)
+                    results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
+                    return results;
+                }
+                IAccount dbAccount = InMemoryDatabase.Accounts[index];
+                // check if confirmed
+                if (dbAccount.Confirmed == false)
+                {
+                    results.Add(_messageBank.ErrorMessages["notConfirmed"]);
+                    return results;
+                }
+                // check if enabled
+                if (dbAccount.AccountStatus == false)
+                {
+                    results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
+                    return results;
+                }
+                // find otp claim in db
+                index = InMemoryDatabase.OTPClaims.IndexOf(otpClaim);
+                // no account found
+                if (index == -1)
+                {
+                    results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
+                    return results;
+                }
+                IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[index];
+                // if otps do not match
+                if (!otpClaim.OTP.Equals(dbOTPClaim.OTP))
+                {
+                    // increment fail count
+                    ++InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount;
+                    // if fail count is 5 or more, disable account
+                    if (InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount >= 5)
                     {
-                        // check if enabled
-                        if (dbAccount.AccountStatus != false)
-                        {
-                            // find otp claim in db
-                            index = InMemoryDatabase.OTPClaims.IndexOf(otpClaim);
-                            if (index != -1)
-                            {
-                                IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[index];
-                                // check if otp is same
-                                if (otpClaim.OTP.Equals(dbOTPClaim.OTP))
-                                {
-                                    if (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2))
-                                    {
-                                        results.Add(_messageBank.SuccessMessages["generic"]);
-                                        results.Add($"username:{dbAccount.Username},authorizationLevel:{dbAccount.AuthorizationLevel}");
-                                        return results;
-                                    }
-                                    else
-                                    {
-                                        InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount++;
-                                        if (InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount >= 5)
-                                        {
-                                            InMemoryDatabase.Accounts[InMemoryDatabase.Accounts.IndexOf(account)].AccountStatus = false;
-                                            results.Add(_messageBank.ErrorMessages["tooManyFails"]);
-                                            return results;
-                                        }
-                                        else
-                                        {
-                                            results.Add(_messageBank.ErrorMessages["otpExpired"]);
-                                            return results;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
-                                    return results;
-                                }
-                            }
-                            else
-                            {
-                                results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
-                                return results;
-                            }
-                        }
-                        else
-                        {
-                            results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
-                            return results;
-                        }
+                        InMemoryDatabase.Accounts[InMemoryDatabase.Accounts.IndexOf(account)].AccountStatus = false;
+                        results.Add(_messageBank.ErrorMessages["tooManyFails"]);
+                        return results;
                     }
                     else
                     {
-                        results.Add(_messageBank.ErrorMessages["notConfirmed"]);
+                        results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
                         return results;
                     }
                 }
-                results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
-                return results;
+                // check that the otp was entered within 2 minutes of being created
+                if (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2))
+                {
+                    results.Add(_messageBank.SuccessMessages["generic"]);
+                    results.Add($"username:{dbAccount.Username},authorizationLevel:{dbAccount.AuthorizationLevel}");
+                    return results;
+                }
+                else
+                {
+                    results.Add(_messageBank.ErrorMessages["otpExpired"]);
+                    return results;
+                }
             }
             catch (AccountCreationFailedException acfe)
             {
