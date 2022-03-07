@@ -2014,6 +2014,7 @@
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
           "Microsoft.AspNetCore.Http.Abstractions": "2.2.0",
+          "System.IdentityModel.Tokens.Jwt": "6.16.0",
           "TrialByFire.Tresearch.Models": "1.0.0"
         },
         "compile": {
@@ -7074,19 +7075,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ianho\\.nuget\\packages\\": {}
+    "C:\\Users\\Matthew Chen\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\TrialByFire.Tresearch.Tests.csproj",
+      "projectUniqueName": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\TrialByFire.Tresearch.Tests.csproj",
       "projectName": "TrialByFire.Tresearch.Tests",
-      "projectPath": "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\TrialByFire.Tresearch.Tests.csproj",
-      "packagesPath": "C:\\Users\\ianho\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\obj\\",
+      "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\TrialByFire.Tresearch.Tests.csproj",
+      "packagesPath": "C:\\Users\\Matthew Chen\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\ianho\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Matthew Chen\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -7100,20 +7101,20 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
-              "projectPath": "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
+            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\TrialByFire.Tresearch.DAL.csproj"
             },
-            "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Managers\\TrialByFire.Tresearch.Managers.csproj": {
-              "projectPath": "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Managers\\TrialByFire.Tresearch.Managers.csproj"
+            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Managers\\TrialByFire.Tresearch.Managers.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Managers\\TrialByFire.Tresearch.Managers.csproj"
             },
-            "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj": {
-              "projectPath": "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj"
+            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj"
             },
-            "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj": {
-              "projectPath": "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj"
+            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\TrialByFire.Tresearch.Services.csproj"
             },
-            "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\TrialByFire.Tresearch.WebApi.csproj": {
-              "projectPath": "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\TrialByFire.Tresearch.WebApi.csproj"
+            "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\TrialByFire.Tresearch.WebApi.csproj": {
+              "projectPath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\TrialByFire.Tresearch.WebApi.csproj"
             }
           }
         }
@@ -7171,7 +7172,7 @@
       "code": "Undefined",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Problem reading the cache file C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+      "message": "Problem reading the cache file C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
     }
   ]
 }

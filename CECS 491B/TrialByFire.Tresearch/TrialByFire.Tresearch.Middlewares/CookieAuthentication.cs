@@ -32,7 +32,7 @@ namespace TrialByFire.Tresearch.Middlewares
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ClockSkew = TimeSpan.Zero
-                }, out SecurityToken validatedToken);;
+                }, out SecurityToken validatedToken);
                 var jwtToken = (JwtSecurityToken)validatedToken;
                 rolePrincipal.RoleIdentity = new RoleIdentity(true, jwtToken.Claims.First(x => x.Type == "username").Value,
                      jwtToken.Claims.First(x => x.Type == "authorizationLevel").Value);
