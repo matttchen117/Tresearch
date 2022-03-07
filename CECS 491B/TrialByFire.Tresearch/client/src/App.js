@@ -14,7 +14,9 @@ function App() {
       <Router>
         <header></header>
         <Routes>
-          <Route path="/Registration" element = {<RegistrationForm />}/>
+          <Route path="/Authentication/Login" element = {<RegistrationForm />}/>
+
+          <Route path="/Registration/Register" element = {<RegistrationForm />}/>
           <Route path="/Registration/ConfirmationSent" element = {<ConfirmationSent />}/>
           <Route path="/Registration/InactiveLink" element = {<InactiveLink />}/>
         </Routes>
