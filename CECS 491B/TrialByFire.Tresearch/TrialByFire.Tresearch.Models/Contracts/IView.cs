@@ -8,8 +8,9 @@ namespace TrialByFire.Tresearch.Models.Contracts
 {
     public interface IView
     {
-        public DateTime timestamp { get; }
-        public string viewName { get; }
-        public double averageDuration { get; }
+        public DateTime date { get; set; }
+        public string viewName { get; set; }
+        public int visits { get; set; }
+        public double averageDuration { get; set; }
     }
 }

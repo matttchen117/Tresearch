@@ -1,8 +1,14 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "dgSpecHash": "RrddEk11huns46URSui0pkhsWAKc2G0kl7u1pEfUwyLoNOoevguEWF5TxFYN5M44mDEXAZIALCaQgF53ldemCg==",
   "success": true,
   "projectFilePath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj",
+=======
+  "dgSpecHash": "XE+PP2l2jLrEavm4ulfnhO02igonpnEZZOSROtvrtRfhQzzLfkJ+IBRWZ5p/fWixmH9fyEBkd9+pGr3b/xHKsg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\jeslaz\\Source\\Repos\\Drakat7\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj",
+>>>>>>> 4e8d8f0c122ccf001a922b24c5d541cf6dc80421
   "expectedPackageFiles": [],
   "logs": []
 }

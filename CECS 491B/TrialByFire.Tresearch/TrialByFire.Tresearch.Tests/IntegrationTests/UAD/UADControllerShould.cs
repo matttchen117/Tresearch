@@ -3,33 +3,42 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
-using TrialByFire.Tresearch.WebApi.Controllers;
+using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
+using TrialByFire.Tresearch.Services.Contracts;
+using TrialByFire.Tresearch.Services.Implementations;
+using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
+using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.IntegrationTests.UAD
+namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 {
-	public class UADControllerShould
+	public class UADControllerShould : IntegrationTestDependencies
 	{
-		public void LoadKPI(DateTime now)
+		public UADControllerShould() : base()
 		{
-			/*// Arrange
-			ISqlDAO _sqlDAO = new SqlDAO();
-			ILogService _logService = new SqlLogService(_sqlDAO);
-			IUADManager _uadManager = new UADManager(_sqlDAO, _logService);
-			UADController _uadController = new UADController(_sqlDAO, _logService, _uadManager);
-			List<KPI> expected;
-			expected.Add(new KPI("success"));
+		}
+
+		[Theory]
+		[InlineData(2022, 3, 5, "success")]
+		[InlineData(2021, 12, 12, "Error")]
+		public void LoadKPI(int year, int month, int day, string expected)
+		{
+			// Arrange
+			IUADService uadService = new UADService(sqlDAO, logService);
+			IUADManager uadManager = new UADManager(sqlDAO, logService, uadService, authenticationService, authorizationService);
+			IUADController uadController = new UADController(sqlDAO, logService, uadManager);
 
 			// Act
-			List<KPI> results = _uadController.LoadKPI(_sqlDAO, _logService, _uadManager);
+			List<IKPI> results = new List<IKPI>();
+			results = uadController.LoadKPI(new DateTime(year, month, day));
 
 			// Assert
-			Assert.Equal(expected, results);*/
+			Assert.Equal(expected, results[0].result);
 		}
 	}
 }

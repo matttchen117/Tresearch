@@ -4,7 +4,8 @@ namespace TrialByFire.Tresearch.Models.Contracts
 {
 	public interface IViewKPI : IKPI
 	{
-		List<View> views { get; set; }
+		string result { get; set; }
+		List<IView> views { get; set; }
 	}
 }
 

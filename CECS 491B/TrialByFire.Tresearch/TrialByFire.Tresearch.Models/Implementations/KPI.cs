@@ -5,11 +5,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
 	public class KPI : IKPI
 	{
-		public string result { get; set; } 
+		public string result { get; set; }
 		public KPI(string result)
 		{
 			this.result = result;
 		}
+
 	}
 }
-

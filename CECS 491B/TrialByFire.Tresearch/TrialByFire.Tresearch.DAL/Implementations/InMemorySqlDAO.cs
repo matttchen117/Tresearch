@@ -335,9 +335,150 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public List<IKPI> LoadKPI(DateTime now)
         {
-            throw new NotImplementedException();
+            List<IKPI> kpiList = new List<IKPI>();
+            kpiList.Add(GetViewKPI());
+            kpiList.Add(GetViewDurationKPI());
+            kpiList.Add(GetNodeKPI(now));
+            kpiList.Add(GetLoginKPI(now));
+            kpiList.Add(GetRegistrationKPI(now));
+            kpiList.Add(GetSearchKPI(now));
+            return kpiList;
         }
 
+        //1
+        public IViewKPI GetViewKPI()
+        {
+            IViewKPI viewKPI = new ViewKPI();
+            List<IView> ordered = InMemoryDatabase.Views.OrderBy(x => x.visits).ToList();
+            if (ordered.Count == 0)
+            {
+                viewKPI.result = "Error";
+            }
+            int n = ordered.Count;
+            for (int i = 1; i <= 5; i++)
+            {
+                viewKPI.views.Add(ordered[(n - i)]);
+            }
+            viewKPI.result = "success";
+            return viewKPI;
+        }
+
+        //2
+        public IViewDurationKPI GetViewDurationKPI()
+        {
+            IViewDurationKPI viewDurationKPI = new ViewDurationKPI();
+            List<IView> ordered = InMemoryDatabase.Views.OrderBy(x => x.averageDuration).ToList();
+            if (ordered.Count == 0)
+            {
+                viewDurationKPI.result = "Error";
+                return viewDurationKPI;
+            }
+            int n = ordered.Count;
+            for (int i = 1; i < 5; i++)
+            {
+                viewDurationKPI.views.Add(ordered[(n - 1)]);
+            }
+            viewDurationKPI.result = "success";
+            return viewDurationKPI;
+        }
+
+        //3
+        public INodeKPI GetNodeKPI(DateTime now)
+        {
+            INodeKPI nodeKPI = new NodeKPI();
+            int counter = 1;
+            INodesCreated nCreated = GetNodesCreated(now);//Initial Check to see if InMemoryDatabase is not empty
+            if (nCreated.nodeCreationCount == -1)
+            {
+                nodeKPI.result = "Error";
+                return nodeKPI;
+            }
+            while ((counter < 29) && (nCreated.nodeCreationCount != -1))
+            {
+                nodeKPI.nodesCreated.Add(nCreated);
+                DateTime past = now.AddDays((counter * -1));
+                nCreated = GetNodesCreated(past);
+                counter++;
+            }
+            nodeKPI.result = "success";
+            return nodeKPI;
+        }
+
+        //4
+        public ILoginKPI GetLoginKPI(DateTime now)
+        {
+            ILoginKPI loginKPI = new LoginKPI();
+            int counter = 1;
+            IDailyLogin dLogin = GetDailyLogin(now);
+            if (dLogin.loginCount == -1)
+            {
+                loginKPI.result = "Error";
+                return loginKPI;
+            }
+            while ((counter <= 90) && (dLogin.loginCount != -1))
+            {
+                loginKPI.dailyLogins.Add(dLogin);
+                DateTime past = now.AddDays((counter * -1));
+                dLogin = GetDailyLogin(past);
+                counter++;
+            }
+            loginKPI.result = "success";
+            return loginKPI;
+        }
+
+        //5
+        public IRegistrationKPI GetRegistrationKPI(DateTime now)
+        {
+            IRegistrationKPI registrationKPI = new RegistrationKPI();
+            int counter = 1;
+            IDailyRegistration dRegistration = GetDailyRegistration(now);
+            if (dRegistration.registrationCount == -1)
+            {
+                registrationKPI.result = "Error";
+                return registrationKPI;
+            }
+            while ((counter <= 90) && (dRegistration.registrationCount != -1))
+            {
+                registrationKPI.dailyRegistrations.Add(dRegistration);
+                DateTime past = now.AddDays((counter * -1));
+                dRegistration = GetDailyRegistration(past);
+                counter++;
+            }
+            registrationKPI.result = "success";
+            return registrationKPI;
+        }
+
+        //6
+        public ISearchKPI GetSearchKPI(DateTime now)
+        {
+            ISearchKPI searchKPI = new SearchKPI();
+            int counter = 1;
+            ITopSearch sCreated = GetTopSearch(now);//Initial Check to see if InMemoryDatabase is not empty
+            List<ITopSearch> preSort = new List<ITopSearch>();
+            if (sCreated.searchCount == -1)
+            {
+                searchKPI.result = "Error";
+                return searchKPI;
+            }
+
+            while ((counter <= 28) && (sCreated.searchCount != -1))
+            {
+                preSort.Add(sCreated);
+                DateTime past = now.AddDays((counter * -1));
+                sCreated = GetTopSearch(past);
+                counter++;
+            }
+
+            List<ITopSearch> afterSort = preSort.OrderBy(x => x.searchCount).ToList();
+            int n = (afterSort.Count);
+            for (int i = 1; i <= 5 || i < n; i++)
+            {
+                Console.WriteLine(n);
+                searchKPI.topSearches.Add(afterSort[(n - i)]);
+            }
+            searchKPI.result = "success";
+            return searchKPI;
+        }
 
         /*
             Ian's Methods
