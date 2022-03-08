@@ -6,6 +6,8 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
+    [ApiController]
+    [Route("[controller]")]
     public class AuthenticationController : Controller, IAuthenticationController
     {
         private ISqlDAO _sqlDAO { get; }
@@ -25,7 +27,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _username = "guest";
         }
 
-        // IEnumerable may be faster than using lists, gives compiler chance to defer work to later, possibly optimizing in the process
+        [HttpPost]
+        [Route("authenticate")]
         public string Authenticate(string username, string otp, string authorizationLevel)
         {
             _username = username;
@@ -46,6 +49,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             return result;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         public string Authenticate(string username, string otp, string authorizationLevel, DateTime now)
         {
             _username = username;
@@ -66,7 +70,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             return result;
         }
 
-        [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         private string CreateCookie(string jwtToken)
         {
             string result;

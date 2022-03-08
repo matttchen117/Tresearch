@@ -14,7 +14,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public SqlDAO(IMessageBank messageBank)
         {
-            _sqlConnectionString = "Data Source=tresearchstudentserver.database.windows.net;Initial Catalog=tresearchStudentServer;User ID=tresearchadmin;Password=CECS491B!;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+            _sqlConnectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true";
 
             _messageBank = messageBank;
         }
@@ -219,7 +219,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
                     var readQuery = "SELECT * FROM Accounts WHERE Username = @username AND AuthorizationLevel = @role";
-                    var account = connection.ExecuteScalar<int>(readQuery, new { username = rolePrincipal.RoleIdentity.Name, role = rolePrincipal.RoleIdentity.AuthorizationLevel });
+                    var account = connection.ExecuteScalar<int>(readQuery, new { username = rolePrincipal.RoleIdentity.Username, role = rolePrincipal.RoleIdentity.AuthorizationLevel });
                     if (account == 0)
                     {
                         return _messageBank.ErrorMessages["notFoundOrAuthorized"];
@@ -234,7 +234,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             "DELETE FROM EmailConfirmationLinks WHERE username = @username;" +
                             "END";
 
-                        affectedRows = connection.Execute(storedProcedure, rolePrincipal.RoleIdentity.Name);
+                        affectedRows = connection.Execute(storedProcedure, rolePrincipal.RoleIdentity.Username);
                     }
 
 
@@ -315,7 +315,23 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    string query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
+                    string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
+                    IAccount dbAccount = connection.QueryFirst<Account>(query, new
+                    {
+                        Username = otpClaim.Username,
+                        AuthorizationLevel = otpClaim.AuthorizationLevel
+                    });
+                    if(dbAccount.Confirmed == false)
+                    {
+                        results.Add(_messageBank.ErrorMessages["notConfirmed"]);
+                        return results;
+                    }
+                    if(dbAccount.AccountStatus == false)
+                    {
+                        results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
+                        return results;
+                    }
+                    query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                     IOTPClaim dbOTPClaim = connection.QueryFirst<OTPClaim>(query, new
                     {
                         Username = otpClaim.Username,
@@ -328,10 +344,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     }
                     if (!otpClaim.OTP.Equals(dbOTPClaim.OTP))
                     {
-                        int failCount = dbOTPClaim.FailCount++;
+                        int failCount = ++dbOTPClaim.FailCount;
                         if (failCount >= 5)
                         {
-                            query = "UPDATE Accounts SET AccountStatus = false WHERE " +
+                            query = "UPDATE Accounts SET AccountStatus = 0 WHERE " +
                             "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                             affectedRows = connection.Execute(query, new
                             {
@@ -368,14 +384,15 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             return results;
                         }
                     }
-                    else if (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2))
+                    else if ((otpClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
                     {
-                        results.Add(_messageBank.ErrorMessages["otpExpired"]);
+                        results.Add(_messageBank.SuccessMessages["generic"]);
+                        results.Add($"username:{otpClaim.Username},authorizationLevel:{otpClaim.AuthorizationLevel}");
                         return results;
                     }
                     else
                     {
-                        results.Add(_messageBank.SuccessMessages["generic"]);
+                        results.Add(_messageBank.ErrorMessages["otpExpired"]);
                         return results;
                     }
                 }
@@ -405,24 +422,26 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                     IAccount dbAccount = connection.QueryFirst<Account>(query, new
                     {
-                        Username = rolePrincipal.RoleIdentity.Name,
+                        Username = rolePrincipal.RoleIdentity.Username,
                         AuthorizationLevel = rolePrincipal.RoleIdentity.AuthorizationLevel
                     });
-                    if (dbAccount == null)
+                    if (dbAccount.Confirmed == false)
                     {
-                        return _messageBank.ErrorMessages["notFoundOrAuthorized"];
-                    }
-                    else if (dbAccount.AccountStatus == false)
+                        return _messageBank.ErrorMessages["notConfirmed"];
+                    }else if (dbAccount.AccountStatus == false)
                     {
                         return _messageBank.ErrorMessages["notFoundOrEnabled"];
                     }
-                    else if (dbAccount.Confirmed == false)
-                    {
-                        return _messageBank.ErrorMessages["notConfirmed"];
-                    }
                     else
                     {
-                        return _messageBank.SuccessMessages["generic"];
+                        if(dbAccount.AuthorizationLevel.Equals("admin") || 
+                            dbAccount.AuthorizationLevel.Equals(requiredAuthLevel))
+                        {
+                            return _messageBank.SuccessMessages["generic"];
+                        }else
+                        {
+                            return _messageBank.ErrorMessages["notFoundOrAuthorized"];
+                        }
                     }
                 }
             }
@@ -432,7 +451,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (InvalidOperationException ioe)
             {
-                return _messageBank.ErrorMessages["notFoundOrEnabled"];
+                return _messageBank.ErrorMessages["notFoundOrAuthorized"];
             }
             catch (Exception ex)
             {

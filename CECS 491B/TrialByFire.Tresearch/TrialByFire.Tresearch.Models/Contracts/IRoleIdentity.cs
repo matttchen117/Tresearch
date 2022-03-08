@@ -9,6 +9,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
 {
     public interface IRoleIdentity : IIdentity
     {
-        string AuthorizationLevel { get; }
+        string Username { get; set; }
+        string AuthorizationLevel { get; set; }
     }
 }

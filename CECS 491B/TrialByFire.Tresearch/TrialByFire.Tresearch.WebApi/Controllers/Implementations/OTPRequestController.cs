@@ -6,6 +6,8 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
+    [ApiController]
+    [Route("[controller]")]
     public class OTPRequestController : Controller, IOTPRequestController
     {
         private ISqlDAO _sqlDAO { get; }
@@ -18,6 +20,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _otpRequestManager = otpRequestManager;
         }
 
+        [HttpPost]
+        [Route("requestotp")]
         public string RequestOTP(string username, string passphrase, string authorizationLevel)
         {
             return _otpRequestManager.RequestOTP(username, passphrase, authorizationLevel);

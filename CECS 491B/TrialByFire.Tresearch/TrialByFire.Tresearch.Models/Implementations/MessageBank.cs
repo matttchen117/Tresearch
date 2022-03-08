@@ -30,7 +30,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("badNameOrOTP", "Data: Invalid Username or OTP. Please try again.");
             errorMessages.Add("badEmail", "Data: Invalid Email. Please try again.");
             errorMessages.Add("notAuthorized", "Database: You are not authorized to perform this operation.");
-            errorMessages.Add("notAuthenticated", "Database: No active session found. Please login and try again.");
+            errorMessages.Add("notAuthenticated", "Server: No active session found. Please login and try again.");
             errorMessages.Add("alreadyAuthenticated", "Server: Active session found. Please logout and try again.");
             errorMessages.Add("notConfirmed", "Database: Please confirm your account before attempting to login.");
             errorMessages.Add("accountNotFound", "Database: The account was not found.");
@@ -44,6 +44,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 "operation.");
             errorMessages.Add("otpFail", "Database: Failed to create OTP.");
             errorMessages.Add("databaseFail", "Database: The database is down. Please try again later.");
+            errorMessages.Add("logoutFail", "Server: Logout failed.");
             return errorMessages;
         }
     }

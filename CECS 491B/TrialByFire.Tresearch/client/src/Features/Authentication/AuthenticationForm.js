@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import axios from 'axios';
 
-import "./LoginForm.css";
+import "./AuthenticationForm.css";
 
-const LoginForm = () => {
+const AuthenticationForm = () => {
     // States
     const [errorMessages, setErrorMessages] = useState({});
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [checked, setChecked] = useState(false);
 
     const errors = {
-        credentials: "Invalid username or password"
+        credentials: "Invalid username or otp"
     };
 
     const renderErrorMessage = (name) =>
@@ -20,10 +20,10 @@ const LoginForm = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        var { username, password } = document.forms[0];
+        var { username, otp, authorizationLevel } = document.forms[0];
 
 
-        axios.post('https://localhost:7010/Registration/register?=', {username, password})
+        axios.post('https://localhost:7010/Authentication/authenticate?=', {username, otp, authorizationLevel})
         .then(res => {
             
          })
@@ -69,4 +69,4 @@ const LoginForm = () => {
     );
 }
 
-export default LoginForm;
+export default AuthenticationForm;

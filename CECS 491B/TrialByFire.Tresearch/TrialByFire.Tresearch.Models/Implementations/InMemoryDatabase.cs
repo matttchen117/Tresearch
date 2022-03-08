@@ -50,6 +50,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<IOTPClaim> InitializeOTPClaims()
         {
             List<IOTPClaim> otpClaims = new List<IOTPClaim>();
+            otpClaims.Add(new OTPClaim("drakat7@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("drakat7@gmail.com", "ABCdef123", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
             // for otp request tests
             otpClaims.Add(new OTPClaim("aarry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
             otpClaims.Add(new OTPClaim("barry@gmail.com", "ABCdef123", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
@@ -74,6 +76,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<IAccount> InitializeAccounts()
         {
             List<IAccount> accounts = new List<IAccount>();
+            accounts.Add(new Account("drakat7@gmail.com", "drakat7@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new Account("drakat7@gmail.com", "drakat7@gmail.com", "abcDEF123", "admin", true, true));
             // for otp request tests
             accounts.Add(new Account("aarry@gmail.com", "aarry@gmail.com", "abcDEF123", "user", true, true));
             accounts.Add(new Account("barry@gmail.com", "barry@gmail.com", "abcDEF123", "admin", true, true));

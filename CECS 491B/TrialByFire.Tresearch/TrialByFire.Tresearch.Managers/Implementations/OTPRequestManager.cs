@@ -58,6 +58,10 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                         IAccount account = new Account(username, passphrase, authorizationLevel);
                         IOTPClaim otpClaim = new OTPClaim(account);
                         result = _otpRequestService.RequestOTP(account, otpClaim);
+                        if(result.Equals(_messageBank.SuccessMessages["generic"]))
+                        {
+                            result = _mailService.SendOTP(account.Username, otpClaim.OTP, otpClaim.OTP, otpClaim.OTP);
+                        }
                     }
                     return result;
                 }

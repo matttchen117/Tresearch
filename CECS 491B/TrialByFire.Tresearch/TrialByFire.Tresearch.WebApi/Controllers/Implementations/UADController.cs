@@ -9,7 +9,7 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
     [ApiController]
-    [Route("[controller")]
+    [Route("controller")]
     public class UADController : Controller, IUADController
     {
         private ISqlDAO _sqlDAO { get; }

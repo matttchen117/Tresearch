@@ -98,7 +98,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     }
                 }
                 // check that the otp was entered within 2 minutes of being created
-                if (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2))
+                if ((otpClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
                 {
                     results.Add(_messageBank.SuccessMessages["generic"]);
                     results.Add($"username:{dbAccount.Username},authorizationLevel:{dbAccount.AuthorizationLevel}");
@@ -126,7 +126,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             try
             {
-                IAccount account = new Account(rolePrincipal.RoleIdentity.Name, rolePrincipal.RoleIdentity.AuthorizationLevel);
+                IAccount account = new Account(rolePrincipal.RoleIdentity.Username, rolePrincipal.RoleIdentity.AuthorizationLevel);
                 // Find account in db
                 int index = InMemoryDatabase.Accounts.IndexOf(account);
                 if (index != -1)
@@ -192,7 +192,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public string DeleteAccount(IRolePrincipal rolePrincipal)
         {
             bool accountExists = false;
-            string accountName = rolePrincipal.RoleIdentity.Name;
+            string accountName = rolePrincipal.RoleIdentity.Username;
             string accountRole = rolePrincipal.RoleIdentity.AuthorizationLevel;
             try
             {
