@@ -15,7 +15,7 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
+namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
 {
     public class AccountDeletionServiceShould : IntegrationTestDependencies
     {
@@ -26,7 +26,6 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
         [Theory]
         [InlineData("altyn@gmail.com", "user", "success")]
         [InlineData("ryst@gmail.com", "admin", "success")]
-        [InlineData("redKeyCard@gmail.com", "admin", "Database: The account was not found.")]
 
 
         public void DeleteTheUser(string currentIdentity, string currentRole, string expected)

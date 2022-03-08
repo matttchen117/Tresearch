@@ -210,51 +210,47 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             return results;
         }
+
+
         public string DeleteAccount(IRolePrincipal rolePrincipal)
         {
-
-            int affectedRows;
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var readQuery = "SELECT * FROM Accounts WHERE Username = @username AND AuthorizationLevel = @role";
-                    var account = connection.ExecuteScalar<int>(readQuery, new { username = rolePrincipal.RoleIdentity.Name, role = rolePrincipal.RoleIdentity.AuthorizationLevel });
-                    if (account == 0)
+                    var deleteQuery = "DELETE FROM dbo.Accounts WHERE Username = @username AND AuthorizationLevel = @authorizationLevel";
+                    var rowsAffected = connection.ExecuteScalar<int>(deleteQuery, new { username = rolePrincipal.RoleIdentity.Name, authorizationLevel = rolePrincipal.RoleIdentity.AuthorizationLevel });
+                    if (rowsAffected == 0)
                     {
-                        return _messageBank.ErrorMessages["notFoundOrAuthorized"];
+                        var readQuery = "SELECT * FROM dbo.Accounts WHERE Username = @username AND AuthorizationLevel = @authorizationLevel";
+                        var rowsAffectedAfter = connection.ExecuteScalar<int>(readQuery, new { username = rolePrincipal.RoleIdentity.Name, authorizationLevel = rolePrincipal.RoleIdentity.AuthorizationLevel });
+                        if(rowsAffectedAfter == 0)
+                        {
+                            return _messageBank.SuccessMessages["generic"];
+
+                        }
+                        else
+                        {
+                            return _messageBank.ErrorMessages["accountNotFound"];
+                        }
                     }
+
                     else
                     {
-                        var storedProcedure = "CREATE PROCEDURE dbo.deleteAccount @username varchar(25) AS BEGIN" +
-                            "DELETE FROM Accounts WHERE Username = @username;" +
-                            "DELETE FROM OTPClaims WHERE Username = @username;" +
-                            "DELETE FROM Nodes WHERE account_own = @username;" +
-                            "DELETE FROM UserRatings WHERE Username = @username;" +
-                            "DELETE FROM EmailConfirmationLinks WHERE username = @username;" +
-                            "END";
-
-                        affectedRows = connection.Execute(storedProcedure, rolePrincipal.RoleIdentity.Name);
+                        return _messageBank.ErrorMessages["accountNotFound"];
                     }
 
 
                 }
-
-                if (affectedRows >= 1)
-                {
-                    return _messageBank.SuccessMessages["generic"];
-                }
-                else
-                {
-                    return _messageBank.ErrorMessages["notFoundOrAuthorized"];
-                }
             }
-            catch (AccountDeletionFailedException adfe)
+            catch(AccountDeletionFailedException adfe)
             {
                 return adfe.Message;
             }
-
         }
+
+
+
 
         public string VerifyAccount(IAccount account)
         {

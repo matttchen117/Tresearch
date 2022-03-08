@@ -403,3 +403,5 @@ C:\Users\viet\Source\Repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\Tri
 C:\Users\viet\Source\Repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Tests\obj\Debug\net6.0\ref\TrialByFire.Tresearch.Tests.dll
 C:\Users\viet\Source\Repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Tests\obj\Debug\net6.0\TrialByFire.Tresearch.Tests.pdb
 C:\Users\viet\Source\Repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Tests\obj\Debug\net6.0\TrialByFire.Tresearch.Tests.genruntimeconfig.cache
+C:\Users\viet\Source\Repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Tests\bin\Debug\net6.0\TrialByFire.Tresearch.Middlewares.dll
+C:\Users\viet\Source\Repos\Drakat7\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Tests\bin\Debug\net6.0\TrialByFire.Tresearch.Middlewares.pdb
