@@ -18,7 +18,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
         }
 
         [Theory]
-        [InlineData(2022, 3, 6, "success")]
+        [InlineData(2022, 3, 7, "success")]
         [InlineData(2021, 12, 12, "Error")]
         public void LoadKPIs(int year, int month, int day, string expected)
         {
@@ -31,7 +31,15 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
             results = uadService.LoadKPI(new DateTime(year, month, day));
 
             // Assert
-            Assert.Equal(expected, results[0].result);
+            string ex = "success";
+            foreach (var x in results)
+            {
+                if (x.result != "success")
+                {
+                    ex = "Error";
+                }
+            }
+            Assert.Equal(expected, ex);
         }
 
 

@@ -345,6 +345,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return kpiList;
         }
 
+
         //1
         public IViewKPI GetViewKPI()
         {
@@ -671,6 +672,46 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
 
             return "Daily Registration does not exist to be updated";
+        }
+
+        public string CreateView(IView view)
+        {
+            foreach (IView view1 in InMemoryDatabase.Views)
+            {
+                if (view1.date == view.date)
+                {
+                    return "View Already Exists in the Database";
+                }
+            }
+
+            InMemoryDatabase.Views.Add(view);
+
+            return "View Successfully Added to the Database";
+        }
+
+        public IList<IView> GetAllViews()
+        {
+            throw new NotImplementedException();
+        }
+
+        IList<INodesCreated> ISqlDAO.GetNodesCreated(DateTime nodeCreationDate)
+        {
+            throw new NotImplementedException();
+        }
+
+        IList<IDailyLogin> ISqlDAO.GetDailyLogin(DateTime nodeCreationDate)
+        {
+            throw new NotImplementedException();
+        }
+
+        IList<ITopSearch> ISqlDAO.GetTopSearch(DateTime nodeCreationDate)
+        {
+            throw new NotImplementedException();
+        }
+
+        IList<IDailyRegistration> ISqlDAO.GetDailyRegistration(DateTime nodeCreationDate)
+        {
+            throw new NotImplementedException();
         }
     }
 }

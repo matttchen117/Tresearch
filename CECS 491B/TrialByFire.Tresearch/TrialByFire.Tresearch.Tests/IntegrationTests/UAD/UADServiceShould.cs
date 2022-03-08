@@ -20,20 +20,21 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 		}
 
 		[Theory]
-		[InlineData(2022, 3, 6, "success")]
+		[InlineData(2022, 3, 7, "success")]
 		[InlineData(2021, 1, 1, "Error")]
 		public void LoadKPI(int year, int month, int day, string expected)
 		{
 			// Arrange
 			IUADService uadService = new UADService(sqlDAO, logService);
 
+			InMemoryDatabase db = new InMemoryDatabase();
+
 			// Act
-			List<IKPI> results = new List<IKPI>();
-			results = uadService.LoadKPI(new DateTime(year, month, day));
+			List<IKPI> results = uadService.LoadKPI(new DateTime(year, month, day));
 
 			// Assert
 			string ex = "success";
-			for (int i = 0; i < 6; i++)
+			for (int i = 0; i < results.Count; i++)
 			{
 				if (results[i].result != "success")
 				{

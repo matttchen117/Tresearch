@@ -177,37 +177,39 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<IDailyLogin> InitializeDailyLogins()
         {
             List<IDailyLogin> dailyLogins = new List<IDailyLogin>();
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 3)), 100));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 4)), 99));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 5)), 98));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 6)), 97));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 7)), 96));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 8)), 95));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 9)), 94));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 10)), 93));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 11)), 92));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 12)), 91));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 1)), 102));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 2)), 101));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 3)), 100));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 4)), 99));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 5)), 98));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 6)), 97));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 7)), 96));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 8)), 95));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 9)), 94));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 10)), 93));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 11)), 92));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 12)), 91));
 
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 13)), 90));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 14)), 89));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 15)), 88));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 16)), 87));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 17)), 86));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 18)), 85));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 19)), 84));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 20)), 83));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 21)), 82));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 22)), 81));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 13)), 90));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 14)), 89));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 15)), 88));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 16)), 87));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 17)), 86));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 18)), 85));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 19)), 84));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 20)), 83));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 21)), 82));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 22)), 81));
 
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 23)), 80));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 24)), 79));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 25)), 78));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 26)), 77));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 27)), 76));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 28)), 75));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 29)), 74));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 30)), 73));
-            dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 31)), 72));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 23)), 80));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 24)), 79));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 25)), 78));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 26)), 77));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 27)), 76));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 28)), 75));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 29)), 74));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 30)), 73));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 31)), 72));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 1, 1)), 71));
 
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 1, 2)), 70));
@@ -275,6 +277,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 4)), 13));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 5)), 12));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 6)), 11));
+            dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 7)), 10));
             return dailyLogins;
         }
 
@@ -313,6 +316,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
             topSearches.Add(new TopSearch((new DateTime(2022, 3, 4)), "Fish", 49));
             topSearches.Add(new TopSearch((new DateTime(2022, 3, 5)), "Cows", 45));
             topSearches.Add(new TopSearch((new DateTime(2022, 3, 6)), "Dogs", 50));
+            topSearches.Add(new TopSearch((new DateTime(2022, 3, 7)), "Coffee", 51));
+
+
             return topSearches;
         }
 
@@ -351,43 +357,46 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 4)), 98));
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 5)), 99));
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 6)), 100));
+            nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 7)), 101));
             return nodesCreated;
         }
 
         private List<IDailyRegistration> InitializeDailyRegistrations()
         {
             List<IDailyRegistration> dailyRegistrations = new List<IDailyRegistration>();
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 3)), 100));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 4)), 99));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 5)), 98));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 6)), 97));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 7)), 96));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 8)), 95));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 9)), 94));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 10)), 93));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 11)), 92));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 12)), 91));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 1)), 102));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 2)), 101));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 3)), 100));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 4)), 99));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 5)), 98));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 6)), 97));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 7)), 96));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 8)), 95));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 9)), 94));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 10)), 93));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 11)), 92));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 12)), 91));
 
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 13)), 90));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 14)), 89));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 15)), 88));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 16)), 87));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 17)), 86));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 18)), 85));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 19)), 84));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 20)), 83));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 21)), 82));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 22)), 81));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 13)), 90));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 14)), 89));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 15)), 88));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 16)), 87));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 17)), 86));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 18)), 85));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 19)), 84));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 20)), 83));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 21)), 82));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 22)), 81));
 
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 23)), 80));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 24)), 79));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 25)), 78));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 26)), 77));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 27)), 76));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 28)), 75));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 29)), 74));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 30)), 73));
-            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 31)), 72));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 23)), 80));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 24)), 79));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 25)), 78));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 26)), 77));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 27)), 76));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 28)), 75));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 29)), 74));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 30)), 73));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 31)), 72));
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 1, 1)), 71));
 
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 1, 2)), 70));
@@ -455,6 +464,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 3, 4)), 13));
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 3, 5)), 12));
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 3, 6)), 11));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 3, 7)), 10));
             return dailyRegistrations;
         }
 
@@ -467,6 +477,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<IView> InitializeViews()
         {
             List<IView> views = new List<IView>();
+            views.Add(new View(new DateTime(2022, 3, 7), "Email", 10, 99.54));
             views.Add(new View(new DateTime(2022, 3, 6), "UAD", 50, 75.29));
             views.Add(new View(new DateTime(2022, 3, 5), "DeleteAccount", 60, 15.39));
             views.Add(new View(new DateTime(2022, 3, 4), "CreateAccount", 20, 17.43));

@@ -9,7 +9,7 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
     [ApiController]
-    [Route("[controller")]
+    [Route("[controller]")]
     public class UADController : Controller, IUADController
     {
         private ISqlDAO _sqlDAO { get; }
@@ -22,9 +22,10 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _uadManager = uadManager;
         }
 
-        [HttpPost("kpi")]
-        public List<IKPI> LoadKPI(DateTime now)
+        [HttpGet("kpi")]
+        public List<IKPI> LoadKPI()
         {
+            DateTime now = DateTime.Now.Date;
             List<IKPI> kpiList = new List<IKPI>();
             kpiList = _sqlDAO.LoadKPI(now);
             return kpiList;

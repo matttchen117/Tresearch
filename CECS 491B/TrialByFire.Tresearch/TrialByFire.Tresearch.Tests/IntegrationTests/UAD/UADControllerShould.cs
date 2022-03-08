@@ -35,7 +35,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 
 			// Act
 			List<IKPI> results = new List<IKPI>();
-			results = uadController.LoadKPI(new DateTime(year, month, day));
+			results = uadController.LoadKPI();
 
 			// Assert
 			Assert.Equal(expected, results[0].result);

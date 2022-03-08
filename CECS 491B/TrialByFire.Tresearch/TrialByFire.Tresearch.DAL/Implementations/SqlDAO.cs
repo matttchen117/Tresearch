@@ -500,10 +500,118 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public List<IKPI> LoadKPI(DateTime now)
         {
-            throw new NotImplementedException();
+            List<IKPI> kpiList = new List<IKPI>();
+            kpiList.Add(GetViewKPI());
+            kpiList.Add(GetViewDurationKPI());
+            kpiList.Add(GetNodeKPI(now));
+            kpiList.Add(GetLoginKPI(now));
+            kpiList.Add(GetRegistrationKPI(now));
+            kpiList.Add(GetSearchKPI(now));
+            return kpiList;
         }
 
+        public IViewKPI GetViewKPI()
+        {
+            IViewKPI viewKPI = new ViewKPI();
+            IList<IView> ordered = GetAllViews();
+            if (ordered.Count == 0)
+            {
+                viewKPI.result = "Error";
+            }
+            int n = ordered.Count;
+            for (int i = 1; i <= 5; i++)
+            {
+                viewKPI.views.Add(ordered[(n - i)]);
+            }
+            viewKPI.result = "success";
+            return viewKPI;
+        }
 
+        public IViewDurationKPI GetViewDurationKPI()
+        {
+            IViewDurationKPI viewDurationKPI = new ViewDurationKPI();
+            IList<IView> ordered = GetAllViews();
+            if (ordered.Count == 0)
+            {
+                viewDurationKPI.result = "Error";
+                return viewDurationKPI;
+            }
+            int n = ordered.Count;
+            for (int i = 1; i < 5; i++)
+            {
+                viewDurationKPI.views.Add(ordered[(n - 1)]);
+            }
+            viewDurationKPI.result = "success";
+            return viewDurationKPI;
+        }
+
+        public INodeKPI GetNodeKPI(DateTime now)
+        {
+            INodeKPI nodeKPI = new NodeKPI();
+            IList <INodesCreated> nC= GetNodesCreated(now);
+            if(nC.Count == 0)
+            {
+                nodeKPI.result = "Error";
+                return nodeKPI;
+            }
+            for(int i = 1; i < nC.Count; i++)
+            {
+                nodeKPI.nodesCreated.Add(nC[(nC.Count - 1)]);
+            }
+            nodeKPI.result = "success";
+            return nodeKPI;
+        }
+
+        public ILoginKPI GetLoginKPI(DateTime now)
+        {
+            ILoginKPI loginKPI = new LoginKPI();
+            IList<IDailyLogin> nC = GetDailyLogin(now);
+            if (nC.Count == 0)
+            {
+                loginKPI.result = "Error";
+                return loginKPI;
+            }
+            for (int i = 1; i < nC.Count; i++)
+            {
+                loginKPI.dailyLogins.Add(nC[(nC.Count - 1)]);
+            }
+            loginKPI.result = "success";
+            return loginKPI;
+        }
+
+        public IRegistrationKPI GetRegistrationKPI(DateTime now)
+        {
+            IRegistrationKPI registrationKPI = new RegistrationKPI();
+            IList<IDailyRegistration> nC = GetDailyRegistration(now);
+            if (nC.Count == 0)
+            {
+                registrationKPI.result = "Error";
+                return registrationKPI;
+            }
+            for (int i = 1; i < nC.Count; i++)
+            {
+                registrationKPI.dailyRegistrations.Add(nC[(nC.Count - 1)]);
+            }
+            registrationKPI.result = "success";
+            return registrationKPI;
+        }
+
+        public ISearchKPI GetSearchKPI(DateTime now)
+        {
+            ISearchKPI searchKPI = new SearchKPI();
+            IList<ITopSearch> nC = GetTopSearch(now);
+            if (nC.Count == 0)
+            {
+                searchKPI.result = "Error";
+                return searchKPI;
+            }
+            for (int i = 1; i < nC.Count; i++)
+            {
+                searchKPI.topSearches.Add(nC[(nC.Count - 1)]);
+            }
+            searchKPI.result = "success";
+            return searchKPI;
+        }
 
         public string CreateNodesCreated(INodesCreated nodesCreated)
         {
@@ -512,14 +620,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var insertQuery = @"INSERT INTO Tresearch.NodesCreated (node_creation_date, node_creation_count)
-Values (@node_creation_date, @node_creation_count)";
+                    var insertQuery = @"INSERT INTO dbo.NodesCreated (NodeCreationDate, NodeCreationCount)
+                            Values (@NodeCreationDate, @NodeCreationCount)";
 
                     affectedRows = connection.Execute(insertQuery,
                                     new
                                     {
-                                        node_creation_date = nodesCreated.nodeCreationDate,
-                                        node_creation_count = nodesCreated.nodeCreationCount
+                                        NodeCreationDate = nodesCreated.nodeCreationDate,
+                                        NodeCreationCount = nodesCreated.nodeCreationCount
                                     });
                 }
                 if (affectedRows == 1)
@@ -537,27 +645,26 @@ Values (@node_creation_date, @node_creation_count)";
             }
         }
 
-        public INodesCreated GetNodesCreated(DateTime nodeCreationDate)
+        public IList<INodesCreated> GetNodesCreated(DateTime nodeCreationDate)
         {
-            INodesCreated nodesCreated;
+            //INodesCreated nodesCreated;
 
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                var selectQuery = "SELECT * FROM Tresearch.nodes_created" +
-                                  "WHERE _node_creation_date >= @node_creation_date - 30";
-
-                nodesCreated = connection.QuerySingle<INodesCreated>(selectQuery, new { node_creation_date = nodeCreationDate });
+                return connection.Query<INodesCreated>("SELECT * FROM dbo.NodesCreated WHERE NodeCreationDate >= @NodeCreationDate").ToList();
+                //nodesCreated = connection.QuerySingle<NodesCreated>(selectQuery, new { NodeCreationDate = nodeCreationDate });
             }
 
-            return nodesCreated;
+            //return new NodesCreated();
         }
+
 
         public string UpdateNodesCreated(INodesCreated nodesCreated)
         {
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                var updateQuery = @"UPDATE Tresearch.nodes_created (nodes_created_date, nodes_created_count)" +
-                                    "VALUES (@nodes_created_date, @nodes_created_count)";
+                var updateQuery = @"UPDATE dbo.NodesCreated (NodesCreatedDate, NodesCreatedCount)" +
+                                    "VALUES (@NodesCreatedDate, @NodesCreatedCount)";
 
                 var _result = connection.Execute(updateQuery,
                             new
@@ -573,20 +680,20 @@ Values (@node_creation_date, @node_creation_count)";
 
 
 
-        public string CreateDailyLogins(IDailyLogin dailyLogin)
+        public string CreateDailyLogin(IDailyLogin dailyLogin)
         {
             int affectedRows;
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var insertQuery = @"INSERT INTO Tresearch.DailyLogins (login_date, login_count)
-                                        Values (@loginDate, @loginCount)";
+                    var insertQuery = @"INSERT INTO dbo.DailyLogins (LoginDate, LoginCount)
+                                        Values (@LoginDate, @LoginCount)";
                     affectedRows = connection.Execute(insertQuery,
                                         new
                                         {
-                                            login_date = dailyLogin.loginDate,
-                                            login_count = dailyLogin.loginCount
+                                            LoginDate = dailyLogin.loginDate,
+                                            LoginCount = dailyLogin.loginCount
                                         });
                 }
                 if (affectedRows == 1)
@@ -604,19 +711,24 @@ Values (@node_creation_date, @node_creation_count)";
             }
         }
 
-        public IDailyLogin GetDailyLogin(DateTime loginDate)
+        public IList<IDailyLogin> GetDailyLogin(DateTime loginDate)
         {
-            IDailyLogin dailyLogin;
 
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                var selectQuery = "SELECT * FROM Tresearch.daily_logins" +
-                                    "WHERE _loginDate >= @login_date - 30";
-
-                dailyLogin = connection.QuerySingle<IDailyLogin>(selectQuery, new { login_date = loginDate });
+                return connection.Query<IDailyLogin>("SELECT * FROM dbo.DailyLogins WHERE LoginDate >= @LoginDate").ToList();
+                //dailyLogin = connection.QuerySingle<DailyLogin>(selectQuery, new { LoginDate = loginDate });
             }
 
-            return dailyLogin;
+            //return dailyLogin;
+        }
+
+        public IList<IView> GetAllViews()
+        {
+            using(var connection = new SqlConnection(_sqlConnectionString))
+            {
+                return connection.Query<IView>("SELECT DateCreated, ViewName, Visits, AverageDuration from dbo.ViewTable").ToList();
+            }
         }
 
         public string UpdateDailyLogin(IDailyLogin dailyLogin)
@@ -625,8 +737,8 @@ Values (@node_creation_date, @node_creation_count)";
 
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                var updateQuery = @"UPDATE Tresearch.daily_logins (login_date, login_count) " +
-                                    "VALUES (@login_date, @login_count)";
+                var updateQuery = @"UPDATE dbo.DailyLogins (LoginDate, LoginCount) " +
+                                    "VALUES (@LoginDate, @LoginCount)";
 
                 logins = connection.QuerySingle<IDailyLogin>(updateQuery, new
                 {
@@ -647,14 +759,14 @@ Values (@node_creation_date, @node_creation_count)";
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var insertQuery = @"INSERT INTO Tresearch.TopSearch (top_search_date, top_search_string, top_search_countl)" +
-                                        "Values (@top_search_date, @top_search_string, @top_search_count)";
+                    var insertQuery = @"INSERT INTO dbo.TopSearches (TopSearchDate, SearchString, SearchCount)" +
+                                        "Values (@TopSearchDate, @SearchString, @SearchCount)";
                     affectedRows = connection.Execute(insertQuery,
                                         new
                                         {
-                                            top_search_date = topSearch.topSearchDate,
-                                            top_search_string = topSearch.searchString,
-                                            top_search_count = topSearch.searchCount
+                                            TopSearchDate = topSearch.topSearchDate,
+                                            SearchString = topSearch.searchString,
+                                            SearchCount = topSearch.searchCount
                                         });
                 }
                 if (affectedRows == 1)
@@ -672,33 +784,32 @@ Values (@node_creation_date, @node_creation_count)";
             }
         }
 
-        public ITopSearch GetTopSearch(DateTime topSearchDate)
+        public IList<ITopSearch> GetTopSearch(DateTime topSearchDate)
         {
-            ITopSearch topSearch;
+            //ITopSearch topSearch;
 
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                var selectQuery = "SELECT * FROM Tresearch.top_search" +
-                                    "WHERE topSearchDate >= @top_search_date - 30";
-                topSearch = connection.QuerySingle<ITopSearch>(selectQuery, new { top_search_date = topSearchDate });
+                return connection.Query<ITopSearch>("SELECT * FROM dbo.TopSearches + WHERE TopSearchDate >= @TopSearchDate - 30").ToList();
+                //topSearch = connection.QuerySingle<TopSearch>(selectQuery, new { TopSearchDate = topSearchDate });
             }
 
-            return topSearch;
+            //return topSearch;
         }
 
         public string UpdateTopSearch(ITopSearch topSearch)
         {
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                var updateQuery = @"UPDATE Tresearch.top_search (top_search_date, search_string, search_count)" +
-                                    "VALUES (@top_search_date, @search_string, @search_count)";
+                var updateQuery = @"UPDATE dbo.TopSearches (TopSearchDate, SearchString, SearchCount)" +
+                                    "VALUES (@TopSearchDate, @SearchString, @SearchCount)";
 
                 var _result = connection.Execute(updateQuery,
                                                     new
                                                     {
-                                                        top_search_date = topSearch.topSearchDate,
-                                                        search_string = topSearch.searchCount,
-                                                        search_count = topSearch.searchCount
+                                                        TopSearchDate = topSearch.topSearchDate,
+                                                        SearchString = topSearch.searchCount,
+                                                        SearchCount = topSearch.searchCount
                                                     });
             }
 
@@ -714,13 +825,13 @@ Values (@node_creation_date, @node_creation_count)";
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var insertQuery = @"INSERT INTO Tresearch.DailyRegistrations (registration_date, registration_countl)" +
-                                        "Values (@registrationDate, @registrationCount)";
+                    var insertQuery = @"INSERT INTO dbo.DailyRegistrations (RegistrationDate, RegistrationCount)" +
+                                        "Values (@RegistrationDate, @RegistrationCount)";
                     affectedRows = connection.Execute(insertQuery,
                                      new
                                      {
-                                         registration_date = dailyRegistration.registrationDate,
-                                         registration_count = dailyRegistration.registrationCount
+                                         RegistrationDate = dailyRegistration.registrationDate,
+                                         RegistrationCount = dailyRegistration.registrationCount
                                      });
                 }
                 if (affectedRows == 1)
@@ -738,38 +849,66 @@ Values (@node_creation_date, @node_creation_count)";
             }
         }
 
-        public IDailyRegistration GetDailyRegistration(DateTime dailyRegistrationDate)
+        public string CreateView(IView view)
+        {
+            int affectedRows;
+            try
+            {
+                using (var connection = new SqlConnection(_sqlConnectionString))
+                {
+                    var insertQuery = @"INSERT INTO dbo.ViewTable (DateCreated, ViewName, Visits, AverageDuration)" +
+                        "Values (@DateCreated, @ViewName, @Visits, @AverageDuration)";
+                    affectedRows = connection.Execute(insertQuery, new
+                    {
+                        DateCreated = view.date,
+                        ViewName = view.viewName,
+                        Visits = view.visits,
+                        AverageDuration = view.averageDuration
+                    });
+                }
+                if(affectedRows == 1)
+                {
+                    return "View Creation Successful";
+                }
+                else
+                {
+                    return "View Creation Failed";
+                }
+            }
+            catch (Exception ex)
+            {
+                return "Fail";
+            }
+        }
+
+        public IList<IDailyRegistration> GetDailyRegistration(DateTime dailyRegistrationDate)
         {
             IDailyRegistration dailyRegistration;
 
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                var selectQuery = "SELECT * FROM Tresearch.daily_registrations" +
-                                    "WHERE _registrationDate >= @registration_date - 30";
-
-                dailyRegistration = connection.QuerySingle<IDailyRegistration>(selectQuery, new { registration_date = dailyRegistrationDate });
+                
+                return connection.Query<IDailyRegistration>("SELECT * FROM dbo.DailyRegistration + WHERE RegistrationDate >= @Registration - 90").ToList();
+                //dailyRegistration = connection.QuerySingle<DailyRegistration>(selectQuery, new { RegistrationDate = dailyRegistrationDate });
             }
 
-            return dailyRegistration;
+            //return dailyRegistration;
         }
 
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration)
         {
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                var updateQuery = @"UPDATE Tresearch.daily_registrations (registration_date, registration_count)" +
-                                    "VALUES (@registration_date, @registration_count)";
+                var updateQuery = @"UPDATE dbo.DailyRegistrations (RegistrationDate, RegistrationCount)" +
+                                    "VALUES (@RegistrationDate, @RegistrationCount)";
 
                 var result = connection.Execute(updateQuery,
-                                new { registration_date = dailyRegistration.registrationDate });
+                                new { RegistrationDate = dailyRegistration.registrationDate });
             }
 
             return "Daily Registration Update Successful";
         }
 
-        public string CreateDailyLogin(IDailyLogin dailyLogin)
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }
