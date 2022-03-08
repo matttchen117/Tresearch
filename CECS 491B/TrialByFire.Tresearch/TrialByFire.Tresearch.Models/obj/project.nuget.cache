@@ -1,8 +1,21 @@
 {
   "version": 2,
+<<<<<<< Updated upstream
   "dgSpecHash": "dtRU2R48TdUixyKagyF0cz3JnGyp0YoBt6HxcHhPK0oteNPG9PUgrp27qKbIQYh5BQ1PCnEyN+UZxLYf/htgCA==",
   "success": true,
   "projectFilePath": "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj",
+=======
+  "dgSpecHash": "wiiIZ4h4mYclcOoynXGGbPUrHeIzpNtC0JekJPel/Ud/XNDVt1xlbpjAe9NIBWLqB8zg7Z9LDX3+WzVN2EvMwg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\pammy\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\TrialByFire.Tresearch.Models.csproj",
+>>>>>>> Stashed changes
   "expectedPackageFiles": [],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file C:\\Users\\pammy\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }

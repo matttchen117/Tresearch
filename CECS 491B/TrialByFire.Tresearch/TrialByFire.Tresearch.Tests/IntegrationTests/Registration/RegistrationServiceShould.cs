@@ -10,8 +10,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 {
     public class RegistrationServiceShould
     {
-        public string SqlConnectionString = "Data Source=tresearchstudentserver.database.windows.net;Initial Catalog=tresearchStudentServer;User ID=tresearchadmin;Password=CECS491B!Connect Timeout=30;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
-        
+
         public ISqlDAO _sqlDAO { get; set; }
 
         public ILogService _logService { get; set; }
@@ -22,21 +21,21 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public RegistrationServiceShould()
         {
             _messageBank = new MessageBank();
-            _sqlDAO = new SqlDAO(SqlConnectionString, _messageBank);
+            _sqlDAO = new SqlDAO(_messageBank);
             _logService = new SqlLogService(_sqlDAO);
             _registrationService = new RegistrationService(_sqlDAO, _logService);
         }
 
 
         [Theory]
-        [InlineData("pammypoor+serviceRegisterUser1@gmail.com", "myRegisterPassword")]
+        [InlineData("wonderbread@gmail.com", "myRegisterPassword")]
+        [InlineData("orowheat@hotmail.com", "unFortunateName")]
         public void RegisterTheUser(string email, string passphrase)
         {
             //Arrange 
-            IAccount account = new Account(email, passphrase);
+            IAccount account = new Account(email, email, passphrase, "user", true, false);
 
             //Act
-
             List<string> results = _registrationService.CreatePreConfirmedAccount(account);
 
             //Assert
@@ -45,7 +44,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 
 
         [Theory]
-        [InlineData("pammypoor@gmail.com", "pammypoor-203c", "myPassword", "U", true, false, "www.Tresearch.systems/")]
+        [InlineData("wheatIsGreat@gmail.com", "wheatIsGreat@gmail.com", "myPassword", "user", true, false, "www.Tresearch.systems/Registration/confirm?=")]
+        [InlineData("whitebread@hotmail.com", "whitebread@hotmail.com", "servicePassword", "user", true, false, "www.Tresearch.systems/Registration/confirm?=")]
         public void CreateTheLink(string email, string username, string passphrase, string authenticationLevel, bool status, bool confirmed, string baseUrl)
         {
             //Arrange
@@ -53,22 +53,56 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 
             //Act
             List<string> results = _registrationService.CreateConfirmation(email, baseUrl);
-            string guidString = results.First().Substring(results.First().LastIndexOf('=')+1);
-
 
             //Assert
-            Assert.Equal(36, guidString.Length);        // GUID contains 36 characters
+            Assert.Equal('S', results.Last()[0]);        // GUID contains 36 characters
         }
 
         [Theory]
-        [InlineData("pammypoor@gmail.com", "pammypoor-203c", "myPassword", "U", true, false)]
-        public void ConfirmTheUser(string email, string username, string passphrase, string authenticationLevel, bool status, bool confirmed)
+        [InlineData("confirmMe@gmail.com", "myPassword", "User", true, false)]
+        [InlineData("confirmMe2@gmail.com", "myPassword", "User", true, false)]
+        public void ConfirmTheUser(string email, string passphrase, string authenticationLevel, bool status, bool confirmed)
         {
             //Arrange
-            IAccount _account = new Account(email, username, passphrase, authenticationLevel, status, confirmed);
+            _sqlDAO.CreateConfirmationLink(new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now));
 
+            IAccount _account = new Account(email, email, passphrase, authenticationLevel, status, confirmed);
+            _sqlDAO.CreateAccount(_account);
             //Act
             List<string> results = _registrationService.ConfirmAccount(_account);
+
+            //Assert
+            Assert.Equal('S', results.Last()[0]);
+        }
+
+        [Theory]
+        [InlineData("getMyLink@gmail.com")]
+        [InlineData("getMyLink2@gmail.com")]
+        public void GetConfirmationLink(string email)
+        {
+            //Arrange
+            Guid myguid = Guid.NewGuid();
+            string guid = myguid.ToString();
+            _sqlDAO.CreateConfirmationLink(new ConfirmationLink(email, myguid, DateTime.Now));
+
+            //Act
+            IConfirmationLink link = _registrationService.GetConfirmationLink(guid);
+
+            //Assert
+            Assert.Equal(email, link.Username);
+        }
+
+        [Theory]
+        [InlineData("removeMe@gmail.com")]
+        [InlineData("removeMe2@gmail.com")]
+        public void RemoveConfirmationLink(string email)
+        {
+            //Arrange
+            IConfirmationLink link = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now);
+            _sqlDAO.CreateConfirmationLink(link);
+
+            //Act
+            List<string> results = _registrationService.RemoveConfirmationLink(link);
 
             //Assert
             Assert.Equal('S', results.Last()[0]);

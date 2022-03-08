@@ -61,11 +61,19 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
 
+<<<<<<< Updated upstream
                     var readQuery = "SELECT username FROM dbo.confirmation_links WHERE GUID = @guid";
+=======
+                    var readQuery = "SELECT Username FROM dbo.EmailConfirmationLinks WHERE GUID = @guid";
+>>>>>>> Stashed changes
                     _confirmationLink.Username = connection.ExecuteScalar<string>(readQuery, new { guid = guidString });
                     readQuery = "SELECT GUID FROM dbo.confirmation_links WHERE GUID = @guid";
                     _confirmationLink.UniqueIdentifier = connection.ExecuteScalar<Guid>(readQuery, new { guid = guidString });
+<<<<<<< Updated upstream
                     readQuery = "SELECT datetime FROM dbo.confirmation_links WHERE GUID = @guid";
+=======
+                    readQuery = "SELECT Timestamp FROM dbo.EmailConfirmationLinks WHERE GUID = @guid";
+>>>>>>> Stashed changes
                     _confirmationLink.Datetime = connection.ExecuteScalar<DateTime>(readQuery, new { guid = guidString });
                 }
             }
@@ -87,8 +95,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
+<<<<<<< Updated upstream
                     var updateQuery = "UPDATE dbo.user_accounts SET confirmation = 1 WHERE email = @Email and username = @Username";
                     affectedRows = connection.Execute(updateQuery, account);
+=======
+                    var updateQuery = "UPDATE dbo.Accounts SET Confirmed = 1 WHERE email = @Email";
+                    affectedRows = connection.Execute(updateQuery, new { Email = account.Email});
+>>>>>>> Stashed changes
 
                 }
                 if (affectedRows == 1)
@@ -167,11 +180,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var readQuery = "SELECT username FROM dbo.user_accounts WHERE email = @Email and authorization_level = 'User'";
+                    var readQuery = "SELECT Username FROM dbo.Accounts WHERE email = @Email'";
                     string username = connection.ExecuteScalar<string>(readQuery, new { Email = email });
-                    readQuery = "SELECT passphrase FROM dbo.user_accounts WHERE email = @Email and authorization_level = 'User'";
+                    readQuery = "SELECT Passphrase FROM dbo.Accounts WHERE email = @Email'";
                     string passphrase = connection.ExecuteScalar<string>(readQuery, new { Email = email });
-                    readQuery = "SELECT account_status FROM dbo.user_accounts WHERE email = @Email and authorization_level = 'User'";
+                    readQuery = "SELECT AccountStatus FROM dbo.Accounts WHERE email = @Email'";
                     bool status = connection.ExecuteScalar<bool>(readQuery, new { Email = email });
                     account = new Account(email, username, passphrase, "User", status, false);
                     return account;
@@ -195,7 +208,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var deleteQuery = "DELETE FROM dbo.confirmation_links WHERE GUID = @guid";
+                    var deleteQuery = "DELETE FROM dbo.EmailConfirmationlinks WHERE GUID = @guid";
                     affectedRows = connection.Execute(deleteQuery, new { guid = confirmationLink.UniqueIdentifier });
                 }
                 if (affectedRows == 1)
