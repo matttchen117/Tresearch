@@ -8,7 +8,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
    public  class MailService: IMailService 
     {
         private IMessageBank _messageBank { get; }
-        private string _APIKey = "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";
+        private string _APIKey = "";
         private string _sender = "no-reply@tresearch.systems";
         private string _senderName = "Tresearch Support";
         private string _confirmationTemplate = "d-a7af897441a34066b64fe416cf76d29b";

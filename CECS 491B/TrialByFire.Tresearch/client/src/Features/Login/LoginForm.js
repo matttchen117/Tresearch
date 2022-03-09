@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import axios from 'axios';
 
-import "./AuthenticationForm.css";
+import "./LoginForm.css";
 
-const AuthenticationForm = () => {
+const LoginForm = () => {
     // States
     const [errorMessages, setErrorMessages] = useState({});
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [checked, setChecked] = useState(false);
 
     const errors = {
-        credentials: "Invalid username or otp"
+        credentials: "Invalid username or password"
     };
 
     const renderErrorMessage = (name) =>
@@ -20,10 +20,10 @@ const AuthenticationForm = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        var { username, otp, authorizationLevel } = document.forms[0];
+        var { username, passphrase } = document.forms[0];
+        var authorizationLevel = "user";
 
-
-        axios.post('https://localhost:7010/Authentication/authenticate?=', {username, otp, authorizationLevel})
+        axios.post('https://localhost:7010/OTPRequest/requestotp?=', {username, passphrase, authorizationLevel})
         .then(res => {
             
          })
@@ -38,25 +38,20 @@ const AuthenticationForm = () => {
             <div className="form-components">
                 <form onSubmit={handleSubmit}>
                     <div className="input-container">
-                        <input type="username" name="uname" required placeholder="Email Address" />
+                        <input type="username" name="uname" required placeholder="Username" />
                         {renderErrorMessage("uname")}
                     </div>
                     <div className="input-container">
-                        <input type="password" name="pass" required placeholder="Password" />
+                        <input type="password" name="pass" required placeholder="Passphrase" />
                         {renderErrorMessage("pass")}
-                    </div>
-                    <div className="checkbox-container">
-                        <input type="checkbox" checked={checked} onChange={handleCheck} />
-                        <label for="agree">I am 15 years or older </label>
                     </div>
 
                     <div className="create-button-container">
-                        <input type="submit" value="Create" />
+                        <input type="submit" value="Sign In" />
                     </div>
                 </form>
             </div>
         </div>
-        
     );
 
     return (
@@ -69,4 +64,4 @@ const AuthenticationForm = () => {
     );
 }
 
-export default AuthenticationForm;
+export default LoginForm;
