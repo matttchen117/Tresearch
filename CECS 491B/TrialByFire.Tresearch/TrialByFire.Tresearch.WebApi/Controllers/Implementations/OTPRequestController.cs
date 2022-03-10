@@ -6,9 +6,13 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
+<<<<<<< HEAD
     [ApiController]
     [Route("[controller]")]
     public class OTPRequestController : Controller, IOTPRequestController
+=======
+    public class OTPRequestController : ControllerBase, IOTPRequestController
+>>>>>>> TestPammyMerge
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }

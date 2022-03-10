@@ -11,6 +11,12 @@ using TrialByFire.Tresearch.Services.Implementations;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+<<<<<<< HEAD
+=======
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers();
+
+>>>>>>> TestPammyMerge
 builder.Services.AddTransient<IMessageBank, MessageBank>();
 builder.Services.AddTransient<ISqlDAO, SqlDAO>();
 builder.Services.AddTransient<ILogService, SqlLogService>();
@@ -28,7 +34,11 @@ builder.Services.AddTransient<IOTPRequestManager, OTPRequestManager>();
 builder.Services.AddTransient<IRegistrationManager, RegistrationManager>();
 builder.Services.AddTransient<IRoleIdentity>(service => new RoleIdentity(true, "guest", "guest"));
 builder.Services.AddTransient<IRolePrincipal, RolePrincipal>();
+<<<<<<< HEAD
 builder.Services.AddControllers();
+=======
+
+>>>>>>> TestPammyMerge
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -54,20 +64,21 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
-
 app.UseHttpsRedirection();
+
+app.UseCors();
+
+app.UseCookieAuthentication();
 
 app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthorization();
 
-app.MapControllers();
-
 app.Run();
 
 public static class AuthExtensions
 {
+<<<<<<< HEAD
     // Refer UseRouting, just passing Host
     public static IApplicationBuilder UseCookieAuthentication(this IApplicationBuilder host, IRolePrincipal role)
     {
@@ -75,3 +86,10 @@ public static class AuthExtensions
     }
 
 }
+=======
+    public static IApplicationBuilder UseCookieAuthentication(this IApplicationBuilder host)
+    {
+        return host.UseMiddleware<CookieAuthentication>();
+    }
+}
+>>>>>>> TestPammyMerge

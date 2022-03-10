@@ -14,7 +14,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
     [ApiController]
     [Route("[controller]")]
-    public class RegistrationController : Controller, IRegistrationController
+    public class RegistrationController : ControllerBase, IRegistrationController
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }

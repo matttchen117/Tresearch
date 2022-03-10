@@ -126,6 +126,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
             try
             {
+
                 account = _sqlDAO.GetUnconfirmedAccount(link.Username);
             }
             catch (Exception ex)
