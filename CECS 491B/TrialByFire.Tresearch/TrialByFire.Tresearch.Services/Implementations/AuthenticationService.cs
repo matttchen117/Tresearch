@@ -78,14 +78,11 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 results.Add(_messageBank.SuccessMessages["generic"]);
                 results.Add(tokenHandler.WriteToken(token));
-<<<<<<< HEAD
             }
             catch (RoleIdentityCreationFailedException ricf)
             {
                 results.Add(ricf.Message);
                 return results;
-=======
->>>>>>> TestPammyMerge
             }
             catch (ArgumentNullException ane)
             {

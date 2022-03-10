@@ -8,11 +8,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
     [ApiController]
     [Route("[controller]")]
-<<<<<<< HEAD
     public class AuthenticationController : Controller, IAuthenticationController
-=======
-    public class AuthenticationController : ControllerBase, IAuthenticationController
->>>>>>> TestPammyMerge
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
@@ -32,10 +28,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _username = "guest";
         }
 
-<<<<<<< HEAD
-=======
-        // IEnumerable may be faster than using lists, gives compiler chance to defer work to later, possibly optimizing in the process
->>>>>>> TestPammyMerge
         [HttpPost]
         [Route("authenticate")]
         public string Authenticate(string username, string otp, string authorizationLevel)
@@ -58,10 +50,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             return result;
         }
 
-<<<<<<< HEAD
-=======
-        // This is for testing with custom times
->>>>>>> TestPammyMerge
         [ApiExplorerSettings(IgnoreApi = true)]
         public string Authenticate(string username, string otp, string authorizationLevel, DateTime now)
         {

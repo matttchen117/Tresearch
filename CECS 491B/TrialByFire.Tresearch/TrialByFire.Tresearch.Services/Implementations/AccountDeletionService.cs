@@ -21,10 +21,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         private IRolePrincipal RolePrincipal { get; }
 
 
-<<<<<<< HEAD
 
-=======
->>>>>>> TestPammyMerge
         public AccountDeletionService(ISqlDAO sqlDAO, ILogService logService, IRolePrincipal rolePrincipal)
         {
             this.SqlDAO = sqlDAO;

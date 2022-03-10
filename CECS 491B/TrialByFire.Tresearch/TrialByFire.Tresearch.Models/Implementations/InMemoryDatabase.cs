@@ -181,7 +181,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<IDailyLogin> InitializeDailyLogins()
         {
             List<IDailyLogin> dailyLogins = new List<IDailyLogin>();
-<<<<<<< HEAD
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 3)), 100));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 4)), 99));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 5)), 98));
@@ -280,7 +279,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 4)), 13));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 5)), 12));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 6)), 11));
-=======
             dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 1), 1));
             dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 2), 2));
             dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 3), 3));
@@ -311,14 +309,12 @@ namespace TrialByFire.Tresearch.Models.Implementations
             dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 28), 28));
             dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 29), 29));
             dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 30), 30));
->>>>>>> TestPammyMerge
             return dailyLogins;
         }
 
         private List<ITopSearch> InitializeTopSearches()
         {
             List<ITopSearch> topSearches = new List<ITopSearch>();
-<<<<<<< HEAD
             topSearches.Add(new TopSearch((new DateTime(2022, 2, 5)), "Donuts", 20));
             topSearches.Add(new TopSearch((new DateTime(2022, 2, 6)), "Dark", 21));
             topSearches.Add(new TopSearch((new DateTime(2022, 2, 7)), "Dumb", 22));
@@ -351,7 +347,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
             topSearches.Add(new TopSearch((new DateTime(2022, 3, 4)), "Fish", 49));
             topSearches.Add(new TopSearch((new DateTime(2022, 3, 5)), "Cows", 45));
             topSearches.Add(new TopSearch((new DateTime(2022, 3, 6)), "Dogs", 50));
-=======
             topSearches.Add(new TopSearch(new DateTime(2000, 1, 1), "test1", 1));
             topSearches.Add(new TopSearch(new DateTime(2000, 1, 2), "test2", 2));
             topSearches.Add(new TopSearch(new DateTime(2000, 1, 3), "test3", 3));
@@ -382,14 +377,12 @@ namespace TrialByFire.Tresearch.Models.Implementations
             topSearches.Add(new TopSearch(new DateTime(2000, 1, 28), "test28", 28));
             topSearches.Add(new TopSearch(new DateTime(2000, 1, 29), "test29", 29));
             topSearches.Add(new TopSearch(new DateTime(2000, 1, 30), "test30", 30));
->>>>>>> TestPammyMerge
             return topSearches;
         }
 
         private List<INodesCreated> InitializeNodesCreated()
         {
             List<INodesCreated> nodesCreated = new List<INodesCreated>();
-<<<<<<< HEAD
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 2, 5)), 70));
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 2, 6)), 71));
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 2, 7)), 72));
@@ -422,7 +415,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 4)), 98));
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 5)), 99));
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 6)), 100));
-=======
             nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 1), 1));
             nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 2), 2));
             nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 3), 3));
@@ -453,13 +445,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 28), 28));
             nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 29), 29));
             nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 30), 30));
->>>>>>> TestPammyMerge
             return nodesCreated;
         }
 
         private IList<IDailyRegistration> InitializeDailyRegistrations()
         {
-<<<<<<< HEAD
             List<IDailyRegistration> dailyRegistrations = new List<IDailyRegistration>();
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 3)), 100));
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 4)), 99));
@@ -559,7 +549,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 3, 4)), 13));
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 3, 5)), 12));
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 3, 6)), 11));
-=======
+            return dailyRegistrations;
             IList<IDailyRegistration> dailyRegistrations = new List<IDailyRegistration>();
 
             dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 1), 1));
@@ -594,7 +584,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
             dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 30), 30));
 
 
->>>>>>> TestPammyMerge
             return dailyRegistrations;
         }
 

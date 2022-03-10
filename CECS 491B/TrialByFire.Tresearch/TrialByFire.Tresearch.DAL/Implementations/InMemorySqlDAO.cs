@@ -507,11 +507,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
             foreach (INodesCreated nodesCreated in InMemoryDatabase.NodesCreated)
             {
-<<<<<<< HEAD
-                if (nodeCreationDate == nodesCreated.nodeCreationDate)
-=======
                 if(nodeCreationDate <= nodesCreated.nodeCreationDate && nodeCreationDate >= nodeCreationDate.Date.AddDays(-30))
->>>>>>> TestPammyMerge
                 {
                     nodeResult.Add(nodesCreated);
                 }
@@ -555,19 +551,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public IList<IDailyLogin> GetDailyLogin(DateTime loginDate)
         {
-<<<<<<< HEAD
-            IDailyLogin dailyLogin = new DailyLogin();
-=======
            List<IDailyLogin> dailyLoginResults = new List<IDailyLogin>();
->>>>>>> TestPammyMerge
 
             foreach (IDailyLogin dailyLogin1 in InMemoryDatabase.DailyLogins)
             {
-<<<<<<< HEAD
-                if (dailyLogin1.loginDate == loginDate)
-=======
                 if(dailyLogin1.loginDate <= loginDate && dailyLogin1.loginDate >= loginDate.Date.AddDays(-30))
->>>>>>> TestPammyMerge
                 {
                     dailyLoginResults.Add(dailyLogin1);
                 }
@@ -614,11 +602,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
             foreach (ITopSearch topSearch in InMemoryDatabase.TopSearches)
             {
-<<<<<<< HEAD
-                if (topSearch.topSearchDate == topSearchDate)
-=======
                 if(topSearch.topSearchDate <= topSearchDate && topSearch.topSearchDate >= topSearchDate.Date.AddDays(-30))
->>>>>>> TestPammyMerge
                 {
                     topSearchResult.Add(topSearch);
                 }
@@ -665,11 +649,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
             foreach (IDailyRegistration dailyRegistration in InMemoryDatabase.DailyRegistrations)
             {
-<<<<<<< HEAD
-                if (dailyRegistration.registrationDate == dailyRegistrationDate)
-=======
                 if(dailyRegistration.registrationDate <= dailyRegistrationDate && dailyRegistration.registrationDate >= dailyRegistrationDate.Date.AddDays(-30))
->>>>>>> TestPammyMerge
                 {
                     dailyRegistrationResults.Add(dailyRegistration);
                 }
