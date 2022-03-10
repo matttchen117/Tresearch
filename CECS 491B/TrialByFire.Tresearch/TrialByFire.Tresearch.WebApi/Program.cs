@@ -69,9 +69,9 @@ app.Run();
 public static class AuthExtensions
 {
     // Refer UseRouting, just passing Host
-    public static IApplicationBuilder UseCookieAuthentication(this IApplicationBuilder host)
+    public static IApplicationBuilder UseCookieAuthentication(this IApplicationBuilder host, IRolePrincipal role)
     {
-        return host.UseMiddleware<CookieAuthentication>();
+        return host.UseMiddleware<CookieAuthentication>(host);
     }
 
 }

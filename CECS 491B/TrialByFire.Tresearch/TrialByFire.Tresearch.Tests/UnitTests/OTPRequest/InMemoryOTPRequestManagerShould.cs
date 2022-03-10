@@ -22,8 +22,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
         }
 
         [Theory]
-        [InlineData("drakat7@gmail.com", "abcDEF123", "user", "guest", "guest", "success")]
-        [InlineData("drakat7@gmail.com", "abcDEF123", "admin", "guest", "guest", "success")]
+        [InlineData("drakat7@gmail.com", "abcDEF123", "user", "guest", "guest", "Server: Email failed to send.")]
+        [InlineData("drakat7@gmail.com", "abcDEF123", "admin", "guest", "guest", "Server: Email failed to send.")]
         [InlineData("aarry@gmail.com", "#$%", "guest", "user", "guest", "Data: Invalid Username or " +
             "Passphrase. Please try again.")]
         [InlineData("aarry@gmail.com", "abcdef#$%", "user", "guest", "guest", "Data: Invalid Username or " +
