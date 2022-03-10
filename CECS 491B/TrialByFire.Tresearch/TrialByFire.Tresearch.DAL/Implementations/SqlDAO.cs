@@ -321,12 +321,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         Username = otpClaim.Username,
                         AuthorizationLevel = otpClaim.AuthorizationLevel
                     });
-                    if(dbAccount.Confirmed == false)
+                    if (dbAccount.Confirmed == false)
                     {
                         results.Add(_messageBank.ErrorMessages["notConfirmed"]);
                         return results;
                     }
-                    if(dbAccount.AccountStatus == false)
+                    if (dbAccount.AccountStatus == false)
                     {
                         results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
                         return results;
@@ -428,17 +428,19 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     if (dbAccount.Confirmed == false)
                     {
                         return _messageBank.ErrorMessages["notConfirmed"];
-                    }else if (dbAccount.AccountStatus == false)
+                    }
+                    else if (dbAccount.AccountStatus == false)
                     {
                         return _messageBank.ErrorMessages["notFoundOrEnabled"];
                     }
                     else
                     {
-                        if(dbAccount.AuthorizationLevel.Equals("admin") || 
+                        if (dbAccount.AuthorizationLevel.Equals("admin") ||
                             dbAccount.AuthorizationLevel.Equals(requiredAuthLevel))
                         {
                             return _messageBank.SuccessMessages["generic"];
-                        }else
+                        }
+                        else
                         {
                             return _messageBank.ErrorMessages["notFoundOrAuthorized"];
                         }

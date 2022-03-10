@@ -550,41 +550,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 3, 5)), 12));
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 3, 6)), 11));
             return dailyRegistrations;
-            IList<IDailyRegistration> dailyRegistrations = new List<IDailyRegistration>();
-
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 1), 1));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 2), 2));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 3), 3));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 4), 4));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 5), 5));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 6), 6));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 7), 7));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 8), 8));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 9), 9));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 10), 10));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 11), 11));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 12), 12));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 13), 13));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 14), 14));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 15), 15));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 16), 16));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 17), 17));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 18), 18));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 19), 19));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 20), 20));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 21), 21));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 21), 22));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 23), 23));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 24), 24));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 25), 25));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 26), 26));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 27), 27));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 28), 28));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 29), 29));
-            dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, 30), 30));
-
-
-            return dailyRegistrations;
         }
 
         private List<IConfirmationLink> InitializeConfirmationLinks()

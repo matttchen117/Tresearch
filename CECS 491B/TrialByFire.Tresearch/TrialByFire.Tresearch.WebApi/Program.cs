@@ -29,12 +29,6 @@ builder.Services.AddTransient<IRegistrationManager, RegistrationManager>();
 builder.Services.AddTransient<IRoleIdentity>(service => new RoleIdentity(true, "guest", "guest"));
 builder.Services.AddTransient<IRolePrincipal, RolePrincipal>();
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -60,19 +54,24 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+
 app.UseHttpsRedirection();
-
-app.UseCors();
-
-app.UseCookieAuthentication();
 
 app.UseCors(MyAllowSpecificOrigins);
 
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
+
+public static class AuthExtensions
+{
     // Refer UseRouting, just passing Host
     public static IApplicationBuilder UseCookieAuthentication(this IApplicationBuilder host, IRolePrincipal role)
-    public static IApplicationBuilder UseCookieAuthentication(this IApplicationBuilder host)
+    {
         return host.UseMiddleware<CookieAuthentication>(host);
-        throw new NotImplementedException();
+    }
 
-}
 }

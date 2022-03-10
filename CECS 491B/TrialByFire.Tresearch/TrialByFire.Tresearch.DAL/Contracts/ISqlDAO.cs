@@ -82,7 +82,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         public string CreateNodesCreated(INodesCreated nodesCreated);
 
-        public IList<INodesCreated> GetNodesCreated(DateTime nodeCreationDate);
+        public INodesCreated GetNodesCreated(DateTime nodeCreationDate);
 
         public string UpdateNodesCreated(INodesCreated nodesCreated);
 
@@ -90,21 +90,21 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         public string CreateDailyLogin(IDailyLogin dailyLogin);
 
-        public IList<IDailyLogin> GetDailyLogin(DateTime nodeCreationDate);
+        public IDailyLogin GetDailyLogin(DateTime nodeCreationDate);
 
         public string UpdateDailyLogin(IDailyLogin dailyLogin);
 
 
         public string CreateTopSearch(ITopSearch topSearch);
 
-        public IList<ITopSearch> GetTopSearch(DateTime nodeCreationDate);
+        public ITopSearch GetTopSearch(DateTime nodeCreationDate);
 
         public string UpdateTopSearch(ITopSearch topSearch);
 
 
         public string CreateDailyRegistration(IDailyRegistration dailyRegistration);
 
-        public IList<IDailyRegistration> GetDailyRegistration(DateTime nodeCreationDate);
+        public IDailyRegistration GetDailyRegistration(DateTime nodeCreationDate);
 
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration);
     }

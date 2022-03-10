@@ -73,12 +73,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     results.Add("Failed - Registration Manager unable to create confirmation link object");
                     return results;
                 }
-
-
-
-=======
                 results.Add(_confirmationLink.Username);
->>>>>>> Stashed changes
                 IAccount account = _registrationService.GetUserFromConfirmationLink(_confirmationLink);
                 if (account.Email == null)
                 {

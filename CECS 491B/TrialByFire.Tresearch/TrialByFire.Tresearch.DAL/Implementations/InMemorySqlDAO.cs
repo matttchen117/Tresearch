@@ -20,6 +20,31 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = new MessageBank();
         }
 
+        public List<IKPI> LoadKPI(DateTime now)
+        {
+            throw new NotImplementedException();
+        }
+
+        INodesCreated ISqlDAO.GetNodesCreated(DateTime nodeCreationDate)
+        {
+            throw new NotImplementedException();
+        }
+
+        IDailyLogin ISqlDAO.GetDailyLogin(DateTime nodeCreationDate)
+        {
+            throw new NotImplementedException();
+        }
+
+        ITopSearch ISqlDAO.GetTopSearch(DateTime nodeCreationDate)
+        {
+            throw new NotImplementedException();
+        }
+
+        IDailyRegistration ISqlDAO.GetDailyRegistration(DateTime nodeCreationDate)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VerifyAccount(IAccount account)
         {
             int index = InMemoryDatabase.Accounts.IndexOf(account);
@@ -333,7 +358,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return null;
         }
 
-        public List<IKPI> LoadKPI(DateTime now)
+/*        public List<IKPI> LoadKPI(DateTime now)
         {
             List<IKPI> kpiList = new List<IKPI>();
             kpiList.Add(GetViewKPI());
@@ -343,7 +368,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             kpiList.Add(GetRegistrationKPI(now));
             kpiList.Add(GetSearchKPI(now));
             return kpiList;
-        }
+        }*/
 
         //1
         public IViewKPI GetViewKPI()
@@ -382,8 +407,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return viewDurationKPI;
         }
 
-        //3
-        public INodeKPI GetNodeKPI(DateTime now)
+/*        public INodeKPI GetNodeKPI(DateTime now)
         {
             INodeKPI nodeKPI = new NodeKPI();
             int counter = 1;
@@ -478,11 +502,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             searchKPI.result = "success";
             return searchKPI;
-        }
-
-        /*
-            Ian's Methods
-         */
+        }*/
 
         public string CreateNodesCreated(INodesCreated nodesCreated)
         {
