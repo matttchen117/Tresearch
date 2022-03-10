@@ -1,21 +1,15 @@
 {
   "version": 2,
-<<<<<<< Updated upstream
-  "dgSpecHash": "SivtGKVSh8YoeUxiBeWbNti+/YRlFnw2XPzyZmv1iJU/H3TVGu/C2C3bQ6VfpAWKzSn9njCfNZZLwvUtHOxjkQ==",
+  "dgSpecHash": "KnyPZpqeYOWT61lky26/MVffQUaz/x1Gu8hYUBPhUP99CRKkGs6Fays7Q6sFFBSSMpRfIYZYKge7VatUMCJ56A==",
   "success": true,
-  "projectFilePath": "C:\\Users\\ianho\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\TrialByFire.Tresearch.Exceptions.csproj",
-=======
-  "dgSpecHash": "vRf+23wg5i5RM2aTYkgDCZ4C/JEKi8Xzq0JUUnT9cHD1jQmhBzNRpqcdzx/SW9rJNYHgM9hI8E1Ahpdjvc4dEA==",
-  "success": true,
-  "projectFilePath": "C:\\Users\\pammy\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\TrialByFire.Tresearch.Exceptions.csproj",
->>>>>>> Stashed changes
+  "projectFilePath": "C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\TrialByFire.Tresearch.Exceptions.csproj",
   "expectedPackageFiles": [],
   "logs": [
     {
       "code": "Undefined",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "Problem reading the cache file C:\\Users\\pammy\\OneDrive\\Documents\\GitHub\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+      "message": "Problem reading the cache file C:\\Users\\Matthew Chen\\Source\\Repos\\Tresearch\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Exceptions\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
     }
   ]
 }
