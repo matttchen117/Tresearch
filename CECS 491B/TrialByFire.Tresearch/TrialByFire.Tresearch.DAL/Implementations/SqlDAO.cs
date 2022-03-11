@@ -14,7 +14,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public SqlDAO(IMessageBank messageBank)
         {
-            _sqlConnectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true";
+            _sqlConnectionString = "Data Source=tresearchstudentserver.database.windows.net;Initial Catalog=tresearchStudentServer;User ID=tresearchadmin;Password=********;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
             _messageBank = messageBank;
         }
@@ -531,197 +531,172 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var insertQuery = @"INSERT INTO Tresearch.NodesCreated (node_creation_date, node_creation_count)
-Values (@node_creation_date, @node_creation_count)";
+                    var insertQuery = @"INSERT INTO tresearchStudentServer.dbo.NodesCreated (nodesCreatedDate, nodesCreatedCount) VALUES (@nodesCreatedDate, @nodesCreatedCount)";
 
                     affectedRows = connection.Execute(insertQuery,
                                     new
                                     {
-                                        node_creation_date = nodesCreated.nodeCreationDate,
-                                        node_creation_count = nodesCreated.nodeCreationCount
+                                        nodesCreatedDate = nodesCreated.nodesCreatedDate,
+                                        nodesCreatedCount = nodesCreated.nodesCreatedCount
                                     });
                 }
-                if (affectedRows == 1)
-                {
-                    return "Created Nodes Successfully Inserted";
-                }
-                else
-                {
-                    return "Created Nodes Not Inserted";
-                }
+                 
+                return _messageBank.SuccessMessages["generic"];
             }
             catch (Exception ex)
             {
-                return "Fail";
+                return _messageBank.ErrorMessages["createdNodesExists"];
             }
         }
 
-        public INodesCreated GetNodesCreated(DateTime nodeCreationDate)
+        public List<NodesCreated> GetNodesCreated(DateTime nodesCreatedDate)
         {
-            INodesCreated nodesCreated;
-
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                var selectQuery = "SELECT * FROM Tresearch.nodes_created" +
-                                  "WHERE _node_creation_date >= @node_creation_date - 30";
+                var selectQuery = "SELECT * FROM tresearchStudentServer.dbo.nodesCreated WHERE nodesCreatedDate BETWEEN DATEADD(day, -30, @nodeCreationDate) AND @nodeCreationDate";
 
-                nodesCreated = connection.QuerySingle<INodesCreated>(selectQuery, new { node_creation_date = nodeCreationDate });
+                return connection.Query<NodesCreated>(selectQuery, new { nodeCreationDate = nodesCreatedDate }).ToList();
             }
-
-            return nodesCreated;
         }
 
         public string UpdateNodesCreated(INodesCreated nodesCreated)
         {
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                var updateQuery = @"UPDATE Tresearch.nodes_created (nodes_created_date, nodes_created_count)" +
-                                    "VALUES (@nodes_created_date, @nodes_created_count)";
+                string updateQuery = @"UPDATE tresearchStudentServer.dbo.nodesCreated SET nodesCreatedCount = @nodesCreatedCount WHERE nodesCreatedDate = @nodesCreatedDate";
 
-                var _result = connection.Execute(updateQuery,
+                int rowsAffected = connection.Execute(updateQuery,
                             new
                             {
-                                nodes_created_date = nodesCreated.nodeCreationDate,
-                                nodes_created_count = nodesCreated.nodeCreationCount
+                                nodesCreatedDate = nodesCreated.nodesCreatedDate,
+                                nodesCreatedCount = nodesCreated.nodesCreatedCount
                             }
                             );
+                if (rowsAffected == 1)
+                {
+                    return _messageBank.SuccessMessages["generic"];
+                } else
+                {
+                    return _messageBank.ErrorMessages["createdNodesNotExists"];
+                }
             }
-
-            return "Node Created Successfully Updated";
         }
 
 
 
-        public string CreateDailyLogins(IDailyLogin dailyLogin)
+        public string CreateDailyLogin(IDailyLogin dailyLogin)
         {
-            int affectedRows;
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var insertQuery = @"INSERT INTO Tresearch.DailyLogins (login_date, login_count)
+                    string insertQuery = @"INSERT INTO tresearchStudentServer.dbo.dailyLogins (loginDate, loginCount)
                                         Values (@loginDate, @loginCount)";
-                    affectedRows = connection.Execute(insertQuery,
+                    int affectedRows = connection.Execute(insertQuery,
                                         new
                                         {
-                                            login_date = dailyLogin.loginDate,
-                                            login_count = dailyLogin.loginCount
+                                            loginDate = dailyLogin.loginDate,
+                                            loginCount = dailyLogin.loginCount
                                         });
                 }
-                if (affectedRows == 1)
-                {
-                    return "Daily Login Successfully Created";
-                }
-                else
-                {
-                    return "Daily Login Creation Failed";
-                }
+                    return _messageBank.SuccessMessages["generic"];
             }
             catch (Exception ex)
             {
-                return "Fail";
+                return _messageBank.ErrorMessages["dailyLoginsExists"];
             }
         }
 
-        public IDailyLogin GetDailyLogin(DateTime loginDate)
+        public List<DailyLogin> GetDailyLogin(DateTime getDate)
         {
-            IDailyLogin dailyLogin;
-
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                var selectQuery = "SELECT * FROM Tresearch.daily_logins" +
-                                    "WHERE _loginDate >= @login_date - 30";
+                var selectQuery = "SELECT * FROM tresearchStudentServer.dbo.dailyLogins WHERE loginDate BETWEEN DATEADD(day, -30, @loginDate) AND @loginDate";
 
-                dailyLogin = connection.QuerySingle<IDailyLogin>(selectQuery, new { login_date = loginDate });
+                return connection.Query<DailyLogin>(selectQuery, new { loginDate = getDate }).ToList();
             }
-
-            return dailyLogin;
         }
 
         public string UpdateDailyLogin(IDailyLogin dailyLogin)
         {
-            IDailyLogin logins;
-
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                var updateQuery = @"UPDATE Tresearch.daily_logins (login_date, login_count) " +
-                                    "VALUES (@login_date, @login_count)";
+                string updateQuery = @"UPDATE tresearchStudentServer.dbo.dailyLogins SET loginCount = @loginCount WHERE loginDate = @loginDate";
 
-                logins = connection.QuerySingle<IDailyLogin>(updateQuery, new
+                int rowsAffected = connection.Execute(updateQuery, new
                 {
-                    login_date = dailyLogin.loginDate,
-                    login_count = dailyLogin.loginCount
+                    loginDate = dailyLogin.loginDate,
+                    loginCount = dailyLogin.loginCount
                 });
-            }
 
-            return "Daily Login Update Successful";
+                if(rowsAffected == 1)
+                {
+                    return _messageBank.SuccessMessages["generic"];
+                } else
+                {
+                    return _messageBank.ErrorMessages["dailyLoginsNotExists"];
+                }
+            }
         }
 
 
 
         public string CreateTopSearch(ITopSearch topSearch)
         {
-            int affectedRows;
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var insertQuery = @"INSERT INTO Tresearch.TopSearch (top_search_date, top_search_string, top_search_countl)" +
-                                        "Values (@top_search_date, @top_search_string, @top_search_count)";
-                    affectedRows = connection.Execute(insertQuery,
+                    string insertQuery = @"INSERT INTO tresearchStudentServer.dbo.TopSearches (topSearchDate, topSearchString, topSearchCount) VALUES (@topSearchDate, @topSearchString, @topSearchCount)";
+                    
+                    int affectedRows = connection.Execute(insertQuery,
                                         new
                                         {
-                                            top_search_date = topSearch.topSearchDate,
-                                            top_search_string = topSearch.searchString,
-                                            top_search_count = topSearch.searchCount
+                                            topSearchDate = topSearch.topSearchDate,
+                                            topSearchString = topSearch.searchString,
+                                            topSearchCount = topSearch.searchCount
                                         });
                 }
-                if (affectedRows == 1)
-                {
-                    return "Top Search Creation Successful";
-                }
-                else
-                {
-                    return "Top Search Creation Failed";
-                }
+
+                return _messageBank.SuccessMessages["generic"];
             }
             catch (Exception ex)
             {
-                return "Fail";
+                return _messageBank.ErrorMessages["topSearchesExists"];
             }
         }
 
-        public ITopSearch GetTopSearch(DateTime topSearchDate)
+        public List<TopSearch> GetTopSearch(DateTime getTopSearchDate)
         {
-            ITopSearch topSearch;
-
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                var selectQuery = "SELECT * FROM Tresearch.top_search" +
-                                    "WHERE topSearchDate >= @top_search_date - 30";
-                topSearch = connection.QuerySingle<ITopSearch>(selectQuery, new { top_search_date = topSearchDate });
-            }
+                string selectQuery = "SELECT * FROM tresearchStudentServer.dbo.topSearches WHERE topSearchDate BETWEEN DATEADD(day, -30, @topSearchDate) AND @topSearchDate;";
 
-            return topSearch;
+                return connection.Query<TopSearch>(selectQuery, new { topSearchDate = getTopSearchDate }).ToList();
+            }
         }
 
         public string UpdateTopSearch(ITopSearch topSearch)
         {
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                var updateQuery = @"UPDATE Tresearch.top_search (top_search_date, search_string, search_count)" +
-                                    "VALUES (@top_search_date, @search_string, @search_count)";
+                string updateQuery = @"UPDATE tresearchStudentServer.dbo.topSearches SET topSearchCount = @topSearchCount, topSearchString = @topSearchString WHERE topSearchDate = @topSearchDate;";
 
-                var _result = connection.Execute(updateQuery,
+                int rowsAffected = connection.Execute(updateQuery,
                                                     new
                                                     {
-                                                        top_search_date = topSearch.topSearchDate,
-                                                        search_string = topSearch.searchCount,
-                                                        search_count = topSearch.searchCount
+                                                        topSearchDate = topSearch.topSearchDate,
+                                                        topSearchString = topSearch.searchCount,
+                                                        topSearchCount = topSearch.searchCount
                                                     });
+                if(rowsAffected == 1)
+                {
+                    return _messageBank.SuccessMessages["generic"];
+                } else
+                {
+                    return _messageBank.ErrorMessages["topSearchesNotExists"];
+                }
             }
-
-            return "Top Search Update Successful";
         }
 
 
@@ -733,62 +708,50 @@ Values (@node_creation_date, @node_creation_count)";
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var insertQuery = @"INSERT INTO Tresearch.DailyRegistrations (registration_date, registration_countl)" +
-                                        "Values (@registrationDate, @registrationCount)";
+                    var insertQuery = @"INSERT INTO tresearchStudentServer.dbo.dailyRegistrations (registrationDate, registrationCount) VALUES (@registrationDate, @registrationCount)";
                     affectedRows = connection.Execute(insertQuery,
                                      new
                                      {
-                                         registration_date = dailyRegistration.registrationDate,
-                                         registration_count = dailyRegistration.registrationCount
+                                         registrationDate = dailyRegistration.registrationDate,
+                                         registrationCount = dailyRegistration.registrationCount
                                      });
                 }
-                if (affectedRows == 1)
-                {
-                    return "Daily Registration Creation Successful";
-                }
-                else
-                {
-                    return "Daily Registration Creation Failed";
-                }
+                    return _messageBank.SuccessMessages["generic"];
             }
             catch (Exception ex)
             {
-                return "Fail";
+                return _messageBank.ErrorMessages["dailyRegistrationsExists"];
             }
         }
 
-        public IDailyRegistration GetDailyRegistration(DateTime dailyRegistrationDate)
+        public List<DailyRegistration> GetDailyRegistration(DateTime getRegistrationDate)
         {
-            IDailyRegistration dailyRegistration;
-
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                var selectQuery = "SELECT * FROM Tresearch.daily_registrations" +
-                                    "WHERE _registrationDate >= @registration_date - 30";
+                var selectQuery = "SELECT * FROM tresearchStudentServer.dbo.dailyRegistrations WHERE registrationDate BETWEEN DATEADD(day, -30, @registrationDate) AND @registrationDate";
 
-                dailyRegistration = connection.QuerySingle<IDailyRegistration>(selectQuery, new { registration_date = dailyRegistrationDate });
+                return connection.Query<DailyRegistration>(selectQuery, new { registrationDate = getRegistrationDate }).ToList();
             }
-
-            return dailyRegistration;
         }
 
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration)
         {
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                var updateQuery = @"UPDATE Tresearch.daily_registrations (registration_date, registration_count)" +
-                                    "VALUES (@registration_date, @registration_count)";
+                string updateQuery = @"UPDATE tresearchStudentServer.dbo.dailyRegistrations SET registrationCount = @registrationCount WHERE registrationDate = @registrationDate";
 
-                var result = connection.Execute(updateQuery,
-                                new { registration_date = dailyRegistration.registrationDate });
+                int rowsAffected = connection.Execute(updateQuery,
+                                new { registrationDate = dailyRegistration.registrationDate,
+                                      registrationCount = dailyRegistration.registrationCount});
+
+                if(rowsAffected == 1)
+                {
+                    return _messageBank.SuccessMessages["generic"];
+                } else
+                {
+                    return _messageBank.ErrorMessages["dailyRegistrationsNotExists"];
+                }
             }
-
-            return "Daily Registration Update Successful";
-        }
-
-        public string CreateDailyLogin(IDailyLogin dailyLogin)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -45,6 +45,22 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("otpFail", "Database: Failed to create OTP.");
             errorMessages.Add("databaseFail", "Database: The database is down. Please try again later.");
             errorMessages.Add("logoutFail", "Server: Logout failed.");
+
+            /*
+    Ian's messages
+ */
+
+            errorMessages.Add("createdNodesExists", "Fail - Created Nodes Already Exists");
+            errorMessages.Add("createdNodesNotExists", "Fail - Created Nodes to Update Does Not Exist in Database");
+
+            errorMessages.Add("dailyLoginsExists", "Fail - Daily Logins Already Exists");
+            errorMessages.Add("dailyLoginsNotExists", "Fail - Daily Logins to Update Does Not Exist in Database");
+
+            errorMessages.Add("topSearchesExists", "Fail - Top Search Already Exists");
+            errorMessages.Add("topSearchesNotExists", "Fail - Top Search to Update Does Not Exist");
+
+            errorMessages.Add("dailyRegistrationsExists", "Fail - Daily Registration Already Exists");
+            errorMessages.Add("dailyRegistrationsNotExists", "Fail - Daily Registration to Update Does Not Exist");
             return errorMessages;
         }
     }

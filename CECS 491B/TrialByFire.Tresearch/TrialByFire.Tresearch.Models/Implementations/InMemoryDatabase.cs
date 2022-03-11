@@ -181,6 +181,12 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<IDailyLogin> InitializeDailyLogins()
         {
             List<IDailyLogin> dailyLogins = new List<IDailyLogin>();
+
+            for(int i = 1; i <= 31; i++)
+            {
+                dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, i), i));
+            }
+
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 3)), 100));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 4)), 99));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 5)), 98));
@@ -285,6 +291,12 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<ITopSearch> InitializeTopSearches()
         {
             List<ITopSearch> topSearches = new List<ITopSearch>();
+
+            for(int i = 1; i <= 31; i++)
+            {
+                topSearches.Add(new TopSearch(new DateTime(2000, 1, i), "test" + i, i));
+            }
+
             topSearches.Add(new TopSearch((new DateTime(2022, 2, 5)), "Donuts", 20));
             topSearches.Add(new TopSearch((new DateTime(2022, 2, 6)), "Dark", 21));
             topSearches.Add(new TopSearch((new DateTime(2022, 2, 7)), "Dumb", 22));
@@ -323,6 +335,12 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<INodesCreated> InitializeNodesCreated()
         {
             List<INodesCreated> nodesCreated = new List<INodesCreated>();
+
+            for(int i = 1; i <= 31; i++)
+            {
+                nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, i), i));
+            }
+
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 2, 5)), 70));
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 2, 6)), 71));
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 2, 7)), 72));
@@ -361,6 +379,12 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<IDailyRegistration> InitializeDailyRegistrations()
         {
             List<IDailyRegistration> dailyRegistrations = new List<IDailyRegistration>();
+
+            for(int i = 1; i <= 31; i++)
+            {
+                dailyRegistrations.Add(new DailyRegistration(new DateTime(2000, 1, i), i));
+            }
+
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 3)), 100));
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 4)), 99));
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 5)), 98));

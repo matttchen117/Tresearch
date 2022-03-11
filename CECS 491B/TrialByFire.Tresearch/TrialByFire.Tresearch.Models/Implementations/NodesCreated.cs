@@ -5,20 +5,20 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class NodesCreated : INodesCreated
     {
-        public DateTime nodeCreationDate { get; set; }
+        public DateTime nodesCreatedDate { get; set; }
 
-        public int nodeCreationCount { get; set; }
+        public int nodesCreatedCount { get; set; }
 
         public NodesCreated()
         {
-            nodeCreationDate = DateTime.Now;
-            nodeCreationCount = -1;
+            nodesCreatedDate = DateTime.Now;
+            nodesCreatedCount = -1;
         }
 
-        public NodesCreated(DateTime nodeCreationDate, int nodeCreationCount)
+        public NodesCreated(DateTime nodesCreatedDate, int nodesCreatedCount)
         {
-            this.nodeCreationDate = nodeCreationDate;
-            this.nodeCreationCount = nodeCreationCount;
+            this.nodesCreatedDate = nodesCreatedDate;
+            this.nodesCreatedCount = nodesCreatedCount;
         }
     }
 }

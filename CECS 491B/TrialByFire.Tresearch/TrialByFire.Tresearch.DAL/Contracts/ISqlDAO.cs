@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.DAL.Contracts
 {
@@ -41,7 +42,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         public string CreateNodesCreated(INodesCreated nodesCreated);
 
-        public INodesCreated GetNodesCreated(DateTime nodeCreationDate);
+        public List<NodesCreated> GetNodesCreated(DateTime nodeCreationDate);
 
         public string UpdateNodesCreated(INodesCreated nodesCreated);
 
@@ -49,21 +50,21 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         public string CreateDailyLogin(IDailyLogin dailyLogin);
 
-        public IDailyLogin GetDailyLogin(DateTime nodeCreationDate);
+        public List<DailyLogin> GetDailyLogin(DateTime nodeCreationDate);
 
         public string UpdateDailyLogin(IDailyLogin dailyLogin);
 
 
         public string CreateTopSearch(ITopSearch topSearch);
 
-        public ITopSearch GetTopSearch(DateTime nodeCreationDate);
+        public List<TopSearch> GetTopSearch(DateTime nodeCreationDate);
 
         public string UpdateTopSearch(ITopSearch topSearch);
 
 
         public string CreateDailyRegistration(IDailyRegistration dailyRegistration);
 
-        public IDailyRegistration GetDailyRegistration(DateTime nodeCreationDate);
+        public List<DailyRegistration> GetDailyRegistration(DateTime nodeCreationDate);
 
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration);
     }

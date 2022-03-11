@@ -4,8 +4,8 @@ namespace TrialByFire.Tresearch.Models.Contracts
 {
     public interface INodesCreated
     {
-        DateTime nodeCreationDate { get; set; }
+        DateTime nodesCreatedDate { get; set; }
 
-        int nodeCreationCount { get; set; }
+        int nodesCreatedCount { get; set; }
     }
 }
