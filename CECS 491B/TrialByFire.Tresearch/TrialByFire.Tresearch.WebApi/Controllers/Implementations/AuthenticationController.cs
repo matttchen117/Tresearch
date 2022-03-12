@@ -29,6 +29,13 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         }
 
         [HttpPost]
+        [Route("test")]
+        public string Test(string username, string otp, string authorizationLevel)
+        {
+            return $"success: {username} + {otp} + {authorizationLevel}";
+        }
+
+        [HttpPost]
         [Route("authenticate")]
         public string Authenticate(string username, string otp, string authorizationLevel)
         {
@@ -46,7 +53,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             }
             // {category}: {error message}
             string[] error = result.Split(": ");
-            //_logService.CreateLog(DateTime.Now, "Error", username, error[0], error[1]);
+            Response.StatusCode = Convert.ToInt32(error[0]);
+            //_logService.CreateLog(DateTime.Now, "Error", username, error[1], error[2]);
             return result;
         }
 
@@ -81,7 +89,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 cookieOptions.IsEssential = true;
                 cookieOptions.Expires = DateTime.Now.AddDays(5);
                 cookieOptions.Secure = true;
-                Response.Cookies.Append("AuthN", jwtToken, cookieOptions);
+                Response.Cookies.Append("TresearchAuthenticationCookie", jwtToken, cookieOptions);
                 result = _messageBank.SuccessMessages["generic"];
             }catch(Exception ex)
             {

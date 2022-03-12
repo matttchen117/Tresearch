@@ -14,6 +14,9 @@ using TrialByFire.Tresearch.Services.Implementations;
 
 namespace TrialByFire.Tresearch.Managers.Implementations
 {
+    // Summary:
+    //     A manager class for enforcing the business rules for requesting an OTP and calling the
+    //     appropriate services for the operation.
     public class OTPRequestManager : IOTPRequestManager
     {
         private ISqlDAO _sqlDAO { get; }
@@ -42,6 +45,24 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _mailService = mailService;
         }
 
+        //
+        // Summary:
+        //     Checks that the User is not currently logged in. Calls the Validation Service to
+        //     do basic input validation on the Users inputted username and passphrase. Creates
+        //     Account and OTPClaim objects to be passed in to the call to the OTPRequestService.
+        //     Emails to OTP to the User.
+        //
+        // Parameters:
+        //   username:
+        //     The username entered by the User requesting the OTP.
+        //   passphrase:
+        //     The passphrase entered by the User requesting the OTP.
+        //   authorizationLevel:
+        //     The selected authorization level for the Account that the User is trying to get an
+        //     OTP for.
+        //
+        // Returns:
+        //     The result of the operation.
         public string RequestOTP(string username, string passphrase, string authorizationLevel)
         {
             string result;
