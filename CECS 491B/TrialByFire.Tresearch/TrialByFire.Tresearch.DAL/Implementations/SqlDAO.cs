@@ -14,7 +14,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public SqlDAO(IMessageBank messageBank)
         {
-            _sqlConnectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true";
+            _sqlConnectionString = "Data Source=tresearchstudentserver.database.windows.net;Initial Catalog=tresearchStudentServer;User ID=tresearchadmin;Password=CECS491B!;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
             _messageBank = messageBank;
         }
