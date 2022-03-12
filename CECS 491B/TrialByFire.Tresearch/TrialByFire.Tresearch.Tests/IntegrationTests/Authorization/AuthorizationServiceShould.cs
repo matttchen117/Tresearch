@@ -23,7 +23,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authorization
         [Theory]
         [InlineData("aarry@gmail.com", "user", "user", "success")]
         [InlineData("barry@gmail.com", "admin", "user", "success")]
-        [InlineData("carry@gmail.com", "user", "admin", "Database: You are not authorized to perform this operation.")]
+        [InlineData("carry@gmail.com", "user", "admin", "Database: Account not found or not authorized to perform the operation.")]
         [InlineData("darry@gmail.com", "user", "user", "Database: The account was not found or it has been disabled.")]
         [InlineData("earry@gmail.com", "user", "user", "Database: Please confirm your account before attempting to login.")]
         public void VerifyThatTheUserIsAuthorized(string username, string authorizationLevel, string requiredAuthLevel, string expected)

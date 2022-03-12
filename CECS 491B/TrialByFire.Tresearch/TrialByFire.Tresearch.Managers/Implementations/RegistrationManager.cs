@@ -17,7 +17,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
         public IMessageBank _messageBank { get; set; }
 
-        private string defaultAuthorization = "User";
+        private string defaultAuthorization = "user";
 
         private int linkActivationLimit = 24;
 
@@ -51,7 +51,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                         return results;
                     }
                 }
-
             }
             catch
             {
@@ -74,9 +73,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     results.Add("Failed - Registration Manager unable to create confirmation link object");
                     return results;
                 }
-
-
-
+                results.Add(_confirmationLink.Username);
                 IAccount account = _registrationService.GetUserFromConfirmationLink(_confirmationLink);
                 if (account.Email == null)
                 {
@@ -124,6 +121,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                         results.Add("Failed - Registration Manager unable to create confirmation link");
                     return results;
                 }
+
                 results.Add(_mailService.SendConfirmation(email, results.First()));
                 if (results.Last()[0] == 'F')
                 {
@@ -138,7 +136,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             {
                 results.Add("Failed - Account Manager" + ex);
             }
-
             return results;
         }
 

@@ -14,8 +14,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public SqlDAO(IMessageBank messageBank)
         {
-            _messageBank = messageBank;
             _sqlConnectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true";
+
+            _messageBank = messageBank;
         }
 
         public SqlDAO(string sqlConnectionString, IMessageBank messageBank)
@@ -31,7 +32,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var insertQuery = "INSERT INTO dbo.confirmation_links (username, GUID, datetime) VALUES (@Username, @UniqueIdentifier, @Datetime)";
+                    var insertQuery = "INSERT INTO dbo.EmailConfirmationLinks (username, GUID, timestamp) VALUES (@Username, @UniqueIdentifier, @Datetime)";
                     int affectedRows = connection.Execute(insertQuery, _confirmationlink);
 
                     if (affectedRows == 1)
@@ -40,9 +41,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         result.Add("Failed - Email already has confirmation link");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                result.Add("Failed - Unable to add confirmation link to database");
+                result.Add("Failed - SQLDAO " + ex);
             }
             return result;
         }
@@ -50,7 +51,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public IConfirmationLink GetConfirmationLink(string url)
         {
 
-            string guidString = url.Substring(url.LastIndexOf('=')+1);
+            string guidString = url.Substring(url.LastIndexOf('=') + 1);
             //Guid guid = new Guid(guidString);
 
 
@@ -61,11 +62,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
 
-                    var readQuery = "SELECT username FROM dbo.confirmation_links WHERE GUID = @guid";
+                    var readQuery = "SELECT username FROM dbo.EmailConfirmationLinks WHERE GUID = @guid";
                     _confirmationLink.Username = connection.ExecuteScalar<string>(readQuery, new { guid = guidString });
-                    readQuery = "SELECT GUID FROM dbo.confirmation_links WHERE GUID = @guid";
+                    readQuery = "SELECT GUID FROM dbo.EmailConfirmationLinks WHERE GUID = @guid";
                     _confirmationLink.UniqueIdentifier = connection.ExecuteScalar<Guid>(readQuery, new { guid = guidString });
-                    readQuery = "SELECT datetime FROM dbo.confirmation_links WHERE GUID = @guid";
+                    readQuery = "SELECT datetime FROM dbo.EmailConfirmationLinks WHERE GUID = @guid";
                     _confirmationLink.Datetime = connection.ExecuteScalar<DateTime>(readQuery, new { guid = guidString });
                 }
             }
@@ -87,7 +88,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var updateQuery = "UPDATE dbo.user_accounts SET confirmation = 1 WHERE email = @Email and username = @Username";
+                    var updateQuery = "UPDATE dbo.Accounts SET confirmation = 1 WHERE email = @Email and username = @Username";
                     affectedRows = connection.Execute(updateQuery, account);
 
                 }
@@ -109,7 +110,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var deleteQuery = "DELETE FROM confirmation_links WHERE @Username=username and @Guid=guid and @Timestamp=Timestamp";
+                    var deleteQuery = "DELETE FROM dbo.EmailConfirmationLinks WHERE @Username=username and @Guid=guid and @Timestamp=Timestamp";
                     affectedRows = connection.Execute(deleteQuery, confirmationLink);
                 }
                 if (affectedRows == 1)
@@ -135,7 +136,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var readQuery = "SELECT COUNT(*) FROM dbo.user_accounts WHERE email = @Email";
+                    var readQuery = "SELECT COUNT(*) FROM dbo.Accounts WHERE Email = @Email";
                     var accounts = connection.ExecuteScalar<int>(readQuery, new { Email = account.Email });
 
                     if (accounts > 0)
@@ -143,7 +144,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         results.Add("Failed - Account already exists in database");
                         return results;
                     }
-                    var insertQuery = "INSERT INTO dbo.user_accounts (username, email, passphrase, authorization_level, account_status, confirmation) " +
+                    var insertQuery = "INSERT INTO dbo.Accounts (Username, Email, Passphrase, AuthorizationLevel, AccountStatus, Confirmed) " +
                         "VALUES (@Username, @Email, @Passphrase, @AuthorizationLevel, @AccountStatus, @Confirmed)";
 
                     affectedRows = connection.Execute(insertQuery, account);
@@ -218,7 +219,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
                     var readQuery = "SELECT * FROM Accounts WHERE Username = @username AND AuthorizationLevel = @role";
-                    var account = connection.ExecuteScalar<int>(readQuery, new { username = rolePrincipal.RoleIdentity.Name, role = rolePrincipal.RoleIdentity.AuthorizationLevel });
+                    var account = connection.ExecuteScalar<int>(readQuery, new { username = rolePrincipal.RoleIdentity.Username, role = rolePrincipal.RoleIdentity.AuthorizationLevel });
                     if (account == 0)
                     {
                         return _messageBank.ErrorMessages["notFoundOrAuthorized"];
@@ -233,7 +234,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             "DELETE FROM EmailConfirmationLinks WHERE username = @username;" +
                             "END";
 
-                        affectedRows = connection.Execute(storedProcedure, rolePrincipal.RoleIdentity.Name);
+                        affectedRows = connection.Execute(storedProcedure, rolePrincipal.RoleIdentity.Username);
                     }
 
 
@@ -248,9 +249,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     return _messageBank.ErrorMessages["notFoundOrAuthorized"];
                 }
             }
-            catch (Exception ex)
+            catch (AccountDeletionFailedException adfe)
             {
-                return "Exception occurred";
+                return adfe.Message;
             }
 
         }
@@ -296,7 +297,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 return acfe.Message;
             }
-            catch(InvalidOperationException ioe)
+            catch (InvalidOperationException ioe)
             {
                 return _messageBank.ErrorMessages["notFoundOrEnabled"];
             }
@@ -312,64 +313,38 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             int affectedRows = 0;
             try
             {
-                // create connection to database
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    // query to select account
                     string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                     IAccount dbAccount = connection.QueryFirst<Account>(query, new
                     {
                         Username = otpClaim.Username,
                         AuthorizationLevel = otpClaim.AuthorizationLevel
                     });
-                    // check if account exists, if it is confirmed, and if it is enabled
-                    if (dbAccount == null)
-                    {
-                        results.Add(_messageBank.ErrorMessages["accountNotFound"]);
-                        return results;
-                    }else if(dbAccount.Confirmed == false)
+                    if (dbAccount.Confirmed == false)
                     {
                         results.Add(_messageBank.ErrorMessages["notConfirmed"]);
                         return results;
-                    }else if(dbAccount.AccountStatus == false)
+                    }
+                    if (dbAccount.AccountStatus == false)
                     {
                         results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
                         return results;
                     }
-                    // query to select otp claim
                     query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IOTPClaim dbOTPClaim = connection.QueryFirst<OTPClaim>(query, new 
-                    { 
-                        Username = otpClaim.Username, 
-                        AuthorizationLevel = otpClaim.AuthorizationLevel 
+                    IOTPClaim dbOTPClaim = connection.QueryFirst<OTPClaim>(query, new
+                    {
+                        Username = otpClaim.Username,
+                        AuthorizationLevel = otpClaim.AuthorizationLevel
                     });
-                    // check if null
-                    if(dbOTPClaim == null)
+                    if (dbOTPClaim == null)
                     {
                         results.Add(_messageBank.ErrorMessages["accountNotFound"]);
                         return results;
                     }
-                    // if otps do not match
-                    if(!otpClaim.OTP.Equals(dbOTPClaim.OTP))
+                    if (!otpClaim.OTP.Equals(dbOTPClaim.OTP))
                     {
-                        // increment fail count
                         int failCount = ++dbOTPClaim.FailCount;
-                        // update fail count in db
-                        query = "UPDATE OTPClaims SET FailCount = @FailCount WHERE " +
-                        "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                        affectedRows = connection.Execute(query, new
-                        {
-                            Username = otpClaim.Username,
-                            AuthorizationLevel = otpClaim.AuthorizationLevel,
-                            FailCount = dbOTPClaim.FailCount
-                        });
-                        // update failed
-                        if (affectedRows != 1)
-                        {
-                            results.Add(_messageBank.ErrorMessages["accountNotFound"]);
-                            return results;
-                        }
-                        // if fail count is 5 or more, attempt to disable account
                         if (failCount >= 5)
                         {
                             query = "UPDATE Accounts SET AccountStatus = 0 WHERE " +
@@ -379,7 +354,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                                 Username = otpClaim.Username,
                                 AuthorizationLevel = otpClaim.AuthorizationLevel,
                             });
-                            // disable failed
                             if (affectedRows != 1)
                             {
                                 results.Add(_messageBank.ErrorMessages["accountDisableFail"]);
@@ -391,14 +365,26 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                                 return results;
                             }
                         }
+                        query = "UPDATE OTPClaims SET FailCount = @FailCount WHERE " +
+                        "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
+                        affectedRows = connection.Execute(query, new
+                        {
+                            Username = otpClaim.Username,
+                            AuthorizationLevel = otpClaim.AuthorizationLevel,
+                            FailCount = dbOTPClaim.FailCount++
+                        });
+                        if (affectedRows != 1)
+                        {
+                            results.Add(_messageBank.ErrorMessages["accountNotFound"]);
+                            return results;
+                        }
                         else
                         {
                             results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
                             return results;
                         }
                     }
-                    // check that otp was entered within 2 minutes of being created
-                    else if((otpClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
+                    else if ((otpClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
                     {
                         results.Add(_messageBank.SuccessMessages["generic"]);
                         results.Add($"username:{otpClaim.Username},authorizationLevel:{otpClaim.AuthorizationLevel}");
@@ -409,7 +395,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         results.Add(_messageBank.ErrorMessages["otpExpired"]);
                         return results;
                     }
-                } 
+                }
             }
             catch (OTPClaimCreationFailedException occfe)
             {
@@ -417,9 +403,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return results;
             }
             catch (InvalidOperationException ioe)
-            { 
-                results.Add("Database: " + ioe.Message);
-                //results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
+            {
+                results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
                 return results;
             }
             catch (Exception ex)
@@ -437,14 +422,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
                     IAccount dbAccount = connection.QueryFirst<Account>(query, new
                     {
-                        Username = rolePrincipal.RoleIdentity.Name,
+                        Username = rolePrincipal.RoleIdentity.Username,
                         AuthorizationLevel = rolePrincipal.RoleIdentity.AuthorizationLevel
                     });
-                    if (dbAccount == null)
-                    {
-                        return _messageBank.ErrorMessages["notFoundOrAuthorized"];
-                    }
-                    else if (dbAccount.Confirmed == false)
+                    if (dbAccount.Confirmed == false)
                     {
                         return _messageBank.ErrorMessages["notConfirmed"];
                     }
@@ -454,14 +435,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     }
                     else
                     {
-                        if (rolePrincipal.RoleIdentity.AuthorizationLevel.Equals("admin") || 
-                            rolePrincipal.RoleIdentity.AuthorizationLevel.Equals(requiredAuthLevel))
+                        if (dbAccount.AuthorizationLevel.Equals("admin") ||
+                            dbAccount.AuthorizationLevel.Equals(requiredAuthLevel))
                         {
                             return _messageBank.SuccessMessages["generic"];
                         }
                         else
                         {
-                            return _messageBank.ErrorMessages["notAuthorized"];
+                            return _messageBank.ErrorMessages["notFoundOrAuthorized"];
                         }
                     }
                 }
@@ -472,7 +453,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (InvalidOperationException ioe)
             {
-                return _messageBank.ErrorMessages["notFoundOrEnabled"];
+                return _messageBank.ErrorMessages["notFoundOrAuthorized"];
             }
             catch (Exception ex)
             {
@@ -499,7 +480,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     else
                     {
                         int failCount = dbOTPClaim.FailCount;
-                        if(otpClaim.TimeCreated > dbOTPClaim.TimeCreated.AddDays(1))
+                        if (otpClaim.TimeCreated > dbOTPClaim.TimeCreated.AddDays(1))
                         {
                             failCount = 0;
                         }
@@ -513,7 +494,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             TimeCreated = otpClaim.TimeCreated,
                             FailCount = otpClaim.FailCount
                         });
-                        if(affectedRows != 1)
+                        if (affectedRows != 1)
                         {
                             return _messageBank.ErrorMessages["otpFail"];
                         }
@@ -544,11 +525,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
 
-        /*
-            Ian's Methods
-         */
-
-        
 
         public string CreateNodesCreated(INodesCreated nodesCreated)
         {
@@ -561,36 +537,37 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 Values (@node_creation_date, @node_creation_count)";
 
                     affectedRows = connection.Execute(insertQuery,
-                                    new { node_creation_date = nodesCreated.nodeCreationDate,
+                                    new
+                                    {
+                                        node_creation_date = nodesCreated.nodeCreationDate,
                                         node_creation_count = nodesCreated.nodeCreationCount
                                     });
                 }
                 if (affectedRows == 1)
                 {
-                    return _messageBank.SuccessMessages["generic"];
+                    return "Created Nodes Successfully Inserted";
                 }
                 else
                 {
-                    return _messageBank.ErrorMessages["createdNodeNotInserted"];
+                    return "Created Nodes Not Inserted";
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                return null;
+                return "Fail";
             }
         }
 
-        public IList<INodesCreated> GetNodesCreated(DateTime nodeCreationDate)
+        public INodesCreated GetNodesCreated(DateTime nodeCreationDate)
         {
-            IList<INodesCreated> nodesCreated;
+            INodesCreated nodesCreated;
 
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
                 var selectQuery = "SELECT * FROM Tresearch.nodes_created" +
                                   "WHERE _node_creation_date >= @node_creation_date - 30";
 
-                nodesCreated = (List<INodesCreated>)connection.Query<INodesCreated>(selectQuery, new {node_creation_date = nodeCreationDate});
+                nodesCreated = connection.QuerySingle<INodesCreated>(selectQuery, new { node_creation_date = nodeCreationDate });
             }
 
             return nodesCreated;
@@ -598,39 +575,26 @@ Values (@node_creation_date, @node_creation_count)";
 
         public string UpdateNodesCreated(INodesCreated nodesCreated)
         {
-            try
+            using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
-                {
-                    var updateQuery = @"UPDATE Tresearch.nodes_created (nodes_created_date, nodes_created_count)" +
-                                        "VALUES (@nodes_created_date, @nodes_created_count)";
+                var updateQuery = @"UPDATE Tresearch.nodes_created (nodes_created_date, nodes_created_count)" +
+                                    "VALUES (@nodes_created_date, @nodes_created_count)";
 
-                    var result = connection.Execute(updateQuery,
-                                new
-                                {
-                                    nodes_created_date = nodesCreated.nodeCreationDate,
-                                    nodes_created_count = nodesCreated.nodeCreationCount
-                                }
-                                );
-
-                    if (result == 1)
-                    {
-                        return _messageBank.SuccessMessages["generic"];
-                    }
-                    else
-                    {
-                        return _messageBank.ErrorMessages["createdNodeNotExist"];
-                    }
-                }
-            } catch(Exception ex) {
-                Console.WriteLine(ex.Message);
-                return null;
+                var _result = connection.Execute(updateQuery,
+                            new
+                            {
+                                nodes_created_date = nodesCreated.nodeCreationDate,
+                                nodes_created_count = nodesCreated.nodeCreationCount
+                            }
+                            );
             }
+
+            return "Node Created Successfully Updated";
         }
 
 
 
-        public string CreateDailyLogin(IDailyLogin dailyLogin)
+        public string CreateDailyLogins(IDailyLogin dailyLogin)
         {
             int affectedRows;
             try
@@ -638,38 +602,39 @@ Values (@node_creation_date, @node_creation_count)";
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
                     var insertQuery = @"INSERT INTO Tresearch.DailyLogins (login_date, login_count)
-                                        Values (@loginDate, @loginCount)";           
+                                        Values (@loginDate, @loginCount)";
                     affectedRows = connection.Execute(insertQuery,
-                                        new { login_date = dailyLogin.loginDate,
+                                        new
+                                        {
+                                            login_date = dailyLogin.loginDate,
                                             login_count = dailyLogin.loginCount
                                         });
                 }
                 if (affectedRows == 1)
                 {
-                    return _messageBank.SuccessMessages["generic"];
+                    return "Daily Login Successfully Created";
                 }
                 else
                 {
-                    return _messageBank.ErrorMessages["dailyLoginNotInserted"];
+                    return "Daily Login Creation Failed";
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                return null;
+                return "Fail";
             }
         }
 
-        public IList<IDailyLogin> GetDailyLogin(DateTime loginDate)
+        public IDailyLogin GetDailyLogin(DateTime loginDate)
         {
-            IList<IDailyLogin> dailyLogin;
+            IDailyLogin dailyLogin;
 
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
                 var selectQuery = "SELECT * FROM Tresearch.daily_logins" +
                                     "WHERE _loginDate >= @login_date - 30";
 
-                dailyLogin = (List<IDailyLogin>)connection.Query<IDailyLogin>(selectQuery, new { login_date = loginDate });
+                dailyLogin = connection.QuerySingle<IDailyLogin>(selectQuery, new { login_date = loginDate });
             }
 
             return dailyLogin;
@@ -677,34 +642,21 @@ Values (@node_creation_date, @node_creation_count)";
 
         public string UpdateDailyLogin(IDailyLogin dailyLogin)
         {
-            try
+            IDailyLogin logins;
+
+            using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                var updateQuery = @"UPDATE Tresearch.daily_logins (login_date, login_count) " +
+                                    "VALUES (@login_date, @login_count)";
+
+                logins = connection.QuerySingle<IDailyLogin>(updateQuery, new
                 {
-                    var updateQuery = @"UPDATE Tresearch.daily_logins (login_date, login_count) " +
-                                        "VALUES (@login_date, @login_count)";
-
-                    var result = connection.Execute(updateQuery, new
-                    {
-                        login_date = dailyLogin.loginDate,
-                        login_count = dailyLogin.loginCount
-                    });
-
-                    if (result == 1)
-                    {
-                        return _messageBank.SuccessMessages["generic"];
-                    } else
-                    {
-                        return _messageBank.ErrorMessages["dailyLoginNotExist"];
-                    }
-                }
-            } catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
+                    login_date = dailyLogin.loginDate,
+                    login_count = dailyLogin.loginCount
+                });
             }
 
-                return "Daily Login Update Successful";
+            return "Daily Login Update Successful";
         }
 
 
@@ -719,36 +671,37 @@ Values (@node_creation_date, @node_creation_count)";
                     var insertQuery = @"INSERT INTO Tresearch.TopSearch (top_search_date, top_search_string, top_search_countl)" +
                                         "Values (@top_search_date, @top_search_string, @top_search_count)";
                     affectedRows = connection.Execute(insertQuery,
-                                        new { top_search_date = topSearch.topSearchDate,
+                                        new
+                                        {
+                                            top_search_date = topSearch.topSearchDate,
                                             top_search_string = topSearch.searchString,
                                             top_search_count = topSearch.searchCount
                                         });
                 }
                 if (affectedRows == 1)
                 {
-                    return _messageBank.SuccessMessages["generic"];
+                    return "Top Search Creation Successful";
                 }
                 else
                 {
-                    return _messageBank.ErrorMessages["topSearchNotInserted"];
+                    return "Top Search Creation Failed";
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                return null;
+                return "Fail";
             }
         }
 
-        public IList<ITopSearch> GetTopSearch(DateTime topSearchDate)
+        public ITopSearch GetTopSearch(DateTime topSearchDate)
         {
-            IList<ITopSearch> topSearch;
-            
+            ITopSearch topSearch;
+
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
                 var selectQuery = "SELECT * FROM Tresearch.top_search" +
                                     "WHERE topSearchDate >= @top_search_date - 30";
-                topSearch = (List<ITopSearch>)connection.Query<ITopSearch>(selectQuery, new {top_search_date = topSearchDate});
+                topSearch = connection.QuerySingle<ITopSearch>(selectQuery, new { top_search_date = topSearchDate });
             }
 
             return topSearch;
@@ -756,35 +709,21 @@ Values (@node_creation_date, @node_creation_count)";
 
         public string UpdateTopSearch(ITopSearch topSearch)
         {
-            try
+            using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
-                {
-                    var updateQuery = @"UPDATE Tresearch.top_search (top_search_date, search_string, search_count)" +
-                                        "VALUES (@top_search_date, @search_string, @search_count)";
+                var updateQuery = @"UPDATE Tresearch.top_search (top_search_date, search_string, search_count)" +
+                                    "VALUES (@top_search_date, @search_string, @search_count)";
 
-                    var result = connection.Execute(updateQuery,
-                                                        new
-                                                        {
-                                                            top_search_date = topSearch.topSearchDate,
-                                                            search_string = topSearch.searchCount,
-                                                            search_count = topSearch.searchCount
-                                                        });
-
-                    if (result == 1)
-                    {
-                        return _messageBank.SuccessMessages["generic"];
-                    }
-                    else
-                    {
-                        return _messageBank.ErrorMessages["topSearchNotExist"];
-                    }
-                }
-            } catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
+                var _result = connection.Execute(updateQuery,
+                                                    new
+                                                    {
+                                                        top_search_date = topSearch.topSearchDate,
+                                                        search_string = topSearch.searchCount,
+                                                        search_count = topSearch.searchCount
+                                                    });
             }
+
+            return "Top Search Update Successful";
         }
 
 
@@ -796,41 +735,40 @@ Values (@node_creation_date, @node_creation_count)";
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var insertQuery = @"INSERT INTO Tresearch.DailyRegistrations (registration_date, registration_countl)" + 
+                    var insertQuery = @"INSERT INTO Tresearch.DailyRegistrations (registration_date, registration_countl)" +
                                         "Values (@registrationDate, @registrationCount)";
-                   affectedRows = connection.Execute(insertQuery,
-                                    new
-                                    {
-                                        registration_date = dailyRegistration.registrationDate,
-                                        registration_count = dailyRegistration.registrationCount
-                                    });
+                    affectedRows = connection.Execute(insertQuery,
+                                     new
+                                     {
+                                         registration_date = dailyRegistration.registrationDate,
+                                         registration_count = dailyRegistration.registrationCount
+                                     });
                 }
                 if (affectedRows == 1)
                 {
-                    return _messageBank.SuccessMessages["generic"];
+                    return "Daily Registration Creation Successful";
                 }
                 else
                 {
-                    return _messageBank.ErrorMessages["dailyRegistrationNotInserted"];
+                    return "Daily Registration Creation Failed";
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                return null;
+                return "Fail";
             }
         }
 
-        public IList<IDailyRegistration> GetDailyRegistration(DateTime dailyRegistrationDate)
+        public IDailyRegistration GetDailyRegistration(DateTime dailyRegistrationDate)
         {
-            IList<IDailyRegistration> dailyRegistration;
+            IDailyRegistration dailyRegistration;
 
             using (var connection = new SqlConnection(_sqlConnectionString))
             {
                 var selectQuery = "SELECT * FROM Tresearch.daily_registrations" +
                                     "WHERE _registrationDate >= @registration_date - 30";
 
-                dailyRegistration = (List<IDailyRegistration>)connection.Query<IDailyRegistration>(selectQuery, new { registration_date = dailyRegistrationDate });
+                dailyRegistration = connection.QuerySingle<IDailyRegistration>(selectQuery, new { registration_date = dailyRegistrationDate });
             }
 
             return dailyRegistration;
@@ -838,29 +776,21 @@ Values (@node_creation_date, @node_creation_count)";
 
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration)
         {
-            try
+            using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
-                {
-                    var updateQuery = @"UPDATE Tresearch.daily_registrations (registration_date, registration_count)" +
-                                        "VALUES (@registration_date, @registration_count)";
+                var updateQuery = @"UPDATE Tresearch.daily_registrations (registration_date, registration_count)" +
+                                    "VALUES (@registration_date, @registration_count)";
 
-                    var result = connection.Execute(updateQuery,
-                                    new { registration_date = dailyRegistration.registrationDate });
+                var result = connection.Execute(updateQuery,
+                                new { registration_date = dailyRegistration.registrationDate });
+            }
 
-                    if(result == 1)
-                    {
-                        return _messageBank.SuccessMessages["generic"];
-                    } else
-                    {
-                        return _messageBank.ErrorMessages["dailyRegistrationNotExist"];
-                    }
-                }
-            } catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
-            }  
+            return "Daily Registration Update Successful";
+        }
+
+        public string CreateDailyLogin(IDailyLogin dailyLogin)
+        {
+            throw new NotImplementedException();
         }
     }
 }

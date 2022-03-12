@@ -22,7 +22,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
         }
 
         [Theory]
-        [InlineData("aarry@gmail.com", "abcDEF123", "user", "guest", "guest", "success")]
+        [InlineData("drakat7@gmail.com", "abcDEF123", "user", "guest", "guest", "Server: Email failed to send.")]
+        [InlineData("drakat7@gmail.com", "abcDEF123", "admin", "guest", "guest", "Server: Email failed to send.")]
         [InlineData("aarry@gmail.com", "#$%", "guest", "user", "guest", "Data: Invalid Username or " +
             "Passphrase. Please try again.")]
         [InlineData("aarry@gmail.com", "abcdef#$%", "user", "guest", "guest", "Data: Invalid Username or " +
@@ -33,7 +34,6 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             "it has been disabled.")]
         [InlineData("barry@gmail.com", "abcDEF123", "admin", "billy@yahoo.com", "admin", "Server: Active session found. " +
             "Please logout and try again.")]
-        [InlineData("carry@gmail.com", "abcDEF123", "user", "guest", "guest", "success")]
         [InlineData("darry@gmail.com", "abcDEF123", "user", "guest", "guest", "Database: The account was not found or it " +
             "has been disabled.")]
         [InlineData("earry@gmail.com", "abcDEF123", "user", "guest", "guest", "Database: Please confirm your " +

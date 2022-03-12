@@ -5,6 +5,8 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Builder;
 
 namespace TrialByFire.Tresearch.Middlewares
 {
@@ -18,9 +20,9 @@ namespace TrialByFire.Tresearch.Middlewares
 
         public async Task InvokeAsync(HttpContext httpContext, IRolePrincipal rolePrincipal)
         {
-            if(httpContext.Request.Cookies.ContainsKey("AuthN"))
+            if(httpContext.Request.Cookies.ContainsKey("TresearchAuthenticationCookie"))
             {
-                string jwt = httpContext.Request.Cookies["AuthN"];
+                string jwt = httpContext.Request.Cookies["TresearchAuthenticationCookie"];
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var keyValue = "akxhBSian218c9pJA98912n4010409AMKLUHqjn2njwaj";
                 var key = Encoding.ASCII.GetBytes(keyValue);

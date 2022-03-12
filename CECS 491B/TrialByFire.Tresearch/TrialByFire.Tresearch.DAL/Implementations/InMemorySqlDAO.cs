@@ -20,13 +20,38 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = new MessageBank();
         }
 
+        public List<IKPI> LoadKPI(DateTime now)
+        {
+            throw new NotImplementedException();
+        }
+
+        INodesCreated ISqlDAO.GetNodesCreated(DateTime nodeCreationDate)
+        {
+            throw new NotImplementedException();
+        }
+
+        IDailyLogin ISqlDAO.GetDailyLogin(DateTime nodeCreationDate)
+        {
+            throw new NotImplementedException();
+        }
+
+        ITopSearch ISqlDAO.GetTopSearch(DateTime nodeCreationDate)
+        {
+            throw new NotImplementedException();
+        }
+
+        IDailyRegistration ISqlDAO.GetDailyRegistration(DateTime nodeCreationDate)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VerifyAccount(IAccount account)
         {
             int index = InMemoryDatabase.Accounts.IndexOf(account);
             if (index != -1)
             {
                 IAccount dbAccount = InMemoryDatabase.Accounts[index];
-                if((account.Passphrase != null) && account.Passphrase.Equals(dbAccount.Passphrase))
+                if ((account.Passphrase != null) && account.Passphrase.Equals(dbAccount.Passphrase))
                 {
                     if (dbAccount.Confirmed != false)
                     {
@@ -80,7 +105,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 }
                 IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[index];
                 // if otps do not match
-                if(!otpClaim.OTP.Equals(dbOTPClaim.OTP))
+                if (!otpClaim.OTP.Equals(dbOTPClaim.OTP))
                 {
                     // increment fail count
                     ++InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount;
@@ -108,7 +133,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     results.Add(_messageBank.ErrorMessages["otpExpired"]);
                     return results;
-                } 
+                }
             }
             catch (AccountCreationFailedException acfe)
             {
@@ -126,7 +151,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             try
             {
-                IAccount account = new Account(rolePrincipal.RoleIdentity.Name, rolePrincipal.RoleIdentity.AuthorizationLevel);
+                IAccount account = new Account(rolePrincipal.RoleIdentity.Username, rolePrincipal.RoleIdentity.AuthorizationLevel);
                 // Find account in db
                 int index = InMemoryDatabase.Accounts.IndexOf(account);
                 if (index != -1)
@@ -138,7 +163,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         // check if enabled
                         if (dbAccount.AccountStatus != false)
                         {
-                            if(dbAccount.AuthorizationLevel.Equals("admin") || dbAccount.AuthorizationLevel.Equals(requiredAuthLevel))
+                            if (dbAccount.AuthorizationLevel.Equals("admin") || dbAccount.AuthorizationLevel.Equals(requiredAuthLevel))
                             {
                                 return _messageBank.SuccessMessages["generic"];
                             }
@@ -149,7 +174,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         }
                         else
                         {
-                            return _messageBank.ErrorMessages["notFoundOrEnabled"]; 
+                            return _messageBank.ErrorMessages["notFoundOrEnabled"];
                         }
                     }
                     else
@@ -174,7 +199,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             string result;
             int index = InMemoryDatabase.OTPClaims.IndexOf(otpClaim);
-            if(index >= 0)
+            if (index >= 0)
             {
                 IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)];
                 IAccount account = new Account(dbOTPClaim.Username, dbOTPClaim.AuthorizationLevel);
@@ -192,53 +217,62 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public string DeleteAccount(IRolePrincipal rolePrincipal)
         {
             bool accountExists = false;
-            string accountName = rolePrincipal.RoleIdentity.Name;
+            string accountName = rolePrincipal.RoleIdentity.Username;
             string accountRole = rolePrincipal.RoleIdentity.AuthorizationLevel;
-            foreach(Account ac in InMemoryDatabase.Accounts)
+            try
             {
-                if(ac.Username.Equals(accountName) && ac.AuthorizationLevel.Equals(accountRole))
+                for (int i = 0; i < InMemoryDatabase.Accounts.Count; i++)
                 {
-                    accountExists = true; 
-                    InMemoryDatabase.Accounts.Remove(ac);   
-                }
-            }
-            if(accountExists)
-            {
-                for(int i = 0; i < InMemoryDatabase.OTPClaims.Count; i++)
-                {
-                    if (InMemoryDatabase.OTPClaims[i].Equals(accountName))
+                    if ((InMemoryDatabase.Accounts[i].Username.Equals(accountName)) && (InMemoryDatabase.Accounts[i].AuthorizationLevel.Equals(accountRole)))
                     {
-                        InMemoryDatabase.OTPClaims.RemoveAt(i);
+                        accountExists = true;
+                        InMemoryDatabase.Accounts.RemoveAt(i);
                         break;
                     }
                 }
-                for (int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
+                if (accountExists)
                 {
-                    if (InMemoryDatabase.Nodes[i].accountOwner.Equals(accountName))
+                    for (int i = 0; i < InMemoryDatabase.OTPClaims.Count; i++)
                     {
-                        InMemoryDatabase.Nodes.RemoveAt(i);
+                        if (InMemoryDatabase.OTPClaims[i].Username.Equals(accountName))
+
+                        {
+                            InMemoryDatabase.OTPClaims.RemoveAt(i);
+                            break;
+                        }
                     }
+                    for (int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
+                    {
+                        if (InMemoryDatabase.Nodes[i].accountOwner.Equals(accountName))
+                        {
+                            InMemoryDatabase.Nodes.RemoveAt(i);
+                        }
+                    }
+                    for (int i = 0; i < InMemoryDatabase.Ratings.Count; i++)
+                    {
+                        if (InMemoryDatabase.Ratings[i].username.Equals(accountName))
+                        {
+                            InMemoryDatabase.Ratings.RemoveAt(i);
+                        }
+                    }
+                    for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count; i++)
+                    {
+                        if (InMemoryDatabase.ConfirmationLinks[i].Username.Equals(accountName))
+                        {
+                            InMemoryDatabase.ConfirmationLinks.RemoveAt(i);
+                            break;
+                        }
+                    }
+                    return _messageBank.SuccessMessages["generic"];
                 }
-                for (int i = 0; i < InMemoryDatabase.Ratings.Count; i++)
+                else
                 {
-                    if (InMemoryDatabase.Ratings[i].username.Equals(accountName))
-                    {
-                        InMemoryDatabase.Ratings.RemoveAt(i);
-                    }
+                    return _messageBank.ErrorMessages["accountNotFound"];
                 }
-                for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count; i++)
-                {
-                    if (InMemoryDatabase.ConfirmationLinks[i].Equals(accountName))
-                    {
-                        InMemoryDatabase.ConfirmationLinks.RemoveAt(i);
-                        break;
-                    }
-                }
-                return _messageBank.SuccessMessages["generic"];
             }
-            else
+            catch (AccountDeletionFailedException adfe)
             {
-                return _messageBank.ErrorMessages["notFoundOrEnabled"];
+                return adfe.Message;
             }
 
         }
@@ -316,7 +350,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public IConfirmationLink GetConfirmationLink(string url)
         {
-            string guidString = url.Substring(url.LastIndexOf('=')+1);
+            string guidString = url.Substring(url.LastIndexOf('=') + 1);
             Guid guid = new Guid(guidString);
             for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count(); i++)
                 if (guid.Equals(InMemoryDatabase.ConfirmationLinks[i].UniqueIdentifier))
@@ -324,22 +358,158 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return null;
         }
 
-        public List<IKPI> LoadKPI(DateTime now)
+/*        public List<IKPI> LoadKPI(DateTime now)
         {
-            throw new NotImplementedException();
+            List<IKPI> kpiList = new List<IKPI>();
+            kpiList.Add(GetViewKPI());
+            kpiList.Add(GetViewDurationKPI());
+            kpiList.Add(GetNodeKPI(now));
+            kpiList.Add(GetLoginKPI(now));
+            kpiList.Add(GetRegistrationKPI(now));
+            kpiList.Add(GetSearchKPI(now));
+            return kpiList;
+        }*/
+
+        //1
+        public IViewKPI GetViewKPI()
+        {
+            IViewKPI viewKPI = new ViewKPI();
+            List<IView> ordered = InMemoryDatabase.Views.OrderBy(x => x.visits).ToList();
+            if (ordered.Count == 0)
+            {
+                viewKPI.result = "Error";
+            }
+            int n = ordered.Count;
+            for (int i = 1; i <= 5; i++)
+            {
+                viewKPI.views.Add(ordered[(n - i)]);
+            }
+            viewKPI.result = "success";
+            return viewKPI;
         }
 
+        //2
+        public IViewDurationKPI GetViewDurationKPI()
+        {
+            IViewDurationKPI viewDurationKPI = new ViewDurationKPI();
+            List<IView> ordered = InMemoryDatabase.Views.OrderBy(x => x.averageDuration).ToList();
+            if (ordered.Count == 0)
+            {
+                viewDurationKPI.result = "Error";
+                return viewDurationKPI;
+            }
+            int n = ordered.Count;
+            for (int i = 1; i < 5; i++)
+            {
+                viewDurationKPI.views.Add(ordered[(n - 1)]);
+            }
+            viewDurationKPI.result = "success";
+            return viewDurationKPI;
+        }
 
-        /*
-            Ian's Methods
-         */
+/*        public INodeKPI GetNodeKPI(DateTime now)
+        {
+            INodeKPI nodeKPI = new NodeKPI();
+            int counter = 1;
+            INodesCreated nCreated = GetNodesCreated(now);//Initial Check to see if InMemoryDatabase is not empty
+            if (nCreated.nodeCreationCount == -1)
+            {
+                nodeKPI.result = "Error";
+                return nodeKPI;
+            }
+            while ((counter < 29) && (nCreated.nodeCreationCount != -1))
+            {
+                nodeKPI.nodesCreated.Add(nCreated);
+                DateTime past = now.AddDays((counter * -1));
+                nCreated = GetNodesCreated(past);
+                counter++;
+            }
+            nodeKPI.result = "success";
+            return nodeKPI;
+        }
+
+        //4
+        public ILoginKPI GetLoginKPI(DateTime now)
+        {
+            ILoginKPI loginKPI = new LoginKPI();
+            int counter = 1;
+            IDailyLogin dLogin = GetDailyLogin(now);
+            if (dLogin.loginCount == -1)
+            {
+                loginKPI.result = "Error";
+                return loginKPI;
+            }
+            while ((counter <= 90) && (dLogin.loginCount != -1))
+            {
+                loginKPI.dailyLogins.Add(dLogin);
+                DateTime past = now.AddDays((counter * -1));
+                dLogin = GetDailyLogin(past);
+                counter++;
+            }
+            loginKPI.result = "success";
+            return loginKPI;
+        }
+
+        //5
+        public IRegistrationKPI GetRegistrationKPI(DateTime now)
+        {
+            IRegistrationKPI registrationKPI = new RegistrationKPI();
+            int counter = 1;
+            IDailyRegistration dRegistration = GetDailyRegistration(now);
+            if (dRegistration.registrationCount == -1)
+            {
+                registrationKPI.result = "Error";
+                return registrationKPI;
+            }
+            while ((counter <= 90) && (dRegistration.registrationCount != -1))
+            {
+                registrationKPI.dailyRegistrations.Add(dRegistration);
+                DateTime past = now.AddDays((counter * -1));
+                dRegistration = GetDailyRegistration(past);
+                counter++;
+            }
+            registrationKPI.result = "success";
+            return registrationKPI;
+        }
+
+        //6
+        public ISearchKPI GetSearchKPI(DateTime now)
+        {
+            ISearchKPI searchKPI = new SearchKPI();
+            int counter = 1;
+            ITopSearch sCreated = GetTopSearch(now);//Initial Check to see if InMemoryDatabase is not empty
+            List<ITopSearch> preSort = new List<ITopSearch>();
+            if (sCreated.searchCount == -1)
+            {
+                searchKPI.result = "Error";
+                return searchKPI;
+            }
+
+            while ((counter <= 28) && (sCreated.searchCount != -1))
+            {
+                preSort.Add(sCreated);
+                DateTime past = now.AddDays((counter * -1));
+                sCreated = GetTopSearch(past);
+                counter++;
+            }
+
+            List<ITopSearch> afterSort = preSort.OrderBy(x => x.searchCount).ToList();
+            int n = (afterSort.Count);
+            for (int i = 1; i <= 5 || i < n; i++)
+            {
+                Console.WriteLine(n);
+                searchKPI.topSearches.Add(afterSort[(n - i)]);
+            }
+            searchKPI.result = "success";
+            return searchKPI;
+        }*/
 
         public string CreateNodesCreated(INodesCreated nodesCreated)
         {
             // Check whether the NodesCreated object exists already
             foreach (INodesCreated nodesCreated1 in InMemoryDatabase.NodesCreated)
             {
-                if(nodesCreated1.nodeCreationDate == nodesCreated.nodeCreationDate)
+                if (nodesCreated1.nodeCreationDate == nodesCreated.nodeCreationDate)
                 {
                     return _messageBank.ErrorMessages["createdNodesExists"];
                 }
@@ -368,9 +538,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public string UpdateNodesCreated(INodesCreated nodesCreated)
         {
-            for(int i = 0; i < InMemoryDatabase.NodesCreated.Count; i++)
+            for (int i = 0; i < InMemoryDatabase.NodesCreated.Count; i++)
             {
-                if(InMemoryDatabase.NodesCreated[i].nodeCreationDate == nodesCreated.nodeCreationDate)
+                if (InMemoryDatabase.NodesCreated[i].nodeCreationDate == nodesCreated.nodeCreationDate)
                 {
                     InMemoryDatabase.NodesCreated[i] = nodesCreated;
 
@@ -386,9 +556,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public string CreateDailyLogin(IDailyLogin dailyLogin)
         {
             // Check whether the daily login already exists in the database
-            foreach(IDailyLogin dailyLogin1 in InMemoryDatabase.DailyLogins)
+            foreach (IDailyLogin dailyLogin1 in InMemoryDatabase.DailyLogins)
             {
-                if(dailyLogin1.loginDate == dailyLogin.loginDate)
+                if (dailyLogin1.loginDate == dailyLogin.loginDate)
                 {
                     return _messageBank.ErrorMessages["dailyLoginsExists"];
                 }
@@ -403,7 +573,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
            List<IDailyLogin> dailyLoginResults = new List<IDailyLogin>();
 
-           foreach (IDailyLogin dailyLogin1 in InMemoryDatabase.DailyLogins)
+            foreach (IDailyLogin dailyLogin1 in InMemoryDatabase.DailyLogins)
             {
                 if(dailyLogin1.loginDate <= loginDate && dailyLogin1.loginDate >= loginDate.Date.AddDays(-30))
                 {
@@ -418,7 +588,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             for (int i = 0; i < InMemoryDatabase.DailyLogins.Count; i++)
             {
-                if(InMemoryDatabase.DailyLogins[i].loginDate == dailyLogin.loginDate)
+                if (InMemoryDatabase.DailyLogins[i].loginDate == dailyLogin.loginDate)
                 {
                     InMemoryDatabase.DailyLogins[i] = dailyLogin;
 
@@ -435,7 +605,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             foreach (ITopSearch topSearch1 in InMemoryDatabase.TopSearches)
             {
-                if(topSearch1.topSearchDate == topSearch.topSearchDate)
+                if (topSearch1.topSearchDate == topSearch.topSearchDate)
                 {
                     return _messageBank.ErrorMessages["topSearchExists"];
                 }
@@ -450,7 +620,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             IList<ITopSearch> topSearchResult = new List<ITopSearch>();
 
-            foreach(ITopSearch topSearch in InMemoryDatabase.TopSearches)
+            foreach (ITopSearch topSearch in InMemoryDatabase.TopSearches)
             {
                 if(topSearch.topSearchDate <= topSearchDate && topSearch.topSearchDate >= topSearchDate.Date.AddDays(-30))
                 {
@@ -465,7 +635,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             for (int i = 0; i < InMemoryDatabase.TopSearches.Count; i++)
             {
-                if(topSearch.topSearchDate == InMemoryDatabase.TopSearches[i].topSearchDate)
+                if (topSearch.topSearchDate == InMemoryDatabase.TopSearches[i].topSearchDate)
                 {
                     InMemoryDatabase.TopSearches[i] = topSearch;
 
@@ -482,7 +652,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             foreach (IDailyRegistration dailyRegistration1 in InMemoryDatabase.DailyRegistrations)
             {
-                if(dailyRegistration1.registrationDate == dailyRegistration.registrationDate)
+                if (dailyRegistration1.registrationDate == dailyRegistration.registrationDate)
                 {
                     return _messageBank.ErrorMessages["dailyRegistrationExists"];
                 }
@@ -497,7 +667,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             IList<IDailyRegistration> dailyRegistrationResults = new List<IDailyRegistration>();
 
-            foreach(IDailyRegistration dailyRegistration in InMemoryDatabase.DailyRegistrations)
+            foreach (IDailyRegistration dailyRegistration in InMemoryDatabase.DailyRegistrations)
             {
                 if(dailyRegistration.registrationDate <= dailyRegistrationDate && dailyRegistration.registrationDate >= dailyRegistrationDate.Date.AddDays(-30))
                 {
@@ -510,9 +680,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration)
         {
-            for(int i = 0; i < InMemoryDatabase.DailyRegistrations.Count; i++)
+            for (int i = 0; i < InMemoryDatabase.DailyRegistrations.Count; i++)
             {
-                if(InMemoryDatabase.DailyRegistrations[i].registrationDate == dailyRegistration.registrationDate)
+                if (InMemoryDatabase.DailyRegistrations[i].registrationDate == dailyRegistration.registrationDate)
                 {
                     InMemoryDatabase.DailyRegistrations[i] = dailyRegistration;
 

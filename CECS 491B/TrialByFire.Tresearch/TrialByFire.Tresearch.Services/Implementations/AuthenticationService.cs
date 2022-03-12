@@ -23,7 +23,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         private IMessageBank _messageBank { get; }
         private string _payLoad { get; }
 
-        public AuthenticationService(ISqlDAO sqlDAO, ILogService logService, 
+        public AuthenticationService(ISqlDAO sqlDAO, ILogService logService,
             IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
@@ -35,7 +35,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         public List<string> Authenticate(IOTPClaim otpClaim)
         {
             List<string> results = _sqlDAO.Authenticate(otpClaim);
-            if(results[0].Equals(_messageBank.SuccessMessages["generic"]))
+            if (results[0].Equals(_messageBank.SuccessMessages["generic"]))
             {
                 return CreateJwtToken(results[1]);
             }
@@ -45,15 +45,15 @@ namespace TrialByFire.Tresearch.Services.Implementations
         // use microsoft built in jWT
         // use default key, randomizer, replace every 3 months
         // look into AES type 
-        
+
         private List<string> CreateJwtToken(string _payload)
         {
             List<string> results = new List<string>();
-            
+
             // break payload into parts
             Dictionary<string, string> claimValuePairs = new Dictionary<string, string>();
             string[] claimValue = _payload.Split(",");
-            foreach(string cV in claimValue)
+            foreach (string cV in claimValue)
             {
                 string[] pair = cV.Split(":");
                 claimValuePairs.Add(pair[0], pair[1]);
@@ -79,7 +79,12 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 results.Add(_messageBank.SuccessMessages["generic"]);
                 results.Add(tokenHandler.WriteToken(token));
             }
-            catch(ArgumentNullException ane)
+            catch (RoleIdentityCreationFailedException ricf)
+            {
+                results.Add(ricf.Message);
+                return results;
+            }
+            catch (ArgumentNullException ane)
             {
                 results.Add("Server: " + ane.Message);
                 return results;

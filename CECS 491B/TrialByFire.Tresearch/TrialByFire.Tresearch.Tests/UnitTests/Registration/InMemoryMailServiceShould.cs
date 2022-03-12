@@ -14,7 +14,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
 
         public InMemoryMailServiceShould()
         {
-            
+
             _messageBank = new MessageBank();
             _mailService = new MailService(_messageBank);
         }
@@ -24,7 +24,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         [InlineData("pammmmyyyy@gmail.com", "https://github.com/Drakat7/Tresearch")]
         public void SendEmail(string email, string url)
         {
-            
+
 
             //Act
             string result = _mailService.SendConfirmation(email, url);

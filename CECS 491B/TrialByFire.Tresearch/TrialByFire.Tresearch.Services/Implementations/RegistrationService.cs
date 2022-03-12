@@ -29,7 +29,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             List<string> results = new List<string>();
             try
             {
-                results = _sqlDAO.CreateAccount(account);
+                results.AddRange(_sqlDAO.CreateAccount(account));
 
                 if (results.Last()[0] == 'S')
                     results.Add("Success - Register Service created account");
@@ -51,7 +51,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             try
             {
                 activationGuid = Guid.NewGuid();
-                linkUrl = $"{baseUrl}/Account/Verify?t={activationGuid}";
+                linkUrl = $"{baseUrl}{activationGuid}";
                 results.Add(linkUrl);
                 IConfirmationLink _confirmationLink = new ConfirmationLink(email, activationGuid, DateTime.Now);
 
@@ -126,6 +126,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
             try
             {
+
                 account = _sqlDAO.GetUnconfirmedAccount(link.Username);
             }
             catch (Exception ex)

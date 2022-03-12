@@ -21,28 +21,28 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 		private IUADService _uadService { get; }
 		private IAuthenticationService _authenticationService { get; }
 		private IAuthorizationService _authorizationService { get; }
-		
+
 		private IRolePrincipal _rolePrincipal { get; }
 		private IOTPRequestService _otpRequestService { get; }
 		private readonly string _authorizationLevel = "Admin";
 
 		public UADManager(ISqlDAO sqlDAO, ILogService logService, IUADService uadService, IAuthenticationService authenticationService, IAuthorizationService authorizationService)
-        {
+		{
 			_sqlDAO = sqlDAO;
 			_logService = logService;
 			_uadService = uadService;
 			_authenticationService = authenticationService;
 			_authorizationService = authorizationService;
-        }
+		}
 
 		public List<KPI> LoadKPI(DateTime now)
-        {
+		{
 			//return _uadService.LoadKPI(now);
 			throw new NotImplementedException();
-        }
+		}
 
 		public List<KPI> KPIsFetched(DateTime now)
-        {
+		{
 			string result;
 			string authorizeResult;
 			authorizeResult = _authorizationService.VerifyAuthorized(_rolePrincipal, _authorizationLevel);
@@ -64,7 +64,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 			List<KPI> resultList = new List<KPI>();
 			resultList.Add(new KPI("Error: Timeout"));
 			return resultList;
-        }
-    }
+		}
+	}
 }
-

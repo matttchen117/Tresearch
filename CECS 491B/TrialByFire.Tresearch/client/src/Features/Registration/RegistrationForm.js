@@ -1,16 +1,20 @@
 import React, { useState } from "react";
+import {useNavigate} from 'react-router-dom';
+import axios from 'axios';
 
 import "./RegistrationForm.css";
 
 const RegistrationForm = () => {
     // States
     const [errorMessages, setErrorMessages] = useState({});
-    const [isSubmitted, setIsSubmitted] = useState(false);
     const [checked, setChecked] = useState(false);
 
-    const errors = {
-        credentials: "Invalid username or password"
-    };
+    const navigate = useNavigate();
+
+    const [data, setData] = useState({
+        email: "pammypoor@gmail.com",
+        passphrase: "myPassword123"
+    });
 
     const renderErrorMessage = (name) =>
         name === errorMessages.name && (
@@ -19,8 +23,23 @@ const RegistrationForm = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        var { username, password } = document.forms[0];
-        alert("TEST");
+        
+        
+
+        axios.post('https://localhost:7010/Registration/register?email=' + data.email + '&passphrase=' + data.passphrase
+            ).then(response => {
+                navigate("/Register/InactiveLink");
+                console.log(response.data)
+            }).catch(err => console.log("api Erorr: ", err.message))
+        
+            try{
+                axios.post('https://localhost:7010/Registration/confirmation?email=' + data.email
+                    ).then(response => {
+                        navigate('/Registration/ConfirmationSent');
+                    }).catch(err => console.log("api Erorr: ", err.message))
+            }catch{
+
+            }   
     };
 
     const handleCheck = () => {
@@ -30,8 +49,6 @@ const RegistrationForm = () => {
     const renderForm = (
         <div className="form-container">
             <div className="form-components">
-                
-
                 <form onSubmit={handleSubmit}>
                     <div className="input-container">
                         <input type="username" name="uname" required placeholder="Email Address" />
@@ -42,24 +59,19 @@ const RegistrationForm = () => {
                         {renderErrorMessage("pass")}
                     </div>
                     <div className="checkbox-container">
-                        <input type="checkbox" checked={checked} onChange={handleCheck} />
+                        <input id = "ageCheck" type="checkbox" onChange={handleCheck} />
                         <label for="agree">I am 15 years or older </label>
                     </div>
-
                     <div className="create-button-container">
                         <input type="submit" value="Create" />
                     </div>
                 </form>
             </div>
         </div>
-        
     );
 
     return (
         <div className="form">
-            <button type="button" className="form-close-btn" onclick="handleRegClick()">
-                <span className="icon-close">x</span>
-            </button>
             <div className="title-text">
                 <h1 className="register-title">Registration</h1>
             </div>

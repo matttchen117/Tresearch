@@ -12,7 +12,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public DailyLogin()
         {
             loginDate = DateTime.Now;
-            loginCount = 0;
+            loginCount = -1;
         }
 
         public DailyLogin(DateTime loginDate, int loginCount)

@@ -35,7 +35,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             _sqlDAO = new InMemorySqlDAO();
             _logService = new InMemoryLogService(_sqlDAO);
             _registrationService = new RegistrationService(_sqlDAO, _logService);
-            
+
             _messageBank = new MessageBank();
             _mailService = new MailService(_messageBank);
             _validationService = new ValidationService(_messageBank);
@@ -44,20 +44,18 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         }
 
         [Theory]
-        [InlineData("pammypoor+INcontrollerRegister1@gmail.com", "myValidPassphrase")]
-        [InlineData("pammypoor+INcontrollerRegister2@gmail.com", "ApplePie!")]
+        [InlineData("pammypoor@gmail.com", "myValidPassphrase")]
+        [InlineData("pammypoor@gmail.com", "ApplePie!")]
         public void RegisterTheUser(string email, string passphrase)
         {
             //Arrange
             IAccount account = new Account(email, email, passphrase, "User", true, false);
             //Act
-            string result = _registrationController.RegisterAccount(account);
+            string result = _registrationController.RegisterAccount(email, passphrase);
 
             //Assert
             Assert.Equal('S', result[0]);
         }
-
-
 
         [Theory]
         [InlineData("pammypoor+INcontrollerSendConfirmation1@gmail.com")]
@@ -76,8 +74,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
 
 
         [Theory]
-        [InlineData("pammypoor+INcontrollerConfirm1@gmail.com", "myControllerPass", "www.tresearch.systems/Registration/verify?=", "2022-03-05 21:32:59.910")]
-        [InlineData("pammypoor+INcontrollerConfirm2@gmail.com", "myControllerPassword", "www.tresearch.systems/Registration/verify?=", "2022-03-05 21:32:59.910")]
+        [InlineData("pammypoor+INcontrollerConfirm1@gmail.com", "myControllerPass", "www.tresearch.systems/Registration/verify?=", "2022-03-06 21:32:59.910")]
+        [InlineData("pammypoor+INcontrollerConfirm2@gmail.com", "myControllerPassword", "www.tresearch.systems/Registration/verify?=", "2022-03-06 21:32:59.910")]
         public void confirmAccount(string email, string passphrase, string url, string date)
         {
             //Arrange

@@ -3,37 +3,45 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
-using TrialByFire.Tresearch.WebApi.Controllers;
-using Xunit;
+using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
+using TrialByFire.Tresearch.Services.Contracts;
+using TrialByFire.Tresearch.Services.Implementations;
+using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
+using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 {
-	public class InMemoryUADControllerShould
+	public class InMemoryUADControllerShould : InMemoryTestDependencies
 	{
-		public void LoadKPI(DateTime now)
+		public InMemoryUADControllerShould() : base()
 		{
-			/*// Arrange
-			ISqlDAO _inMemorySqlDAO = new InMemorySqlDAO();
-			ILogService _inMemoryLogService = new InMemoryLogService(_inMemorySqlDAO);
-			IUADManager _uadManager = new UADManager(_inMemorySqlDAO, _inMemoryLogService);
-			UADController _uadController = new UADController(_inMemorySqlDAO, _inMemoryLogService, _uadManager);
-			List<KPI> expected = new List<KPI>();
-			expected.Add(new KPI("success"));
+		}
+
+		[Theory]
+		[InlineData(2022, 3, 5, "success")]
+		[InlineData(2021, 12, 12, "Error")]
+		public void LoadKPI(int year, int month, int day, string expected)
+		{
+			// Arrange
+			IMessageBank messageBank = new MessageBank();
+			IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService, messageBank);
+			IAuthorizationService authorizationService = new AuthorizationService(sqlDAO, logService);
+			IUADService uadService = new UADService(sqlDAO, logService);
+			IUADManager uadManager = new UADManager(sqlDAO, logService, uadService, authenticationService, authorizationService);
+			IUADController uadController = new UADController(sqlDAO, logService, uadManager);
 
 			// Act
-			List<KPI> results = _uadController.LoadKPI(_inMemorySqlDAO, _inMemoryLogService, _uadManager);
+			List<IKPI> results = new List<IKPI>();
+			results = uadController.LoadKPI(new DateTime(year, month, day));
 
 			// Assert
-			Assert.Equal(expected, results);*/
-			throw new NotImplementedException();
+			Assert.Equal(expected, results[0].result);
 		}
 	}
 }
-

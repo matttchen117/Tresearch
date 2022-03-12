@@ -40,7 +40,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                         }
                         if (!char.IsLetterOrDigit(username[i]))
                         {
-                            if(!validSymbols.Contains(username[i]))
+                            if (!validSymbols.Contains(username[i]))
                             {
                                 return _messageBank.ErrorMessages["badNameOrPass"];
                             }
@@ -110,7 +110,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 }
                 return _messageBank.ErrorMessages["badNameOrOTP"];
             }
-            if(input.ContainsKey("email"))
+            if (input.ContainsKey("email"))
             {
                 throw new NotImplementedException();
             }

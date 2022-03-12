@@ -11,9 +11,6 @@ using TrialByFire.Tresearch.Services.Implementations;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddControllers();
-
 builder.Services.AddTransient<IMessageBank, MessageBank>();
 builder.Services.AddTransient<ISqlDAO, SqlDAO>();
 builder.Services.AddTransient<ILogService, SqlLogService>();
@@ -31,9 +28,22 @@ builder.Services.AddTransient<IOTPRequestManager, OTPRequestManager>();
 builder.Services.AddTransient<IRegistrationManager, RegistrationManager>();
 builder.Services.AddTransient<IRoleIdentity>(service => new RoleIdentity(true, "guest", "guest"));
 builder.Services.AddTransient<IRolePrincipal, RolePrincipal>();
-
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      builder =>
+                      {
+                          builder.WithOrigins("http://localhost:3000")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                      });
+});
 
 var app = builder.Build();
 
@@ -46,18 +56,22 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors();
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseCookieAuthentication();
 
 app.UseAuthorization();
 
+app.MapControllers();
+
 app.Run();
 
 public static class AuthExtensions
 {
+    // Refer UseRouting, just passing Host
     public static IApplicationBuilder UseCookieAuthentication(this IApplicationBuilder host)
     {
         return host.UseMiddleware<CookieAuthentication>();
     }
+
 }
