@@ -5,6 +5,8 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
+using TrialByFire.Tresearch.DAL.Implementations;
+using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Services.Contracts;
 
 namespace TrialByFire.Tresearch.Services.Implementations
@@ -12,29 +14,26 @@ namespace TrialByFire.Tresearch.Services.Implementations
     public class AccountDeletionService : IAccountDeletionService
     {
 
-        public SqlDAO _sqlDAO { get; set; }
+        public ISqlDAO SqlDAO { get;}
 
-        public ILogService _logService { get; set; }
-
-        public string _result { get; set; }
+        public ILogService LogService { get;}
 
 
-        public AccountDeletionService(SqlDAO _sqlDAO, ILogService _logService)
+
+        public AccountDeletionService(SqlDAO sqlDAO, ILogService logService)
         {
-            this._sqlDAO = _sqlDAO;
-            this._logService = _logService;
+            this.SqlDAO = sqlDAO;
+            this.LogService = logService;
         }
 
 
-        public string DeleteAccount(IPrincipal _rolePrincipal)
-        {
-            _result = _sqlDAO.DeleteAccount(_rolePrincipal);
-        }
 
-        public string DeleteAccount(IPrincipal _rolePrincipal)
+        public string DeleteAccount(IRolePrincipal rolePrincipal)
         {
-            string _results = _sqlDAO.DeleteAccount(_rolePrincipal);
+            string _results = SqlDAO.DeleteAccount(rolePrincipal);
             return _results;
         }
+
+
     }
 }

@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using System.Security.Principal;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Services.Contracts;
+using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Managers.Contracts
 {
     public interface IAccountDeletionManager
     {
-        IPrincipal principal { get; }
+        string DeleteAccount(IRolePrincipal principal);
 
     }
 
