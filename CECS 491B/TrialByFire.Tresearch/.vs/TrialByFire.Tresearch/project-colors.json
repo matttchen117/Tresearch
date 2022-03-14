@@ -40,7 +40,12 @@
       "ProjectGuid": "b98dc29d-5008-48df-a58e-7ed9047860e0",
       "DisplayName": "TrialByFire.Tresearch.Exceptions",
       "ColorIndex": 6
+    },
+    "d5119c66-eb4a-4165-a3c5-9073027ebbbf": {
+      "ProjectGuid": "d5119c66-eb4a-4165-a3c5-9073027ebbbf",
+      "DisplayName": "TrialByFire.Tresearch.Middlewares",
+      "ColorIndex": 7
     }
   },
-  "NextColorIndex": 7
+  "NextColorIndex": 8
 }

@@ -39,7 +39,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch.DAL",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch.Exceptions", "TrialByFire.Tresearch.Exceptions\TrialByFire.Tresearch.Exceptions.csproj", "{B98DC29D-5008-48DF-A58E-7ED9047860E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrialByFire.Tresearch.Middlewares", "TrialByFire.Tresearch.Middlewares\TrialByFire.Tresearch.Middlewares.csproj", "{D5119C66-EB4A-4165-A3C5-9073027EBBBF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrialByFire.Tresearch.Middlewares", "TrialByFire.Tresearch.Middlewares\TrialByFire.Tresearch.Middlewares.csproj", "{D5119C66-EB4A-4165-A3C5-9073027EBBBF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
