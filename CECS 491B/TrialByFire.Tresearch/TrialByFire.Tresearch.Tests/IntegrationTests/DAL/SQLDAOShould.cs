@@ -19,9 +19,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.DAL
 
         public static IEnumerable<object[]> GetMethodData()
         {
-            get
-            {
-                IntegrationTestDependencies test = new IntegrationTestDependencies ();
+            IntegrationTestDependencies test = new IntegrationTestDependencies ();
 
             // Nodes Created
             yield return new object[] {
@@ -54,8 +52,6 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.DAL
 
         public static IEnumerable<object[]> CreateMethodData()
         {
-            get
-            {
             IntegrationTestDependencies test = new IntegrationTestDependencies();
 
             // Nodes Created
@@ -123,7 +119,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.DAL
             };
 
             yield return new object[] {
-                new NodesCreated(new DateTime(2000, 2, 2), 1),
+                new NodesCreated(new DateTime(2000, 2, 3), 1),
                 new Func<INodesCreated, string> (test.sqlDAO.UpdateNodesCreated),
                 test.messageBank.ErrorMessages["createdNodesNotExists"]
             };
@@ -136,7 +132,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.DAL
             };
 
             yield return new object[] {
-                new TopSearch(new DateTime(2000, 2, 2), "test0", 1),
+                new TopSearch(new DateTime(2000, 2, 3), "test0", 1),
                 new Func<ITopSearch, string> (test.sqlDAO.UpdateTopSearch),
                 test.messageBank.ErrorMessages["topSearchesNotExists"]
             };
@@ -149,7 +145,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.DAL
             };
 
             yield return new object[] {
-                new DailyLogin(new DateTime(2000, 2, 2), 1),
+                new DailyLogin(new DateTime(2000, 2, 3), 1),
                 new Func<IDailyLogin, string> (test.sqlDAO.UpdateDailyLogin),
                 test.messageBank.ErrorMessages["dailyLoginsNotExists"]
             };
@@ -162,7 +158,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.DAL
             };
 
             yield return new object[] {
-                new DailyRegistration(new DateTime(2000, 2, 2), 1),
+                new DailyRegistration(new DateTime(2000, 2, 3), 1),
                 new Func<IDailyRegistration, string> (test.sqlDAO.UpdateDailyRegistration),
                 test.messageBank.ErrorMessages["dailyRegistrationsNotExists"]
             };
