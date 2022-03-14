@@ -5,12 +5,12 @@
     "\\CECS 491B\\TrialByFire.Tresearch",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests\\Authentication",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests\\Authorization",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests\\OTPRequest",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\UnitTests",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\UnitTests\\AccountDeletion",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\UnitTests\\Authentication"
   ],
-  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\InMemoryTestDependencies.cs",
+  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests\\OTPRequest\\OTPRequestServiceShould.cs",
   "PreviewInSolutionExplorer": false
 }
