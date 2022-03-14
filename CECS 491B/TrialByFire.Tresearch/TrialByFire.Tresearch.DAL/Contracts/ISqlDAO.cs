@@ -35,6 +35,14 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         // Delete account
         public string DeleteAccount(IRolePrincipal rolePrincipal);
 
+
+        /*
+         * KPI Methods
+         */
+
+        public string CreateView(IView view);
+
+
         /*
             Ian's Methods
          */

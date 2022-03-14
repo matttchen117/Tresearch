@@ -24,13 +24,13 @@ namespace TrialByFire.Tresearch.Tests
         public IRolePrincipal rolePrincipal { get; }
 
 
-        private string _connectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true";
+        private string _sqlConnectionString = "Data Source=tresearchstudentserver.database.windows.net;Initial Catalog=tresearchStudentServer;User ID=tresearchadmin;Password=CECS491B!;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
 
         public IntegrationTestDependencies()
         {
             messageBank = new MessageBank();
-            sqlDAO = new SqlDAO(_connectionString, messageBank);
+            sqlDAO = new SqlDAO(_sqlConnectionString, messageBank);
             logService = new SqlLogService(sqlDAO);
             authenticationService = new AuthenticationService(sqlDAO, logService, messageBank);
             authorizationService = new AuthorizationService(sqlDAO, logService);

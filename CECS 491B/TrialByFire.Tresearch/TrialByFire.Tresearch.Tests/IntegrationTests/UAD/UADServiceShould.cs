@@ -20,16 +20,16 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 		}
 
 		[Theory]
-		[InlineData(2022, 3, 6, "success")]
+		[InlineData(2022, 3, 7, "success")]
 		[InlineData(2021, 1, 1, "Error")]
-		public void LoadKPI(int year, int month, int day, string expected)
+		public async Task LoadKPI(int year, int month, int day, string expected)
 		{
 			// Arrange
 			IUADService uadService = new UADService(sqlDAO, logService);
+			CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
 
 			// Act
-			List<IKPI> results = new List<IKPI>();
-			results = uadService.LoadKPI(new DateTime(year, month, day));
+			var results = await uadService.LoadKPIAsync(new DateTime(year, month, day), cts.Token);
 
 			// Assert
 			string ex = "success";

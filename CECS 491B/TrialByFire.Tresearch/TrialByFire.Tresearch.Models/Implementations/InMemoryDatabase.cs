@@ -181,6 +181,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<IDailyLogin> InitializeDailyLogins()
         {
             List<IDailyLogin> dailyLogins = new List<IDailyLogin>();
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 1)), 102));
+            dailyLogins.Add(new DailyLogin((new DateTime(2021, 12, 2)), 101));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 3)), 100));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 4)), 99));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 12, 5)), 98));
@@ -279,6 +281,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 4)), 13));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 5)), 12));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 6)), 11));
+            dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 7)), 10));
             return dailyLogins;
         }
 
@@ -317,6 +320,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             topSearches.Add(new TopSearch((new DateTime(2022, 3, 4)), "Fish", 49));
             topSearches.Add(new TopSearch((new DateTime(2022, 3, 5)), "Cows", 45));
             topSearches.Add(new TopSearch((new DateTime(2022, 3, 6)), "Dogs", 50));
+            topSearches.Add(new TopSearch((new DateTime(2022, 3, 7)), "Coffee", 51));
             return topSearches;
         }
 
@@ -355,12 +359,15 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 4)), 98));
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 5)), 99));
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 6)), 100));
+            nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 7)), 101));
             return nodesCreated;
         }
 
         private List<IDailyRegistration> InitializeDailyRegistrations()
         {
             List<IDailyRegistration> dailyRegistrations = new List<IDailyRegistration>();
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 1)), 102));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2021, 12, 2)), 101));
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 3)), 100));
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 4)), 99));
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 12, 5)), 98));
@@ -459,6 +466,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 3, 4)), 13));
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 3, 5)), 12));
             dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 3, 6)), 11));
+            dailyRegistrations.Add(new DailyRegistration((new DateTime(2022, 3, 7)), 10));
             return dailyRegistrations;
         }
 
@@ -471,6 +479,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<IView> InitializeViews()
         {
             List<IView> views = new List<IView>();
+            views.Add(new View(new DateTime(2022, 3, 7), "Email", 10, 99.54));
             views.Add(new View(new DateTime(2022, 3, 6), "UAD", 50, 75.29));
             views.Add(new View(new DateTime(2022, 3, 5), "DeleteAccount", 60, 15.39));
             views.Add(new View(new DateTime(2022, 3, 4), "CreateAccount", 20, 17.43));

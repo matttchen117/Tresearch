@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
-using TrialByFire.Tresearch.Models.Implementations;
+using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 
@@ -12,8 +12,7 @@ namespace TrialByFire.Tresearch.Managers.Contracts
 {
 	public interface IUADManager
 	{
-		List<KPI> LoadKPI(DateTime now);
-		List<KPI> KPIsFetched(DateTime now);
+		Task<List<IKPI>> LoadKPIAsync(DateTime now);
 	}
 }
 

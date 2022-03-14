@@ -25,8 +25,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
 			this._logService = _logService;
 		}
 
-		public List<IKPI> LoadKPI(DateTime now)
+		public async Task<List<IKPI>> LoadKPIAsync(DateTime now, CancellationToken cancellationToken = default)
 		{
+			cancellationToken.ThrowIfCancellationRequested();
 			List<IKPI> kpiList = new List<IKPI>();
 			kpiList = _sqlDAO.LoadKPI(now);
 			return _sqlDAO.LoadKPI(now);

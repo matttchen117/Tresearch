@@ -672,5 +672,19 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
             return "Daily Registration does not exist to be updated";
         }
+
+        public string CreateView(IView view)
+        {
+            foreach (IView view1 in InMemoryDatabase.Views)
+            {
+                if(view1.date == view.date)
+                {
+                    return "View Already Exists in the Database";
+                }
+            }
+
+            InMemoryDatabase.Views.Add(view);
+            return "View Successfully Added to the Database";
+        }
     }
 }
