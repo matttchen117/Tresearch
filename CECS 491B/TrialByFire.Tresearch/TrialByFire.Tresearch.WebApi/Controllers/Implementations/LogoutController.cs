@@ -38,12 +38,15 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             {
                 try
                 {
-                    Response.Cookies.Delete("AuthN");
+                    Response.Cookies.Delete("TresearchAuthenticationCookie");
                 }catch(Exception e)
                 {
-                    return _messageBank.ErrorMessages["logoutFail"];
+                    result = _messageBank.ErrorMessages["logoutFail"];
+                    Response.StatusCode = Convert.ToInt32(result.Split(": ")[0]);
+                    return result;
                 }
             }
+            Response.StatusCode = Convert.ToInt32(result.Split(": ")[0]);
             return result;
         }
     }

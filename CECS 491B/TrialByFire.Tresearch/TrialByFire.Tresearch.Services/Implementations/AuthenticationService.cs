@@ -63,15 +63,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
             try
             {
                 IRoleIdentity roleIdentity = new RoleIdentity(true, claimValuePairs["username"], claimValuePairs["authorizationLevel"]);
-                ClaimsIdentity claimsIdentity = new ClaimsIdentity(roleIdentity);
-
                 //create jwt and set values
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var keyValue = "akxhBSian218c9pJA98912n4010409AMKLUHqjn2njwaj";
                 var key = Encoding.ASCII.GetBytes(keyValue);
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    Subject = claimsIdentity,
+                    Subject = new ClaimsIdentity(new[] { new Claim("username", claimValuePairs["username"]), 
+                        new Claim("authorizationLevel", claimValuePairs["authorizationLevel"]) }),
                     Expires = DateTime.UtcNow.AddDays(7),
                     IssuedAt = DateTime.UtcNow,
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

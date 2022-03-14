@@ -54,11 +54,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
-
 app.UseHttpsRedirection();
 
 app.UseCors(MyAllowSpecificOrigins);
+
+app.UseCookieAuthentication();
 
 app.UseAuthorization();
 
@@ -69,9 +69,9 @@ app.Run();
 public static class AuthExtensions
 {
     // Refer UseRouting, just passing Host
-    public static IApplicationBuilder UseCookieAuthentication(this IApplicationBuilder host, IRolePrincipal role)
+    public static IApplicationBuilder UseCookieAuthentication(this IApplicationBuilder host)
     {
-        return host.UseMiddleware<CookieAuthentication>(host);
+        return host.UseMiddleware<CookieAuthentication>();
     }
 
 }
