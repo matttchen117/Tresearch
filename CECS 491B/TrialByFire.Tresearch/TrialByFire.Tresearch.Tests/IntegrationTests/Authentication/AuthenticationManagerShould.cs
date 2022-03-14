@@ -21,6 +21,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
 
         [Theory]
         [InlineData("garry@gmail.com", "ABCdef123", "user", "guest", "guest", 2022, 3, 4, 5, 6, 0, "success")]
+        [InlineData("garry@gmail.com", "ABCdef123", "user", "garry@gmail.com", "user", 2022, 3, 4, 5, 6, 0, "Server: Active session found. Please logout and try again.")]
         [InlineData("iarry@gmail.com", "abcdef123", "admin", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +
             "Please try again.")]
         [InlineData("iarry@gmail.com", "abc", "admin", "guest", "guest", 2022, 3, 4, 5, 6, 0, "Data: Invalid Username or OTP. " +

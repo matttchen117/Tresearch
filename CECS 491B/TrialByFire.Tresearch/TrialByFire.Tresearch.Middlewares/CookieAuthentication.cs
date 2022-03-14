@@ -1,4 +1,5 @@
-﻿using TrialByFire.Tresearch.Models.Contracts;
+﻿using Microsoft.AspNetCore.Http;
+using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
@@ -19,9 +20,9 @@ namespace TrialByFire.Tresearch.Middlewares
 
         public async Task InvokeAsync(HttpContext httpContext, IRolePrincipal rolePrincipal)
         {
-            if (httpContext.Request.Cookies.ContainsKey("AuthN"))
+            if(httpContext.Request.Cookies.ContainsKey("TresearchAuthenticationCookie"))
             {
-                string jwt = httpContext.Request.Cookies["AuthN"];
+                string jwt = httpContext.Request.Cookies["TresearchAuthenticationCookie"];
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var keyValue = "akxhBSian218c9pJA98912n4010409AMKLUHqjn2njwaj";
                 var key = Encoding.ASCII.GetBytes(keyValue);
@@ -29,7 +30,7 @@ namespace TrialByFire.Tresearch.Middlewares
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidAlgorithms = new[] { "hmacsha256 " },
+                    ValidAlgorithms = new[] { "hmacsha256 "},
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ClockSkew = TimeSpan.Zero

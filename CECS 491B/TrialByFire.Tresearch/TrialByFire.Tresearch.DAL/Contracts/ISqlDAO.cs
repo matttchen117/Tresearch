@@ -39,6 +39,47 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         /*
             Ian's Methods
          */
+        
+        /*
+        public string CreateNode();
+
+        public INode GetNode();
+
+        public string UpdateNode();
+
+        public string DeleteNode();
+
+
+        public string CreateTag();
+
+        public ITag GetTag();
+
+        public string UpdateTag();
+
+        public string DeleteTag();
+
+
+        public string CreateNodeTag();
+
+        public INodeTag GetNodeTag();
+
+        public string UpdateNodeTag();
+
+        public string DeleteNodeTag();
+
+
+        public string CreateRating();
+
+        public IRating GetRating();
+
+        public string UpdateRating();
+
+        public string DeleteRating();
+
+        //*/
+
+
+
 
         public string CreateNodesCreated(INodesCreated nodesCreated);
 

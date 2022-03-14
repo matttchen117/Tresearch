@@ -285,6 +285,36 @@ namespace TrialByFire.Tresearch.Models.Implementations
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 4)), 13));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 5)), 12));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 6)), 11));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 1), 1));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 2), 2));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 3), 3));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 4), 4));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 5), 5));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 6), 6));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 7), 7));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 8), 8));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 9), 9));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 10), 10));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 11), 11));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 12), 12));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 13), 13));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 14), 14));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 15), 15));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 16), 16));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 17), 17));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 18), 18));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 19), 19));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 20), 20));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 21), 21));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 22), 22));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 23), 23));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 24), 24));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 25), 25));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 26), 26));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 27), 27));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 28), 28));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 29), 29));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 30), 30));
             return dailyLogins;
         }
 
@@ -329,6 +359,36 @@ namespace TrialByFire.Tresearch.Models.Implementations
             topSearches.Add(new TopSearch((new DateTime(2022, 3, 4)), "Fish", 49));
             topSearches.Add(new TopSearch((new DateTime(2022, 3, 5)), "Cows", 45));
             topSearches.Add(new TopSearch((new DateTime(2022, 3, 6)), "Dogs", 50));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 1), "test1", 1));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 2), "test2", 2));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 3), "test3", 3));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 4), "test4", 4));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 5), "test5", 5));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 6), "test6", 6));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 7), "test7", 7));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 8), "test8", 8));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 9), "test9", 9));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 10), "test10", 10));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 11), "test11", 11));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 12), "test12", 12));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 13), "test13", 13));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 14), "test14", 14));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 15), "test15", 15));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 16), "test16", 16));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 17), "test17", 17));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 18), "test18", 18));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 19), "test19", 19));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 20), "test20", 20));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 21), "test21", 21));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 22), "test22", 22));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 23), "test23", 23));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 24), "test24", 24));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 25), "test25", 25));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 26), "test26", 26));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 27), "test27", 27));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 28), "test28", 28));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 29), "test29", 29));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 30), "test30", 30));
             return topSearches;
         }
 
@@ -373,10 +433,40 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 4)), 98));
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 5)), 99));
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 6)), 100));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 1), 1));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 2), 2));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 3), 3));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 4), 4));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 5), 5));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 6), 6));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 7), 7));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 8), 8));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 9), 9));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 10), 10));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 11), 11));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 12), 12));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 13), 13));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 14), 14));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 15), 15));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 16), 16));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 17), 17));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 18), 18));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 19), 19));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 20), 20));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 21), 21));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 22), 22));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 23), 23));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 24), 24));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 25), 25));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 26), 26));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 27), 27));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 28), 28));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 29), 29));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 30), 30));
             return nodesCreated;
         }
 
-        private List<IDailyRegistration> InitializeDailyRegistrations()
+        private IList<IDailyRegistration> InitializeDailyRegistrations()
         {
             List<IDailyRegistration> dailyRegistrations = new List<IDailyRegistration>();
 

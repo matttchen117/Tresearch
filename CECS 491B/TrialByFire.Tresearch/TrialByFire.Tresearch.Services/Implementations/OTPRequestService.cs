@@ -10,6 +10,8 @@ using TrialByFire.Tresearch.Services.Contracts;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
+    // Summary:
+    //     A service class for requesting OTPs.
     public class OTPRequestService : IOTPRequestService
     {
         private ISqlDAO _sqlDAO { get; }
@@ -22,6 +24,18 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _messageBank = messageBank;
         }
 
+        //
+        // Summary:
+        //     Verifies the Account and calls the DAO to store an OTPClaim for the corresponding Account
+        //
+        // Parameters:
+        //   account:
+        //     The Account to verify and store the OTPClaim for.
+        //   otpClaim:
+        //     The OTPClaim to store.
+        //
+        // Returns:
+        //     The result of the verification/storing process.
         public string RequestOTP(IAccount account, IOTPClaim otpClaim)
         {
             string result = _sqlDAO.VerifyAccount(account);
