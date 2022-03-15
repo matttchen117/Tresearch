@@ -418,8 +418,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (InvalidOperationException ioe)
             { 
-                results.Add("Database: " + ioe.Message);
-                //results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
+                //results.Add("Database: " + ioe.Message);
+                results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
                 return results;
             }
             catch (Exception ex)

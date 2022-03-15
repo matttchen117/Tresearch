@@ -38,7 +38,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
         public void AuthenticateTheUser(string username, string otp, string authorizationLevel, int year, int month, int day, int hour,
             int minute, int second, string expected)
         {
-            // Arrange
+            // Arrange  
             IOTPClaim otpClaim = new OTPClaim(username, otp, authorizationLevel, new DateTime(year, month, day, hour, minute, second));
 
             // Act

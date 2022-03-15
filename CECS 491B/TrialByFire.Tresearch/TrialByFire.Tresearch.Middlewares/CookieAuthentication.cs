@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
+
 using System.Text;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 
 namespace TrialByFire.Tresearch.Middlewares
 {
