@@ -32,9 +32,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _payLoad = "";
         }
 
-        public List<string> Authenticate(IOTPClaim otpClaim)
+        public async Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim)
         {
-            List<string> results = _sqlDAO.Authenticate(otpClaim);
+            List<string> results = await _sqlDAO.AuthenticateAsync(otpClaim);
             if (results[0].Equals(_messageBank.SuccessMessages["generic"]))
             {
                 return CreateJwtToken(results[1]);
@@ -66,7 +66,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 //create jwt and set values
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var keyValue = "akxhBSian218c9pJA98912n4010409AMKLUHqjn2njwaj";
-                var key = Encoding.ASCII.GetBytes(keyValue);
+                var key = Encoding.UTF8.GetBytes(keyValue);
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     Subject = new ClaimsIdentity(new[] { new Claim("username", claimValuePairs["username"]), 

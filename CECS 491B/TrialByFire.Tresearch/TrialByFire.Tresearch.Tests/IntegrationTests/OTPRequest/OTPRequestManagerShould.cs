@@ -20,24 +20,25 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
         public OTPRequestManagerShould() : base()
         {
         }
+
         [Theory]
-        [InlineData("drakat7@gmail.com", "abcDEF123", "user", "guest", "guest", "Server: Email failed to send.")]
-        [InlineData("drakat7@gmail.com", "abcDEF123", "admin", "guest", "guest", "Server: Email failed to send.")]
-        [InlineData("aarry@gmail.com", "#$%", "guest", "user", "guest", "Data: Invalid Username or " +
+        [InlineData("drakat7@gmail.com", "abcDEF123", "user", "guest", "guest", "503: Server: Email failed to send.")]
+        [InlineData("drakat7@gmail.com", "abcDEF123", "admin", "guest", "guest", "503: Server: Email failed to send.")]
+        [InlineData("aarry@gmail.com", "#$%", "user", "guest", "guest", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("aarry@gmail.com", "abcdef#$%", "user", "guest", "guest", "Data: Invalid Username or " +
+        [InlineData("aarry@gmail.com", "abcdef#$%", "user", "guest", "guest", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("aarry@gmail.com", "abcdEF123", "user", "guest", "guest", "Data: Invalid Username or " +
+        [InlineData("aarry@gmail.com", "abcdEF123", "user", "guest", "guest", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "guest", "guest", "Database: The account was not found or " +
+        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "guest", "guest", "404: Database: The account was not found or " +
             "it has been disabled.")]
-        [InlineData("barry@gmail.com", "abcDEF123", "admin", "billy@yahoo.com", "admin", "Server: Active session found. " +
+        [InlineData("barry@gmail.com", "abcDEF123", "admin", "billy@yahoo.com", "admin", "403: Server: Active session found. " +
             "Please logout and try again.")]
-        [InlineData("darry@gmail.com", "abcDEF123", "user", "guest", "guest", "Database: The account was not found or it " +
+        [InlineData("darry@gmail.com", "abcDEF123", "user", "guest", "guest", "404: Database: The account was not found or it " +
             "has been disabled.")]
-        [InlineData("earry@gmail.com", "abcDEF123", "user", "guest", "guest", "Database: Please confirm your " +
+        [InlineData("earry@gmail.com", "abcDEF123", "user", "guest", "guest", "401: Database: Please confirm your " +
             "account before attempting to login.")]
-        public void RequestTheOTP(string username, string passphrase, string authorizationLevel, string currentIdentity, string currentRole, string expected)
+        public async Task RequestTheOTP(string username, string passphrase, string authorizationLevel, string currentIdentity, string currentRole, string expected)
         {
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
@@ -48,7 +49,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
                 authenticationService, rolePrincipal, otpRequestService, messageBank, mailService);
 
             // Act
-            string result = otpRequestManager.RequestOTP(username, passphrase, authorizationLevel);
+            string result = await otpRequestManager.RequestOTPAsync(username, passphrase, authorizationLevel);
 
             // Assert
             Assert.Equal(expected, result);

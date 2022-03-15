@@ -8,7 +8,8 @@ import RegistrationForm from './Features/Registration/RegistrationForm';
 import ConfirmationSent from './Features/Registration/ConfirmationSent';
 import InactiveLink from './Features/Registration/InactiveLink';
 import LogoutForm from "./Features/Logout/LogoutForm";
-import LoginForm from "./Features/Login/LoginForm";
+import LoginForm from "./Features/Login/Login";
+import Authentication from "./Features/Login/Authentication";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <header></header>
         <Routes>
           <Route path="/Login/Login" element = {<LoginForm />}/>
+          <Route path="/Login/Authentication" element = {<Authentication />}/>
           <Route path="/Logout/Logout" element = {<LogoutForm />}/>
           <Route path="/Registration/Register" element = {<RegistrationForm />}/>
           <Route path="/Registration/ConfirmationSent" element = {<ConfirmationSent />}/>

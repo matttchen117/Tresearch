@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
@@ -19,6 +20,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         private IOTPRequestManager _otpRequestManager { get; }
 
         private IMessageBank _messageBank { get; }
+
+        private IRolePrincipal? _rolePrincipal { get; }
         public OTPRequestController(ISqlDAO sqlDAO, ILogService logService, 
             IOTPRequestManager otpRequestManager, IMessageBank messageBank)
         {
@@ -27,7 +30,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _otpRequestManager = otpRequestManager;
             _messageBank = messageBank;
         }
-
 
         //
         // Summary:
@@ -47,16 +49,15 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         //     The result of the operation with any status codes if applicable.
         [HttpPost]
         [Route("requestotp")]
-        public string RequestOTP(string username, string passphrase, string authorizationLevel)
+        public async Task<IActionResult> RequestOTPAsync(string username, string passphrase, string authorizationLevel)
         {
-            string result = _otpRequestManager.RequestOTP(username, passphrase, authorizationLevel);
+            string result = await _otpRequestManager.RequestOTPAsync(username, passphrase, authorizationLevel);
             if (result.Equals(_messageBank.SuccessMessages["generic"]))
             {
-                return result;
+                return new OkObjectResult(Request.Cookies["TresearchAuthenticationCookie"]);
             }
             string[] error = result.Split(": ");
-            Response.StatusCode = Convert.ToInt32(error[0]);
-            return result;
+            return StatusCode(Convert.ToInt32(error[0]), error[2]);
         }
     }
 }

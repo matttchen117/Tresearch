@@ -41,7 +41,8 @@ builder.Services.AddCors(options =>
                       {
                           builder.WithOrigins("http://localhost:3000")
                           .AllowAnyHeader()
-                          .AllowAnyMethod();
+                          .AllowAnyMethod()
+                          .AllowAnyOrigin();
                       });
 });
 
@@ -60,7 +61,13 @@ app.UseCors(MyAllowSpecificOrigins);
 
 app.UseCookieAuthentication();
 
-app.UseAuthorization();
+using(var serviceScope = app.Services.CreateScope())
+{
+    var services = serviceScope.ServiceProvider;
+    var myDependency = services.GetRequiredService<IRoleIdentity>();
+}
+
+//app.UseAuthorization();
 
 app.MapControllers();
 
@@ -71,7 +78,7 @@ public static class AuthExtensions
     // Refer UseRouting, just passing Host
     public static IApplicationBuilder UseCookieAuthentication(this IApplicationBuilder host)
     {
-        return host.UseMiddleware<CookieAuthentication>();
+        return host.UseMiddleware<CookieAuthentication>(host);
     }
 
 }

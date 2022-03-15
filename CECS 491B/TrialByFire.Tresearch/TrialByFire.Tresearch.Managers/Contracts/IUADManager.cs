@@ -13,7 +13,7 @@ namespace TrialByFire.Tresearch.Managers.Contracts
 	public interface IUADManager
 	{
 		List<KPI> LoadKPI(DateTime now);
-		List<KPI> KPIsFetched(DateTime now);
+		Task<List<KPI>> KPIsFetchedAsync(DateTime now);
 	}
 }
 

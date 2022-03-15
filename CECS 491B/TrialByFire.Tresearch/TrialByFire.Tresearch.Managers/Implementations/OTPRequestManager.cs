@@ -63,27 +63,29 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         //
         // Returns:
         //     The result of the operation.
-        public string RequestOTP(string username, string passphrase, string authorizationLevel)
+        public async Task<string> RequestOTPAsync(string username, string passphrase, string authorizationLevel)
         {
             string result;
             try
             {
                 if(_rolePrincipal.IsInRole("guest"))
                 {
-                    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+                    // Basic input validation will be done at client side
+                    /*Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
                     keyValuePairs.Add("username", username);
                     keyValuePairs.Add("passphrase", passphrase);
-                    result = _validationService.ValidateInput(keyValuePairs);
+                    result = await _validationService.ValidateInputAsync(keyValuePairs);
                     if (result.Equals(_messageBank.SuccessMessages["generic"]))
+                    {*/
+                    IAccount account = new Account(username, passphrase, authorizationLevel);
+                    IOTPClaim otpClaim = new OTPClaim(account);
+                    result = await _otpRequestService.RequestOTPAsync(account, otpClaim);
+                    if(result.Equals(_messageBank.SuccessMessages["generic"]))
                     {
-                        IAccount account = new Account(username, passphrase, authorizationLevel);
-                        IOTPClaim otpClaim = new OTPClaim(account);
-                        result = _otpRequestService.RequestOTP(account, otpClaim);
-                        if(result.Equals(_messageBank.SuccessMessages["generic"]))
-                        {
-                            result = _mailService.SendOTP(account.Username, otpClaim.OTP, otpClaim.OTP, otpClaim.OTP);
-                        }
+                        // No API Key right now
+                        //result = await _mailService.SendOTPAsync(account.Username, otpClaim.OTP, otpClaim.OTP, otpClaim.OTP);
                     }
+                    //}
                     return result;
                 }
                 else

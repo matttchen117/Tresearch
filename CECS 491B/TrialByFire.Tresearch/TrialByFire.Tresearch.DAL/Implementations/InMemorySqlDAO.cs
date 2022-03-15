@@ -45,7 +45,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             throw new NotImplementedException();
         }
 
-        public string VerifyAccount(IAccount account)
+        public async Task<string> VerifyAccountAsync(IAccount account)
         {
             int index = InMemoryDatabase.Accounts.IndexOf(account);
             if (index != -1)
@@ -68,7 +68,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return _messageBank.ErrorMessages["notFoundOrEnabled"];
         }
 
-        public List<string> Authenticate(IOTPClaim otpClaim)
+        public async Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim)
         {
             List<string> results = new List<string>();
             try
@@ -147,7 +147,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredAuthLevel)
+        public async Task<string> VerifyAuthorizedAsync(IRolePrincipal rolePrincipal, string requiredAuthLevel)
         {
             try
             {
@@ -190,12 +190,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public IOTPClaim GetOTPClaim(IOTPClaim otpClaim)
-        {
-            return InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)];
-        }
-
-        public string StoreOTP(IOTPClaim otpClaim)
+        public async Task<string> StoreOTPAsync(IOTPClaim otpClaim)
         {
             string result;
             int index = InMemoryDatabase.OTPClaims.IndexOf(otpClaim);

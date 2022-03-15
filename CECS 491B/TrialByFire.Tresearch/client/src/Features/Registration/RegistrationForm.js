@@ -25,21 +25,16 @@ const RegistrationForm = () => {
         event.preventDefault();
         
         
-
+        
         axios.post('https://localhost:7010/Registration/register?email=' + data.email + '&passphrase=' + data.passphrase
             ).then(response => {
-                navigate("/Register/InactiveLink");
                 console.log(response.data)
             }).catch(err => console.log("api Erorr: ", err.message))
         
-            try{
-                axios.post('https://localhost:7010/Registration/confirmation?email=' + data.email
-                    ).then(response => {
-                        navigate('/Registration/ConfirmationSent');
-                    }).catch(err => console.log("api Erorr: ", err.message))
-            }catch{
-
-            }   
+        axios.post('https://localhost:7010/Registration/confirmation?email=' + data.email
+            ).then(response => {
+                navigate('/Registration/ConfirmationSent');
+            }).catch(err => console.log("api Erorr: ", err.message))
     };
 
     const handleCheck = () => {

@@ -20,7 +20,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private Dictionary<string, string> InitializeSuccessMessages()
         {
             Dictionary<string, string> successMessages = new Dictionary<string, string>();
-            successMessages.Add("generic", "200: success");
+            successMessages.Add("generic", "200: Server: success");
             return successMessages;
         }
         private Dictionary<string, string> InitializeErrorMessages()
@@ -35,11 +35,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
             // 401 Errors - Unauthorized (Not authenticated)
             errorMessages.Add("notAuthenticated", "401: Server: No active session found. Please login and try again.");
             errorMessages.Add("notConfirmed", "401: Database: Please confirm your account before attempting to login.");
-            // 403 Errors - Forbidden (User identity know, not Authorized)
+            // 403 Errors - Forbidden (User identity known, not Authorized)
             errorMessages.Add("alreadyAuthenticated", "403: Server: Active session found. Please logout and try again.");
+            errorMessages.Add("notAuthorized", "403: Database: You are not authorized to perform this operation.");
             // 404 Errors - Not Found (Resource not found, interchangeable with 403 to hide existence
-            //              of resource
-            errorMessages.Add("notAuthorized", "404: Database: You are not authorized to perform this operation.");
+            //              of resource)
             errorMessages.Add("accountNotFound", "404: Database: The account was not found.");
             errorMessages.Add("notFoundOrEnabled", "404: Database: The account was not found or it has been disabled.");
             errorMessages.Add("notFoundOrAuthorized", "404: Database: Account not found or not authorized to perform the " +

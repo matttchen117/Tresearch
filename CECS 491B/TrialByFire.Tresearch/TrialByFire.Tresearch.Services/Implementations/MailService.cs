@@ -40,7 +40,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             return "Success - Confirmation email sent";
         }
 
-        public string SendOTP(string email, string subject, string plainBody, string htmlBody)
+        public async Task<string> SendOTPAsync(string email, string subject, string plainBody, string htmlBody)
         {
             try
             {
@@ -48,7 +48,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 var from = new EmailAddress(_sender, _senderName);
                 var to = new EmailAddress(email);
                 var msg = MailHelper.CreateSingleEmail(from, to, subject, plainBody, htmlBody);
-                var response = client.SendEmailAsync(msg);
+                var response = await client.SendEmailAsync(msg);
             } catch
             {
                 return _messageBank.ErrorMessages["sendEmailFail"];

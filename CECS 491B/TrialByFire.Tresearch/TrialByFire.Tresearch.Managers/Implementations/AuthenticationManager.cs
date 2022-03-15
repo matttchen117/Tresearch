@@ -35,25 +35,26 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _messageBank = messageBank;
         }
 
-        public List<string> Authenticate(string username, string otp, string authorizationLevel, DateTime now)
+        public async Task<List<string>> AuthenticateAsync(string username, string otp, string authorizationLevel, DateTime now)
         {
             List<string> results = new List<string>();
             try
             {
                 if (_rolePrincipal.IsInRole("guest"))
                 {
-                    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+                    // Basic input validation will be done at client side
+ /*                   Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
                     keyValuePairs.Add("username", username);
                     keyValuePairs.Add("otp", otp);
                     string result = _validationService.ValidateInput(keyValuePairs);
                     if(result.Equals(_messageBank.SuccessMessages["generic"]))
-                    {
-                        IOTPClaim resultClaim = new OTPClaim(username, otp, authorizationLevel, now);
-                        results = _authenticationService.Authenticate(resultClaim);
-                        return results;
-                    }
-                    results.Add(result);
+                    {*/
+                    IOTPClaim resultClaim = new OTPClaim(username, otp, authorizationLevel, now);
+                    results = await _authenticationService.AuthenticateAsync(resultClaim);
                     return results;
+                    /*}
+                    results.Add(result);
+                    return results;*/
                 }
                 results.Add(_messageBank.ErrorMessages["alreadyAuthenticated"]);
             }catch(OTPClaimCreationFailedException occfe)

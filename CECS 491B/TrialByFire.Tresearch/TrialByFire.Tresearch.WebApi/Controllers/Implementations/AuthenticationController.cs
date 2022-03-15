@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Models.Contracts;
@@ -37,50 +38,56 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         [HttpPost]
         [Route("authenticate")]
-        public string Authenticate(string username, string otp, string authorizationLevel)
+        public async Task<IActionResult> AuthenticateAsync(string username, string otp, string authorizationLevel)
         {
             _username = username;
-            List<string> results = _authenticationManager.Authenticate(username, otp, authorizationLevel, DateTime.Now);
-            string result = results[0];
-            if(result.Equals(_messageBank.SuccessMessages["generic"]))
-            {
-                result = CreateCookie(results[1]);
-                if(result.Equals(_messageBank.SuccessMessages["generic"]))
-                {
-                    //_logService.CreateLog(DateTime.Now, "Server", username, "Info", "Authentication Succeeded");
-                    return result;
-                }
-            }
-            // {category}: {error message}
-            string[] error = result.Split(": ");
-            Response.StatusCode = Convert.ToInt32(error[0]);
-            //_logService.CreateLog(DateTime.Now, "Error", username, error[1], error[2]);
-            return result;
-        }
-
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public string Authenticate(string username, string otp, string authorizationLevel, DateTime now)
-        {
-            _username = username;
-            List<string> results = _authenticationManager.Authenticate(username, otp, authorizationLevel, now);
+            List<string> results = await _authenticationManager.AuthenticateAsync(username, otp, authorizationLevel, DateTime.Now);
             string result = results[0];
             if (result.Equals(_messageBank.SuccessMessages["generic"]))
             {
-                result = CreateCookie(results[1]);
+                CookieOptions cookieOptions = new CookieOptions();
+                cookieOptions.IsEssential = true;
+                cookieOptions.Expires = DateTime.Now.AddDays(5);
+                cookieOptions.Path = "/";
+                cookieOptions.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
+                cookieOptions.Secure = true;
+                Response.Cookies.Append("TresearchAuthenticationCookie", results[1], cookieOptions);
+                //result = await CreateCookieAsync(results[1]);
                 if (result.Equals(_messageBank.SuccessMessages["generic"]))
                 {
                     //_logService.CreateLog(DateTime.Now, "Server", username, "Info", "Authentication Succeeded");
-                    return result;
+                    return new OkResult();
                 }
             }
             // {category}: {error message}
+            //_logService.CreateLog(DateTime.Now, "Error", username, error[1], error[2]);
             string[] error = result.Split(": ");
-            //_logService.CreateLog(DateTime.Now, "Error", username, error[0], error[1]);
-            return result;
+            return StatusCode(Convert.ToInt32(error[0]), error[2]);
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        private string CreateCookie(string jwtToken)
+        public async Task<IActionResult> AuthenticateAsync(string username, string otp, string authorizationLevel, DateTime now)
+        {
+            _username = username;
+            List<string> results = await _authenticationManager.AuthenticateAsync(username, otp, authorizationLevel, now);
+            string result = results[0];
+            if (result.Equals(_messageBank.SuccessMessages["generic"]))
+            {
+                result = await CreateCookieAsync(results[1]);
+                if (result.Equals(_messageBank.SuccessMessages["generic"]))
+                {
+                    //_logService.CreateLog(DateTime.Now, "Server", username, "Info", "Authentication Succeeded");
+                    return new OkResult();
+                }
+            }
+            // {category}: {error message}
+            //_logService.CreateLog(DateTime.Now, "Error", username, error[0], error[1]);
+            string[] error = result.Split(": ");
+            return StatusCode(Convert.ToInt32(error[0]), error[2]);
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        private async Task<string> CreateCookieAsync(string jwtToken)
         {
             string result;
             try

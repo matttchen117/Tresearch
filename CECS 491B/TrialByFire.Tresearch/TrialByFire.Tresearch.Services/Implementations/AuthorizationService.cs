@@ -20,9 +20,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _logService = logService;
         }
 
-        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredAuthLevel)
+        public async Task<string> VerifyAuthorizedAsync(IRolePrincipal rolePrincipal, string requiredAuthLevel)
         {
-            return _sqlDAO.VerifyAuthorized(rolePrincipal, requiredAuthLevel);
+            return await _sqlDAO.VerifyAuthorizedAsync(rolePrincipal, requiredAuthLevel);
         }
     }
 }

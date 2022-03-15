@@ -35,7 +35,7 @@ const LogoutForm = () => {
             <div className="title-text">
                 <h1 className="logout-title">Log In</h1>
             </div>
-            {loginForm}
+            {logoutForm}
         </div>
     );
 }

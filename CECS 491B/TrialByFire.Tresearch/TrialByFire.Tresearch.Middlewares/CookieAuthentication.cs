@@ -7,6 +7,7 @@ using System.Text;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TrialByFire.Tresearch.Middlewares
 {
@@ -20,24 +21,31 @@ namespace TrialByFire.Tresearch.Middlewares
 
         public async Task InvokeAsync(HttpContext httpContext, IRolePrincipal rolePrincipal)
         {
-            if(httpContext.Request.Cookies.ContainsKey("TresearchAuthenticationCookie"))
+            if(httpContext.Request.Cookies["TresearchAuthenticationCookie"] != null)
             {
-                string jwt = httpContext.Request.Cookies["TresearchAuthenticationCookie"];
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var keyValue = "akxhBSian218c9pJA98912n4010409AMKLUHqjn2njwaj";
-                var key = Encoding.ASCII.GetBytes(keyValue);
-                tokenHandler.ValidateToken(jwt, new TokenValidationParameters
+                try
                 {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidAlgorithms = new[] { "hmacsha256 "},
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ClockSkew = TimeSpan.Zero
-                }, out SecurityToken validatedToken);
-                var jwtToken = (JwtSecurityToken)validatedToken;
-                rolePrincipal.RoleIdentity = new RoleIdentity(true, jwtToken.Claims.First(x => x.Type == "username").Value,
-                     jwtToken.Claims.First(x => x.Type == "authorizationLevel").Value);
+                    string jwt = httpContext.Request.Cookies["TresearchAuthenticationCookie"];
+                    var tokenHandler = new JwtSecurityTokenHandler();
+                    var keyValue = "akxhBSian218c9pJA98912n4010409AMKLUHqjn2njwaj";
+                    var key = Encoding.UTF8.GetBytes(keyValue);
+                    tokenHandler.ValidateToken(jwt, new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ClockSkew = TimeSpan.Zero
+                    }, out SecurityToken validatedToken);
+                    var jwtToken = (JwtSecurityToken)validatedToken;
+                    rolePrincipal.RoleIdentity = new RoleIdentity(true, jwtToken.Claims.First(x => x.Type == "username").Value,
+                         jwtToken.Claims.First(x => x.Type == "authorizationLevel").Value);
+                    //IServiceProvider serviceProvider = 
+                    //httpContext.RequestServices = new ServiceProvider();
+                }catch(Exception ex)
+                {
+
+                }
             }
 
             await _next(httpContext);

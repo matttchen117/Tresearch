@@ -10,6 +10,6 @@ namespace TrialByFire.Tresearch.Services.Contracts
 {
     public interface IAuthorizationService
     {
-        string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredAuthLevel);
+        Task<string> VerifyAuthorizedAsync(IRolePrincipal rolePrincipal, string requiredAuthLevel);
     }
 }

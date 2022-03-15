@@ -41,11 +41,11 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 			throw new NotImplementedException();
 		}
 
-		public List<KPI> KPIsFetched(DateTime now)
+		public async Task<List<KPI>> KPIsFetchedAsync(DateTime now)
 		{
 			string result;
 			string authorizeResult;
-			authorizeResult = _authorizationService.VerifyAuthorized(_rolePrincipal, _authorizationLevel);
+			authorizeResult = await _authorizationService.VerifyAuthorizedAsync(_rolePrincipal, _authorizationLevel);
 			if (authorizeResult == "success")
 			{
 				Task t1 = Task.Run(() =>

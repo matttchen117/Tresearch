@@ -1,7 +1,9 @@
-﻿namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
 {
     public interface IOTPRequestController
     {
-        public string RequestOTP(string username, string passphrase, string authorizationLevel);
+        public Task<IActionResult> RequestOTPAsync(string username, string passphrase, string authorizationLevel);
     }
 }

@@ -256,14 +256,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         }
 
-        public string VerifyAccount(IAccount account)
+        public async Task<string> VerifyAccountAsync(IAccount account)
         {
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
                     string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IAccount dbAccount = connection.QueryFirst<Account>(query, new
+                    IAccount dbAccount = await connection.QueryFirstAsync<Account>(query, new
                     {
                         Username = account.Username,
                         AuthorizationLevel = account.AuthorizationLevel
@@ -307,7 +307,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public List<string> Authenticate(IOTPClaim otpClaim)
+        public async Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim)
         {
             List<string> results = new List<string>();
             int affectedRows = 0;
@@ -316,7 +316,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
                     string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IAccount dbAccount = connection.QueryFirst<Account>(query, new
+                    IAccount dbAccount = await connection.QueryFirstAsync<Account>(query, new
                     {
                         Username = otpClaim.Username,
                         AuthorizationLevel = otpClaim.AuthorizationLevel
@@ -332,7 +332,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         return results;
                     }
                     query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IOTPClaim dbOTPClaim = connection.QueryFirst<OTPClaim>(query, new
+                    IOTPClaim dbOTPClaim = await connection.QueryFirstAsync<OTPClaim>(query, new
                     {
                         Username = otpClaim.Username,
                         AuthorizationLevel = otpClaim.AuthorizationLevel
@@ -349,7 +349,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         {
                             query = "UPDATE Accounts SET AccountStatus = 0 WHERE " +
                             "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                            affectedRows = connection.Execute(query, new
+                            affectedRows = await connection.ExecuteAsync(query, new
                             {
                                 Username = otpClaim.Username,
                                 AuthorizationLevel = otpClaim.AuthorizationLevel,
@@ -367,7 +367,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         }
                         query = "UPDATE OTPClaims SET FailCount = @FailCount WHERE " +
                         "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                        affectedRows = connection.Execute(query, new
+                        affectedRows = await connection.ExecuteAsync(query, new
                         {
                             Username = otpClaim.Username,
                             AuthorizationLevel = otpClaim.AuthorizationLevel,
@@ -413,14 +413,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return results;
             }
         }
-        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredAuthLevel)
+        public async Task<string> VerifyAuthorizedAsync(IRolePrincipal rolePrincipal, string requiredAuthLevel)
         {
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
                     string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IAccount dbAccount = connection.QueryFirst<Account>(query, new
+                    IAccount dbAccount = await connection.QueryFirstAsync<Account>(query, new
                     {
                         Username = rolePrincipal.RoleIdentity.Username,
                         AuthorizationLevel = rolePrincipal.RoleIdentity.AuthorizationLevel
@@ -461,14 +461,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public string StoreOTP(IOTPClaim otpClaim)
+        public async Task<string> StoreOTPAsync(IOTPClaim otpClaim)
         {
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
                     string query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IOTPClaim dbOTPClaim = connection.QueryFirst<OTPClaim>(query, new
+                    IOTPClaim dbOTPClaim = await connection.QueryFirstAsync<OTPClaim>(query, new
                     {
                         Username = otpClaim.Username,
                         AuthorizationLevel = otpClaim.AuthorizationLevel
@@ -486,7 +486,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         }
                         query = "UPDATE OTPClaims SET OTP = @OTP,TimeCreated = @TimeCreated, " +
                         "FailCount = @FailCount WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                        var affectedRows = connection.Execute(query, new
+                        var affectedRows = await connection.ExecuteAsync(query, new
                         {
                             Username = otpClaim.Username,
                             AuthorizationLevel = otpClaim.AuthorizationLevel,

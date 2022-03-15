@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,21 +21,21 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
         }
 
         [Theory]
-        [InlineData("drakat7@gmail.com", "abcDEF123", "user", "success")]
-        [InlineData("drakat7@gmail.com", "abcDEF123", "admin", "success")]
-        [InlineData("aarry@gmail.com", "#$%", "user", "Data: Invalid Username or " +
+        [InlineData("drakat7@gmail.com", "abcDEF123", "user", "200: Server: success")]
+        [InlineData("drakat7@gmail.com", "abcDEF123", "admin", "200: Server: success")]
+        [InlineData("aarry@gmail.com", "#$%", "user", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("aarry@gmail.com", "abcdef#$%", "user", "Data: Invalid Username or " +
+        [InlineData("aarry@gmail.com", "abcdef#$%", "user", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("aarry@gmail.com", "abcdEF123", "user", "Data: Invalid Username or " +
+        [InlineData("aarry@gmail.com", "abcdEF123", "user", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "Database: The account was not found or it " +
+        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "404: Database: The account was not found or it " +
             "has been disabled.")]
-        [InlineData("darry@gmail.com", "abcDEF123", "user", "Database: The account was not found or it " +
+        [InlineData("darry@gmail.com", "abcDEF123", "user", "404: Database: The account was not found or it " +
             "has been disabled.")]
-        [InlineData("earry@gmail.com", "abcDEF123", "user", "Database: Please confirm your " +
+        [InlineData("earry@gmail.com", "abcDEF123", "user", "401: Database: Please confirm your " +
             "account before attempting to login.")]
-        public void RequestTheOTP(string username, string passphrase, string authorizationLevel, string expected)
+        public async Task RequestTheOTPAsync(string username, string passphrase, string authorizationLevel, string expected)
         {
             // Arrange
             IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService, messageBank);
@@ -42,7 +43,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             IOTPClaim otpClaim = new OTPClaim(account);
 
             // Act
-            string result = otpRequestService.RequestOTP(account, otpClaim);
+            string result = await otpRequestService.RequestOTPAsync(account, otpClaim);
 
             // Assert
             Assert.Equal(expected, result);

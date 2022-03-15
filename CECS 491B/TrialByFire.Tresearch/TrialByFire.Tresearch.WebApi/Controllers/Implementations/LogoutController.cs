@@ -31,7 +31,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         [HttpPost]
         [Route("logout")]
-        public string Logout()
+        public IActionResult Logout()
         {
             string result = _logoutManager.Logout();
             if(result.Equals(_messageBank.SuccessMessages["generic"]))
@@ -39,15 +39,15 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 try
                 {
                     Response.Cookies.Delete("TresearchAuthenticationCookie");
-                }catch(Exception e)
+                    return new OkResult();
+                }
+                catch(Exception e)
                 {
                     result = _messageBank.ErrorMessages["logoutFail"];
-                    Response.StatusCode = Convert.ToInt32(result.Split(": ")[0]);
-                    return result;
                 }
             }
-            Response.StatusCode = Convert.ToInt32(result.Split(": ")[0]);
-            return result;
+            string[] error = result.Split(": ");
+            return StatusCode(Convert.ToInt32(error[0]), error[2]);
         }
     }
 }

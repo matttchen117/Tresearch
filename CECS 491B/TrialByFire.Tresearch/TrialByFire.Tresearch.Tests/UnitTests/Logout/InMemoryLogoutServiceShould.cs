@@ -18,7 +18,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
         }
 
         [Theory]
-        [InlineData("aarry@gmail.com", "user", "success")]
+        [InlineData("aarry@gmail.com", "user", "200: Server: success")]
         public void LogTheUserOut(string currentIdentity, string currentRole, string expected)
         {
             // Arrange

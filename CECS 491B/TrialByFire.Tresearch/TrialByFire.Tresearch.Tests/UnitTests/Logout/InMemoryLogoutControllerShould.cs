@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,8 +23,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
         }
 
         [Theory]
-        [InlineData("guest", "guest", "Server: No active session found. Please login and try again.")]
-        [InlineData("aarry@gmail.com", "user", "Server: Logout failed.")]
+        [InlineData("guest", "guest", "401: Server: No active session found. Please login and try again.")]
+        [InlineData("aarry@gmail.com", "user", "503: Server: Logout failed.")]
         public void LogTheUserOut(string currentIdentity, string currentRole, string expected)
         {
             // Arrange
@@ -34,12 +35,17 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
                 rolePrincipal, logoutService);
             ILogoutController logoutController = new LogoutController(sqlDAO, logService, messageBank, 
                 logoutManager, rolePrincipal);
+            string[] expecteds = expected.Split(": ");
+            ObjectResult expectedResult = new ObjectResult(expecteds[2])
+            { StatusCode = Convert.ToInt32(expecteds[0]) };
 
             // Act
-            string result = logoutController.Logout();
+            IActionResult result = logoutController.Logout();
+            var objectResult = result as ObjectResult;
 
             // Assert
-            Assert.Equal(expected, result);
+            Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);
+            Assert.Equal(expectedResult.Value, objectResult.Value);
         }
     }
 }

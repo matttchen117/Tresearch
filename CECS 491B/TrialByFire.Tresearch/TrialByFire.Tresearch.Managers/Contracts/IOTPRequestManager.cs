@@ -8,6 +8,6 @@ namespace TrialByFire.Tresearch.Managers.Contracts
 {
     public interface IOTPRequestManager
     {
-        string RequestOTP(string username, string passphrase, string authorizationLevel);
+        Task<string> RequestOTPAsync(string username, string passphrase, string authorizationLevel);
     }
 }
