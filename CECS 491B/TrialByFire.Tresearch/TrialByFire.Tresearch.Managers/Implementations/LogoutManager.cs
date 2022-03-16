@@ -10,32 +10,44 @@ using TrialByFire.Tresearch.Services.Contracts;
 
 namespace TrialByFire.Tresearch.Managers.Implementations
 {
+    // Summary:
+    //     A manager class for enforcing the business rules for logging a User out and calling the
+    //     appropriate services for the operation.
     public class LogoutManager : ILogoutManager
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
 
         private IMessageBank _messageBank { get; }
-        private IRolePrincipal _rolePrincipal { get; }
-
         private ILogoutService _logoutService { get; }
 
         public LogoutManager(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, 
-            IRolePrincipal rolePrincipal, ILogoutService logoutService)
+            ILogoutService logoutService)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
             _messageBank = messageBank;
-            _rolePrincipal = rolePrincipal;
             _logoutService = logoutService;
         }
 
+        //
+        // Summary:
+        //     Checks that the User is currently Authenticated. Calls the appropriate service for the
+        //     operation.
+        //
+        // Returns:
+        //     The result of the operation.
         public string Logout()
         {
-            if(!_rolePrincipal.RoleIdentity.Username.Equals("guest") && 
-                !_rolePrincipal.RoleIdentity.AuthorizationLevel.Equals("guest"))
+            if(Thread.CurrentPrincipal != null)
             {
-                return _logoutService.Logout();
+                try
+                {
+                    return _logoutService.Logout();
+                }catch (Exception ex)
+                {
+                    return "Error occurred";
+                }
             }
             return _messageBank.ErrorMessages["notAuthenticated"];
         }

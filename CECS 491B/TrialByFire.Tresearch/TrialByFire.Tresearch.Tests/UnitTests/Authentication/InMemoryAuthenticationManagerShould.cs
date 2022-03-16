@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
@@ -45,12 +46,19 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            IAuthenticationManager authenticationManager = new AuthenticationManager(sqlDAO,
-                logService, validationService, authenticationService, rolePrincipal, messageBank);
+            if(!currentIdentity.Equals("guest"))
+            {
+                Thread.CurrentPrincipal = new ClaimsPrincipal(rolePrincipal);
+            }
+            IAuthenticationManager authenticationManager = new AuthenticationManager(SqlDAO,
+                LogService, ValidationService, AuthenticationService, MessageBank);
             DateTime now = new DateTime(year, month, day, hour, minute, second);
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(
+                TimeSpan.FromSeconds(5));
 
             // Act
-            List<string> results = await authenticationManager.AuthenticateAsync(username, otp, authorizationLevel, now);
+            List<string> results = await authenticationManager.AuthenticateAsync(username, otp, 
+                authorizationLevel, now, cancellationTokenSource.Token);
 
             // Assert
             Assert.Equal(expected, results[0]);

@@ -10,28 +10,19 @@ using TrialByFire.Tresearch.Managers.Implementations;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 {
-    public class RegistrationManagerShould
+    public class RegistrationManagerShould : IntegrationTestDependencies
     {
-        public ISqlDAO _sqlDAO { get; set; }
-        public ILogService _logService { get; set; }
-        public IMessageBank _messageBank { get; set; }
 
         public IRegistrationService _registrationService { get; set; }
 
         public IMailService _mailService { get; set; }
-
-        public IValidationService _validationService { get; set; }
         public IRegistrationManager _registrationManager { get; set; }
 
-        public RegistrationManagerShould()
+        public RegistrationManagerShould() : base()
         {
-            _messageBank = new MessageBank();
-            _sqlDAO = new SqlDAO(_messageBank);
-            _mailService = new MailService(_messageBank);
-            _validationService = new ValidationService(_messageBank);
-            _logService = new SqlLogService(_sqlDAO);
-            _registrationService = new RegistrationService(_sqlDAO, _logService);
-            _registrationManager = new RegistrationManager(_sqlDAO, _logService, _registrationService, _mailService, _validationService, _messageBank);
+            _mailService = new MailService(MessageBank);
+            _registrationService = new RegistrationService(SqlDAO, SqlLogService);
+            _registrationManager = new RegistrationManager(SqlDAO, SqlLogService, _registrationService, _mailService, ValidationService, MessageBank);
         }
         [Theory]
         [InlineData("skiPatrol@gmail.com", "myRegisterPassword")]
@@ -55,9 +46,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
             //Arrange
             IConfirmationLink link = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now);
             string url = link.UniqueIdentifier.ToString();
-            _sqlDAO.CreateConfirmationLink(link);
+            SqlDAO.CreateConfirmationLink(link);
             IAccount _account = new Account(email, email, passphrase, authenticationLevel, status, confirmed);
-            _sqlDAO.CreateAccount(_account);
+            SqlDAO.CreateAccount(_account);
 
             //Act
             List<string> results = _registrationManager.ConfirmAccount(url);

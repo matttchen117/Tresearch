@@ -9,6 +9,6 @@ namespace TrialByFire.Tresearch.Services.Contracts
 {
     public interface IOTPRequestService
     {
-        Task<string> RequestOTPAsync(IAccount account, IOTPClaim otpClaim);
+        Task<string> RequestOTPAsync(IAccount account, IOTPClaim otpClaim, CancellationToken cancellationToken);
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
@@ -47,12 +48,16 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            IMailService mailService = new MailService(messageBank);
-            IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService, messageBank);
-            IOTPRequestManager otpRequestManager = new OTPRequestManager(sqlDAO, logService, validationService,
-                authenticationService, rolePrincipal, otpRequestService, messageBank, mailService);
-            IOTPRequestController otpRequestController = new OTPRequestController(sqlDAO, logService,
-                otpRequestManager, messageBank);
+            if (!currentIdentity.Equals("guest"))
+            {
+                Thread.CurrentPrincipal = rolePrincipal;
+            }
+            IMailService mailService = new MailService(MessageBank);
+            IOTPRequestService otpRequestService = new OTPRequestService(SqlDAO, SqlLogService, MessageBank);
+            IOTPRequestManager otpRequestManager = new OTPRequestManager(SqlDAO, SqlLogService, ValidationService,
+                AuthenticationService, otpRequestService, MessageBank, mailService);
+            IOTPRequestController otpRequestController = new OTPRequestController(SqlDAO, SqlLogService,
+                otpRequestManager, MessageBank);
             string[] expecteds = expected.Split(": ");
             ObjectResult expectedResult = new ObjectResult(expecteds[2])
             { StatusCode = Convert.ToInt32(expecteds[0]) };

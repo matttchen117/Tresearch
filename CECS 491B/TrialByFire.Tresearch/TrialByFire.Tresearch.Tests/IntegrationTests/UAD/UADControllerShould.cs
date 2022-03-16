@@ -29,9 +29,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 		public void LoadKPI(int year, int month, int day, string expected)
 		{
 			// Arrange
-			IUADService uadService = new UADService(sqlDAO, logService);
-			IUADManager uadManager = new UADManager(sqlDAO, logService, uadService, authenticationService, authorizationService);
-			IUADController uadController = new UADController(sqlDAO, logService, uadManager);
+			IUADService uadService = new UADService(SqlDAO, SqlLogService);
+			IUADManager uadManager = new UADManager(SqlDAO, SqlLogService, uadService, AuthenticationService, AuthorizationService);
+			IUADController uadController = new UADController(SqlDAO, SqlLogService, uadManager);
 
 			// Act
 			List<IKPI> results = new List<IKPI>();

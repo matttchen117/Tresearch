@@ -19,11 +19,11 @@ namespace TrialByFire.Tresearch.Middlewares
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext httpContext, IRolePrincipal rolePrincipal)
+        public async Task InvokeAsync(HttpContext httpContext)
         {
-            if(httpContext.Request.Cookies["TresearchAuthenticationCookie"] != null)
+            try
             {
-                try
+                if (httpContext.Request.Cookies["TresearchAuthenticationCookie"] != null)
                 {
                     string jwt = httpContext.Request.Cookies["TresearchAuthenticationCookie"];
                     var tokenHandler = new JwtSecurityTokenHandler();
@@ -38,14 +38,32 @@ namespace TrialByFire.Tresearch.Middlewares
                         ClockSkew = TimeSpan.Zero
                     }, out SecurityToken validatedToken);
                     var jwtToken = (JwtSecurityToken)validatedToken;
-                    rolePrincipal.RoleIdentity = new RoleIdentity(true, jwtToken.Claims.First(x => x.Type == "username").Value,
+                    //singleton
+                    IRoleIdentity roleIdentity = new RoleIdentity(true, jwtToken.Claims.First(x => x.Type == "username").Value,
                          jwtToken.Claims.First(x => x.Type == "authorizationLevel").Value);
-                    //IServiceProvider serviceProvider = 
-                    //httpContext.RequestServices = new ServiceProvider();
-                }catch(Exception ex)
-                {
+                    IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+                    httpContext.User = new ClaimsPrincipal(rolePrincipal);
+                    Thread.CurrentPrincipal = rolePrincipal;
 
+                    //a - object for all cross cutting concerns
+                    //b - set current thread to be the principal Thread.CurrentPrincipal, do this way
+                    // need to set user (ClaimPrincipal here too, put data from RolePrincipal into
+                    // new ClaimPrincipal object)
+                    // httpContext.User = ClaimPrincipal(RolePrincipal)
+
+                    // Visual Studio Magazine
+                    // Can check archives for blog on how to do a
+
+                    // Otherwise look at UseAuthentication module/source code
+                    // Refer to see what need to do to create correct dependencies
+
+                    //IServiceProvider serviceProvider = 
+                    //httpContext.RequestServices.CreateScope(); // gives scope and access
                 }
+            }
+            catch (Exception ex)
+            {
+                await _next(httpContext);
             }
 
             await _next(httpContext);

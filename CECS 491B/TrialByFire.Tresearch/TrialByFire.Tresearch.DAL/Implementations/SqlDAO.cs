@@ -1,7 +1,9 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Options;
 using System.Data.SqlClient;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Exceptions;
+using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 
@@ -9,20 +11,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 {
     public class SqlDAO : ISqlDAO
     {
-        private string _sqlConnectionString { get; }
+        private BuildSettingsOptions _options { get; }
         private IMessageBank _messageBank;
 
-        public SqlDAO(IMessageBank messageBank)
+        public SqlDAO(IMessageBank messageBank, IOptions<BuildSettingsOptions> options)
         {
-            _sqlConnectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true";
-
             _messageBank = messageBank;
-        }
-
-        public SqlDAO(string sqlConnectionString, IMessageBank messageBank)
-        {
-            _sqlConnectionString = sqlConnectionString;
-            _messageBank = messageBank;
+            _options = options.Value;
         }
 
         public List<string> CreateConfirmationLink(IConfirmationLink _confirmationlink)
@@ -30,7 +25,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             List<string> result = new List<string>();
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var insertQuery = "INSERT INTO dbo.EmailConfirmationLinks (username, GUID, timestamp) VALUES (@Username, @UniqueIdentifier, @Datetime)";
                     int affectedRows = connection.Execute(insertQuery, _confirmationlink);
@@ -59,7 +54,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
 
                     var readQuery = "SELECT username FROM dbo.EmailConfirmationLinks WHERE GUID = @guid";
@@ -86,7 +81,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var updateQuery = "UPDATE dbo.Accounts SET confirmation = 1 WHERE email = @Email and username = @Username";
                     affectedRows = connection.Execute(updateQuery, account);
@@ -108,7 +103,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var deleteQuery = "DELETE FROM dbo.EmailConfirmationLinks WHERE @Username=username and @Guid=guid and @Timestamp=Timestamp";
                     affectedRows = connection.Execute(deleteQuery, confirmationLink);
@@ -134,7 +129,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var readQuery = "SELECT COUNT(*) FROM dbo.Accounts WHERE Email = @Email";
                     var accounts = connection.ExecuteScalar<int>(readQuery, new { Email = account.Email });
@@ -163,10 +158,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public IAccount GetUnconfirmedAccount(string email)
         {
-            IAccount account = new Account();
+            IAccount account;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var readQuery = "SELECT username FROM dbo.user_accounts WHERE email = @Email and authorization_level = 'User'";
                     string username = connection.ExecuteScalar<string>(readQuery, new { Email = email });
@@ -194,7 +189,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var deleteQuery = "DELETE FROM dbo.confirmation_links WHERE GUID = @guid";
                     affectedRows = connection.Execute(deleteQuery, new { guid = confirmationLink.UniqueIdentifier });
@@ -210,16 +205,17 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             return results;
         }
-        public string DeleteAccount(IRolePrincipal rolePrincipal)
+        public string DeleteAccount()
         {
 
             int affectedRows;
+            string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var readQuery = "SELECT * FROM Accounts WHERE Username = @username AND AuthorizationLevel = @role";
-                    var account = connection.ExecuteScalar<int>(readQuery, new { username = rolePrincipal.RoleIdentity.Username, role = rolePrincipal.RoleIdentity.AuthorizationLevel });
+                    var account = connection.ExecuteScalar<int>(readQuery, new { username = Thread.CurrentPrincipal.Identity.Name, role = userAuthLevel });
                     if (account == 0)
                     {
                         return _messageBank.ErrorMessages["notFoundOrAuthorized"];
@@ -234,7 +230,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             "DELETE FROM EmailConfirmationLinks WHERE username = @username;" +
                             "END";
 
-                        affectedRows = connection.Execute(storedProcedure, rolePrincipal.RoleIdentity.Username);
+                        affectedRows = connection.Execute(storedProcedure, Thread.CurrentPrincipal.Identity.Name);
                     }
 
 
@@ -256,18 +252,22 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         }
 
-        public async Task<string> VerifyAccountAsync(IAccount account)
+        public async Task<string> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IAccount dbAccount = await connection.QueryFirstAsync<Account>(query, new
-                    {
-                        Username = account.Username,
-                        AuthorizationLevel = account.AuthorizationLevel
-                    });
+                    IAccount dbAccount = await connection.QueryFirstAsync<Account>(new CommandDefinition(
+                        query, 
+                        new{
+                            Username = account.Username,
+                            AuthorizationLevel = account.AuthorizationLevel
+                        }, 
+                        cancellationToken: default
+                    )).ConfigureAwait(false);
                     if (dbAccount == null)
                     {
                         return _messageBank.ErrorMessages["notFoundOrAuthorized"];
@@ -295,7 +295,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (AccountCreationFailedException acfe)
             {
-                return acfe.Message;
+                return "400: Server: " + acfe.Message;
+                //return acfe.Message;
             }
             catch (InvalidOperationException ioe)
             {
@@ -303,24 +304,37 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return "Database: " + ex.Message;
+                return "500: Database: " + ex.Message;
             }
         }
 
-        public async Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim)
+        public async Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             List<string> results = new List<string>();
             int affectedRows = 0;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IAccount dbAccount = await connection.QueryFirstAsync<Account>(query, new
-                    {
-                        Username = otpClaim.Username,
-                        AuthorizationLevel = otpClaim.AuthorizationLevel
-                    });
+                    IAccount dbAccount = await connection.QueryFirstAsync<Account>(new CommandDefinition(
+                        query, 
+                        new{
+                            Username = otpClaim.Username,
+                            AuthorizationLevel = otpClaim.AuthorizationLevel
+                        }, 
+                        cancellationToken: cancellationToken
+                    )).ConfigureAwait(false);
+                    // Just make the decision, multiple calls or leak abstraction
+                    // Do as stored procedure, do all this work in the database, one request and
+                    // encapsulated, and faster - requires database to have concept of stored procedure
+                    // Would need to make a decision again if not using a relational DB
+
+                    // Service layer responsibility - interpret return of DAO
+                    // Service that Creates User - generic logic to be reusable
+                    //  DAO says "row added", Service says "User created"
+
                     if (dbAccount.Confirmed == false)
                     {
                         results.Add(_messageBank.ErrorMessages["notConfirmed"]);
@@ -332,11 +346,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         return results;
                     }
                     query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IOTPClaim dbOTPClaim = await connection.QueryFirstAsync<OTPClaim>(query, new
-                    {
-                        Username = otpClaim.Username,
-                        AuthorizationLevel = otpClaim.AuthorizationLevel
-                    });
+                    IOTPClaim dbOTPClaim = await connection.QueryFirstAsync<OTPClaim>(new CommandDefinition(
+                        query, 
+                        new{
+                            Username = otpClaim.Username,
+                            AuthorizationLevel = otpClaim.AuthorizationLevel
+                        }, 
+                        cancellationToken: cancellationToken
+                    )).ConfigureAwait(false);
                     if (dbOTPClaim == null)
                     {
                         results.Add(_messageBank.ErrorMessages["accountNotFound"]);
@@ -349,11 +366,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         {
                             query = "UPDATE Accounts SET AccountStatus = 0 WHERE " +
                             "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                            affectedRows = await connection.ExecuteAsync(query, new
-                            {
-                                Username = otpClaim.Username,
-                                AuthorizationLevel = otpClaim.AuthorizationLevel,
-                            });
+                            affectedRows = await connection.ExecuteAsync(new CommandDefinition(
+                                query, 
+                                new{
+                                    Username = otpClaim.Username,
+                                    AuthorizationLevel = otpClaim.AuthorizationLevel,
+                                }, 
+                                cancellationToken: cancellationToken
+                            )).ConfigureAwait(false);
                             if (affectedRows != 1)
                             {
                                 results.Add(_messageBank.ErrorMessages["accountDisableFail"]);
@@ -367,12 +387,15 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         }
                         query = "UPDATE OTPClaims SET FailCount = @FailCount WHERE " +
                         "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                        affectedRows = await connection.ExecuteAsync(query, new
-                        {
-                            Username = otpClaim.Username,
-                            AuthorizationLevel = otpClaim.AuthorizationLevel,
-                            FailCount = dbOTPClaim.FailCount++
-                        });
+                        affectedRows = await connection.ExecuteAsync(new CommandDefinition(
+                            query, 
+                            new{
+                                Username = otpClaim.Username,
+                                AuthorizationLevel = otpClaim.AuthorizationLevel,
+                                FailCount = dbOTPClaim.FailCount++
+                            }, 
+                            cancellationToken: cancellationToken
+                        )).ConfigureAwait(false);
                         if (affectedRows != 1)
                         {
                             results.Add(_messageBank.ErrorMessages["accountNotFound"]);
@@ -384,6 +407,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             return results;
                         }
                     }
+                    // This should be done at service level
+                    // (DAO only does a SQL operation then returns results)
+                    // If not related to DB, know it should not be in DAO
                     else if ((otpClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
                     {
                         results.Add(_messageBank.SuccessMessages["generic"]);
@@ -399,7 +425,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (OTPClaimCreationFailedException occfe)
             {
-                results.Add(occfe.Message);
+                results.Add(("400: Server: " + occfe.Message));
                 return results;
             }
             catch (InvalidOperationException ioe)
@@ -409,22 +435,26 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                results.Add("Database: " + ex.Message);
+                results.Add("500: Database: " + ex.Message);
                 return results;
             }
         }
-        public async Task<string> VerifyAuthorizedAsync(IRolePrincipal rolePrincipal, string requiredAuthLevel)
+        public async Task<string> VerifyAuthorizedAsync(string requiredAuthLevel, CancellationToken cancellationToken)
         {
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IAccount dbAccount = await connection.QueryFirstAsync<Account>(query, new
-                    {
-                        Username = rolePrincipal.RoleIdentity.Username,
-                        AuthorizationLevel = rolePrincipal.RoleIdentity.AuthorizationLevel
-                    });
+                    IAccount dbAccount = await connection.QueryFirstAsync<Account>(new CommandDefinition(
+                        query, 
+                        new{
+                            Username = Thread.CurrentPrincipal.Identity.Name,
+                            AuthorizationLevel = userAuthLevel
+                        }, 
+                        cancellationToken: cancellationToken
+                    )).ConfigureAwait(false);
                     if (dbAccount.Confirmed == false)
                     {
                         return _messageBank.ErrorMessages["notConfirmed"];
@@ -449,7 +479,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (AccountCreationFailedException acfe)
             {
-                return acfe.Message;
+                return "400: Server: " + acfe.Message;
+                //return acfe.Message;
             }
             catch (InvalidOperationException ioe)
             {
@@ -457,22 +488,25 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return "Database: " + ex.Message;
+                return "500: Database: " + ex.Message;
             }
         }
 
-        public async Task<string> StoreOTPAsync(IOTPClaim otpClaim)
+        public async Task<string> StoreOTPAsync(IOTPClaim otpClaim, CancellationToken cancellationToken)
         {
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     string query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IOTPClaim dbOTPClaim = await connection.QueryFirstAsync<OTPClaim>(query, new
-                    {
-                        Username = otpClaim.Username,
-                        AuthorizationLevel = otpClaim.AuthorizationLevel
-                    });
+                    IOTPClaim dbOTPClaim = await connection.QueryFirstAsync<OTPClaim>(new CommandDefinition(
+                        query, 
+                        new{
+                            Username = otpClaim.Username,
+                            AuthorizationLevel = otpClaim.AuthorizationLevel
+                        }, 
+                        cancellationToken: cancellationToken
+                    )).ConfigureAwait(false);
                     if (dbOTPClaim == null)
                     {
                         return _messageBank.ErrorMessages["notFound"];
@@ -486,14 +520,17 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         }
                         query = "UPDATE OTPClaims SET OTP = @OTP,TimeCreated = @TimeCreated, " +
                         "FailCount = @FailCount WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                        var affectedRows = await connection.ExecuteAsync(query, new
-                        {
-                            Username = otpClaim.Username,
-                            AuthorizationLevel = otpClaim.AuthorizationLevel,
-                            OTP = otpClaim.OTP,
-                            TimeCreated = otpClaim.TimeCreated,
-                            FailCount = otpClaim.FailCount
-                        });
+                        var affectedRows = await connection.ExecuteAsync(new CommandDefinition(
+                            query, 
+                            new{
+                                Username = otpClaim.Username,
+                                AuthorizationLevel = otpClaim.AuthorizationLevel,
+                                OTP = otpClaim.OTP,
+                                TimeCreated = otpClaim.TimeCreated,
+                                FailCount = otpClaim.FailCount
+                            }, 
+                            cancellationToken: cancellationToken
+                        )).ConfigureAwait(false);
                         if (affectedRows != 1)
                         {
                             return _messageBank.ErrorMessages["otpFail"];
@@ -507,7 +544,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (OTPClaimCreationFailedException occfe)
             {
-                return occfe.Message;
+                return "400: Server: " + occfe.Message;
+                //return occfe.Message;
             }
             catch (InvalidOperationException ioe)
             {
@@ -515,7 +553,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return "Database: " + ex.Message;
+                return "500: Database: " + ex.Message;
             }
         }
 
@@ -531,7 +569,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var insertQuery = @"INSERT INTO Tresearch.NodesCreated (node_creation_date, node_creation_count)
 Values (@node_creation_date, @node_creation_count)";
@@ -562,7 +600,7 @@ Values (@node_creation_date, @node_creation_count)";
         {
             INodesCreated nodesCreated;
 
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
             {
                 var selectQuery = "SELECT * FROM Tresearch.nodes_created" +
                                   "WHERE _node_creation_date >= @node_creation_date - 30";
@@ -575,7 +613,7 @@ Values (@node_creation_date, @node_creation_count)";
 
         public string UpdateNodesCreated(INodesCreated nodesCreated)
         {
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
             {
                 var updateQuery = @"UPDATE Tresearch.nodes_created (nodes_created_date, nodes_created_count)" +
                                     "VALUES (@nodes_created_date, @nodes_created_count)";
@@ -599,7 +637,7 @@ Values (@node_creation_date, @node_creation_count)";
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var insertQuery = @"INSERT INTO Tresearch.DailyLogins (login_date, login_count)
                                         Values (@loginDate, @loginCount)";
@@ -629,7 +667,7 @@ Values (@node_creation_date, @node_creation_count)";
         {
             IDailyLogin dailyLogin;
 
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
             {
                 var selectQuery = "SELECT * FROM Tresearch.daily_logins" +
                                     "WHERE _loginDate >= @login_date - 30";
@@ -644,7 +682,7 @@ Values (@node_creation_date, @node_creation_count)";
         {
             IDailyLogin logins;
 
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
             {
                 var updateQuery = @"UPDATE Tresearch.daily_logins (login_date, login_count) " +
                                     "VALUES (@login_date, @login_count)";
@@ -666,7 +704,7 @@ Values (@node_creation_date, @node_creation_count)";
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var insertQuery = @"INSERT INTO Tresearch.TopSearch (top_search_date, top_search_string, top_search_countl)" +
                                         "Values (@top_search_date, @top_search_string, @top_search_count)";
@@ -697,7 +735,7 @@ Values (@node_creation_date, @node_creation_count)";
         {
             ITopSearch topSearch;
 
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
             {
                 var selectQuery = "SELECT * FROM Tresearch.top_search" +
                                     "WHERE topSearchDate >= @top_search_date - 30";
@@ -709,7 +747,7 @@ Values (@node_creation_date, @node_creation_count)";
 
         public string UpdateTopSearch(ITopSearch topSearch)
         {
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
             {
                 var updateQuery = @"UPDATE Tresearch.top_search (top_search_date, search_string, search_count)" +
                                     "VALUES (@top_search_date, @search_string, @search_count)";
@@ -733,7 +771,7 @@ Values (@node_creation_date, @node_creation_count)";
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var insertQuery = @"INSERT INTO Tresearch.DailyRegistrations (registration_date, registration_countl)" +
                                         "Values (@registrationDate, @registrationCount)";
@@ -763,7 +801,7 @@ Values (@node_creation_date, @node_creation_count)";
         {
             IDailyRegistration dailyRegistration;
 
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
             {
                 var selectQuery = "SELECT * FROM Tresearch.daily_registrations" +
                                     "WHERE _registrationDate >= @registration_date - 30";
@@ -776,7 +814,7 @@ Values (@node_creation_date, @node_creation_count)";
 
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration)
         {
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
             {
                 var updateQuery = @"UPDATE Tresearch.daily_registrations (registration_date, registration_count)" +
                                     "VALUES (@registration_date, @registration_count)";

@@ -25,7 +25,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 		public void LoadKPI(int year, int month, int day, string expected)
 		{
 			// Arrange
-			IUADService uadService = new UADService(sqlDAO, logService);
+			IUADService uadService = new UADService(SqlDAO, LogService);
 
 			// Act
 			List<IKPI> results = new List<IKPI>();

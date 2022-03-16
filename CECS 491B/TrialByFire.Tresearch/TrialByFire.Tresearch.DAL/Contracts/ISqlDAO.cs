@@ -20,20 +20,20 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public IAccount GetUnconfirmedAccount(string email);
 
         // Authentication
-        public Task<string> VerifyAccountAsync(IAccount account);
-        public Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim);
+        public Task<string> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken);
+        public Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim, CancellationToken cancellationToken);
 
         // Authorization
-        public Task<string> VerifyAuthorizedAsync(IRolePrincipal rolePrincipal, string requiredAuthLevel);
+        public Task<string> VerifyAuthorizedAsync(string requiredAuthLevel, CancellationToken cancellation);
 
         // Request OTP
-        public Task<string> StoreOTPAsync(IOTPClaim otpClaim);
+        public Task<string> StoreOTPAsync(IOTPClaim otpClaim, CancellationToken cancellationToken);
 
         // Usage Analysis Dashboard
         public List<IKPI> LoadKPI(DateTime now);
 
         // Delete account
-        public string DeleteAccount(IRolePrincipal rolePrincipal);
+        public string DeleteAccount();
 
         /*
             Ian's Methods

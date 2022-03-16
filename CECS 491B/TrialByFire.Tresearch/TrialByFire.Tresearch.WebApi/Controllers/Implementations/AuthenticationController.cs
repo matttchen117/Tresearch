@@ -1,13 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
+using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
+    // Summary:
+    //     A controller class for Authenticating the User.
     [ApiController]
+    [EnableCors]
     [Route("[controller]")]
     public class AuthenticationController : Controller, IAuthenticationController
     {
@@ -16,17 +22,19 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         private IAuthenticationManager _authenticationManager { get; }
         private IMessageBank _messageBank { get; }
 
-        private string _username { get; set; }
+        private BuildSettingsOptions _buildSettingsOptions { get; }
 
+        private static CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
+            TimeSpan.FromSeconds(5));
 
         public AuthenticationController(ISqlDAO sqlDAO, ILogService logService, 
-            IAuthenticationManager authenticationManager, IMessageBank messageBank)
+            IAuthenticationManager authenticationManager, IMessageBank messageBank, IOptions<BuildSettingsOptions> buildSettingsOptions)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
             _authenticationManager = authenticationManager;
             _messageBank = messageBank;
-            _username = "guest";
+            _buildSettingsOptions = buildSettingsOptions.Value;
         }
 
         [HttpPost]
@@ -36,75 +44,102 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             return $"success: {username} + {otp} + {authorizationLevel}";
         }
 
+        //
+        // Summary:
+        //     Entry point for Authentication requests and creates the Cookie for the User on success.
+        //
+        // Parameters:
+        //   username:
+        //     The username entered by the User attempting to Authenticate.
+        //   otp:
+        //     The otp entered by the User attempting to Authenticate.
+        //   authorizationLevel:
+        //     The selected authorization level for the Account that the User is trying Authenticate for.
+        //
+        // Returns:
+        //     The result of the operation with any status codes if applicable.
         [HttpPost]
         [Route("authenticate")]
         public async Task<IActionResult> AuthenticateAsync(string username, string otp, string authorizationLevel)
         {
-            _username = username;
-            List<string> results = await _authenticationManager.AuthenticateAsync(username, otp, authorizationLevel, DateTime.Now);
+            string[] split;
+            List<string> results = await _authenticationManager.AuthenticateAsync(username, otp, authorizationLevel, 
+                DateTime.Now, _cancellationTokenSource.Token).ConfigureAwait(false);
             string result = results[0];
             if (result.Equals(_messageBank.SuccessMessages["generic"]))
             {
-                CookieOptions cookieOptions = new CookieOptions();
-                cookieOptions.IsEssential = true;
-                cookieOptions.Expires = DateTime.Now.AddDays(5);
-                cookieOptions.Path = "/";
-                cookieOptions.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
-                cookieOptions.Secure = true;
-                Response.Cookies.Append("TresearchAuthenticationCookie", results[1], cookieOptions);
-                //result = await CreateCookieAsync(results[1]);
-                if (result.Equals(_messageBank.SuccessMessages["generic"]))
+                if (_buildSettingsOptions.Environment.Equals("Test"))
                 {
-                    //_logService.CreateLog(DateTime.Now, "Server", username, "Info", "Authentication Succeeded");
-                    return new OkResult();
+                    split = result.Split(": ");
+                    return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                 }
+                Response.Cookies.Append("TresearchAuthenticationCookie", results[1], CreateCookieOptions());
+                //_logService.CreateLog(DateTime.Now, "Server", username, "Info", "Authentication Succeeded");
+                split = result.Split(": ");
+                return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
             }
             // {category}: {error message}
             //_logService.CreateLog(DateTime.Now, "Error", username, error[1], error[2]);
-            string[] error = result.Split(": ");
-            return StatusCode(Convert.ToInt32(error[0]), error[2]);
+            split = result.Split(": ");
+            return StatusCode(Convert.ToInt32(split[0]), split[2]);
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> AuthenticateAsync(string username, string otp, string authorizationLevel, DateTime now)
+        public async Task<IActionResult> AuthenticateAsync(string username, string otp, 
+            string authorizationLevel, DateTime now)
         {
-            _username = username;
-            List<string> results = await _authenticationManager.AuthenticateAsync(username, otp, authorizationLevel, now);
-            string result = results[0];
-            if (result.Equals(_messageBank.SuccessMessages["generic"]))
+            string[] split;
+            string result = "";
+            try
             {
-                result = await CreateCookieAsync(results[1]);
+                List<string> results = await _authenticationManager.AuthenticateAsync(username, 
+                    otp, authorizationLevel, now, _cancellationTokenSource.Token).ConfigureAwait(false);
+                result = results[0];
                 if (result.Equals(_messageBank.SuccessMessages["generic"]))
                 {
+                    if (_buildSettingsOptions.Environment.Equals("Test"))
+                    {
+                        split = result.Split(": ");
+                        return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
+                    }
+                    Response.Cookies.Append("TresearchAuthenticationCookie", results[1], CreateCookieOptions());
                     //_logService.CreateLog(DateTime.Now, "Server", username, "Info", "Authentication Succeeded");
-                    return new OkResult();
+                    split = result.Split(": ");
+                    return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                 }
+            }
+            catch (OperationCanceledException tce)
+            {
+                return StatusCode(400, tce.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(400, ex.Message);
             }
             // {category}: {error message}
             //_logService.CreateLog(DateTime.Now, "Error", username, error[0], error[1]);
-            string[] error = result.Split(": ");
-            return StatusCode(Convert.ToInt32(error[0]), error[2]);
+            split = result.Split(": ");
+            return StatusCode(Convert.ToInt32(split[0]), split[2]);
         }
 
+        //
+        // Summary:
+        //     Generates the CookieOptions for the Cookie to be created for the User.
+        //
+        // Returns:
+        //     The created CookieOptions.
         [ApiExplorerSettings(IgnoreApi = true)]
-        private async Task<string> CreateCookieAsync(string jwtToken)
+        private CookieOptions CreateCookieOptions()
         {
-            string result;
-            try
-            {
-                CookieOptions cookieOptions = new CookieOptions();
-                cookieOptions.IsEssential = true;
-                cookieOptions.Expires = DateTime.Now.AddDays(5);
-                cookieOptions.Secure = true;
-                Response.Cookies.Append("TresearchAuthenticationCookie", jwtToken, cookieOptions);
-                result = _messageBank.SuccessMessages["generic"];
-            }catch(Exception ex)
-            {
-                result = _messageBank.ErrorMessages["cookieFail"];
-                /*_logService.CreateLog(DateTime.Now, "Error", _username, "Server", "Authentication Cookie " +
-                    "creation failed");*/
-            }
-            return result;
+            CookieOptions cookieOptions = new CookieOptions();
+            cookieOptions.IsEssential = true;
+            cookieOptions.Expires = DateTime.Now.AddDays(5);
+            //cookieOptions.Path = "/";
+            cookieOptions.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
+            cookieOptions.Secure = true;
+            return cookieOptions;
+            //Return CookieOptions, set actual Cookie in the caller code
+            // For Readability
         }
 
     }

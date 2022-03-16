@@ -13,31 +13,21 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 {
-    public class RegistrationControllerShould
+    public class RegistrationControllerShould : IntegrationTestDependencies
     {
-        public ISqlDAO _sqlDAO { get; set; }
-        public ILogService _logService { get; set; }
-        public IMessageBank _messageBank { get; set; }
-
         public IRegistrationService _registrationService { get; set; }
 
         public IMailService _mailService { get; set; }
-
-        public IValidationService _validationService { get; set; }
         public IRegistrationManager _registrationManager { get; set; }
 
         public IRegistrationController _registrationController { get; set; }
 
-        public RegistrationControllerShould()
+        public RegistrationControllerShould() : base()
         {
-            _messageBank = new MessageBank();
-            _sqlDAO = new SqlDAO(_messageBank);
-            _mailService = new MailService(_messageBank);
-            _validationService = new ValidationService(_messageBank);
-            _logService = new SqlLogService(_sqlDAO);
-            _registrationService = new RegistrationService(_sqlDAO, _logService);
-            _registrationManager = new RegistrationManager(_sqlDAO, _logService, _registrationService, _mailService, _validationService, _messageBank);
-            _registrationController = new RegistrationController(_sqlDAO, _logService, _registrationService, _mailService, _messageBank, _validationService, _registrationManager);
+            _mailService = new MailService(MessageBank);
+            _registrationService = new RegistrationService(SqlDAO, SqlLogService);
+            _registrationManager = new RegistrationManager(SqlDAO, SqlLogService, _registrationService, _mailService, ValidationService, MessageBank);
+            _registrationController = new RegistrationController(SqlDAO, SqlLogService, _registrationService, _mailService, MessageBank, ValidationService, _registrationManager);
         }
 
         [Theory]

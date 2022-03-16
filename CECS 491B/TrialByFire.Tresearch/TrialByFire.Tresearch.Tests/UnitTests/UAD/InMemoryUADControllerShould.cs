@@ -30,11 +30,11 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 		{
 			// Arrange
 			IMessageBank messageBank = new MessageBank();
-			IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService, messageBank);
-			IAuthorizationService authorizationService = new AuthorizationService(sqlDAO, logService);
-			IUADService uadService = new UADService(sqlDAO, logService);
-			IUADManager uadManager = new UADManager(sqlDAO, logService, uadService, authenticationService, authorizationService);
-			IUADController uadController = new UADController(sqlDAO, logService, uadManager);
+			IAuthenticationService authenticationService = new AuthenticationService(SqlDAO, LogService, messageBank);
+			IAuthorizationService authorizationService = new AuthorizationService(SqlDAO, LogService);
+			IUADService uadService = new UADService(SqlDAO, LogService);
+			IUADManager uadManager = new UADManager(SqlDAO, LogService, uadService, authenticationService, authorizationService);
+			IUADController uadController = new UADController(SqlDAO, LogService, uadManager);
 
 			// Act
 			List<IKPI> results = new List<IKPI>();

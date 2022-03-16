@@ -10,28 +10,34 @@ using TrialByFire.Tresearch.Services.Contracts;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
+    // Summary:
+    //     A service class for Logging the User Out
     public class LogoutService : ILogoutService
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
 
         private IMessageBank _messageBank { get; }
-        private IRolePrincipal _rolePrincipal { get; }
 
-        public LogoutService(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, IRolePrincipal rolePrincipal)
+        public LogoutService(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
             _messageBank = messageBank;
-            _rolePrincipal = rolePrincipal;
         }
 
+        //
+        // Summary:
+        //     Logs the User out
+        //
+        // Returns:
+        //     The result of the logout process.
         public string Logout()
         {
-            _rolePrincipal.RoleIdentity.Username = "guest";
-            _rolePrincipal.RoleIdentity.AuthorizationLevel = "guest";
-            if(_rolePrincipal.RoleIdentity.Username.Equals("guest") && 
-                _rolePrincipal.RoleIdentity.AuthorizationLevel.Equals("guest"))
+            Thread.CurrentPrincipal = null;
+            // this actually seems unnecessary, so not sure what
+            // this service should actually do
+            if (Thread.CurrentPrincipal == null)
             {
                 return _messageBank.SuccessMessages["generic"];
             }

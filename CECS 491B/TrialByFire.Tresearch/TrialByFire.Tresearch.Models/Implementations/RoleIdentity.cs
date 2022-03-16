@@ -14,16 +14,14 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public bool IsAuthenticated { get; }
 
-        public string? Name { get; }
+        public string Name { get; }
 
-        public string Username { get; set; }
+        public string AuthorizationLevel { get; }
 
-        public string AuthorizationLevel { get; set; }
-
-        public RoleIdentity(bool isAuthenticated, string username, string authorizationLevel)
+        public RoleIdentity(bool isAuthenticated, string name, string authorizationLevel)
         {
             IsAuthenticated = isAuthenticated;
-            Username = username;
+            Name = name;
             AuthorizationLevel = authorizationLevel;
         }
     }

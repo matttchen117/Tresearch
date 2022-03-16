@@ -1,12 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
+using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
+    // Summary:
+    //     A controller class for logging the User out.
     [ApiController]
+    [EnableCors]
     [Route("[controller]")]
     public class LogoutController : Controller, ILogoutController
     {
@@ -16,38 +22,59 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         private ILogoutManager _logoutManager { get; }
 
-        private IRolePrincipal _rolePrincipal { get; }
+        private BuildSettingsOptions _buildSettingsOptions { get; }
 
+        private static CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
+            TimeSpan.FromSeconds(5));
 
         public LogoutController(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, 
-            ILogoutManager logoutManager, IRolePrincipal rolePrincipal)
+            ILogoutManager logoutManager, IOptions<BuildSettingsOptions> buildSettingsOptions)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
             _messageBank = messageBank;
             _logoutManager = logoutManager;
-            _rolePrincipal = rolePrincipal;
+            _buildSettingsOptions = buildSettingsOptions.Value;
         }
 
+        //
+        // Summary:
+        //     Entry point for Logout requests and deletes the Users Cookie
+        //
+        // Returns:
+        //     The result of the operation with any status codes if applicable.
         [HttpPost]
         [Route("logout")]
+        // Do Async if want to log something for DB (last time logged in)
+        // Only Async if require operation to be done
         public IActionResult Logout()
         {
-            string result = _logoutManager.Logout();
-            if(result.Equals(_messageBank.SuccessMessages["generic"]))
+            string[] split;
+            string result = "";
+            try
             {
-                try
+                result = _logoutManager.Logout();
+                if (result.Equals(_messageBank.SuccessMessages["generic"]))
                 {
+                    if(_buildSettingsOptions.Environment.Equals("Test"))
+                    {
+                        split = result.Split(": ");
+                        return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
+                    }
                     Response.Cookies.Delete("TresearchAuthenticationCookie");
-                    return new OkResult();
-                }
-                catch(Exception e)
-                {
-                    result = _messageBank.ErrorMessages["logoutFail"];
+                    split = result.Split(": ");
+                    return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                 }
             }
-            string[] error = result.Split(": ");
-            return StatusCode(Convert.ToInt32(error[0]), error[2]);
+            catch (OperationCanceledException tce)
+            {
+                return StatusCode(400, tce.Message);
+            }
+            catch (Exception ex){
+                return StatusCode(400, ex.Message);
+            }
+            split = result.Split(": ");
+            return StatusCode(Convert.ToInt32(split[0]), split[2]);
         }
     }
 }

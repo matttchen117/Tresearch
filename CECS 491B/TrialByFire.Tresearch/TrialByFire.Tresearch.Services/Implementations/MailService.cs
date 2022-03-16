@@ -40,15 +40,17 @@ namespace TrialByFire.Tresearch.Services.Implementations
             return "Success - Confirmation email sent";
         }
 
-        public async Task<string> SendOTPAsync(string email, string subject, string plainBody, string htmlBody)
+        public async Task<string> SendOTPAsync(string email, string subject, string plainBody, string htmlBody, 
+            CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             try
             {
                 var client = new SendGridClient(_APIKey);
                 var from = new EmailAddress(_sender, _senderName);
                 var to = new EmailAddress(email);
                 var msg = MailHelper.CreateSingleEmail(from, to, subject, plainBody, htmlBody);
-                var response = await client.SendEmailAsync(msg);
+                var response = await client.SendEmailAsync(msg, cancellationToken).ConfigureAwait(false);
             } catch
             {
                 return _messageBank.ErrorMessages["sendEmailFail"];

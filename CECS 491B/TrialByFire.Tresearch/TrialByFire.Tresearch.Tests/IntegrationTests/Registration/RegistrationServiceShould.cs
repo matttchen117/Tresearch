@@ -8,22 +8,14 @@ using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 {
-    public class RegistrationServiceShould
+    public class RegistrationServiceShould : IntegrationTestDependencies
     {
-
-        public ISqlDAO _sqlDAO { get; set; }
-
-        public ILogService _logService { get; set; }
-        public IMessageBank _messageBank { get; set; }
 
         public IRegistrationService _registrationService { get; set; }
 
-        public RegistrationServiceShould()
+        public RegistrationServiceShould() : base()
         {
-            _messageBank = new MessageBank();
-            _sqlDAO = new SqlDAO(_messageBank);
-            _logService = new SqlLogService(_sqlDAO);
-            _registrationService = new RegistrationService(_sqlDAO, _logService);
+            _registrationService = new RegistrationService(SqlDAO, SqlLogService);
         }
 
 
@@ -64,10 +56,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public void ConfirmTheUser(string email, string passphrase, string authenticationLevel, bool status, bool confirmed)
         {
             //Arrange
-            _sqlDAO.CreateConfirmationLink(new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now));
+            SqlDAO.CreateConfirmationLink(new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now));
 
             IAccount _account = new Account(email, email, passphrase, authenticationLevel, status, confirmed);
-            _sqlDAO.CreateAccount(_account);
+            SqlDAO.CreateAccount(_account);
             //Act
             List<string> results = _registrationService.ConfirmAccount(_account);
 
@@ -83,7 +75,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
             //Arrange
             Guid myguid = Guid.NewGuid();
             string guid = myguid.ToString();
-            _sqlDAO.CreateConfirmationLink(new ConfirmationLink(email, myguid, DateTime.Now));
+            SqlDAO.CreateConfirmationLink(new ConfirmationLink(email, myguid, DateTime.Now));
 
             //Act
             IConfirmationLink link = _registrationService.GetConfirmationLink(guid);
@@ -99,7 +91,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         {
             //Arrange
             IConfirmationLink link = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now);
-            _sqlDAO.CreateConfirmationLink(link);
+            SqlDAO.CreateConfirmationLink(link);
 
             //Act
             List<string> results = _registrationService.RemoveConfirmationLink(link);

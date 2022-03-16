@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
@@ -12,6 +13,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
     // Summary:
     //     A controller class for requesting OTPs.
     [ApiController]
+    [EnableCors]
     [Route("[controller]")]
     public class OTPRequestController : Controller, IOTPRequestController
     {
@@ -21,7 +23,9 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         private IMessageBank _messageBank { get; }
 
-        private IRolePrincipal? _rolePrincipal { get; }
+        private static CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
+            TimeSpan.FromSeconds(5));
+
         public OTPRequestController(ISqlDAO sqlDAO, ILogService logService, 
             IOTPRequestManager otpRequestManager, IMessageBank messageBank)
         {
@@ -51,13 +55,27 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         [Route("requestotp")]
         public async Task<IActionResult> RequestOTPAsync(string username, string passphrase, string authorizationLevel)
         {
-            string result = await _otpRequestManager.RequestOTPAsync(username, passphrase, authorizationLevel);
-            if (result.Equals(_messageBank.SuccessMessages["generic"]))
+            try
             {
-                return new OkObjectResult(Request.Cookies["TresearchAuthenticationCookie"]);
+                string[] split;
+                string result = await _otpRequestManager.RequestOTPAsync(username, passphrase, authorizationLevel,
+                    _cancellationTokenSource.Token).ConfigureAwait(false);
+                if (result.Equals(_messageBank.SuccessMessages["generic"]))
+                {
+                    split = result.Split(": ");
+                    return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
+                }
+                split = result.Split(": ");
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
-            string[] error = result.Split(": ");
-            return StatusCode(Convert.ToInt32(error[0]), error[2]);
+            catch(OperationCanceledException tce)
+            {
+                _cancellationTokenSource.Cancel();
+                return StatusCode(400, tce.Message);
+            }catch(Exception ex)
+            {
+                return StatusCode(400, ex.Message);
+            }
         }
     }
 }

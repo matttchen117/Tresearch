@@ -45,7 +45,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             throw new NotImplementedException();
         }
 
-        public async Task<string> VerifyAccountAsync(IAccount account)
+        public async Task<string> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken)
         {
             int index = InMemoryDatabase.Accounts.IndexOf(account);
             if (index != -1)
@@ -68,7 +68,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return _messageBank.ErrorMessages["notFoundOrEnabled"];
         }
 
-        public async Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim)
+        public async Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim, CancellationToken cancellationToken)
         {
             List<string> results = new List<string>();
             try
@@ -147,11 +147,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> VerifyAuthorizedAsync(IRolePrincipal rolePrincipal, string requiredAuthLevel)
+        public async Task<string> VerifyAuthorizedAsync(string requiredAuthLevel, CancellationToken cancellationToken)
         {
             try
             {
-                IAccount account = new Account(rolePrincipal.RoleIdentity.Username, rolePrincipal.RoleIdentity.AuthorizationLevel);
+                string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
+                IAccount account = new Account(Thread.CurrentPrincipal.Identity.Name, userAuthLevel);
                 // Find account in db
                 int index = InMemoryDatabase.Accounts.IndexOf(account);
                 if (index != -1)
@@ -190,7 +191,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> StoreOTPAsync(IOTPClaim otpClaim)
+        public async Task<string> StoreOTPAsync(IOTPClaim otpClaim, CancellationToken cancellationToken)
         {
             string result;
             int index = InMemoryDatabase.OTPClaims.IndexOf(otpClaim);
@@ -209,11 +210,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
 
-        public string DeleteAccount(IRolePrincipal rolePrincipal)
+        public string DeleteAccount()
         {
             bool accountExists = false;
-            string accountName = rolePrincipal.RoleIdentity.Username;
-            string accountRole = rolePrincipal.RoleIdentity.AuthorizationLevel;
+            string accountName = Thread.CurrentPrincipal.Identity.Name;
+            string accountRole = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
             try
             {
                 for (int i = 0; i < InMemoryDatabase.Accounts.Count; i++)

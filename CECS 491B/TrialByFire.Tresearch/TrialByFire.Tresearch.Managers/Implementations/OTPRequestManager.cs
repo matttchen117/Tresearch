@@ -24,22 +24,19 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
         private IValidationService _validationService { get; }
         private IAuthenticationService _authenticationService { get; }
-
-        private IRolePrincipal _rolePrincipal { get; }
         private IOTPRequestService _otpRequestService { get; }
         private IMessageBank _messageBank { get; }
 
         private IMailService _mailService { get; }
 
         public OTPRequestManager(ISqlDAO sqlDAO, ILogService logService, IValidationService validationService, 
-            IAuthenticationService authenticationService, IRolePrincipal rolePrincipal, 
-            IOTPRequestService otpRequestService, IMessageBank messageBank, IMailService mailService)
+            IAuthenticationService authenticationService, IOTPRequestService otpRequestService, 
+            IMessageBank messageBank, IMailService mailService)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
             _validationService = validationService;
             _authenticationService = authenticationService;
-            _rolePrincipal = rolePrincipal;
             _otpRequestService = otpRequestService;
             _messageBank = messageBank;
             _mailService = mailService;
@@ -63,12 +60,14 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         //
         // Returns:
         //     The result of the operation.
-        public async Task<string> RequestOTPAsync(string username, string passphrase, string authorizationLevel)
+        public async Task<string> RequestOTPAsync(string username, string passphrase, 
+            string authorizationLevel, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             string result;
             try
             {
-                if(_rolePrincipal.IsInRole("guest"))
+                if(Thread.CurrentPrincipal == null)
                 {
                     // Basic input validation will be done at client side
                     /*Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
@@ -79,11 +78,13 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     {*/
                     IAccount account = new Account(username, passphrase, authorizationLevel);
                     IOTPClaim otpClaim = new OTPClaim(account);
-                    result = await _otpRequestService.RequestOTPAsync(account, otpClaim);
+                    result = await _otpRequestService.RequestOTPAsync(account, otpClaim, 
+                        cancellationToken).ConfigureAwait(false);
                     if(result.Equals(_messageBank.SuccessMessages["generic"]))
                     {
                         // No API Key right now
-                        //result = await _mailService.SendOTPAsync(account.Username, otpClaim.OTP, otpClaim.OTP, otpClaim.OTP);
+                        result = await _mailService.SendOTPAsync(account.Username, otpClaim.OTP, 
+                            otpClaim.OTP, otpClaim.OTP, cancellationToken).ConfigureAwait(false);
                     }
                     //}
                     return result;

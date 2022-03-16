@@ -36,12 +36,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
         //
         // Returns:
         //     The result of the verification/storing process.
-        public async Task<string> RequestOTPAsync(IAccount account, IOTPClaim otpClaim)
+        public async Task<string> RequestOTPAsync(IAccount account, IOTPClaim otpClaim, 
+            CancellationToken cancellationToken)
         {
-            string result = await _sqlDAO.VerifyAccountAsync(account);
+            cancellationToken.ThrowIfCancellationRequested();
+            string result = await _sqlDAO.VerifyAccountAsync(account, cancellationToken).ConfigureAwait(false);
             if (result.Equals(_messageBank.SuccessMessages["generic"]))
             {
-                result = await _sqlDAO.StoreOTPAsync(otpClaim);
+                result = await _sqlDAO.StoreOTPAsync(otpClaim, cancellationToken).ConfigureAwait(false);
             }
             return result;
         }

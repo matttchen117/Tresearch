@@ -38,12 +38,15 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
         public async Task RequestTheOTPAsync(string username, string passphrase, string authorizationLevel, string expected)
         {
             // Arrange
-            IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService, messageBank);
+            IOTPRequestService otpRequestService = new OTPRequestService(SqlDAO, LogService, MessageBank);
             IAccount account = new Account(username, passphrase, authorizationLevel);
             IOTPClaim otpClaim = new OTPClaim(account);
+            CancellationTokenSource cancellationTokenSource =
+                new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             // Act
-            string result = await otpRequestService.RequestOTPAsync(account, otpClaim);
+            string result = await otpRequestService.RequestOTPAsync(account, otpClaim, 
+                cancellationTokenSource.Token);
 
             // Assert
             Assert.Equal(expected, result);

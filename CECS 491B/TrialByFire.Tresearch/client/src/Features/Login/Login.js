@@ -13,11 +13,12 @@ const Login = () => {
 
     function validateLoginForm(){
         // still allowing invalid special characters
-        return username.length > 8 && (specialChars.test(username) ? validSpecialCharacters.test(username) : true) 
-        &&
-        (verified ? passphrase.length > 8 && !specialChars.test(passphrase) : otp.length > 8 
-        || 
-        (specialChars.test(otp) ? validSpecialCharacters.test(otp) : true))
+        return username.length >= 8 && (passphrase.length >= 8 || otp.length >= 8)
+        // return username.length > 8 && (specialChars.test(username) ? validSpecialCharacters.test(username) : true) 
+        // &&
+        // (verified ? passphrase.length > 8 && !specialChars.test(passphrase) : otp.length > 8 
+        // || 
+        // (specialChars.test(otp) ? validSpecialCharacters.test(otp) : true))
     }
 
     const navigate = useNavigate();
@@ -46,10 +47,10 @@ const Login = () => {
         {
             setError(false)
             {verified ? 
-                axios.post('https://localhost:7010/Authentication/authenticate?username=' + username.toLowerCase + '&otp=' + otp 
+                axios.post('https://localhost:7010/Authentication/authenticate?username=' + username.toLowerCase() + '&otp=' + otp 
                 + '&authorizationLevel=' + authorizationLevel)
                 .then(response => {
-                        console.log('success');
+                        console.log(response.data);
                         console.log(response.headers["TresearchAuthenticationCookie"])
                         console.log(response.headers)
                         //navigate('/Login/Authentication');
@@ -59,14 +60,16 @@ const Login = () => {
                         setError(true)
                     })
                 :
-                axios.post('https://localhost:7010/OTPRequest/requestotp?username=' + username + '&passphrase=' + passphrase 
+                axios.post('https://localhost:7010/OTPRequest/requestotp?username=' + username.toLowerCase() + '&passphrase=' + passphrase 
                 + '&authorizationLevel=' + authorizationLevel)
                 .then(response => {
-                        console.log('success');
                         console.log(response.data);
                         setVerified(true)
                         //navigate('/Login/Authentication');
-                }).catch(err => console.log(err.data))
+                }).catch(err => {
+                    console.log(err.data)
+                    setVerified(true) // need to remove later, only for testing bc no API key
+                })
             }
         }else{
             console.log(errors.credentials)

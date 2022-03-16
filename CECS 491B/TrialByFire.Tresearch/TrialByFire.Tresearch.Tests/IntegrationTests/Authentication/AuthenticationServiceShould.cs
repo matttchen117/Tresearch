@@ -40,9 +40,12 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
         {
             // Arrange
             IOTPClaim otpClaim = new OTPClaim(username, otp, authorizationLevel, new DateTime(year, month, day, hour, minute, second));
+            CancellationTokenSource cancellationTokenSource =
+                new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             // Act
-            List<string> results = await authenticationService.AuthenticateAsync(otpClaim);
+            List<string> results = await AuthenticationService.AuthenticateAsync(otpClaim, 
+                cancellationTokenSource.Token);
 
             // Assert
             Assert.Equal(expected, results[0]);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
@@ -29,9 +30,13 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authorization
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(true, username, authorizationLevel);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+            Thread.CurrentPrincipal = rolePrincipal;
+            CancellationTokenSource cancellationTokenSource =
+                new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             // Act
-            string result = await authorizationService.VerifyAuthorizedAsync(rolePrincipal, requiredAuthLevel);
+            string result = await AuthorizationService.VerifyAuthorizedAsync(requiredAuthLevel, 
+                cancellationTokenSource.Token);
 
             // Assert
             Assert.Equal(expected, result);

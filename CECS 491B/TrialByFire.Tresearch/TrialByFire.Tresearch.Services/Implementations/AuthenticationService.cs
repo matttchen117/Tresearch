@@ -16,6 +16,8 @@ using TrialByFire.Tresearch.Exceptions;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
+    // Summary:
+    //     A service class for Authenticating the User.
     public class AuthenticationService : IAuthenticationService
     {
         private ISqlDAO _sqlDAO { get; }
@@ -32,9 +34,22 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _payLoad = "";
         }
 
-        public async Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim)
+
+        //
+        // Summary:
+        //     Authenticates the User and returns a JWT token for them on success
+        //
+        // Parameters:
+        //   otpClaim:
+        //     The OTPClaim representing the credentials of the User attempting to Authenticate.
+        //
+        // Returns:
+        //     The result of the Authentication process and a JWT token on success.
+        public async Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim, 
+            CancellationToken cancellationToken)
         {
-            List<string> results = await _sqlDAO.AuthenticateAsync(otpClaim);
+            cancellationToken.ThrowIfCancellationRequested();
+            List<string> results = await _sqlDAO.AuthenticateAsync(otpClaim, cancellationToken).ConfigureAwait(false);
             if (results[0].Equals(_messageBank.SuccessMessages["generic"]))
             {
                 return CreateJwtToken(results[1]);
@@ -46,13 +61,23 @@ namespace TrialByFire.Tresearch.Services.Implementations
         // use default key, randomizer, replace every 3 months
         // look into AES type 
 
-        private List<string> CreateJwtToken(string _payload)
+        //
+        // Summary:
+        //     Creates a JWT token based
+        //
+        // Parameters:
+        //   payload:
+        //     The payload to be put into the JWT
+        //
+        // Returns:
+        //     The result of the JWT creation process and the JWT token on success.
+        private List<string> CreateJwtToken(string payload)
         {
             List<string> results = new List<string>();
 
             // break payload into parts
             Dictionary<string, string> claimValuePairs = new Dictionary<string, string>();
-            string[] claimValue = _payload.Split(",");
+            string[] claimValue = payload.Split(",");
             foreach (string cV in claimValue)
             {
                 string[] pair = cV.Split(":");

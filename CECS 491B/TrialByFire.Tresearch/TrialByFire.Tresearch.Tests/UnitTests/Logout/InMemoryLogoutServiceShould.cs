@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.Models.Contracts;
@@ -24,8 +25,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            ILogoutService logoutService = new LogoutService(sqlDAO, logService, messageBank, rolePrincipal);
-            
+            Thread.CurrentPrincipal = rolePrincipal;
+            ILogoutService logoutService = new LogoutService(SqlDAO, LogService, MessageBank);
 
             // Act
             string result = logoutService.Logout();

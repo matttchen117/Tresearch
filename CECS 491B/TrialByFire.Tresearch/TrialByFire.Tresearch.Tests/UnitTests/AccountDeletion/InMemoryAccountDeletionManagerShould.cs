@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
@@ -33,10 +34,11 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            IAccountDeletionManager accountDeletionManager = new AccountDeletionManager(sqlDAO, logService, accountDeletionService, rolePrincipal);
+            Thread.CurrentPrincipal = rolePrincipal;
+            IAccountDeletionManager accountDeletionManager = new AccountDeletionManager(SqlDAO, LogService, AccountDeletionService);
 
             // Act
-            string result = accountDeletionManager.DeleteAccount(rolePrincipal);
+            string result = accountDeletionManager.DeleteAccount();
 
             // Assert
             Assert.Equal(expected, result);

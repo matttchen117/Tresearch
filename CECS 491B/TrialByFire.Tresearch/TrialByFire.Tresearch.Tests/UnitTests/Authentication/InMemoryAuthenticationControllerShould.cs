@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
@@ -25,7 +26,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
         }
 
         [Theory]
-        [InlineData("garry@gmail.com", "ABCdef123", "user", "guest", "guest", 2022, 3, 4, 5, 6, 0, "503: Server: Authentication Cookie creation failed.")]
+        [InlineData("garry@gmail.com", "ABCdef123", "user", "guest", "guest", 2022, 3, 4, 5, 6, 0, "200: Server: success")]
         [InlineData("garry@gmail.com", "ABCdef123", "user", "garry@gmail.com", "user", 2022, 3, 4, 5, 6, 0, "403: Server: Active session found. Please logout and try again.")]
         [InlineData("harry@gmail.com", "abcdef123", "admin", "guest", "guest", 2022, 3, 4, 5, 6, 0, "400: Data: Invalid Username or OTP. " +
             "Please try again.")]
@@ -49,10 +50,14 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            IAuthenticationManager authenticationManager = new AuthenticationManager(sqlDAO,
-                logService, validationService, authenticationService, rolePrincipal, messageBank);
-            IAuthenticationController authenticationController = new AuthenticationController(sqlDAO,
-                logService, authenticationManager, messageBank);
+            if(!currentIdentity.Equals("guest"))
+            {
+                Thread.CurrentPrincipal = rolePrincipal;
+            }
+            IAuthenticationManager authenticationManager = new AuthenticationManager(SqlDAO,
+                LogService, ValidationService, AuthenticationService, MessageBank);
+            IAuthenticationController authenticationController = new AuthenticationController(SqlDAO,
+                LogService, authenticationManager, MessageBank, BuildSettingsOptions);
             DateTime now = new DateTime(year, month, day, hour, minute, second);
             string[] expecteds = expected.Split(": ");
             ObjectResult expectedResult = new ObjectResult(expecteds[2])

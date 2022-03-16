@@ -7,18 +7,23 @@ namespace TrialByFire.Tresearch.WebApi.Controllers
     [Route("[controller]")]
     public class Test : ControllerBase
     {
-        private IRolePrincipal _rolePrincipal { get; }
-        public Test(IRolePrincipal rolePrincipal)
+        public Test()
         {
-            _rolePrincipal = rolePrincipal;
         }
 
         [HttpPost]
         [Route("test")]
         public async Task<IActionResult> Index()
         {
-            return new OkObjectResult(_rolePrincipal.RoleIdentity.Username + 
-                _rolePrincipal.RoleIdentity.AuthorizationLevel);
+            if(Thread.CurrentPrincipal != null)
+            {
+                return new OkObjectResult(Thread.CurrentPrincipal.Identity.Name +
+                Thread.CurrentPrincipal.IsInRole("user"));
+            }
+            else
+            {
+                return new OkObjectResult("Guest");
+            }
         }
     }
 }

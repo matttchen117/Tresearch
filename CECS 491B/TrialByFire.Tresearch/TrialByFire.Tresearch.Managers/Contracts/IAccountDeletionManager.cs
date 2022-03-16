@@ -10,7 +10,7 @@ namespace TrialByFire.Tresearch.Managers.Contracts
 {
     public interface IAccountDeletionManager
     {
-        public string DeleteAccount(IRolePrincipal rolePrincipal);
+        public string DeleteAccount();
 
     }
 

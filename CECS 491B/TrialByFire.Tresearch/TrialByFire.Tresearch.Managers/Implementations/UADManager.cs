@@ -21,8 +21,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 		private IUADService _uadService { get; }
 		private IAuthenticationService _authenticationService { get; }
 		private IAuthorizationService _authorizationService { get; }
-
-		private IRolePrincipal _rolePrincipal { get; }
 		private IOTPRequestService _otpRequestService { get; }
 		private readonly string _authorizationLevel = "Admin";
 
@@ -45,7 +43,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 		{
 			string result;
 			string authorizeResult;
-			authorizeResult = await _authorizationService.VerifyAuthorizedAsync(_rolePrincipal, _authorizationLevel);
+			// Matthew - Commented out for build
+			authorizeResult = ""; //await _authorizationService.VerifyAuthorizedAsync(_authorizationLevel);
 			if (authorizeResult == "success")
 			{
 				Task t1 = Task.Run(() =>

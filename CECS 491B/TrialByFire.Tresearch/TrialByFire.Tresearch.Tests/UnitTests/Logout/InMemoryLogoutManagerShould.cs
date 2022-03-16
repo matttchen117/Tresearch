@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.Managers.Contracts;
@@ -27,9 +28,13 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            ILogoutService logoutService = new LogoutService(sqlDAO, logService, messageBank, rolePrincipal);
-            ILogoutManager logoutManager = new LogoutManager(sqlDAO, logService, messageBank, 
-                rolePrincipal, logoutService);
+            if(!currentIdentity.Equals("guest"))
+            {
+                Thread.CurrentPrincipal = rolePrincipal;
+            }
+            ILogoutService logoutService = new LogoutService(SqlDAO, LogService, MessageBank);
+            ILogoutManager logoutManager = new LogoutManager(SqlDAO, LogService, MessageBank, 
+                logoutService);
 
             // Act
             string result = logoutManager.Logout();

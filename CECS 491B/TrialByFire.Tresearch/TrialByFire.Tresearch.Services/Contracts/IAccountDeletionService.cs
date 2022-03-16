@@ -11,6 +11,6 @@ namespace TrialByFire.Tresearch.Services.Contracts
 {
     public interface IAccountDeletionService
     {
-        string DeleteAccount(IRolePrincipal rolePrincipal);
+        string DeleteAccount();
     }
 }
