@@ -29,8 +29,21 @@ namespace TrialByFire.Tresearch.Services.Implementations
 		{
 			cancellationToken.ThrowIfCancellationRequested();
 			List<IKPI> kpiList = new List<IKPI>();
-			kpiList = _sqlDAO.LoadKPI(now);
-			return _sqlDAO.LoadKPI(now);
+            try
+            {
+				kpiList.Add(await _sqlDAO.GetViewKPI());
+				kpiList.Add(await _sqlDAO.GetViewDurationKPI());
+				kpiList.Add(await _sqlDAO.GetNodeKPI(now));
+				kpiList.Add(await _sqlDAO.GetSearchKPI(now));
+				kpiList.Add(await _sqlDAO.GetLoginKPI(now));
+				kpiList.Add(await _sqlDAO.GetRegistrationKPI(now));
+				return kpiList;
+            }
+            catch(Exception ex)
+            {
+				kpiList.Add(new KPI(ex.Message));
+				return kpiList;
+            }
 		}
 	}
 }

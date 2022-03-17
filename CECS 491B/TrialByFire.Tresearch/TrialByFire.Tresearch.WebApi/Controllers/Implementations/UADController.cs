@@ -15,6 +15,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
         private IUADManager _uadManager { get; }
+        private CancellationTokenSource _cts = new CancellationTokenSource();
         public UADController(ISqlDAO sqlDAO, ILogService logService, IUADManager uadManager)
         {
             _sqlDAO = sqlDAO;
@@ -23,10 +24,10 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         }
 
         [HttpPost("kpi")]
-        public List<IKPI> LoadKPI(DateTime now)
+        public async Task<List<IKPI>> LoadKPIAsync(DateTime now)
         {
             List<IKPI> kpiList = new List<IKPI>();
-            kpiList = _sqlDAO.LoadKPI(now);
+            kpiList = await _uadManager.LoadKPIAsync(now, _cts.Token);
             return kpiList;
         }
     }

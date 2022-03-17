@@ -29,18 +29,17 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 			CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
 
 			// Act
-			var results = await uadService.LoadKPIAsync(new DateTime(year, month, day), cts.Token);
+			var results = await uadService.LoadKPIAsync(new DateTime(year, month, day));
 
 			// Assert
 			string ex = "success";
-			for (int i = 0; i < 6; i++)
-			{
-				if (results[i].result != "success")
-				{
-					Console.WriteLine(i);
+			foreach(var x in results)
+            {
+				if (x.result != "Success")
+                {
 					ex = "Error";
-				}
-			}
+                }
+            }
 			Assert.Equal(expected, ex);
 		}
 	}

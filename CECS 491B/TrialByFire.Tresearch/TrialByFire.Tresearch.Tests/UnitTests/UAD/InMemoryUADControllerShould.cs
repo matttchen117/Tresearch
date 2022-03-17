@@ -24,9 +24,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 		}
 
 		[Theory]
-		[InlineData(2022, 3, 5, "success")]
-		[InlineData(2021, 12, 12, "Error")]
-		public void LoadKPI(int year, int month, int day, string expected)
+		[InlineData(2022, 3, 7, "success")]
+		[InlineData(2021, 1, 1, "Error")]
+		public async Task LoadKPI(int year, int month, int day, string expected)
 		{
 			// Arrange
 			IMessageBank messageBank = new MessageBank();
@@ -38,13 +38,13 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 
 			// Act
 			List<IKPI> results = new List<IKPI>();
-			results = uadController.LoadKPI(new DateTime(year, month, day));
+			results = await uadController.LoadKPIAsync(new DateTime(year, month, day));
 
 			// Assert
 			string ex = "success";
 			foreach (var x in results)
 			{
-				if (x.result != "success")
+				if (x.result != "Success")
 				{
 					ex = "Error";
 				}

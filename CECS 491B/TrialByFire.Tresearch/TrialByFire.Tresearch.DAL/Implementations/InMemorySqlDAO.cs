@@ -20,7 +20,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = new MessageBank();
         }
 
-        public List<IKPI> LoadKPI(DateTime now)
+       /* public List<IKPI> LoadKPI(DateTime now)
         {
             throw new NotImplementedException();
         }
@@ -43,7 +43,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         IDailyRegistration ISqlDAO.GetDailyRegistration(DateTime nodeCreationDate)
         {
             throw new NotImplementedException();
-        }
+        }*/
 
         public string VerifyAccount(IAccount account)
         {
@@ -358,7 +358,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return null;
         }
 
-/*        public List<IKPI> LoadKPI(DateTime now)
+        /*public List<IKPI> LoadKPI(DateTime now)
         {
             List<IKPI> kpiList = new List<IKPI>();
             kpiList.Add(GetViewKPI());
@@ -371,7 +371,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }*/
 
         //1
-        public IViewKPI GetViewKPI()
+        public async Task<IViewKPI> GetViewKPI()
         {
             IViewKPI viewKPI = new ViewKPI();
             List<IView> ordered = InMemoryDatabase.Views.OrderBy(x => x.visits).ToList();
@@ -389,7 +389,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
         //2
-        public IViewDurationKPI GetViewDurationKPI()
+        public async Task<IViewDurationKPI> GetViewDurationKPI()
         {
             IViewDurationKPI viewDurationKPI = new ViewDurationKPI();
             List<IView> ordered = InMemoryDatabase.Views.OrderBy(x => x.averageDuration).ToList();
@@ -407,102 +407,83 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return viewDurationKPI;
         }
 
-/*        public INodeKPI GetNodeKPI(DateTime now)
+        public async Task<INodeKPI> GetNodeKPI(DateTime now)
         {
             INodeKPI nodeKPI = new NodeKPI();
             int counter = 1;
-            INodesCreated nCreated = GetNodesCreated(now);//Initial Check to see if InMemoryDatabase is not empty
-            if (nCreated.nodeCreationCount == -1)
+            List<NodesCreated> nCreated = GetNodesCreated(now);//Initial Check to see if InMemoryDatabase is not empty
+            if (nCreated.Count == 0)
             {
                 nodeKPI.result = "Error";
                 return nodeKPI;
             }
-            while ((counter < 29) && (nCreated.nodeCreationCount != -1))
+            foreach(var x in nCreated)
             {
-                nodeKPI.nodesCreated.Add(nCreated);
-                DateTime past = now.AddDays((counter * -1));
-                nCreated = GetNodesCreated(past);
-                counter++;
+                nodeKPI.nodesCreated.Add(x);
             }
             nodeKPI.result = "success";
             return nodeKPI;
         }
 
         //4
-        public ILoginKPI GetLoginKPI(DateTime now)
+        public async Task<ILoginKPI> GetLoginKPI(DateTime now)
         {
             ILoginKPI loginKPI = new LoginKPI();
             int counter = 1;
-            IDailyLogin dLogin = GetDailyLogin(now);
-            if (dLogin.loginCount == -1)
+            List<DailyLogin> dLogin = GetDailyLogin(now);
+            if (dLogin.Count == 0)
             {
                 loginKPI.result = "Error";
                 return loginKPI;
             }
-            while ((counter <= 90) && (dLogin.loginCount != -1))
+            foreach(var x in dLogin)
             {
-                loginKPI.dailyLogins.Add(dLogin);
-                DateTime past = now.AddDays((counter * -1));
-                dLogin = GetDailyLogin(past);
-                counter++;
+                loginKPI.dailyLogins.Add(x);
             }
             loginKPI.result = "success";
             return loginKPI;
         }
 
         //5
-        public IRegistrationKPI GetRegistrationKPI(DateTime now)
+        public async Task<IRegistrationKPI> GetRegistrationKPI(DateTime now)
         {
             IRegistrationKPI registrationKPI = new RegistrationKPI();
             int counter = 1;
-            IDailyRegistration dRegistration = GetDailyRegistration(now);
-            if (dRegistration.registrationCount == -1)
+            List<DailyRegistration> dRegistration = GetDailyRegistration(now);
+            if (dRegistration.Count == 0)
             {
                 registrationKPI.result = "Error";
                 return registrationKPI;
             }
-            while ((counter <= 90) && (dRegistration.registrationCount != -1))
+            foreach(var x in dRegistration)
             {
-                registrationKPI.dailyRegistrations.Add(dRegistration);
-                DateTime past = now.AddDays((counter * -1));
-                dRegistration = GetDailyRegistration(past);
-                counter++;
+                registrationKPI.dailyRegistrations.Add(x);
             }
             registrationKPI.result = "success";
             return registrationKPI;
         }
 
         //6
-        public ISearchKPI GetSearchKPI(DateTime now)
+        public async Task<ISearchKPI> GetSearchKPI(DateTime now)
         {
             ISearchKPI searchKPI = new SearchKPI();
             int counter = 1;
-            ITopSearch sCreated = GetTopSearch(now);//Initial Check to see if InMemoryDatabase is not empty
-            List<ITopSearch> preSort = new List<ITopSearch>();
-            if (sCreated.searchCount == -1)
+            List<TopSearch> sCreated = GetTopSearch(now);//Initial Check to see if InMemoryDatabase is not empty
+            if (sCreated.Count == 0)
             {
                 searchKPI.result = "Error";
                 return searchKPI;
             }
-
-            while ((counter <= 28) && (sCreated.searchCount != -1))
-            {
-                preSort.Add(sCreated);
-                DateTime past = now.AddDays((counter * -1));
-                sCreated = GetTopSearch(past);
-                counter++;
-            }
-
-            List<ITopSearch> afterSort = preSort.OrderBy(x => x.searchCount).ToList();
-            int n = (afterSort.Count);
+            List<TopSearch> sorted = sCreated.OrderBy(x => x.searchCount).ToList();
+            int n = (sorted.Count);
             for (int i = 1; i <= 5 || i < n; i++)
             {
                 Console.WriteLine(n);
-                searchKPI.topSearches.Add(afterSort[(n - i)]);
+                searchKPI.topSearches.Add(sorted[(n - i)]);
             }
             searchKPI.result = "success";
             return searchKPI;
-        }*/
+        }
 
         public string CreateNodesCreated(INodesCreated nodesCreated)
         {
@@ -521,15 +502,15 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         }
 
-        public IList<INodesCreated> GetNodesCreated(DateTime nodeCreationDate)
+        public List<NodesCreated> GetNodesCreated(DateTime nodeCreationDate)
         {
-            List<INodesCreated> nodeResult = new List<INodesCreated>();
+            List<NodesCreated> nodeResult = new List<NodesCreated>();
 
             foreach (INodesCreated nodesCreated in InMemoryDatabase.NodesCreated)
             {
                 if(nodeCreationDate <= nodesCreated.nodeCreationDate && nodeCreationDate >= nodeCreationDate.Date.AddDays(-30))
                 {
-                    nodeResult.Add(nodesCreated);
+                    nodeResult.Add((NodesCreated)nodesCreated);
                 }
             }
 
@@ -569,15 +550,15 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return _messageBank.SuccessMessages["generic"];
         }
 
-        public IList<IDailyLogin> GetDailyLogin(DateTime loginDate)
+        public List<DailyLogin> GetDailyLogin(DateTime loginDate)
         {
-           List<IDailyLogin> dailyLoginResults = new List<IDailyLogin>();
+           List<DailyLogin> dailyLoginResults = new List<DailyLogin>();
 
             foreach (IDailyLogin dailyLogin1 in InMemoryDatabase.DailyLogins)
             {
                 if(dailyLogin1.loginDate <= loginDate && dailyLogin1.loginDate >= loginDate.Date.AddDays(-30))
                 {
-                    dailyLoginResults.Add(dailyLogin1);
+                    dailyLoginResults.Add((DailyLogin)dailyLogin1);
                 }
             }
 
@@ -616,15 +597,15 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return _messageBank.SuccessMessages["generic"];
         }
 
-        public IList<ITopSearch> GetTopSearch(DateTime topSearchDate)
+        public List<TopSearch> GetTopSearch(DateTime topSearchDate)
         {
-            IList<ITopSearch> topSearchResult = new List<ITopSearch>();
+            List<TopSearch> topSearchResult = new List<TopSearch>();
 
             foreach (ITopSearch topSearch in InMemoryDatabase.TopSearches)
             {
                 if(topSearch.topSearchDate <= topSearchDate && topSearch.topSearchDate >= topSearchDate.Date.AddDays(-30))
                 {
-                    topSearchResult.Add(topSearch);
+                    topSearchResult.Add((TopSearch)topSearch);
                 }
             }
 
@@ -663,15 +644,15 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return _messageBank.SuccessMessages["generic"];
         }
 
-        public IList<IDailyRegistration> GetDailyRegistration(DateTime dailyRegistrationDate)
+        public List<DailyRegistration> GetDailyRegistration(DateTime dailyRegistrationDate)
         {
-            IList<IDailyRegistration> dailyRegistrationResults = new List<IDailyRegistration>();
+            List<DailyRegistration> dailyRegistrationResults = new List<DailyRegistration>();
 
             foreach (IDailyRegistration dailyRegistration in InMemoryDatabase.DailyRegistrations)
             {
                 if(dailyRegistration.registrationDate <= dailyRegistrationDate && dailyRegistration.registrationDate >= dailyRegistrationDate.Date.AddDays(-30))
                 {
-                    dailyRegistrationResults.Add(dailyRegistration);
+                    dailyRegistrationResults.Add((DailyRegistration)dailyRegistration);
                 }
             }
 

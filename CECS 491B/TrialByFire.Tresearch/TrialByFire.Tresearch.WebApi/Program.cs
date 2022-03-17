@@ -21,6 +21,7 @@ builder.Services.AddTransient<IMailService, MailService>();
 builder.Services.AddTransient<IOTPRequestService, OTPRequestService>();
 builder.Services.AddTransient<IRegistrationService, RegistrationService>();
 builder.Services.AddTransient<IUADService, UADService>();
+builder.Services.AddTransient<IUADManager, UADManager>();
 builder.Services.AddTransient<IValidationService, ValidationService>();
 builder.Services.AddTransient<IAccountDeletionManager, AccountDeletionManager>();
 builder.Services.AddTransient<IAuthenticationManager, AuthenticationManager>();

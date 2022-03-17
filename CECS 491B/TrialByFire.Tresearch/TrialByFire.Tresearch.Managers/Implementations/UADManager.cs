@@ -26,8 +26,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 		private IRolePrincipal _rolePrincipal { get; }
 		private IOTPRequestService _otpRequestService { get; }
 		private readonly string _authorizationLevel = "Admin";
-		private static CancellationTokenSource _cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
-		private static readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
+		private CancellationTokenSource _cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+		//private static readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
 
 		public UADManager(ISqlDAO sqlDAO, ILogService logService, IUADService uadService, IAuthenticationService authenticationService, IAuthorizationService authorizationService)
@@ -39,30 +39,27 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 			_authorizationService = authorizationService;
 		}
 
-		public async Task<List<IKPI>> LoadKPIAsync(DateTime now)
+		public async Task<List<IKPI>> LoadKPIAsync(DateTime now, CancellationToken cancellationToken = default)
 		{
-			List<IKPI> result = new List<IKPI>();			
-			await _semaphoreSlim.WaitAsync();
+			cancellationToken.ThrowIfCancellationRequested();
+			List<IKPI> result = new List<IKPI>();		
+			//await _semaphoreSlim.WaitAsync();
 			try
 			{
-				CheckPermissions();
-				result = await _uadService.LoadKPIAsync(now, _cts.Token).ConfigureAwait(false);
+				//CheckPermissions();
+				result = await _uadService.LoadKPIAsync(now, _cts.Token);
 			}
 			catch (TaskCanceledException tcex)
 			{
-				
+				result.Add(new KPI(tcex.Message));
 			}
 			catch (SecurityException se)
 			{
-
+				result.Add(new KPI(se.Message));
 			}
 			catch (Exception ex)
             {
-
-            }
-            finally
-            {
-				_semaphoreSlim.Release();
+				result.Add(new KPI(ex.Message));
             }
 			return result;
 		}
@@ -70,35 +67,10 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 		private void CheckPermissions()
 		{
 			string authorizeResult = _authorizationService.VerifyAuthorized(_rolePrincipal, _authorizationLevel);
-			if (authorizeResult != "success")
+			if (authorizeResult != "Success")
 			{
 				throw new SecurityException("User Not Allowed to LoadKPIs");
 			}
 		}
-
-		/*public List<KPI> KPIsFetched(DateTime now)
-		{
-			string result;
-			string authorizeResult;
-			authorizeResult = _authorizationService.VerifyAuthorized(_rolePrincipal, _authorizationLevel);
-			if (authorizeResult == "success")
-			{
-				Task t1 = Task.Run(() =>
-				{
-					return _uadService.LoadKPI(now);
-				});
-
-				if (!t1.Wait(60000))
-				{
-					List<KPI> results = new List<KPI>();
-					KPI failureKPI = new KPI("Error 504; Timeout Error");
-					results.Add(failureKPI);
-					return results;
-				}
-			}
-			List<KPI> resultList = new List<KPI>();
-			resultList.Add(new KPI("Error: Timeout"));
-			return resultList;
-		}*/
 	}
 }

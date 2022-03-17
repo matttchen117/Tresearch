@@ -279,7 +279,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 4)), 13));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 5)), 12));
             dailyLogins.Add(new DailyLogin((new DateTime(2022, 3, 6)), 11));
-            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 1), 1));
+            /*dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 1), 1));
             dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 2), 2));
             dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 3), 3));
             dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 4), 4));
@@ -308,7 +308,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 27), 27));
             dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 28), 28));
             dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 29), 29));
-            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 30), 30));
+            dailyLogins.Add(new DailyLogin(new DateTime(2000, 1, 30), 30));*/
             return dailyLogins;
         }
 
@@ -347,7 +347,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             topSearches.Add(new TopSearch((new DateTime(2022, 3, 4)), "Fish", 49));
             topSearches.Add(new TopSearch((new DateTime(2022, 3, 5)), "Cows", 45));
             topSearches.Add(new TopSearch((new DateTime(2022, 3, 6)), "Dogs", 50));
-            topSearches.Add(new TopSearch(new DateTime(2000, 1, 1), "test1", 1));
+            /*topSearches.Add(new TopSearch(new DateTime(2000, 1, 1), "test1", 1));
             topSearches.Add(new TopSearch(new DateTime(2000, 1, 2), "test2", 2));
             topSearches.Add(new TopSearch(new DateTime(2000, 1, 3), "test3", 3));
             topSearches.Add(new TopSearch(new DateTime(2000, 1, 4), "test4", 4));
@@ -376,7 +376,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             topSearches.Add(new TopSearch(new DateTime(2000, 1, 27), "test27", 27));
             topSearches.Add(new TopSearch(new DateTime(2000, 1, 28), "test28", 28));
             topSearches.Add(new TopSearch(new DateTime(2000, 1, 29), "test29", 29));
-            topSearches.Add(new TopSearch(new DateTime(2000, 1, 30), "test30", 30));
+            topSearches.Add(new TopSearch(new DateTime(2000, 1, 30), "test30", 30));*/
             return topSearches;
         }
 
@@ -415,7 +415,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 4)), 98));
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 5)), 99));
             nodesCreated.Add(new NodesCreated((new DateTime(2022, 3, 6)), 100));
-            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 1), 1));
+            /*nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 1), 1));
             nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 2), 2));
             nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 3), 3));
             nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 4), 4));
@@ -444,7 +444,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 27), 27));
             nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 28), 28));
             nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 29), 29));
-            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 30), 30));
+            nodesCreated.Add(new NodesCreated(new DateTime(2000, 1, 30), 30));*/
             return nodesCreated;
         }
 
