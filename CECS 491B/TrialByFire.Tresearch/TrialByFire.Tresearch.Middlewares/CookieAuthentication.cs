@@ -21,50 +21,61 @@ namespace TrialByFire.Tresearch.Middlewares
 
         public async Task InvokeAsync(HttpContext httpContext)
         {
-            try
-            {
-                if (httpContext.Request.Cookies["TresearchAuthenticationCookie"] != null)
+            /*try
+            {*/
+
+                // This should check if httpContext.User is not null
+                // The Thread.CurrentPrincipal could be running on a different thread from the logout
+
+                // This is not working, is always not null, but has no values
+                if (httpContext.User != null)
                 {
-                    string jwt = httpContext.Request.Cookies["TresearchAuthenticationCookie"];
-                    var tokenHandler = new JwtSecurityTokenHandler();
-                    var keyValue = "akxhBSian218c9pJA98912n4010409AMKLUHqjn2njwaj";
-                    var key = Encoding.UTF8.GetBytes(keyValue);
-                    tokenHandler.ValidateToken(jwt, new TokenValidationParameters
+                    if(httpContext.Request.Cookies["TresearchAuthenticationCookie"] != null)
                     {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ClockSkew = TimeSpan.Zero
-                    }, out SecurityToken validatedToken);
-                    var jwtToken = (JwtSecurityToken)validatedToken;
-                    //singleton
-                    IRoleIdentity roleIdentity = new RoleIdentity(true, jwtToken.Claims.First(x => x.Type == "username").Value,
-                         jwtToken.Claims.First(x => x.Type == "authorizationLevel").Value);
-                    IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-                    httpContext.User = new ClaimsPrincipal(rolePrincipal);
-                    Thread.CurrentPrincipal = rolePrincipal;
+                        string jwt = httpContext.Request.Cookies["TresearchAuthenticationCookie"];
+                        var tokenHandler = new JwtSecurityTokenHandler();
+                        var keyValue = "akxhBSian218c9pJA98912n4010409AMKLUHqjn2njwaj";
+                        var key = Encoding.UTF8.GetBytes(keyValue);
+                        tokenHandler.ValidateToken(jwt, new TokenValidationParameters
+                        {
+                            ValidateIssuerSigningKey = true,
+                            IssuerSigningKey = new SymmetricSecurityKey(key),
+                            ValidateIssuer = false,
+                            ValidateAudience = false,
+                            ClockSkew = TimeSpan.Zero
+                        }, out SecurityToken validatedToken);
+                        var jwtToken = (JwtSecurityToken)validatedToken;
+                        //singleton
+                        IRoleIdentity roleIdentity = new RoleIdentity(true, jwtToken.Claims.First(x => x.Type == "username").Value,
+                             jwtToken.Claims.First(x => x.Type == "authorizationLevel").Value);
+                        IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
 
-                    //a - object for all cross cutting concerns
-                    //b - set current thread to be the principal Thread.CurrentPrincipal, do this way
-                    // need to set user (ClaimPrincipal here too, put data from RolePrincipal into
-                    // new ClaimPrincipal object)
-                    // httpContext.User = ClaimPrincipal(RolePrincipal)
+                        // possibly issue with this?
+                        httpContext.User = new ClaimsPrincipal(rolePrincipal);
+                        Thread.CurrentPrincipal = rolePrincipal;
 
-                    // Visual Studio Magazine
-                    // Can check archives for blog on how to do a
+                        //a - object for all cross cutting concerns
+                        //b - set current thread to be the principal Thread.CurrentPrincipal, do this way
+                        // need to set user (ClaimPrincipal here too, put data from RolePrincipal into
+                        // new ClaimPrincipal object)
+                        // httpContext.User = ClaimPrincipal(RolePrincipal)
 
-                    // Otherwise look at UseAuthentication module/source code
-                    // Refer to see what need to do to create correct dependencies
+                        // Visual Studio Magazine
+                        // Can check archives for blog on how to do a
 
-                    //IServiceProvider serviceProvider = 
-                    //httpContext.RequestServices.CreateScope(); // gives scope and access
+                        // Otherwise look at UseAuthentication module/source code
+                        // Refer to see what need to do to create correct dependencies
+
+                        //IServiceProvider serviceProvider = 
+                        //httpContext.RequestServices.CreateScope(); // gives scope and access
+
+                    }
                 }
-            }
+            /*}
             catch (Exception ex)
             {
                 await _next(httpContext);
-            }
+            }*/
 
             await _next(httpContext);
         }

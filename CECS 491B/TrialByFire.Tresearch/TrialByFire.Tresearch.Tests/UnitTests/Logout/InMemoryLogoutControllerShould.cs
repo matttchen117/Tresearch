@@ -26,7 +26,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
         [Theory]
         [InlineData("guest", "guest", "401: Server: No active session found. Please login and try again.")]
         [InlineData("aarry@gmail.com", "user", "200: Server: success")]
-        public void LogTheUserOut(string currentIdentity, string currentRole, string expected)
+        public async Task LogTheUserOut(string currentIdentity, string currentRole, string expected)
         {
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
@@ -45,7 +45,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
             { StatusCode = Convert.ToInt32(expecteds[0]) };
 
             // Act
-            IActionResult result = logoutController.Logout();
+            IActionResult result = await logoutController.Logout().ConfigureAwait(false);
             var objectResult = result as ObjectResult;
 
             // Assert

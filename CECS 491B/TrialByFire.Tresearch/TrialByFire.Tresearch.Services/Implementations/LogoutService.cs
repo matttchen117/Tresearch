@@ -32,7 +32,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         //
         // Returns:
         //     The result of the logout process.
-        public string Logout()
+        public async Task<string> Logout(CancellationToken cancellationToken)
         {
             Thread.CurrentPrincipal = null;
             // this actually seems unnecessary, so not sure what

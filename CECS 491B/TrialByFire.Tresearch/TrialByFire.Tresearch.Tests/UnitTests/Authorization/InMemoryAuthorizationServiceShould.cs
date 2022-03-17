@@ -36,7 +36,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authorization
 
             // Act
             string result = await AuthorizationService.VerifyAuthorizedAsync(requiredAuthLevel, 
-                cancellationTokenSource.Token);
+                cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, result);

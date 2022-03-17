@@ -64,7 +64,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             { StatusCode = Convert.ToInt32(expecteds[0]) };
 
             // Act
-            IActionResult result = await authenticationController.AuthenticateAsync(username, otp, authorizationLevel, now);
+            IActionResult result = await authenticationController.AuthenticateAsync(username, otp, 
+                authorizationLevel, now).ConfigureAwait(false);
             var objectResult = result as ObjectResult;
 
             // Assert

@@ -41,7 +41,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         }
 
         public async Task<string> SendOTPAsync(string email, string subject, string plainBody, string htmlBody, 
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             try

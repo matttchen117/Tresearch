@@ -24,7 +24,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         private BuildSettingsOptions _buildSettingsOptions { get; }
 
-        private static CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
             TimeSpan.FromSeconds(5));
 
         public LogoutController(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, 
@@ -47,13 +47,16 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         [Route("logout")]
         // Do Async if want to log something for DB (last time logged in)
         // Only Async if require operation to be done
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
+            // Check if the cookie is here at this point
+            // Middleware is included in everywhere async, therefore everywhere should be async 
+
             string[] split;
             string result = "";
             try
             {
-                result = _logoutManager.Logout();
+                result = await _logoutManager.Logout(_cancellationTokenSource.Token).ConfigureAwait(false);
                 if (result.Equals(_messageBank.SuccessMessages["generic"]))
                 {
                     if(_buildSettingsOptions.Environment.Equals("Test"))
@@ -61,6 +64,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                         split = result.Split(": ");
                         return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                     }
+                    HttpContext.User = null;
                     Response.Cookies.Delete("TresearchAuthenticationCookie");
                     split = result.Split(": ");
                     return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };

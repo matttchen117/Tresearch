@@ -11,6 +11,6 @@ namespace TrialByFire.Tresearch.Services.Contracts
 {
     public interface IAuthenticationService
     {
-        Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim, CancellationToken cancellationToken);
+        Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim, CancellationToken cancellationToken = default);
     }
 }

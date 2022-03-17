@@ -50,7 +50,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         //
         // Returns:
         //     The result of the operation.
-        public async Task<List<string>> AuthenticateAsync(string username, string otp, string authorizationLevel, DateTime now, CancellationToken cancellationToken)
+        public async Task<List<string>> AuthenticateAsync(string username, string otp, 
+            string authorizationLevel, DateTime now, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             List<string> results = new List<string>();

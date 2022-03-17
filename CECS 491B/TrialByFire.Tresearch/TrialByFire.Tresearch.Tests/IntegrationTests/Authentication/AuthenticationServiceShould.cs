@@ -45,7 +45,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
 
             // Act
             List<string> results = await AuthenticationService.AuthenticateAsync(otpClaim, 
-                cancellationTokenSource.Token);
+                cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, results[0]);

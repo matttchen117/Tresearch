@@ -37,16 +37,17 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         //
         // Returns:
         //     The result of the operation.
-        public string Logout()
+        public async Task<string> Logout(CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if(Thread.CurrentPrincipal != null)
             {
                 try
                 {
-                    return _logoutService.Logout();
+                    return await _logoutService.Logout(cancellationToken).ConfigureAwait(false);
                 }catch (Exception ex)
                 {
-                    return "Error occurred";
+                    return "400: Server: Logout Error Occurred";
                 }
             }
             return _messageBank.ErrorMessages["notAuthenticated"];

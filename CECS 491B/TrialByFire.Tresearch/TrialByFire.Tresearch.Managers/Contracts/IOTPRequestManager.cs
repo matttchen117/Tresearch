@@ -9,6 +9,6 @@ namespace TrialByFire.Tresearch.Managers.Contracts
     public interface IOTPRequestManager
     {
         Task<string> RequestOTPAsync(string username, string passphrase, 
-            string authorizationLevel, CancellationToken cancellationToken);
+            string authorizationLevel, CancellationToken cancellationToken = default);
     }
 }

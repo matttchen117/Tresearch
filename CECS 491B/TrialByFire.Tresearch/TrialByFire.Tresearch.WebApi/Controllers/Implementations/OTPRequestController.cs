@@ -23,7 +23,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         private IMessageBank _messageBank { get; }
 
-        private static CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
             TimeSpan.FromSeconds(5));
 
         public OTPRequestController(ISqlDAO sqlDAO, ILogService logService, 
@@ -70,7 +70,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             }
             catch(OperationCanceledException tce)
             {
-                _cancellationTokenSource.Cancel();
                 return StatusCode(400, tce.Message);
             }catch(Exception ex)
             {

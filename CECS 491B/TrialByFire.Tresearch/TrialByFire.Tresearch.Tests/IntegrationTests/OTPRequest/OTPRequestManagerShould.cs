@@ -57,7 +57,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
 
             // Act
             string result = await otpRequestManager.RequestOTPAsync(username, passphrase, 
-                authorizationLevel, cancellationTokenSource.Token);
+                authorizationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, result);

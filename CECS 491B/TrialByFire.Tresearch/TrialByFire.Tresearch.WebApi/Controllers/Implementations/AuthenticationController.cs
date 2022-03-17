@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using System.Security.Claims;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
@@ -24,8 +26,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         private BuildSettingsOptions _buildSettingsOptions { get; }
 
-        private static CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
-            TimeSpan.FromSeconds(5));
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
+            /*TimeSpan.FromSeconds(5)*/);
 
         public AuthenticationController(ISqlDAO sqlDAO, ILogService logService, 
             IAuthenticationManager authenticationManager, IMessageBank messageBank, IOptions<BuildSettingsOptions> buildSettingsOptions)
@@ -41,7 +43,17 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         [Route("test")]
         public string Test(string username, string otp, string authorizationLevel)
         {
-            return $"success: {username} + {otp} + {authorizationLevel}";
+            IRoleIdentity roleIdentity = new RoleIdentity(true, username, authorizationLevel);
+            IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+            Response.HttpContext.User = new ClaimsPrincipal(rolePrincipal);
+            return HttpContext.User.Identity.Name;
+        }
+
+        [HttpPost]
+        [Route("test2")]
+        public string Test()
+        {
+            return HttpContext.User.IsInRole("user").ToString();
         }
 
         //
@@ -73,6 +85,9 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                     split = result.Split(": ");
                     return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                 }
+                IRoleIdentity roleIdentity = new RoleIdentity(true, username, authorizationLevel);
+                IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+                HttpContext.User = new ClaimsPrincipal(rolePrincipal);
                 Response.Cookies.Append("TresearchAuthenticationCookie", results[1], CreateCookieOptions());
                 //_logService.CreateLog(DateTime.Now, "Server", username, "Info", "Authentication Succeeded");
                 split = result.Split(": ");

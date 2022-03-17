@@ -35,6 +35,8 @@ namespace TrialByFire.Tresearch.Tests
                 SendGridAPIKey = ""
             };
             BuildSettingsOptions = Options.Create(_buildSettingsOptions);
+
+
             MessageBank = new MessageBank();
             SqlDAO = new SqlDAO(MessageBank, BuildSettingsOptions);
             SqlLogService = new SqlLogService(SqlDAO);

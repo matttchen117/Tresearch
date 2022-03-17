@@ -9,6 +9,6 @@ namespace TrialByFire.Tresearch.Services.Contracts
 {
     public interface ILogoutService
     {
-        public string Logout();
+        public Task<string> Logout(CancellationToken cancellationToken);
     }
 }

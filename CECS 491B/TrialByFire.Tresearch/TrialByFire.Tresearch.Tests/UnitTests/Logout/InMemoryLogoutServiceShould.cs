@@ -20,16 +20,19 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
 
         [Theory]
         [InlineData("aarry@gmail.com", "user", "200: Server: success")]
-        public void LogTheUserOut(string currentIdentity, string currentRole, string expected)
+        public async Task LogTheUserOut(string currentIdentity, string currentRole, string expected)
         {
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
             ILogoutService logoutService = new LogoutService(SqlDAO, LogService, MessageBank);
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(
+                TimeSpan.FromSeconds(5));
+
 
             // Act
-            string result = logoutService.Logout();
+            string result = await logoutService.Logout(cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, result);

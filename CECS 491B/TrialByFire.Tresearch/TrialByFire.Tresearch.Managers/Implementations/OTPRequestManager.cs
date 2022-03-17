@@ -61,8 +61,9 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         // Returns:
         //     The result of the operation.
         public async Task<string> RequestOTPAsync(string username, string passphrase, 
-            string authorizationLevel, CancellationToken cancellationToken)
+            string authorizationLevel, CancellationToken cancellationToken = default)
         {
+            // Fires operation cancelled exception
             cancellationToken.ThrowIfCancellationRequested();
             string result;
             try

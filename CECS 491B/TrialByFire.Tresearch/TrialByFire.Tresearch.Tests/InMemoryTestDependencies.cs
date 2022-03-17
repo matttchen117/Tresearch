@@ -34,7 +34,7 @@ namespace TrialByFire.Tresearch.Tests
                 SqlConnectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true",
                 SendGridAPIKey = ""
             };
-            BuildSettingsOptions = Options.Create(_buildSettingsOptions);
+            BuildSettingsOptions = Options.Create(_buildSettingsOptions) as IOptions<BuildSettingsOptions>;
             SqlDAO = new InMemorySqlDAO();
             LogService = new InMemoryLogService(SqlDAO);
             MessageBank = new MessageBank();

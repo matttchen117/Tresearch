@@ -46,7 +46,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         // Returns:
         //     The result of the Authentication process and a JWT token on success.
         public async Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim, 
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             List<string> results = await _sqlDAO.AuthenticateAsync(otpClaim, cancellationToken).ConfigureAwait(false);

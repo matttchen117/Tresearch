@@ -4,6 +4,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
 {
     public interface ILogoutController
     {
-        public IActionResult Logout();
+        public Task<IActionResult> Logout();
     }
 }

@@ -63,7 +63,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
             { StatusCode = Convert.ToInt32(expecteds[0]) };
 
             // Act
-            IActionResult result = await otpRequestController.RequestOTPAsync(username, passphrase, authorizationLevel);
+            IActionResult result = await otpRequestController.RequestOTPAsync(username, passphrase, 
+                authorizationLevel).ConfigureAwait(false);
             var objectResult = result as ObjectResult;
 
             // Assert

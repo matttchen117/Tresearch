@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add Configuration File to DI
 builder.Services.Configure<BuildSettingsOptions>(
-    builder.Configuration.GetSection(BuildSettingsOptions.BuildSettings));
+    builder.Configuration.GetSection(nameof(BuildSettingsOptions)));
 // Add services to the container.
 builder.Services.AddScoped<IMessageBank, MessageBank>();
 builder.Services.AddScoped<ISqlDAO, SqlDAO>();
@@ -54,7 +54,7 @@ builder.Services.AddCors(options =>
                       {
                           builder.WithOrigins("http://localhost:3000", 
                                               "https://localhost:3000")
-                                              .WithHeaders("TresearchAuthenticationCookie")
+                                              //.WithHeaders("TresearchAuthenticationCookie")
                                               .AllowAnyHeader()
                                               .AllowAnyMethod()
                                               .AllowAnyOrigin();
@@ -70,7 +70,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHsts();
+//app.UseHsts();
 
 app.UseHttpsRedirection();
 

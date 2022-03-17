@@ -34,7 +34,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         // Returns:
         //     The result of the verification process.
         public async Task<string> VerifyAuthorizedAsync(string requiredAuthLevel, 
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             return await _sqlDAO.VerifyAuthorizedAsync(requiredAuthLevel, cancellationToken);
         }

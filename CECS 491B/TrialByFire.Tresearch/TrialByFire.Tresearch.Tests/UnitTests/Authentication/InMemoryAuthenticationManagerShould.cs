@@ -58,7 +58,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
 
             // Act
             List<string> results = await authenticationManager.AuthenticateAsync(username, otp, 
-                authorizationLevel, now, cancellationTokenSource.Token);
+                authorizationLevel, now, cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, results[0]);

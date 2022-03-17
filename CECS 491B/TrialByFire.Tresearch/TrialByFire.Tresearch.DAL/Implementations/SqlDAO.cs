@@ -252,7 +252,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         }
 
-        public async Task<string> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken)
+        public async Task<string> VerifyAccountAsync(IAccount account, 
+            CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
@@ -308,7 +309,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim, CancellationToken cancellationToken)
+        public async Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim, 
+            CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             List<string> results = new List<string>();
@@ -439,8 +441,16 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return results;
             }
         }
-        public async Task<string> VerifyAuthorizedAsync(string requiredAuthLevel, CancellationToken cancellationToken)
+        public async Task<string> VerifyAuthorizedAsync(string requiredAuthLevel, 
+            CancellationToken cancellationToken = default)
         {
+            // In catch block in above layer, need to roll back if cancel requested
+            // check token before operation, if cancelled then dont do op
+            // check token after operation, if cancelled, then rollback (closer to DAO, easier it is to rollback)
+            // design decision to rollback or not
+            // if cancel at end, designate as either cancelled or undo situation
+
+            cancellationToken.ThrowIfCancellationRequested();
             try
             {
                 string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
@@ -492,8 +502,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> StoreOTPAsync(IOTPClaim otpClaim, CancellationToken cancellationToken)
+        public async Task<string> StoreOTPAsync(IOTPClaim otpClaim, 
+            CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             try
             {
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
