@@ -692,5 +692,34 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
             return _messageBank.ErrorMessages["dailyRegistrationNotExist"];
         }
+
+        public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(Guid guid, CancellationToken cancellationToken)
+        {
+            IRecoveryLink nullLink = null;
+            return Tuple.Create(nullLink, "200");
+        }
+
+        public async Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authenticationLevel, CancellationToken cancellationToken)
+        {
+            IAccount nullAccount = null;
+            return Tuple.Create(nullAccount, "500");
+        }
+
+        public async Task<Tuple<int, string>> GetTotalRecoveryLinksAsync(string email, CancellationToken cancellationToken)
+        {
+            return Tuple.Create(-1, "500");
+        }
+
+        public async Task<Tuple<int, string>> RemoveAllRecoveryLinksAsync(string email, CancellationToken cancellationToken)
+        {
+            return Tuple.Create(-1, "500");
+        }
+
+        public async Task<string> RemoveRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken)
+        {
+            return "500";
+        }
+
+
     }
 }

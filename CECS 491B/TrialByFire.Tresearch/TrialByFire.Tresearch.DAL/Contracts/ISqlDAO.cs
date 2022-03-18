@@ -9,6 +9,19 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 {
     public interface ISqlDAO
     {
+        public Task<string> EnableAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<string> DisableAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken= default(CancellationToken));
+        public Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(Guid guid, CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<string> RemoveRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<Tuple<int, string>> GetTotalRecoveryLinksAsync(string email, CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<Tuple<int, string>> RemoveAllRecoveryLinksAsync(string email, CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<string> CreateRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken));
         public List<string> CreateAccount(IAccount account);
         public List<string> CreateConfirmationLink(IConfirmationLink _confirmationlink);
 
