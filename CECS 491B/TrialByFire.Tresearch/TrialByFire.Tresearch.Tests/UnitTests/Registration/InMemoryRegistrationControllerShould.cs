@@ -8,6 +8,7 @@ using TrialByFire.Tresearch.Managers.Implementations;
 using TrialByFire.Tresearch.Services.Implementations;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
+using Microsoft.AspNetCore.Mvc;
 using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
@@ -51,10 +52,11 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             //Arrange
             IAccount account = new Account(email, email, passphrase, "User", true, false);
             //Act
-            string result = _registrationController.RegisterAccount(email, passphrase);
+            IActionResult results = _registrationController.RegisterAccount(email, passphrase);
+            var objectResult = results as ObjectResult;
 
             //Assert
-            Assert.Equal('S', result[0]);
+            Assert.Equal(200, objectResult.StatusCode);
         }
 
         [Theory]
@@ -66,10 +68,11 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             IAccount account = new Account(email, "temporaryPassword");
 
             //Act
-            string result = _registrationController.SendConfirmation(email);
+            IActionResult results = _registrationController.SendConfirmation(email);
+            var objectResult = results as ObjectResult;
 
             //Assert
-            Assert.Equal('S', result[0]);
+            Assert.Equal(200, objectResult.StatusCode);
         }
 
 
@@ -86,11 +89,11 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             _sqlDAO.CreateConfirmationLink(_confirmationLink);
 
             //Act
-            string result = _registrationController.ConfirmAccount(url + _confirmationLink.UniqueIdentifier);
-
+            IActionResult results = _registrationController.ConfirmAccount(url + _confirmationLink.UniqueIdentifier);
+            var objectResult = results as ObjectResult;
 
             //Assert
-            Assert.Equal('S', result[0]);
+            Assert.Equal(200, objectResult.StatusCode);
         }
     }
 }

@@ -32,7 +32,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         /// <param name="guid">Unique identifier to the return link stored in database</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Tuple of recoverylink and statuscode string</returns>
-        public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(Guid guid, CancellationToken cancellationToken = default)
+        public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(Guid guid, CancellationToken cancellationToken = default(CancellationToken))
         {
             IRecoveryLink nullLink = null;  // To return if there is an exception
             try
@@ -59,7 +59,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         /// <param name="recoveryLink"> Link to remove from database</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>status code upon completion</returns>
-        public async Task<string> RemoveRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken=default)
+        public async Task<string> RemoveRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken= default(CancellationToken))
         {
             try
             {
@@ -80,7 +80,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        public async Task<string> RemoveAllRecoveryLinksAsync(string email, CancellationToken cancellationToken=default)
+        public async Task<string> RemoveAllRecoveryLinksAsync(string email, CancellationToken cancellationToken= default(CancellationToken))
         {
             try
             {
@@ -123,7 +123,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
         }
 
-        public async Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken=default)
+        public async Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken= default(CancellationToken))
         {
             IAccount nullAccount = null;
             try
@@ -143,7 +143,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        public async Task<Tuple<bool, string>> IsAccountDisabledAsync(IAccount account, CancellationToken cancellationToken = default)
+        public async Task<Tuple<bool, string>> IsAccountDisabledAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -169,7 +169,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        public async Task<Tuple<IRecoveryLink, string>> CreateRecoveryLinkAsync(IAccount account, CancellationToken cancellationToken=default)
+        public async Task<Tuple<IRecoveryLink, string>> CreateRecoveryLinkAsync(IAccount account, CancellationToken cancellationToken=default(CancellationToken))
         {
             IRecoveryLink linkCreated = null;
             string result = "";
@@ -214,7 +214,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        public async Task<string> EnableAccountAsync(IAccount account, CancellationToken cancellationToken=default)
+        public async Task<string> EnableAccountAsync(IAccount account, CancellationToken cancellationToken= default(CancellationToken))
         {
             string result = "";
             try

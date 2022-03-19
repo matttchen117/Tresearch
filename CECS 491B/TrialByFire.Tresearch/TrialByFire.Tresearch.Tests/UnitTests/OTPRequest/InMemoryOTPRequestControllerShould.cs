@@ -45,13 +45,13 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
         {
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
+            IMessageBank message = new MessageBank();
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             IMailService mailService = new MailService(messageBank);
             IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService, messageBank);
             IOTPRequestManager otpRequestManager = new OTPRequestManager(sqlDAO, logService, validationService, 
                 authenticationService, rolePrincipal, otpRequestService, messageBank, mailService);
-            IOTPRequestController otpRequestController = new OTPRequestController(sqlDAO, logService, 
-                otpRequestManager);
+            IOTPRequestController otpRequestController = new OTPRequestController(sqlDAO, logService, otpRequestManager, messageBank);
 
             // Act
             string result = otpRequestController.RequestOTP(username, passphrase, authorizationLevel);

@@ -12,6 +12,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         private string _sender = "no-reply@tresearch.systems";
         private string _senderName = "Tresearch Support";
         private string _confirmationTemplate = "d-a7af897441a34066b64fe416cf76d29b";
+        private string _recoveryTemplate = "";
 
         public MailService(IMessageBank messageBank) 
         { 
@@ -53,6 +54,29 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 return _messageBank.ErrorMessages["sendEmailFail"];
             }
             return _messageBank.SuccessMessages["generic"];
+        }
+
+        public async Task<string> SendRecoveryAsync(string email, string url, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                var client = new SendGridClient(_APIKey);
+                var confirmation = new SendGridMessage();
+                confirmation.SetFrom(_sender, _senderName);
+                confirmation.AddTo(email);
+                confirmation.SetTemplateId(_recoveryTemplate);
+                confirmation.SetTemplateData(new
+                {
+                    url = url
+                });
+                cancellationToken.ThrowIfCancellationRequested();
+                var result = client.SendEmailAsync(confirmation).Result;
+                return "200";
+            }
+            catch
+            {
+                return "500";
+            }
         }
     }
 }

@@ -8,6 +8,7 @@ using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
+using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 
@@ -49,10 +50,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 
 
             //Act
-            string results = _registrationController.RegisterAccount(email, passphrase);
+            IActionResult results = _registrationController.RegisterAccount(email, passphrase);
+            var objectResult = results as ObjectResult;
 
             //Assert
-            Assert.Equal('S', results[0]);
+            Assert.Equal(200, objectResult.StatusCode);
         }
 
         public void ConfirmTheUser(string url)

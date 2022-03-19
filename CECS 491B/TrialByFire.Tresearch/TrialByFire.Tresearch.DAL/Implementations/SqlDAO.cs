@@ -25,126 +25,163 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = messageBank;
         }
 
-
+        /// <summary>
+        ///     DisableAccountAsync()
+        ///         Disables accounts account passed in asynchrnously.
+        /// </summary>
+        /// <param name="account">Account to disable</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>String with statuscode</returns>
         public async Task<string> DisableAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
-            IAccount nullAccount = null;
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                cancellationToken.ThrowIfCancellationRequested();                                                       // Check if cancellation token has requested cancellation
+                using (var connection = new SqlConnection(_sqlConnectionString))                                        // Establish connection with database
                 {
-                    var procedure = "[DisableAccount]";
-                    var value = new { Username = account.Username, AuthorizationLevel = account.AuthorizationLevel };
+                    //Perform sql statement
+                    var procedure = "[DisableAccount]";                                                                 // Name of store procedure
+                    var value = new { Username = account.Username, AuthorizationLevel = account.AuthorizationLevel };   //Columns to check in database
                     int affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    if (affectedRows == 0)
-                    {
-                        return "404";
-                    }
-                    else if (affectedRows != 1)
-                    {
-                        return "500";
-                    }
+                    
+                    //Check if cancellation is requested
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        string rollbackResult = await EnableAccountAsync(account);
+                        //Cancellation has been requested, undo everything
+                        string rollbackResult = await EnableAccountAsync(account);                                      // Enables account.. result should be generic success
+                        if (rollbackResult != _messageBank.SuccessMessages["generic"])
+                            return _messageBank.ErrorMessages["rollbackFailed"];                                        // Rollback failed, account is still in database
+                        else
+                            return _messageBank.ErrorMessages["cancellationRequested"];                                 // Cancellation requested, successfully rolledback account disable
+                    }
+                    
+                    //Check rows affected... If account exists, should be 1 otherwise error
+                    if (affectedRows == 0)
+                        return _messageBank.ErrorMessages["accountNotFound"];                                           // Account doesn't exist
+                    else if (affectedRows != 1)
+                        return _messageBank.ErrorMessages["accountDisableFail"];                                        // Could not disable account
+                    return _messageBank.SuccessMessages["generic"];                                                     // Account successfully disabled
+                }   
+            }
+            catch (OperationCanceledException)                                              
+            {
+                // Cancellation requested, nothing to rollback
+                return _messageBank.ErrorMessages["cancellationRequested"];
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+
+        }
+        /// <summary>
+        ///     EnableAccountAsync()
+        ///         Enables accounts account passed in asynchrnously.
+        /// </summary>
+        /// <param name="account">Account to enable</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>String with statuscode</returns>
+        public async Task<string> EnableAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();                                                           // Check if cancellation token has requested cancellation
+                using (var connection = new SqlConnection(_sqlConnectionString))                                            // Establish connection with database
+                {
+                    //Perform sql statement
+                    var procedure = "[EnableAccount]";                                                                      // Store Procedure
+                    var value = new { Username = account.Username, AuthorizationLevel = account.AuthorizationLevel };
+                    int affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    
+                    // Check if cancellation is requested
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        string rollbackResult = await DisableAccountAsync(account);
                         if (rollbackResult != "200")
                             return "503";    // 503 Service Unavailable - Roll back failed
                         else
                             return "500";    // 500 Generic Failed - Roll back su
                     }
-                    return "200";
-                }
-            }
-            catch (OperationCanceledException ex)
-            {
-                return "499";
-            }
-            catch (Exception ex)
-            {
-                return "500";
-            }
 
-        }
-        public async Task<string> EnableAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            IAccount nullAccount = null;
-            try
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                using (var connection = new SqlConnection(_sqlConnectionString))
-                {
-                    var procedure = "[EnableAccount]";
-                    var value = new { Username = account.Username, AuthorizationLevel = account.AuthorizationLevel };
-                    int affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    //Check rows affected... If account exists, should be 1 otherwise error
                     if (affectedRows == 0)
-                    {
-                        return "404";
-                    } else if(affectedRows != 1)
-                    {
-                        return "500";
-                    }
-                }
-                
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    string rollbackResult = await DisableAccountAsync(account);
-                    if (rollbackResult != "200")
-                        return "503";    // 503 Service Unavailable - Roll back failed
-                    else
-                        return "500";    // 500 Generic Failed - Roll back su
-                }
-                return "200";
-                
+                        return _messageBank.ErrorMessages["accountNotFound"];                                               // Account doesn't exist
+                    else if (affectedRows != 1)
+                        return _messageBank.ErrorMessages["accountEnableFail"];                                             // Could not enable account
+                    return _messageBank.SuccessMessages["generic"];                                                         // Account successfully disabled
+                }                
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException)
             {
-                return "499";
+                // Cancellation requested, nothing to rollback
+                return _messageBank.ErrorMessages["cancellationRequested"];
             }
             catch (Exception ex)
             {
-                return "500" ;
+                return "500: Database: " + ex.Message;
             }
         }
 
+        /// <summary>
+        ///     GetAccountAsync()
+        ///         Returns an account 
+        /// </summary>
+        /// <param name="email">Email of account to find</param>
+        /// <param name="authorizationLevel">Authorization level of account to find</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Tuple containing account found (if not found, null) and string status code</returns>
         public async Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             IAccount nullAccount = null;
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if(Thread.CurrentPrincipal != null)
-                    return Tuple.Create(nullAccount, "403");
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
+                    //Perform sql statement
                     var procedure = "[GetAccount]";
                     var value = new { Username = email, AuthorizationLevel = authorizationLevel};
-                    var Accounts = await connection.QueryAsync<IAccount>(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    var Accounts = await connection.QueryAsync<Account>(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
-                    if (Accounts.Count() == 1)
-                        return Tuple.Create(Accounts.First(), "200");
+                    //Check if account was returned
+                    if (Accounts.Count() == 0)
+                        return Tuple.Create(nullAccount, _messageBank.ErrorMessages["accountNotFound"]);            //Account doesn't exist
+                    
+                    IAccount account = Accounts.First();
+
+
+                    // Check if cancellation is requested .. no rollback necessary
+                    if (cancellationToken.IsCancellationRequested)
+                        return Tuple.Create(nullAccount, _messageBank.ErrorMessages["cancellationRequested"]);
                     else
-                        return Tuple.Create(nullAccount, "404");
+                        return Tuple.Create(account, _messageBank.SuccessMessages["generic"]);
                 }
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException)
             {
-                return Tuple.Create(nullAccount, "499");
+                return Tuple.Create(nullAccount, _messageBank.ErrorMessages["cancellationRequested"]);
             }
             catch (Exception ex)
             {
-                return Tuple.Create(nullAccount, "500"); ;
+                return Tuple.Create(nullAccount, "500: Database: " + ex.Message);
             }
         }
+
+        /// <summary>
+        ///     RemoveRecoveryLinkAsync()
+        ///         Removes recovery link from database.
+        /// </summary>
+        /// <param name="recoveryLink">Recovery link to remove</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>String status code</returns>
         public async Task<string> RemoveRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (Thread.CurrentPrincipal != null)
-                    return "403";
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
+                    //Perform sql statement
                     var procedure = "[RemoveRecoveryLink]";
                     var value = new { GUIDLink = recoveryLink.GUIDLink };
                     var affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
