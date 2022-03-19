@@ -13,6 +13,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
     {
         private ISqlDAO _sqlDAO { get; set; }
         private ILogService _logService { get; set; }
+        private IMessageBank _messageBank { get; set; }
 
         /// <summary>
         ///     public RecoveryClass () :
@@ -20,10 +21,11 @@ namespace TrialByFire.Tresearch.Services.Implementations
         /// </summary>
         /// <param name="sqlDAO"> Data access layer used to interact with database</param>
         /// <param name="logService">Logger</param>
-        public RecoveryService(ISqlDAO sqlDAO, ILogService logService)
+        public RecoveryService(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
+            _messageBank = messageBank;
         }
         /// <summary>
         ///     GetRecoveryLinkAsync():
@@ -80,15 +82,15 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        public async Task<string> RemoveAllRecoveryLinksAsync(string email, CancellationToken cancellationToken= default(CancellationToken))
+        public async Task<string> RemoveAllRecoveryLinksAsync(string email, string authorizationLevel, CancellationToken cancellationToken= default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                Tuple<int, string> totalLinks = _sqlDAO.GetTotalRecoveryLinksAsync(email, cancellationToken).Result;
+                Tuple<int, string> totalLinks = _sqlDAO.GetTotalRecoveryLinksAsync(email, authorizationLevel,cancellationToken).Result;
                 if (totalLinks.Item1 > 0)
                 {
-                    Tuple<int, string> linksDeleted = await _sqlDAO.RemoveAllRecoveryLinksAsync(email, cancellationToken);
+                    Tuple<int, string> linksDeleted = await _sqlDAO.RemoveAllRecoveryLinksAsync(email, authorizationLevel, cancellationToken);
                     //Check if total links removed is equal to the total links with email in database
                     if (linksDeleted.Item1 == totalLinks.Item1)
                     {
@@ -130,16 +132,19 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 Tuple<IAccount, string> accountTuple = await _sqlDAO.GetAccountAsync(email, authorizationLevel, cancellationToken);
-                return accountTuple;
+                if (cancellationToken.IsCancellationRequested)                                                  //No rollback necessary if canceled
+                    return Tuple.Create(nullAccount, _messageBank.ErrorMessages["cancellationRequested"]);                                 // Request cancelled
+                else
+                    return accountTuple;
             }
             catch (OperationCanceledException ex)
             {
                 //Service has been cancelled
-                return Tuple.Create(nullAccount, "499");
+                return Tuple.Create(nullAccount, _messageBank.ErrorMessages["cancellationRequested"]);
             }
             catch (Exception ex)
             {
-                return Tuple.Create(nullAccount, "500");
+                return Tuple.Create(nullAccount, "500: Server: " + ex);
             }
         }
 
@@ -148,44 +153,45 @@ namespace TrialByFire.Tresearch.Services.Implementations
             try
             {
                 if (account.AccountStatus == false)
-                    return Tuple.Create(true, "200");
+                    return Tuple.Create(true, _messageBank.SuccessMessages["generic"]);
                 else
-                    return Tuple.Create(false, "200");
+                    return Tuple.Create(false, _messageBank.ErrorMessages["alreadyEnabled"]);
             }
             catch (ArgumentNullException ex)
             {
                 //Account passed in is null
-                return Tuple.Create(false, "404");
+                return Tuple.Create(false, _messageBank.SuccessMessages["accountNotFounds"]);
             }
             catch (OperationCanceledException ex)
             {
                 //Service has been cancelled
                 //No need to make changes (no changes made to db)
-                return Tuple.Create(false, "500");
+                return Tuple.Create(false, _messageBank.ErrorMessages["cancellationRequested"]);
             }
             catch (Exception ex)
             {
-                return Tuple.Create(false, "500");
+                return Tuple.Create(false, "500: Server: " + ex);
             }
         }
 
         public async Task<Tuple<IRecoveryLink, string>> CreateRecoveryLinkAsync(IAccount account, CancellationToken cancellationToken=default(CancellationToken))
         {
             IRecoveryLink linkCreated = null;
+            IRecoveryLink nullLink = null;
             string result = "";
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                Tuple<int, string> totalRecoveryLinks = await _sqlDAO.GetTotalRecoveryLinksAsync(account.Email, cancellationToken);
-                if(totalRecoveryLinks.Item1 == -1)
+                Tuple<int, string> totalRecoveryLinks = await _sqlDAO.GetTotalRecoveryLinksAsync(account.Email, account.AuthorizationLevel,cancellationToken);
+                if(totalRecoveryLinks.Item2 != _messageBank.SuccessMessages["generic"])
                 {
-                    return Tuple.Create(linkCreated, "500");
+                    return Tuple.Create(linkCreated, totalRecoveryLinks.Item2);
                     // Not sure of how many recovery links exist in database
                 } else if(totalRecoveryLinks.Item1 > 5)
                 {
                     // Only a max of 5 total RecoveryLinks per calendar month
                     // Return
-                    return Tuple.Create(linkCreated, "403"); // 403 Forbidden - Account has more than 5 links and cannot create more this calendar month
+                    return Tuple.Create(linkCreated, _messageBank.ErrorMessages["recoveryLinkLimitReached"]); // 403 Forbidden - Account has more than 5 links and cannot create more this calendar month
                 } else
                 {
                     linkCreated  = new RecoveryLink(account.Email, Guid.NewGuid(), DateTime.Now, account.AuthorizationLevel);
@@ -195,22 +201,22 @@ namespace TrialByFire.Tresearch.Services.Implementations
                         //Cancellation has been requested and changes have been made, need to roll back
                         string rollbackResult = await _sqlDAO.RemoveRecoveryLinkAsync(linkCreated);
                         linkCreated = null;
-                        if (rollbackResult != "200")
-                            return Tuple.Create(linkCreated, "503");    // 503 Service Unavailable - Roll back failed
+                        if (rollbackResult != _messageBank.SuccessMessages["generic"])
+                            return Tuple.Create(nullLink, _messageBank.ErrorMessages["rollbackFailed"]);    // 503 Service Unavailable - Roll back failed
                         else
-                            return Tuple.Create(linkCreated, "500");    // 500 Generic Failed - Roll back su
+                            return Tuple.Create(nullLink, _messageBank.ErrorMessages["cancellationRequested"]);    // 500 Generic Failed - Roll back su
                     }
-                    return Tuple.Create(linkCreated, "200");
+                    return Tuple.Create(linkCreated, result);
                 }
                 
             } catch (OperationCanceledException ex)
             {
                 // Cancelled before execution
-                return Tuple.Create(linkCreated, "500"); // 500 Generic Failed - cancel request
+                return Tuple.Create(nullLink, _messageBank.ErrorMessages["cancellationRequested"]);
             }
             catch (Exception ex)
             {
-                return Tuple.Create(linkCreated, "500"); // 500 Generic Failed - cancel request
+                return Tuple.Create(nullLink, _messageBank.ErrorMessages["cancellationRequested"]);
             }
         }
 
@@ -224,7 +230,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 if(cancellationToken.IsCancellationRequested && result == "200")
                 {
                     string rollbackResult = await _sqlDAO.DisableAccountAsync(account, cancellationToken);
-                    if (rollbackResult != "200")
+                    if (rollbackResult != _messageBank.SuccessMessages["generic"])
                         return rollbackResult;
                 }
                 return result;

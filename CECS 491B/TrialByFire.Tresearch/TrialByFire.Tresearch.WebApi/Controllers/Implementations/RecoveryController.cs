@@ -23,13 +23,15 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         private ILogService _logService { get; set; }
 
+        private IMessageBank _messageBank { get; set; }
         private IRecoveryManager _recoveryManager { get; set; }
 
 
-        public RecoveryController(ISqlDAO sqlDAO, ILogService logService, IRecoveryManager recoverManager)
+        public RecoveryController(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank,IRecoveryManager recoverManager)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
+            _messageBank = messageBank;
             _recoveryManager = recoverManager;
         }
 
@@ -40,10 +42,16 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             {
                 string baseUrl = "https://localhost:7010/Recovery/recover?=";
                 string result = await _recoveryManager.SendRecoveryEmail(email, baseUrl, authorizationLevel);
-                if (result == "200")
-                    return StatusCode(200, result);
-                else
-                    return StatusCode(500, result);
+                string[] split;
+                split = result.Split(":");
+                if(result == _messageBank.SuccessMessages["generic"])
+                {
+                    return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
+                } else
+                {
+                    return StatusCode(Convert.ToInt32(split[0]), split[2]);
+                }
+
             } 
             catch(OperationCanceledException ex)
             {

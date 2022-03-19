@@ -705,12 +705,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return Tuple.Create(nullAccount, "500");
         }
 
-        public async Task<Tuple<int, string>> GetTotalRecoveryLinksAsync(string email, CancellationToken cancellationToken)
+        public async Task<Tuple<int, string>> GetTotalRecoveryLinksAsync(string email, string authorizationLevel, CancellationToken cancellationToken)
         {
             return Tuple.Create(-1, "500");
         }
 
-        public async Task<Tuple<int, string>> RemoveAllRecoveryLinksAsync(string email, CancellationToken cancellationToken)
+        public async Task<Tuple<int, string>> RemoveAllRecoveryLinksAsync(string email, string authorizationLevel, CancellationToken cancellationToken)
         {
             return Tuple.Create(-1, "500");
         }

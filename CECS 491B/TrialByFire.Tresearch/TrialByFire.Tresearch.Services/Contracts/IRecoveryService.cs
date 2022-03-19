@@ -9,7 +9,7 @@ namespace TrialByFire.Tresearch.Services.Contracts
 
         public Task<string> RemoveRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken));
 
-        public Task<string> RemoveAllRecoveryLinksAsync(string email, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> RemoveAllRecoveryLinksAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
 
         public Task<Tuple<IAccount, string>>GetAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
 

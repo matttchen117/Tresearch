@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using System.Data;
 using System.Data.SqlClient;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Exceptions;
@@ -139,9 +140,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
                     //Perform sql statement
-                    var procedure = "[GetAccount]";
-                    var value = new { Username = email, AuthorizationLevel = authorizationLevel};
-                    var Accounts = await connection.QueryAsync<Account>(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
+          
+                    var procedure = "dbo.[GetAccount]";
+                    var parameters = new { Username = email, AuthorizationLevel = authorizationLevel };
+                    var Accounts = await connection.QueryAsync<Account>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure,cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                     //Check if account was returned
                     if (Accounts.Count() == 0)
@@ -184,143 +186,190 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Perform sql statement
                     var procedure = "[RemoveRecoveryLink]";
                     var value = new { GUIDLink = recoveryLink.GUIDLink };
-                    var affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    var affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
-                    if (affectedRows == 1)
-                        return "200";
+                    //Check if cancellation requested
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        string rollbackResults = await CreateRecoveryLinkAsync(recoveryLink);
+                        if (rollbackResults != _messageBank.SuccessMessages["generic"])
+                            return _messageBank.ErrorMessages["rollbackFailed"];
+                        else
+                            return _messageBank.ErrorMessages["cancellationRequested"];
+                    }
+                       
+                    //Check if recovery link removed
+                    if (affectedRows == 0)
+                        return _messageBank.ErrorMessages["accountNotFound"];
+                    else if (affectedRows == 1)
+                        return _messageBank.SuccessMessages["generic"];
                     else
-                        return "404";
+                        return _messageBank.ErrorMessages["recoveryLinkRemoveFail"];
                 }
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException)
             {
-                return "499";
+                return _messageBank.ErrorMessages["cancellationRequested"];
             }
             catch (Exception ex)
             {
-                return "500";
+                return "500: Database: " + ex.Message;
             }
         }
 
+        /// <summary>
+        ///     GetRecoveryLinkAsync()
+        ///         Return recovery link from database
+        /// </summary>
+        /// <param name="guid">Uniqueidentifier of link in database</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Tuple containing recovery link and string status code</returns>
         public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(Guid guid, CancellationToken cancellationToken = default(CancellationToken))
         {
             IRecoveryLink nullLink = null;
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (Thread.CurrentPrincipal != null)
-                    return null;
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var procedure = "[GetRecoveryLink]"; // Stored procedure
-                    var value = new { GUIDLink = guid};               // Guid to search in table
-                    var links = await connection.QueryAsync(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    if (links.Count() == 1)
-                        return Tuple.Create(links.First(), "200");
+                    //Perform sql statement
+                    var procedure = "[GetRecoveryLink]";                                    // Stored procedure
+                    var value = new { GUIDLink = guid};                                     // Guid to search in table
+                    var links = await connection.QueryAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    //Check for cancellation...no rollback necessary
+                    if (cancellationToken.IsCancellationRequested)
+                        return Tuple.Create(nullLink, _messageBank.ErrorMessages["cancellationRequested"]);
+                    
+                    //Return recoverylink if found
+                    if (links.Count() == 0)
+                        return Tuple.Create(nullLink, _messageBank.ErrorMessages["accountNotFound"]);
                     else
-                        return Tuple.Create(nullLink, "404");
+                        return Tuple.Create(links.First(), _messageBank.SuccessMessages["generic"]);
                 }
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException)
             {
-                return Tuple.Create(nullLink, "499");
+                return Tuple.Create(nullLink, _messageBank.ErrorMessages["cancellationRequested"]);
             }
             catch (Exception ex)
             {
-                return Tuple.Create(nullLink, "500");
+                return Tuple.Create(nullLink, "500: Database: " + ex);
             }   
         }
 
-        public async Task<Tuple<int,string>> GetTotalRecoveryLinksAsync(string email, CancellationToken cancellationToken = default(CancellationToken))
+        /// <summary>
+        ///     GetTotalRecoveryLinksAsync()
+        ///         Returns an integer count of all recovery links currently in the database matching credentials.
+        /// </summary>
+        /// <param name="email">Email credential of user</param>
+        /// <param name="authorizationLevel">Authorization level of user</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Tuple containing count of all recovery links and string status code</returns>
+        public async Task<Tuple<int,string>> GetTotalRecoveryLinksAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (Thread.CurrentPrincipal != null)
-                    return Tuple.Create(-1, "403");
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var procedure = "[GetTotalRecoveryLinks]"; // Stored procedure
-                    var value = new { Username = email };               // Guid to search in table
-                    var links = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    return Tuple.Create(links, "200");
+                    //Perform sql statement
+                    var procedure = "[GetTotalRecoveryLinks]";          // Stored procedure
+                    var value = new { Username = email, AuthorizationLevel = authorizationLevel};               // Guid to search in table
+                    int totalLinks = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    //Check for cancellation...no rollback necessary
+                    if (cancellationToken.IsCancellationRequested)
+                            return Tuple.Create(-1, _messageBank.ErrorMessages["cancellationRequested"]);
+
+                    return Tuple.Create(totalLinks, _messageBank.SuccessMessages["generic"]);
                 }
-            }
-            catch (SqlException ex)
-            {
-                return Tuple.Create(-1, "500");
             }
             catch (OperationCanceledException ex)
             {
-                return Tuple.Create(-1, "499");
+                return Tuple.Create(-1, _messageBank.ErrorMessages["cancellationRequested"]);
             }
             catch (Exception ex)
             {
-                return Tuple.Create(-1, "500");
+                return Tuple.Create(-1, "500: Database: " + ex);
             }
         }
 
-        public async Task<Tuple<int, string>> RemoveAllRecoveryLinksAsync(string email, CancellationToken cancellationToken= default(CancellationToken))
+        /// <summary>
+        ///     RemoveAllRecoveryLinksAsync()
+        ///         Removes all recovery lists existing in a database with a given email and authorization level 
+        /// </summary>
+        /// <param name="email">Email of user to delete recovery links</param>
+        /// <param name="authorizationLevel">Authorization level of user to delete recover links</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>Tuple containing integer of links removed and string status code</returns>
+        public async Task<Tuple<int, string>> RemoveAllRecoveryLinksAsync(string email, string authorizationLevel, CancellationToken cancellationToken= default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (Thread.CurrentPrincipal != null)
-                    return Tuple.Create(-1, "403");
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var procedure = "[RemoveAllRecoveryLinks]"; // Stored procedure
-                    var value = new { Username = email };               // Guid to search in table
-                    var links = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    return Tuple.Create(links, "200");
+                    //Perform sql statement
+                    var procedure = "[RemoveUserRecoveryLinks]"; // Stored procedure
+                    var value = new { Username = email, AuthorizationLevel = authorizationLevel};               // Guid to search in table
+                    int linksRemoved = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    
+                    //Check if links removed
+                    if (linksRemoved < 0)
+                        return Tuple.Create(-1, _messageBank.ErrorMessages["recoveryLinkRemoveFail"]);
+                    else
+                        return Tuple.Create(linksRemoved, _messageBank.SuccessMessages["generic"]);
                 }
             }
-            catch (SqlException ex)
+            catch (OperationCanceledException)
             {
-                return Tuple.Create(-1, "500");
-            }
-            catch (OperationCanceledException ex)
-            {
-                return Tuple.Create(-1, "499");
+                return Tuple.Create(-1, _messageBank.ErrorMessages["cancellationRequested"]);
             }
             catch (Exception ex)
             {
-                return Tuple.Create(-1, "500");
+                return Tuple.Create(-1, "500: Database: " + ex);
             }
         }
 
+        /// <summary>
+        ///     CreateRecoveryLinkAsync()
+        ///         Adds recovery link to database.
+        /// </summary>
+        /// <param name="recoveryLink">Recovery link object containing email, Guid, datetime created and authorization level of user</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>String status code</returns>
         public async Task<string> CreateRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken= default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (Thread.CurrentPrincipal != null)
-                    return "403";
-
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
+                    //Perform sql statement
                     var procedure = "[CreateRecoveryLink]";
-                    var value = new { recoveryLink };
-                    var affectedRows = await connection.QueryAsync(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    var value = new { Username = recoveryLink.Username, GUIDLink = recoveryLink.GUIDLink, TimeCreated = recoveryLink.TimeCreated, AuthorizationLevel = recoveryLink.AuthorizationLevel };
+                    var affectedRows = await connection.QueryAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
-                    if (affectedRows.Count() == 1)
-                        return "200 - Recovery link created";
-                    else
-                        return "500 - Unable to create link in database";
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        string rollbackResult = await RemoveRecoveryLinkAsync(recoveryLink);
+                        if (rollbackResult != _messageBank.SuccessMessages["generic"]) 
+                            return _messageBank.ErrorMessages["rollbackFailed"];
+                        else
+                            return _messageBank.ErrorMessages["cancellationRequested"];
+                    }
+
+                    return _messageBank.SuccessMessages["generic"];
                 }
             }
-            catch(SqlException ex)
+            catch (OperationCanceledException)
             {
-                return "500 - Sql Exception: " + ex.Message;
-            }
-            catch (OperationCanceledException ex)
-            {
-                return "500 - Operation Cancelled";
+                return _messageBank.ErrorMessages["cancellationRequested"];
             }
             catch (Exception ex)
             {
-               return "500 - Generic exception in sql: " + ex;
+               return "500: Database: " + ex;
             }
         }
 

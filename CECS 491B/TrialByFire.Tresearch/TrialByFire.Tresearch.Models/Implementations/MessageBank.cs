@@ -38,6 +38,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("notConfirmed", "401: Database: Please confirm your account before attempting to login.");
             // 403 Errors - Forbidden (User identity know, not Authorized)
             errorMessages.Add("alreadyAuthenticated", "403: Server: Active session found. Please logout and try again.");
+            errorMessages.Add("alreadyEnabled", "403: Server: Account is already enabled.");
+            errorMessages.Add("recoveryLinkLimitReached", "403: Server: Account has reached limit of five attempts this month");
             // 404 Errors - Not Found (Resource not found, interchangeable with 403 to hide existence
             //              of resource
             errorMessages.Add("notAuthorized", "404: Database: You are not authorized to perform this operation.");
@@ -54,6 +56,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("sendEmailFail", "503: Server: Email failed to send.");            
             errorMessages.Add("accountDisableFail", "503: Database: Failed to disable the account.");
             errorMessages.Add("accountEnableFail", "503: Database: Failed to enable the account.");
+            errorMessages.Add("recoveryLinkRemoveFail", "503: Database: Failed to remove recovery link.");
+            errorMessages.Add("recoveryLinkCreateFail", "504: Database: Failed to create recovery link.");
             errorMessages.Add("otpFail", "503: Database: Failed to create OTP.");
             errorMessages.Add("databaseFail", "503: Database: The database is down. Please try again later.");
             errorMessages.Add("logoutFail", "503: Server: Logout failed.");
