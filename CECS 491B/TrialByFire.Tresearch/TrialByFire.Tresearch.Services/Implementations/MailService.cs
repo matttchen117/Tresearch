@@ -12,7 +12,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         private string _sender = "no-reply@tresearch.systems";
         private string _senderName = "Tresearch Support";
         private string _confirmationTemplate = "d-a7af897441a34066b64fe416cf76d29b";
-        private string _recoveryTemplate = "";
+        private string _recoveryTemplate = "d-a7af897441a34066b64fe416cf76d29b";
 
         public MailService(IMessageBank messageBank) 
         { 
@@ -71,11 +71,12 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 });
                 cancellationToken.ThrowIfCancellationRequested();
                 var result = client.SendEmailAsync(confirmation).Result;
-                return "200";
+                return _messageBank.SuccessMessages["generic"];
+
             }
-            catch
+            catch(Exception ex)
             {
-                return "500";
+                return "500: Server: " + ex.Message;
             }
         }
     }

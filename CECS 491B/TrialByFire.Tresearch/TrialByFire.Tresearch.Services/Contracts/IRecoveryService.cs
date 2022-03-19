@@ -17,6 +17,8 @@ namespace TrialByFire.Tresearch.Services.Contracts
 
         public Task<Tuple<bool, string>> IsAccountDisabledAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken));
 
-        public Task<string> EnableAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> EnableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<string> DisableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

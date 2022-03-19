@@ -33,7 +33,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// <param name="account">Account to disable</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>String with statuscode</returns>
-        public async Task<string> DisableAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> DisableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -42,14 +42,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //Perform sql statement
                     var procedure = "[DisableAccount]";                                                                 // Name of store procedure
-                    var value = new { Username = account.Username, AuthorizationLevel = account.AuthorizationLevel };   //Columns to check in database
+                    var value = new { Username = email, AuthorizationLevel = authorizationLevel };   //Columns to check in database
                     int affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     
                     //Check if cancellation is requested
                     if (cancellationToken.IsCancellationRequested)
                     {
                         //Cancellation has been requested, undo everything
-                        string rollbackResult = await EnableAccountAsync(account);                                      // Enables account.. result should be generic success
+                        string rollbackResult = await EnableAccountAsync(email, authorizationLevel);                                      // Enables account.. result should be generic success
                         if (rollbackResult != _messageBank.SuccessMessages["generic"])
                             return _messageBank.ErrorMessages["rollbackFailed"];                                        // Rollback failed, account is still in database
                         else
@@ -82,7 +82,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// <param name="account">Account to enable</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>String with statuscode</returns>
-        public async Task<string> EnableAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> EnableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -91,13 +91,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //Perform sql statement
                     var procedure = "[EnableAccount]";                                                                      // Store Procedure
-                    var value = new { Username = account.Username, AuthorizationLevel = account.AuthorizationLevel };
+                    var value = new { Username = email, AuthorizationLevel =authorizationLevel };
                     int affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     
                     // Check if cancellation is requested
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        string rollbackResult = await DisableAccountAsync(account);
+                        string rollbackResult = await DisableAccountAsync(email, authorizationLevel);
                         if (rollbackResult != "200")
                             return "503";    // 503 Service Unavailable - Roll back failed
                         else
@@ -235,7 +235,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Perform sql statement
                     var procedure = "[GetRecoveryLink]";                                    // Stored procedure
                     var value = new { GUIDLink = guid};                                     // Guid to search in table
-                    var links = await connection.QueryAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    var links = await connection.QueryAsync<RecoveryLink>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                     //Check for cancellation...no rollback necessary
                     if (cancellationToken.IsCancellationRequested)
@@ -243,9 +243,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     
                     //Return recoverylink if found
                     if (links.Count() == 0)
-                        return Tuple.Create(nullLink, _messageBank.ErrorMessages["accountNotFound"]);
+                        return Tuple.Create(nullLink, _messageBank.ErrorMessages["recoveryLinkNotFound"]);
                     else
-                        return Tuple.Create(links.First(), _messageBank.SuccessMessages["generic"]);
+                    {
+                        IRecoveryLink link = links.First();
+                        return Tuple.Create(link, _messageBank.SuccessMessages["generic"]);
+                    }
+                        
                 }
             }
             catch (OperationCanceledException)

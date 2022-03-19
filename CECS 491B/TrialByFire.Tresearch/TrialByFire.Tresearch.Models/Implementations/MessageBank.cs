@@ -47,6 +47,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("notFoundOrEnabled", "404: Database: The account was not found or it has been disabled.");
             errorMessages.Add("notFoundOrAuthorized", "404: Database: Account not found or not authorized to perform the " +
                 "operation.");
+            errorMessages.Add("recoveryLinkNotFound", "404: Database: The recovery link was not found");
             // 408 Errors - Server side timeout
             errorMessages.Add("cancellationRequested", "408: Server: Cancellation token requested cancellation.");
             
