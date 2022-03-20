@@ -533,12 +533,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
 
         //1/6
-        public async Task<IViewKPI> GetViewKPI()
+        public async Task<IViewKPI> GetViewKPIAsync(CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             IViewKPI vKPI = new ViewKPI();
             try
             {
-                IList<View> views = GetAllViews();
+                IList<View> views = await GetAllViewsAsync(cancellationToken).ConfigureAwait(false);
                 if (views.Count == 0)
                 {
                     vKPI.result = "No Database Entires";
@@ -552,18 +553,19 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                vKPI.result = ex.Message;
+                vKPI.result = ("500: Database: " + ex.Message);
                 return vKPI;
             }
         }
 
         //2/6
-        public async Task<IViewDurationKPI> GetViewDurationKPI()
+        public async Task<IViewDurationKPI> GetViewDurationKPIAsync(CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             IViewDurationKPI vDKPI = new ViewDurationKPI();
             try
             {
-                IList<View> views = GetAllViews();
+                IList<View> views = await GetAllViewsAsync(cancellationToken).ConfigureAwait(false);
                 if(views.Count == 0)
                 {
                     vDKPI.result = "No Database Entries";
@@ -579,7 +581,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch(Exception ex)
             {
-                vDKPI.result = ex.Message;
+                vDKPI.result = ("500: Database: " + ex.Message);
                 return vDKPI;
             }
         }
@@ -623,12 +625,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }*/
 
         //3/6
-        public async Task<INodeKPI> GetNodeKPI(DateTime now)
+        public async Task<INodeKPI> GetNodeKPIAsync(DateTime now, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             INodeKPI nKPI = new NodeKPI();
             try
             {
-                IList<NodesCreated> nodes = GetNodesCreated(now);
+                IList<NodesCreated> nodes = await GetNodesCreatedAsync(now, cancellationToken).ConfigureAwait(false);
                 if(nodes.Count == 0)
                 {
                     nKPI.result = "No Database Entries";
@@ -643,7 +646,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch(Exception ex)
             {
-                nKPI.result = ex.Message;
+                nKPI.result = ("500: Database: " + ex.Message);
                 return nKPI;
             }
         }
@@ -671,12 +674,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }*/
 
         //4/6
-        public async Task<ILoginKPI> GetLoginKPI(DateTime now)
+        public async Task<ILoginKPI> GetLoginKPIAsync(DateTime now, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ILoginKPI lKPI = new LoginKPI();
             try
             {
-                IList<DailyLogin> logins = GetDailyLogin(now);
+                IList<DailyLogin> logins = new List<DailyLogin>();
+                logins = await GetDailyLoginAsync(now, cancellationToken).ConfigureAwait(false);
                 if(logins.Count == 0)
                 {
                     lKPI.result = "No Database Entries";
@@ -691,7 +696,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch(Exception ex)
             {
-                lKPI.result = ex.Message;
+                lKPI.result = ("500: Database: " + ex.Message);
                 return lKPI;
             }
         }
@@ -717,12 +722,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return registrationKPI;
         }*/
         //5/6
-        public async Task<IRegistrationKPI> GetRegistrationKPI(DateTime now)
+        public async Task<IRegistrationKPI> GetRegistrationKPIAsync(DateTime now, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             IRegistrationKPI rKPI = new RegistrationKPI();
             try
             {
-                IList<DailyRegistration> registrations = GetDailyRegistration(now);
+                IList<DailyRegistration> registrations = new List<DailyRegistration>();
+                registrations = await GetDailyRegistrationAsync(now, cancellationToken).ConfigureAwait(false);
                 if(registrations.Count == 0)
                 {
                     rKPI.result = "No Database Entries";
@@ -737,7 +744,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch(Exception ex)
             {
-                rKPI.result = ex.Message;
+                rKPI.result = ("500: Database: " + ex.Message);
                 return rKPI;
             }
         }
@@ -775,12 +782,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }*/
 
         //6/6
-        public async Task<ISearchKPI> GetSearchKPI(DateTime now)
+        public async Task<ISearchKPI> GetSearchKPIAsync(DateTime now, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ISearchKPI sKPI = new SearchKPI();
             try
             {
-                IList<TopSearch> searches = GetTopSearch(now);
+                IList<TopSearch> searches = new List<TopSearch>();
+                searches = await GetTopSearchAsync(now, cancellationToken).ConfigureAwait(false);
                 if(searches.Count == 0)
                 {
                     sKPI.result = "No Database Entries";
@@ -797,11 +806,63 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch(Exception ex)
             {
-                sKPI.result = ex.Message;
+                sKPI.result = ("500: Database: " + ex.Message);
                 return sKPI;
             }
         }
 
+        //Done
+        public async Task<List<View>> GetAllViewsAsync(CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            List<View> results = new List<View>();
+            try
+            {
+                using (var connection = new SqlConnection(_sqlConnectionString))
+                {
+                    //return connection.Execute<IView>("SELECT DateCreated, ViewName, Visits, AverageDuration from dbo.ViewTable").ToList();
+                    var selectQuery = "SELECT DateCreated, ViewName, Visits, AverageDuration FROM dbo.ViewTable";
+                    results = (await connection.QueryAsync<View>(new CommandDefinition(selectQuery, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+                    return results;
+                }
+            }
+            catch (Exception ex)
+            {
+                return results;
+            }
+        }
+
+        public string CreateView(IView view)
+        {
+            int affectedRows;
+            try
+            {
+                using (var connection = new SqlConnection(_sqlConnectionString))
+                {
+                    var insertQuery = @"INSERT INTO dbo.ViewTable (DateCreated, ViewName, Visits, AverageDuration)" +
+                        "Values (@DateCreated, @ViewName, @Visits, @AverageDuration)";
+                    affectedRows = connection.Execute(insertQuery, new
+                    {
+                        DateCreated = view.date,
+                        ViewName = view.viewName,
+                        Visits = view.visits,
+                        AverageDuration = view.averageDuration
+                    });
+                }
+                if (affectedRows == 1)
+                {
+                    return "View Creation Successful";
+                }
+                else
+                {
+                    return "View Creation Failed";
+                }
+            }
+            catch (Exception ex)
+            {
+                return "Fail";
+            }
+        }
 
         public string CreateNodesCreated(INodesCreated nodesCreated)
         {
@@ -828,13 +889,22 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public List<NodesCreated> GetNodesCreated(DateTime nodesCreatedDate)
+        public async Task<List<NodesCreated>> GetNodesCreatedAsync(DateTime nodesCreatedDate, CancellationToken cancellationToken = default)
         {
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            cancellationToken.ThrowIfCancellationRequested();
+            List<NodesCreated> results = new List<NodesCreated>();
+            try
             {
-                var selectQuery = "SELECT * FROM tresearchStudentServer.dbo.nodesCreated WHERE nodesCreatedDate BETWEEN DATEADD(day, -30, @nodeCreationDate) AND @nodeCreationDate";
-
-                return connection.Query<NodesCreated>(selectQuery, new { nodeCreationDate = nodesCreatedDate }).ToList();
+                using (var connection = new SqlConnection(_sqlConnectionString))
+                {
+                    var selectQuery = "SELECT * FROM tresearchStudentServer.dbo.nodesCreated WHERE nodesCreatedDate BETWEEN DATEADD(day, -30, @nodeCreationDate) AND @nodeCreationDate";
+                    results = (await connection.QueryAsync<NodesCreated>(new CommandDefinition(selectQuery, new { nodeCreationDate = nodesCreatedDate }, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+                    return results;
+                }
+            }
+            catch
+            {
+                return results;
             }
         }
 
@@ -887,24 +957,21 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public List<DailyLogin> GetDailyLogin(DateTime getDate)
+        public async Task<List<DailyLogin>> GetDailyLoginAsync(DateTime getDate, CancellationToken cancellationToken = default)
         {
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            cancellationToken.ThrowIfCancellationRequested();
+            List<DailyLogin> results = new List<DailyLogin>();
+            try
             {
-                var selectQuery = "SELECT * FROM tresearchStudentServer.dbo.dailyLogins WHERE loginDate BETWEEN DATEADD(day, -30, @loginDate) AND @loginDate";
-
-                return connection.Query<DailyLogin>(selectQuery, new { loginDate = getDate }).ToList();
+                using (var connection = new SqlConnection(_sqlConnectionString))
+                {
+                    var selectQuery = "SELECT * FROM tresearchStudentServer.dbo.dailyLogins WHERE loginDate BETWEEN DATEADD(day, -30, @loginDate) AND @loginDate";
+                    results = (await connection.QueryAsync<DailyLogin>(new CommandDefinition(selectQuery, new { loginDate = getDate }, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+                    return results;
+                }
             }
-        }
-
-        //Done
-        public IList<View> GetAllViews()
-        {
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            catch
             {
-                //return connection.Execute<IView>("SELECT DateCreated, ViewName, Visits, AverageDuration from dbo.ViewTable").ToList();
-                var selectQuery = "SELECT DateCreated, ViewName, Visits, AverageDuration FROM dbo.ViewTable";
-                List<View> results = connection.Query<View>(selectQuery).ToList();
                 return results;
             }
         }
@@ -959,13 +1026,22 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public List<TopSearch> GetTopSearch(DateTime getTopSearchDate)
+        public async Task<List<TopSearch>> GetTopSearchAsync(DateTime getTopSearchDate, CancellationToken cancellationToken = default)
         {
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            cancellationToken.ThrowIfCancellationRequested();
+            List<TopSearch> result = new List<TopSearch>();
+            try
             {
-                string selectQuery = "SELECT * FROM tresearchStudentServer.dbo.topSearches WHERE topSearchDate BETWEEN DATEADD(day, -30, @topSearchDate) AND @topSearchDate;";
-
-                return connection.Query<TopSearch>(selectQuery, new { topSearchDate = getTopSearchDate }).ToList();
+                using (var connection = new SqlConnection(_sqlConnectionString))
+                {
+                    string selectQuery = "SELECT * FROM tresearchStudentServer.dbo.topSearches WHERE topSearchDate BETWEEN DATEADD(day, -30, @topSearchDate) AND @topSearchDate;";
+                    result = (await connection.QueryAsync<TopSearch>(new CommandDefinition(selectQuery, new { topSearchDate = getTopSearchDate }, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+                    return result;
+                }
+            }
+            catch
+            {
+                return result;   
             }
         }
 
@@ -1018,45 +1094,23 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public string CreateView(IView view)
+
+        public async Task<List<DailyRegistration>> GetDailyRegistrationAsync(DateTime getRegistrationDate, CancellationToken cancellationToken)
         {
-            int affectedRows;
+            cancellationToken.ThrowIfCancellationRequested();
+            List<DailyRegistration> results = new List<DailyRegistration>();
             try
             {
                 using (var connection = new SqlConnection(_sqlConnectionString))
                 {
-                    var insertQuery = @"INSERT INTO dbo.ViewTable (DateCreated, ViewName, Visits, AverageDuration)" +
-                        "Values (@DateCreated, @ViewName, @Visits, @AverageDuration)";
-                    affectedRows = connection.Execute(insertQuery, new
-                    {
-                        DateCreated = view.date,
-                        ViewName = view.viewName,
-                        Visits = view.visits,
-                        AverageDuration = view.averageDuration
-                    });
-                }
-                if (affectedRows == 1)
-                {
-                    return "View Creation Successful";
-                }
-                else
-                {
-                    return "View Creation Failed";
+                    var selectQuery = "SELECT * FROM tresearchStudentServer.dbo.dailyRegistrations WHERE registrationDate BETWEEN DATEADD(day, -30, @registrationDate) AND @registrationDate";
+                    results = (await connection.QueryAsync<DailyRegistration>(new CommandDefinition(selectQuery, new { registrationDate = getRegistrationDate }, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+                    return results;
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                return "Fail";
-            }
-        }
-
-        public List<DailyRegistration> GetDailyRegistration(DateTime getRegistrationDate)
-        {
-            using (var connection = new SqlConnection(_sqlConnectionString))
-            {
-                var selectQuery = "SELECT * FROM tresearchStudentServer.dbo.dailyRegistrations WHERE registrationDate BETWEEN DATEADD(day, -30, @registrationDate) AND @registrationDate";
-
-                return connection.Query<DailyRegistration>(selectQuery, new { registrationDate = getRegistrationDate }).ToList();
+                return results;
             }
         }
 

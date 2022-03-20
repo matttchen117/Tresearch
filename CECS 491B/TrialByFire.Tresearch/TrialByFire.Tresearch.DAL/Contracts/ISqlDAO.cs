@@ -37,15 +37,16 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public string DeleteAccount(IRolePrincipal rolePrincipal);
 
         // KPI Methods
-        public Task<IViewKPI> GetViewKPI();
-        public Task<IViewDurationKPI> GetViewDurationKPI();
-        public Task<ILoginKPI> GetLoginKPI(DateTime now);
-        public Task<INodeKPI> GetNodeKPI(DateTime now);
-        public Task<IRegistrationKPI> GetRegistrationKPI(DateTime now);
-        public Task<ISearchKPI> GetSearchKPI(DateTime now);
+        public Task<IViewKPI> GetViewKPIAsync(CancellationToken cancellationToken = default);
+        public Task<IViewDurationKPI> GetViewDurationKPIAsync(CancellationToken cancellationToken = default);
+        public Task<ILoginKPI> GetLoginKPIAsync(DateTime now, CancellationToken cancellationToken = default);
+        public Task<INodeKPI> GetNodeKPIAsync(DateTime now, CancellationToken cancellationToken = default);
+        public Task<IRegistrationKPI> GetRegistrationKPIAsync(DateTime now, CancellationToken cancellationToken = default);
+        public Task<ISearchKPI> GetSearchKPIAsync(DateTime now, CancellationToken cancellationToken = default);
 
 
         public string CreateView(IView view);
+        public Task<List<View>> GetAllViewsAsync(CancellationToken cancellationToken = default);
 
 
         /*
@@ -95,7 +96,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         public string CreateNodesCreated(INodesCreated nodesCreated);
 
-        public List<NodesCreated> GetNodesCreated(DateTime nodeCreationDate);
+        public Task<List<NodesCreated>> GetNodesCreatedAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
 
         public string UpdateNodesCreated(INodesCreated nodesCreated);
 
@@ -103,21 +104,21 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         public string CreateDailyLogin(IDailyLogin dailyLogin);
 
-        public List<DailyLogin> GetDailyLogin(DateTime nodeCreationDate);
+        public Task<List<DailyLogin>> GetDailyLoginAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
 
         public string UpdateDailyLogin(IDailyLogin dailyLogin);
 
 
         public string CreateTopSearch(ITopSearch topSearch);
 
-        public List<TopSearch> GetTopSearch(DateTime nodeCreationDate);
+        public Task<List<TopSearch>> GetTopSearchAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
 
         public string UpdateTopSearch(ITopSearch topSearch);
 
 
         public string CreateDailyRegistration(IDailyRegistration dailyRegistration);
 
-        public List<DailyRegistration> GetDailyRegistration(DateTime nodeCreationDate);
+        public Task<List<DailyRegistration>> GetDailyRegistrationAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
 
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration);
     }

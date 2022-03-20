@@ -31,12 +31,17 @@ namespace TrialByFire.Tresearch.Services.Implementations
 			List<IKPI> kpiList = new List<IKPI>();
             try
             {
-				kpiList.Add(await _sqlDAO.GetViewKPI());
-				kpiList.Add(await _sqlDAO.GetViewDurationKPI());
-				kpiList.Add(await _sqlDAO.GetNodeKPI(now));
-				kpiList.Add(await _sqlDAO.GetSearchKPI(now));
-				kpiList.Add(await _sqlDAO.GetLoginKPI(now));
-				kpiList.Add(await _sqlDAO.GetRegistrationKPI(now));
+				kpiList.Add(await _sqlDAO.GetViewKPIAsync(cancellationToken).ConfigureAwait(false));
+				kpiList.Add(await _sqlDAO.GetViewDurationKPIAsync(cancellationToken).ConfigureAwait(false));
+				kpiList.Add(await _sqlDAO.GetNodeKPIAsync(now, cancellationToken).ConfigureAwait(false));
+				kpiList.Add(await _sqlDAO.GetSearchKPIAsync(now, cancellationToken).ConfigureAwait(false));
+				kpiList.Add(await _sqlDAO.GetLoginKPIAsync(now, cancellationToken).ConfigureAwait(false));
+				kpiList.Add(await _sqlDAO.GetRegistrationKPIAsync(now, cancellationToken).ConfigureAwait(false));
+				return kpiList;
+            }
+            catch(TaskCanceledException tcex)
+            {
+				kpiList.Add(new KPI(tcex.Message));
 				return kpiList;
             }
             catch(Exception ex)
