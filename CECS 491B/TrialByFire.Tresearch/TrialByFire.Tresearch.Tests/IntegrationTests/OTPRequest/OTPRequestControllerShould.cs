@@ -46,8 +46,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
             string expected)
         {
             // Arrange
+            IMessageBank messageBank = new MessageBank();
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+<<<<<<< HEAD
             if (!currentIdentity.Equals("guest"))
             {
                 Thread.CurrentPrincipal = rolePrincipal;
@@ -61,6 +63,14 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
             string[] expecteds = expected.Split(": ");
             ObjectResult expectedResult = new ObjectResult(expecteds[2])
             { StatusCode = Convert.ToInt32(expecteds[0]) };
+=======
+            IMailService mailService = new MailService(messageBank);
+            IOTPRequestService otpRequestService = new OTPRequestService(sqlDAO, logService, messageBank);
+            IOTPRequestManager otpRequestManager = new OTPRequestManager(sqlDAO, logService, validationService,
+                authenticationService, rolePrincipal, otpRequestService, messageBank, mailService);
+            IOTPRequestController otpRequestController = new OTPRequestController(sqlDAO, logService,
+                otpRequestManager, messageBank);
+>>>>>>> origin/JessieTestMerge
 
             // Act
             IActionResult result = await otpRequestController.RequestOTPAsync(username, passphrase, 

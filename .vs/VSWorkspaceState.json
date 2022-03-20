@@ -11,6 +11,10 @@
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\UnitTests\\AccountDeletion",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\UnitTests\\Authentication"
   ],
+<<<<<<< HEAD
   "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\TrialByFire.Tresearch.Tests.csproj",
+=======
+  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.sln",
+>>>>>>> origin/JessieTestMerge
   "PreviewInSolutionExplorer": false
 }
