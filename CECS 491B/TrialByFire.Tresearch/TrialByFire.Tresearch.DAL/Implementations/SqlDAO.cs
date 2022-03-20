@@ -16,8 +16,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public SqlDAO(IMessageBank messageBank, IOptions<BuildSettingsOptions> options)
         {
-            _sqlConnectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true";
-
             _messageBank = messageBank;
             _options = options.Value;
         }
@@ -870,7 +868,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             List<View> results = new List<View>();
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     //return connection.Execute<IView>("SELECT DateCreated, ViewName, Visits, AverageDuration from dbo.ViewTable").ToList();
                     var selectQuery = "SELECT DateCreated, ViewName, Visits, AverageDuration FROM dbo.ViewTable";
@@ -919,11 +917,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public string CreateNodesCreated(INodesCreated nodesCreated)
         {
             INodesCreated nodesCreated;
-
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            try
             {
-                var selectQuery = "SELECT * FROM Tresearch.nodes_created" +
-                                  "WHERE _node_creation_date >= @node_creation_date - 30";
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var selectQuery = "SELECT * FROM Tresearch.nodes_created" +
+                                      "WHERE _node_creation_date >= @node_creation_date - 30";
 
                     affectedRows = connection.Execute(insertQuery,
                                     new
@@ -932,7 +931,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                                         nodesCreatedCount = nodesCreated.nodeCreationCount
                                     });
                 }
-                 
                 return _messageBank.SuccessMessages["generic"];
             }
             catch (Exception ex)
@@ -947,7 +945,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             List<NodesCreated> results = new List<NodesCreated>();
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var selectQuery = "SELECT * FROM tresearchStudentServer.dbo.nodesCreated WHERE nodesCreatedDate BETWEEN DATEADD(day, -30, @nodeCreationDate) AND @nodeCreationDate";
                     results = (await connection.QueryAsync<NodesCreated>(new CommandDefinition(selectQuery, new { nodeCreationDate = nodesCreatedDate }, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
@@ -1013,7 +1011,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             IDailyLogin dailyLogin;
 
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
             {
                 var selectQuery = "SELECT * FROM Tresearch.daily_logins" +
                                     "WHERE _loginDate >= @login_date - 30";
@@ -1028,7 +1026,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             IDailyLogin logins;
 
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
             {
                 string updateQuery = @"UPDATE tresearchStudentServer.dbo.dailyLogins SET loginCount = @loginCount WHERE loginDate = @loginDate";
 
@@ -1080,7 +1078,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             ITopSearch topSearch;
 
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
             {
                 var selectQuery = "SELECT * FROM Tresearch.top_search" +
                                     "WHERE topSearchDate >= @top_search_date - 30";
@@ -1141,7 +1139,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             IDailyRegistration dailyRegistration;
 
-            using (var connection = new SqlConnection(_sqlConnectionString))
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
             {
                 var selectQuery = "SELECT * FROM Tresearch.daily_registrations" +
                                     "WHERE _registrationDate >= @registration_date - 30";

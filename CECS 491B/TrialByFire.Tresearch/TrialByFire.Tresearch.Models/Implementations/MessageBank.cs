@@ -38,12 +38,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("notConfirmed", "401: Database: Please confirm your account before attempting to login.");
             // 403 Errors - Forbidden (User identity known, not Authorized)
             errorMessages.Add("alreadyAuthenticated", "403: Server: Active session found. Please logout and try again.");
-<<<<<<< HEAD
             errorMessages.Add("notAuthorized", "403: Database: You are not authorized to perform this operation.");
-=======
             errorMessages.Add("alreadyEnabled", "403: Server: Account is already enabled.");
             errorMessages.Add("recoveryLinkLimitReached", "403: Server: Account has reached limit of five attempts this month");
->>>>>>> origin/Pammy-to-Merge
             // 404 Errors - Not Found (Resource not found, interchangeable with 403 to hide existence
             //              of resource)
             errorMessages.Add("accountNotFound", "404: Database: The account was not found.");
