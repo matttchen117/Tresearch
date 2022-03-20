@@ -752,6 +752,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return _messageBank.ErrorMessages["dailyRegistrationNotExist"];
         }
 
+<<<<<<< HEAD
         public string CreateView(IView view)
         {
             foreach (IView view1 in InMemoryDatabase.Views)
@@ -772,5 +773,49 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             List<View> viewList = new List<View>();
             return viewList;
         }
+=======
+        public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(Guid guid, CancellationToken cancellationToken)
+        {
+            IRecoveryLink nullLink = null;
+            return Tuple.Create(nullLink, "200");
+        }
+
+        public async Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authenticationLevel, CancellationToken cancellationToken)
+        {
+            IAccount nullAccount = null;
+            return Tuple.Create(nullAccount, "500");
+        }
+
+        public async Task<Tuple<int, string>> GetTotalRecoveryLinksAsync(string email, string authorizationLevel, CancellationToken cancellationToken)
+        {
+            return Tuple.Create(-1, "500");
+        }
+
+        public async Task<Tuple<int, string>> RemoveAllRecoveryLinksAsync(string email, string authorizationLevel, CancellationToken cancellationToken)
+        {
+            return Tuple.Create(-1, "500");
+        }
+
+        public async Task<string> RemoveRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken)
+        {
+            return "500";
+        }
+
+        public async Task<string> EnableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "500";
+        }
+
+        public async Task<string> DisableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "500";
+        }
+
+        public async Task<string> CreateRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "500";
+        }
+
+>>>>>>> origin/Pammy-to-Merge
     }
 }

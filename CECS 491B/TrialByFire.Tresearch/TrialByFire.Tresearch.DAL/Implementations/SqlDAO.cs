@@ -16,17 +16,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public SqlDAO(IMessageBank messageBank, IOptions<BuildSettingsOptions> options)
         {
-<<<<<<< HEAD
-=======
-            _sqlConnectionString = "Data Source=tresearchstudentserver.database.windows.net;Initial Catalog=tresearchStudentServer;User ID=tresearchadmin;Password=CECS491B!;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+            _sqlConnectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true";
 
-            _messageBank = messageBank;
-        }
-
-        public SqlDAO(string sqlConnectionString, IMessageBank messageBank)
-        {
-            _sqlConnectionString = sqlConnectionString;
->>>>>>> origin/JessieTestMerge
             _messageBank = messageBank;
             _options = options.Value;
         }
@@ -879,7 +870,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             List<View> results = new List<View>();
             try
             {
-                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                using (var connection = new SqlConnection(_sqlConnectionString))
                 {
                     //return connection.Execute<IView>("SELECT DateCreated, ViewName, Visits, AverageDuration from dbo.ViewTable").ToList();
                     var selectQuery = "SELECT DateCreated, ViewName, Visits, AverageDuration FROM dbo.ViewTable";
@@ -898,7 +889,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var insertQuery = @"INSERT INTO dbo.ViewTable (DateCreated, ViewName, Visits, AverageDuration)" +
                         "Values (@DateCreated, @ViewName, @Visits, @AverageDuration)";
@@ -927,18 +918,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public string CreateNodesCreated(INodesCreated nodesCreated)
         {
-<<<<<<< HEAD
             INodesCreated nodesCreated;
 
-            using (var connection = new SqlConnection(_options.SqlConnectionString))
-=======
-            int affectedRows;
-            try
->>>>>>> origin/JessieTestMerge
+            using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
-                {
-                    var insertQuery = @"INSERT INTO tresearchStudentServer.dbo.NodesCreated (nodesCreatedDate, nodesCreatedCount) VALUES (@nodesCreatedDate, @nodesCreatedCount)";
+                var selectQuery = "SELECT * FROM Tresearch.nodes_created" +
+                                  "WHERE _node_creation_date >= @node_creation_date - 30";
 
                     affectedRows = connection.Execute(insertQuery,
                                     new
@@ -1026,38 +1011,24 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public async Task<List<DailyLogin>> GetDailyLoginAsync(DateTime getDate, CancellationToken cancellationToken = default)
         {
-<<<<<<< HEAD
             IDailyLogin dailyLogin;
 
-            using (var connection = new SqlConnection(_options.SqlConnectionString))
-=======
-            cancellationToken.ThrowIfCancellationRequested();
-            List<DailyLogin> results = new List<DailyLogin>();
-            try
->>>>>>> origin/JessieTestMerge
+            using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
-                {
-                    var selectQuery = "SELECT * FROM tresearchStudentServer.dbo.dailyLogins WHERE loginDate BETWEEN DATEADD(day, -30, @loginDate) AND @loginDate";
-                    results = (await connection.QueryAsync<DailyLogin>(new CommandDefinition(selectQuery, new { loginDate = getDate }, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
-                    return results;
-                }
+                var selectQuery = "SELECT * FROM Tresearch.daily_logins" +
+                                    "WHERE _loginDate >= @login_date - 30";
+
+                dailyLogin = connection.QuerySingle<IDailyLogin>(selectQuery, new { login_date = loginDate });
             }
-            catch
-            {
-                return results;
-            }
+
+            return dailyLogin;
         }
 
         public string UpdateDailyLogin(IDailyLogin dailyLogin)
         {
-<<<<<<< HEAD
             IDailyLogin logins;
 
-            using (var connection = new SqlConnection(_options.SqlConnectionString))
-=======
             using (var connection = new SqlConnection(_sqlConnectionString))
->>>>>>> origin/JessieTestMerge
             {
                 string updateQuery = @"UPDATE tresearchStudentServer.dbo.dailyLogins SET loginCount = @loginCount WHERE loginDate = @loginDate";
 
@@ -1105,28 +1076,15 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<List<TopSearch>> GetTopSearchAsync(DateTime getTopSearchDate, CancellationToken cancellationToken = default)
+        public ITopSearch GetTopSearch(DateTime topSearchDate)
         {
-<<<<<<< HEAD
             ITopSearch topSearch;
 
-            using (var connection = new SqlConnection(_options.SqlConnectionString))
-=======
-            cancellationToken.ThrowIfCancellationRequested();
-            List<TopSearch> result = new List<TopSearch>();
-            try
->>>>>>> origin/JessieTestMerge
+            using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
-                {
-                    string selectQuery = "SELECT * FROM tresearchStudentServer.dbo.topSearches WHERE topSearchDate BETWEEN DATEADD(day, -30, @topSearchDate) AND @topSearchDate;";
-                    result = (await connection.QueryAsync<TopSearch>(new CommandDefinition(selectQuery, new { topSearchDate = getTopSearchDate }, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
-                    return result;
-                }
-            }
-            catch
-            {
-                return result;   
+                var selectQuery = "SELECT * FROM Tresearch.top_search" +
+                                    "WHERE topSearchDate >= @top_search_date - 30";
+                topSearch = connection.QuerySingle<ITopSearch>(selectQuery, new { top_search_date = topSearchDate });
             }
         }
 
@@ -1179,27 +1137,16 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-
-<<<<<<< HEAD
-            using (var connection = new SqlConnection(_options.SqlConnectionString))
-=======
-        public async Task<List<DailyRegistration>> GetDailyRegistrationAsync(DateTime getRegistrationDate, CancellationToken cancellationToken)
+        public IDailyRegistration GetDailyRegistration(DateTime dailyRegistrationDate)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            List<DailyRegistration> results = new List<DailyRegistration>();
-            try
->>>>>>> origin/JessieTestMerge
+            IDailyRegistration dailyRegistration;
+
+            using (var connection = new SqlConnection(_sqlConnectionString))
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
-                {
-                    var selectQuery = "SELECT * FROM tresearchStudentServer.dbo.dailyRegistrations WHERE registrationDate BETWEEN DATEADD(day, -30, @registrationDate) AND @registrationDate";
-                    results = (await connection.QueryAsync<DailyRegistration>(new CommandDefinition(selectQuery, new { registrationDate = getRegistrationDate }, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
-                    return results;
-                }
-            }
-            catch
-            {
-                return results;
+                var selectQuery = "SELECT * FROM Tresearch.daily_registrations" +
+                                    "WHERE _registrationDate >= @registration_date - 30";
+
+                dailyRegistration = connection.QuerySingle<IDailyRegistration>(selectQuery, new { registration_date = dailyRegistrationDate });
             }
         }
 

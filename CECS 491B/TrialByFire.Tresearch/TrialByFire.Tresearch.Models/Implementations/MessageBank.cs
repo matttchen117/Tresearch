@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,21 +38,36 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("notConfirmed", "401: Database: Please confirm your account before attempting to login.");
             // 403 Errors - Forbidden (User identity known, not Authorized)
             errorMessages.Add("alreadyAuthenticated", "403: Server: Active session found. Please logout and try again.");
+<<<<<<< HEAD
             errorMessages.Add("notAuthorized", "403: Database: You are not authorized to perform this operation.");
+=======
+            errorMessages.Add("alreadyEnabled", "403: Server: Account is already enabled.");
+            errorMessages.Add("recoveryLinkLimitReached", "403: Server: Account has reached limit of five attempts this month");
+>>>>>>> origin/Pammy-to-Merge
             // 404 Errors - Not Found (Resource not found, interchangeable with 403 to hide existence
             //              of resource)
             errorMessages.Add("accountNotFound", "404: Database: The account was not found.");
             errorMessages.Add("notFoundOrEnabled", "404: Database: The account was not found or it has been disabled.");
             errorMessages.Add("notFoundOrAuthorized", "404: Database: Account not found or not authorized to perform the " +
                 "operation.");
+            errorMessages.Add("recoveryLinkNotFound", "404: Database: The recovery link was not found");
+            // 408 Errors - Server side timeout
+            errorMessages.Add("cancellationRequested", "408: Server: Cancellation token requested cancellation.");
+            
+
             //503 Errors - Service Unavailable (Server unable to handle request)
             errorMessages.Add("cookieFail", "503: Server: Authentication Cookie creation failed.");
             errorMessages.Add("sendEmailFail", "503: Server: Email failed to send.");            
             errorMessages.Add("accountDisableFail", "503: Database: Failed to disable the account.");
+            errorMessages.Add("accountEnableFail", "503: Database: Failed to enable the account.");
+            errorMessages.Add("recoveryLinkRemoveFail", "503: Database: Failed to remove recovery link.");
+            errorMessages.Add("recoveryLinkCreateFail", "504: Database: Failed to create recovery link.");
             errorMessages.Add("otpFail", "503: Database: Failed to create OTP.");
             errorMessages.Add("databaseFail", "503: Database: The database is down. Please try again later.");
             errorMessages.Add("logoutFail", "503: Server: Logout failed.");
+            errorMessages.Add("rollbackFailed", "504: Server rollback failed");
             
+    
 
 
             errorMessages.Add("createdNodesExists", "Fail - Created Nodes Already Exists");

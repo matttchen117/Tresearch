@@ -26,24 +26,19 @@ namespace TrialByFire.Tresearch.Tests
         public IValidationService ValidationService { get; }
         public IAccountDeletionService AccountDeletionService { get; }
 
+
+        private string _connectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true";
+
+
         public IntegrationTestDependencies()
         {
-            _buildSettingsOptions = new BuildSettingsOptions()
-            {
-                Environment = "Test",
-                SqlConnectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true",
-                SendGridAPIKey = ""
-            };
-            BuildSettingsOptions = Options.Create(_buildSettingsOptions);
-
-
-            MessageBank = new MessageBank();
-            SqlDAO = new SqlDAO(MessageBank, BuildSettingsOptions);
-            SqlLogService = new SqlLogService(SqlDAO);
-            AuthenticationService = new AuthenticationService(SqlDAO, SqlLogService, MessageBank);
-            AuthorizationService = new AuthorizationService(SqlDAO, SqlLogService);
-            ValidationService = new ValidationService(MessageBank);
-            AccountDeletionService = new AccountDeletionService(SqlDAO, SqlLogService);
+            messageBank = new MessageBank();
+            sqlDAO = new SqlDAO(_connectionString, messageBank);
+            logService = new SqlLogService(sqlDAO);
+            authenticationService = new AuthenticationService(sqlDAO, logService, messageBank);
+            authorizationService = new AuthorizationService(sqlDAO, logService);
+            validationService = new ValidationService(messageBank);
+            accountDeletionService = new AccountDeletionService(sqlDAO, logService, rolePrincipal);
         }
     }
 }
