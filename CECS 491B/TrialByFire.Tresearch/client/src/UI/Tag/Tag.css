@@ -1,0 +1,17 @@
+
+
+.tag {
+    display: inline-block;
+    position: relative;
+    padding: 0 20px 0 20px;
+    margin: 0 10px 10px 0;
+    background-color: #2b9348;
+    color: white;
+    border-radius: 5px 5px 5px 5px;
+    height: 25px;
+    line-height: 20px;
+}
+
+.tag:hover{
+background-color: #aacc00;
+}

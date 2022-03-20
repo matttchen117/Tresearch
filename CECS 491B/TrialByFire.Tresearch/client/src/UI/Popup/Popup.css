@@ -6,7 +6,7 @@
 
 .container {
     position: relative;
-    margin-top: calc(100vh - 85vh - 20px);
+    margin-top: 0px;
 }
 
 .close-icon {
