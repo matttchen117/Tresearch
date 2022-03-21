@@ -9,6 +9,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 {
     public interface ILogService
     {
-        string CreateLog(DateTime timestamp, string level, string username, string category, string description);
+        public Task<string> CreateLog(DateTime timestamp, string level, string username, 
+            string category, string description, CancellationToken cancellationToken = default);
     }
 }

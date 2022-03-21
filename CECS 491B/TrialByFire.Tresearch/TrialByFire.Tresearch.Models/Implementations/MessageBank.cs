@@ -32,6 +32,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
             {
                 case Responses.generic:
                     return "200: Server: success";
+                case Responses.storeLogFail:
+                    return "503: Database: Failed to store the log.";
                 case Responses.badNameOrPass:
                     return "400: Data: Invalid Username or Passphrase. Please try again.";
                 case Responses.badNameOrOTP:

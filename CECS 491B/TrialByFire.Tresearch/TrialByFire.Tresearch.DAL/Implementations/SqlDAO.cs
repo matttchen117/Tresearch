@@ -21,6 +21,29 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _options = options.Value;
         }
 
+        public async Task<string> StoreLogAsync(ILog log, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            using(var connection = new SqlConnection(_options.SqlConnectionString))
+            {
+                var procedure = "[StoreLog]";                                                               
+                var value = new { Timestamp = log.Timestamp, Level = log.Level, Username = log.Username, 
+                Category = log.Category, Description = log.Description };   
+                int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                if (affectedRows != 1)
+                {
+                    affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    if (affectedRows != 1)
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.storeLogFail).ConfigureAwait(false);
+                    }
+                }
+            }
+            return await _messageBank.GetMessage(IMessageBank.Responses.generic).ConfigureAwait(false);
+        }
+
+
         /// <summary>
         ///     DisableAccountAsync()
         ///         Disables accounts account passed in asynchrnously.
