@@ -56,9 +56,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
                 Thread.CurrentPrincipal = rolePrincipal;
             }
             IAuthenticationManager authenticationManager = new AuthenticationManager(SqlDAO,
-                SqlLogService, ValidationService, AuthenticationService, MessageBank);
+                LogService, ValidationService, AuthenticationService, MessageBank);
             IAuthenticationController authenticationController = new AuthenticationController(SqlDAO,
-                SqlLogService, authenticationManager, MessageBank, BuildSettingsOptions);
+                LogService, authenticationManager, MessageBank, BuildSettingsOptions);
             DateTime now = new DateTime(year, month, day, hour, minute, second);
             string[] expecteds = expected.Split(": ");
             ObjectResult expectedResult = new ObjectResult(expecteds[2])

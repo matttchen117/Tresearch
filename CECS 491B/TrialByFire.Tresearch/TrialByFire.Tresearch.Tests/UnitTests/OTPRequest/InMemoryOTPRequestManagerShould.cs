@@ -44,20 +44,20 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            if(!currentIdentity.Equals("guest"))
+            if (!currentIdentity.Equals("guest"))
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }
             IMailService mailService = new MailService(MessageBank);
             IOTPRequestService otpRequestService = new OTPRequestService(SqlDAO, LogService, MessageBank);
             IOTPRequestManager otpRequestManager = new OTPRequestManager(SqlDAO, LogService, ValidationService,
-                AuthenticationService, otpRequestService, MessageBank, mailService);;
+                AuthenticationService, otpRequestService, MessageBank, mailService);
             CancellationTokenSource cancellationTokenSource =
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             // Act
-            string result = await otpRequestManager.RequestOTPAsync(username, passphrase, 
-                authorizationLevel, cancellationTokenSource.Token);
+            string result = await otpRequestManager.RequestOTPAsync(username, passphrase,
+                authorizationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, result);

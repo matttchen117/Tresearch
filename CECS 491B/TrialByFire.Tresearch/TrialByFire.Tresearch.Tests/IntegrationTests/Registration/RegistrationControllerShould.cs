@@ -26,9 +26,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public RegistrationControllerShould() : base()
         {
             _mailService = new MailService(MessageBank);
-            _registrationService = new RegistrationService(SqlDAO, SqlLogService);
-            _registrationManager = new RegistrationManager(SqlDAO, SqlLogService, _registrationService, _mailService, ValidationService, MessageBank);
-            _registrationController = new RegistrationController(SqlDAO, SqlLogService, _registrationService, _mailService, MessageBank, ValidationService, _registrationManager);
+            _registrationService = new RegistrationService(SqlDAO, LogService);
+            _registrationManager = new RegistrationManager(SqlDAO, LogService, _registrationService, _mailService, ValidationService, MessageBank);
+            _registrationController = new RegistrationController(SqlDAO, LogService, _registrationService, _mailService, MessageBank, ValidationService, _registrationManager);
         }
 
         [Theory]

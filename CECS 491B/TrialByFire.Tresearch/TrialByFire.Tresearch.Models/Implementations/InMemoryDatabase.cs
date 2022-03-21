@@ -27,6 +27,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public IList<IConfirmationLink> ConfirmationLinks { get; set; }
         public IList<IView> Views { get; set; }
 
+        public IList<ILog> Logs { get; set; }
+
         public InMemoryDatabase()
         {
             OTPClaims = InitializeOTPClaims();
@@ -41,6 +43,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             DailyRegistrations = InitializeDailyRegistrations();
             ConfirmationLinks = InitializeConfirmationLinks();
             Views = InitializeViews();
+            Logs = InitializeLogs();
         }
 
         /*
@@ -568,6 +571,12 @@ namespace TrialByFire.Tresearch.Models.Implementations
             views.Add(new View(new DateTime(2022, 3, 1), "Authenticaton", 30, 69.69));
             views.Add(new View(new DateTime(2022, 2, 28), "Authorization", 70, 46.78));
             return views;
+        }
+
+        private List<ILog> InitializeLogs()
+        {
+            List<ILog> logs = new List<ILog>();
+            return logs;
         }
     }
 }

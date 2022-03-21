@@ -26,7 +26,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 		{
 			// Arrange
 <<<<<<< HEAD
-			IUADService uadService = new UADService(SqlDAO, SqlLogService);
+			IUADService uadService = new UADService(SqlDAO, LogService);
 =======
 			IUADService uadService = new UADService(sqlDAO, logService);
 			CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));

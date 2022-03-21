@@ -18,7 +18,7 @@ builder.Services.Configure<BuildSettingsOptions>(
 builder.Services.AddScoped<IMessageBank, MessageBank>();
 builder.Services.AddScoped<ISqlDAO, SqlDAO>();
 // Service
-builder.Services.AddScoped<ILogService, SqlLogService>();
+builder.Services.AddScoped<ILogService, LogService>();
 builder.Services.AddScoped<IAccountDeletionService, AccountDeletionService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();

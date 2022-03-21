@@ -15,7 +15,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 
         public RegistrationServiceShould() : base()
         {
-            _registrationService = new RegistrationService(SqlDAO, SqlLogService);
+            _registrationService = new RegistrationService(SqlDAO, LogService);
         }
 
 
