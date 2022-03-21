@@ -163,10 +163,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var procedure = "dbo.[GetAccount]";
                     var parameters = new { Username = email, AuthorizationLevel = authorizationLevel };
                     var Accounts = await connection.QueryAsync<Account>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-
+          
                     //Check if account was returned
                     if (Accounts.Count() == 0)
-                        return Tuple.Create(nullAccount, _messageBank.ErrorMessages["accountNotFound"]);            //Account doesn't exist
+                        return Tuple.Create(nullAccount, _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result);            //Account doesn't exist
 
                     IAccount account = Accounts.First();
 
@@ -184,7 +184,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return Tuple.Create(nullAccount, "500: Database: " + ex.Message);
+                return Tuple.Create(nullAccount, "500: server:" + ex.Message);
             }
         }
 
@@ -243,7 +243,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// <param name="guid">Uniqueidentifier of link in database</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Tuple containing recovery link and string status code</returns>
-        public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(Guid guid, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken))
         {
             IRecoveryLink nullLink = null;
             try
@@ -254,26 +254,26 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Perform sql statement
                     var procedure = "[GetRecoveryLink]";                                    // Stored procedure
                     var value = new { GUIDLink = guid };                                     // Guid to search in table
-                    var links = await connection.QueryAsync<RecoveryLink>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-
+                    var links = await connection.QueryAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    
                     //Check for cancellation...no rollback necessary
                     if (cancellationToken.IsCancellationRequested)
-                        return Tuple.Create(nullLink, _messageBank.ErrorMessages["cancellationRequested"]);
+                        return Tuple.Create(nullLink, _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result);
 
                     //Return recoverylink if found
                     if (links.Count() == 0)
-                        return Tuple.Create(nullLink, _messageBank.ErrorMessages["recoveryLinkNotFound"]);
+                        return Tuple.Create(nullLink, _messageBank.GetMessage(IMessageBank.Responses.recoveryLinkNotFound).Result);
                     else
                     {
                         IRecoveryLink link = links.First();
-                        return Tuple.Create(link, _messageBank.SuccessMessages["generic"]);
+                        return Tuple.Create(link, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
                     }
 
                 }
             }
             catch (OperationCanceledException)
             {
-                return Tuple.Create(nullLink, _messageBank.ErrorMessages["cancellationRequested"]);
+                return Tuple.Create(nullLink, _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result);
             }
             catch (Exception ex)
             {

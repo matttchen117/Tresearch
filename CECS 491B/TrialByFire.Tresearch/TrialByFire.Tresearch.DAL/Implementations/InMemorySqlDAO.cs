@@ -779,7 +779,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return viewList;
         }
 
-        public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(Guid guid, CancellationToken cancellationToken)
+        public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(string guid, CancellationToken cancellationToken)
         {
             IRecoveryLink nullLink = null;
             return Tuple.Create(nullLink, "200");

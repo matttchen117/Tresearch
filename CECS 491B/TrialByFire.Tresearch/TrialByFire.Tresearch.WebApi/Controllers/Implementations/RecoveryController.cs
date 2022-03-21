@@ -60,21 +60,14 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         }
 
         [HttpPost("recover")]
-        public async Task<IActionResult> EnableAccountAsync(Guid guid)
+        public async Task<IActionResult> EnableAccountAsync(string guid)
         {
             try
             {
                 string result = await _recoveryManager.EnableAccountAsync(guid, _cancellationTokenSource.Token);
                 string[] split;
                 split = result.Split(":");
-                if (result == _messageBank.SuccessMessages["generic"])
-                {
-                    return new OkObjectResult(split[1]) { StatusCode = Convert.ToInt32(split[0]) };
-                }
-                else
-                {
-                    return StatusCode(Convert.ToInt32(split[0]), split[2]);
-                }
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
             catch (Exception ex)
             {

@@ -24,6 +24,7 @@ builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 builder.Services.AddScoped<IMailService, MailService>();
 builder.Services.AddScoped<IOTPRequestService, OTPRequestService>();
+builder.Services.AddScoped<IRecoveryService, RecoveryService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 builder.Services.AddScoped<IUADService, UADService>();
 builder.Services.AddScoped<IValidationService, ValidationService>();
@@ -32,6 +33,7 @@ builder.Services.AddScoped<ILogoutService, LogoutService>();
 builder.Services.AddScoped<IAccountDeletionManager, AccountDeletionManager>();
 builder.Services.AddScoped<IAuthenticationManager, AuthenticationManager>();
 builder.Services.AddScoped<IOTPRequestManager, OTPRequestManager>();
+builder.Services.AddScoped<IRecoveryManager, RecoveryManager>();
 builder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
 builder.Services.AddScoped<ILogoutManager, LogoutManager>();
 // Unnecessary, only here temporarily for successful build

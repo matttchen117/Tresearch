@@ -34,7 +34,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         /// <param name="guid">Unique identifier to the return link stored in database</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Tuple of recoverylink and statuscode string</returns>
-        public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(Guid guid, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken))
         {
             IRecoveryLink nullLink = null;  // To return if there is an exception
             try
@@ -46,11 +46,11 @@ namespace TrialByFire.Tresearch.Services.Implementations
             catch (OperationCanceledException ex)
             {
                 //Service has been cancelled
-                return Tuple.Create(nullLink, "499");
+                return Tuple.Create(nullLink, _messageBank.ErrorMessages["cancellationRequested"]);
             }
             catch (Exception ex)
             {
-                return Tuple.Create(nullLink, "500");
+                return Tuple.Create(nullLink, "500: Server: " + ex);
             }
         }
 
@@ -71,14 +71,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 string result = await _sqlDAO.RemoveRecoveryLinkAsync(recoveryLink, cancellationToken);
                 return result;
             }
-            catch (OperationCanceledException ex)
+            catch (OperationCanceledException)
             {
                 //Service has been cancelled
-                return "499";
+                return _messageBank.ErrorMessages["cancellationRequested"];
             }
             catch (Exception ex)
             {
-                return "500";
+                return "500: Server: " + ex;
             }
         }
 

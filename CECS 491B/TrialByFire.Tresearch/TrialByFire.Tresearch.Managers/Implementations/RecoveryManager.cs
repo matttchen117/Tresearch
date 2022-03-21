@@ -78,7 +78,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             }
         }
 
-        public async Task<string> EnableAccountAsync(Guid guid, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> EnableAccountAsync(string guid, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
