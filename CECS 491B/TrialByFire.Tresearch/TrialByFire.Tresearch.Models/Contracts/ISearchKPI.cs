@@ -3,9 +3,10 @@ using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.Models.Contracts
 {
-    public interface ISearchKPI	: IKPI
+	public interface ISearchKPI : IKPI
 	{
-		List<TopSearch> topSearches { get; set; }
+		string result { get; set; }
+		List<ITopSearch> topSearches { get; set; }
 	}
 }
 

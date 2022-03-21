@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,19 +22,23 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authorization
         }
 
         [Theory]
-        [InlineData("aarry@gmail.com", "user", "user", "success")]
-        [InlineData("barry@gmail.com", "admin", "user", "success")]
-        [InlineData("carry@gmail.com", "user", "admin", "Database: You are not authorized to perform this operation.")]
-        [InlineData("darry@gmail.com", "user", "user", "Database: The account was not found or it has been disabled.")]
-        [InlineData("earry@gmail.com", "user", "user", "Database: Please confirm your account before attempting to login.")]
-        public void VerifyThatTheUserIsAuthorized(string username, string authorizationLevel, string requiredAuthLevel, string expected)
+        [InlineData("aarry@gmail.com", "user", "user", "200: Server: success")]
+        [InlineData("barry@gmail.com", "admin", "user", "200: Server: success")]
+        [InlineData("carry@gmail.com", "user", "admin", "404: Database: Account not found or not authorized to perform the operation.")]
+        [InlineData("darry@gmail.com", "user", "user", "404: Database: The account was not found or it has been disabled.")]
+        [InlineData("earry@gmail.com", "user", "user", "401: Database: Please confirm your account before attempting to login.")]
+        public async Task VerifyThatTheUserIsAuthorized(string username, string authorizationLevel, string requiredAuthLevel, string expected)
         {
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(true, username, authorizationLevel);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+            Thread.CurrentPrincipal = rolePrincipal;
+            CancellationTokenSource cancellationTokenSource =
+                new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             // Act
-            string result = authorizationService.VerifyAuthorized(rolePrincipal, requiredAuthLevel);
+            string result = await AuthorizationService.VerifyAuthorizedAsync(requiredAuthLevel, 
+                cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, result);

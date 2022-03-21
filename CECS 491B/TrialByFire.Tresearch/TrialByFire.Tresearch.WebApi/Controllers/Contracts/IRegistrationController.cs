@@ -15,10 +15,10 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
     public interface IRegistrationController
     {
         [HttpPost("register")]
-        public string RegisterAccount([FromBody] IAccount account);
+        public IActionResult RegisterAccount(string email, string passphrase);
 
-        public string SendConfirmation(string email);
+        public IActionResult SendConfirmation(string email);
 
-        public string ConfirmAccount(string url);
+        public IActionResult ConfirmAccount(string url);
     }
 }

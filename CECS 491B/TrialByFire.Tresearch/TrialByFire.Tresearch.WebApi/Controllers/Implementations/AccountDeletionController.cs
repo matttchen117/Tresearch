@@ -15,21 +15,17 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         private IAccountDeletionManager AccountDeletionManager { get; }
 
-        private IRolePrincipal RolePrincipal { get; }
-
-        public AccountDeletionController(ISqlDAO sqlDAO, ILogService logService, IAccountDeletionManager accountDeletionManager, IRolePrincipal rolePrincipal)
+        public AccountDeletionController(ISqlDAO sqlDAO, ILogService logService, IAccountDeletionManager accountDeletionManager)
         {
             this.SqlDAO = sqlDAO;
             this.LogService = logService;
             this.AccountDeletionManager = accountDeletionManager;
-            this.RolePrincipal = rolePrincipal;
-            
         }
         
 
-        public string DeleteAccount(IRolePrincipal rolePrincipal)
+        public string DeleteAccount()
         {
-            string result = AccountDeletionManager.DeleteAccount(rolePrincipal);
+            string result = AccountDeletionManager.DeleteAccount();
             if (result.Equals("success"))
             {
                 //LogService.CreateLog(DateTime.Now, "Server", principal.Identity.Name, "Account Deletion Successful");

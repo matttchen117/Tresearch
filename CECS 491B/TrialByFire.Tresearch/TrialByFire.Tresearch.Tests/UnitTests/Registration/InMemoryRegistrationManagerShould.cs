@@ -29,9 +29,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public InMemoryRegistrationManagerShould()
         {
             _sqlDAO = new InMemorySqlDAO();
-            _logService = new InMemoryLogService(_sqlDAO);
+            _logService = new LogService(_sqlDAO);
             _registrationService = new RegistrationService(_sqlDAO, _logService);
-            
+
             _messageBank = new MessageBank();
             _mailService = new MailService(_messageBank);
             _validationService = new ValidationService(_messageBank);
@@ -96,12 +96,12 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         }
 
         [Theory]
-        [InlineData("pammypoor@gmail.com", "NowStreaming", "www.tresearch.systems/Account/Verify?t=", "3/5/2022 7:52:04 PM")]
-        [InlineData("pammmmyyyy@gmail.com", "HunterGather", "www.tresearch.systems/Account/Verify?t=", "3/5/2022 5:52:04 PM")]
+        [InlineData("pammypoor@gmail.com", "NowStreaming", "www.tresearch.systems/Account/Verify?t=", "3/7/2022 7:52:04")]
+        [InlineData("pammmmyyyy@gmail.com", "HunterGather", "www.tresearch.systems/Account/Verify?t=", "3/7/2022 5:52:04")]
         public void ConfirmAccount(string email, string passphrase, string baseUrl, string date)
         {
             IConfirmationLink _confirmationLink = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Parse(date));
-            IAccount _account = new Account(email, email, passphrase, "User", true, false);
+            IAccount _account = new Account(email, email, passphrase, "user", true, false);
 
             _sqlDAO.CreateAccount(_account);
             _sqlDAO.CreateConfirmationLink(_confirmationLink);

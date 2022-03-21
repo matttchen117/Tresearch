@@ -20,7 +20,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
 
 
-        public AccountDeletionService(ISqlDAO sqlDAO, ILogService logService, IRolePrincipal rolePrincipal)
+        public AccountDeletionService(ISqlDAO sqlDAO, ILogService logService)
         {
             this.SqlDAO = sqlDAO;
             this.LogService = logService;
@@ -28,9 +28,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
 
 
-        public string DeleteAccount(IRolePrincipal rolePrincipal)
+        public string DeleteAccount()
         {
-            string _results = SqlDAO.DeleteAccount(rolePrincipal);
+            string _results = SqlDAO.DeleteAccount();
             return _results;
         }
 

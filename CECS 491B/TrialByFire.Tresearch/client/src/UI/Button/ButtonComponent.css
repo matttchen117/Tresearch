@@ -1,0 +1,44 @@
+.bttn-container {
+    --button-bkgcolor-green:#90be6d;
+    --button-color-green: white;    
+    --button-bkgcolor-hover-green: #788770;
+    --button-color-disabled-green: #788770;
+    
+}
+
+.bttn-container button {
+    border: none;
+    border-radius: 2px;
+    width: 100%;
+    box-shadow:  2px 2px 8px gray;
+    transition: .20s;
+    overflow: hidden;
+    position: relative;
+    font-size: 15px;
+    text-transform: uppercase;
+    padding: 15px;
+    cursor: pointer;
+}
+
+.bttn-container button.custom-bttn.green {
+    background-color: var(--button-bkgcolor-green);
+    color: var(--button-color-green);
+}
+
+.bttn-container button.custom-bttn.green:enabled:hover {
+    background-color: var(--button-bkgcolor-hover-green);
+}
+
+.bttn-container button.custom-bttn.green:disabled {
+    cursor: pointer;
+    opacity: 0.50;
+    color: black;
+}
+
+.create-button-container {
+    height: 50px;
+    width: 100%;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+}

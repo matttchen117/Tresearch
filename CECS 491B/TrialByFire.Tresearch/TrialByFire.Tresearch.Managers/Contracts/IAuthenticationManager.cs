@@ -10,6 +10,7 @@ namespace TrialByFire.Tresearch.Managers.Contracts
 {
     public interface IAuthenticationManager
     {
-        List<string> Authenticate(string username, string otp, string authorizationLevel, DateTime now);
+        Task<List<string>> AuthenticateAsync(string username, string otp, string authorizationLevel, 
+            DateTime now, CancellationToken cancellationToken = default);
     }
 }

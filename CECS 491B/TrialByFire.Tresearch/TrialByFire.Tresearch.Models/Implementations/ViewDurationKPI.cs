@@ -5,14 +5,20 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
 	public class ViewDurationKPI : IViewDurationKPI
 	{
-		public List<string> viewNames { get; }
-		public List<int> viewAverage { get;  }
-
-		public ViewDurationKPI(List<string> viewNames, List<int> viewAverage)
+		public string result { get; set; }
+		public List<IView> views { get; set; }
+		public ViewDurationKPI()
 		{
-			this.viewNames = viewNames;
-			this.viewAverage = viewAverage;
+			result = "";
+			views = new List<IView>();
 		}
+
+		public ViewDurationKPI(string result, List<IView> views)
+		{
+			this.result = result;
+			this.views = views;
+		}
+
+
 	}
 }
-

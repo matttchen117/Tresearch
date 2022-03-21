@@ -8,6 +8,7 @@ using TrialByFire.Tresearch.Managers.Implementations;
 using TrialByFire.Tresearch.Services.Implementations;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
+using Microsoft.AspNetCore.Mvc;
 using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
@@ -33,9 +34,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public InMemoryRegistrationControllerShould()
         {
             _sqlDAO = new InMemorySqlDAO();
-            _logService = new InMemoryLogService(_sqlDAO);
+            _logService = new LogService(_sqlDAO);
             _registrationService = new RegistrationService(_sqlDAO, _logService);
-            
+
             _messageBank = new MessageBank();
             _mailService = new MailService(_messageBank);
             _validationService = new ValidationService(_messageBank);
@@ -44,20 +45,19 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         }
 
         [Theory]
-        [InlineData("pammypoor+INcontrollerRegister1@gmail.com", "myValidPassphrase")]
-        [InlineData("pammypoor+INcontrollerRegister2@gmail.com", "ApplePie!")]
+        [InlineData("pammypoor@gmail.com", "myValidPassphrase")]
+        [InlineData("pammypoor@gmail.com", "ApplePie!")]
         public void RegisterTheUser(string email, string passphrase)
         {
             //Arrange
             IAccount account = new Account(email, email, passphrase, "User", true, false);
             //Act
-            string result = _registrationController.RegisterAccount(account);
+            IActionResult results = _registrationController.RegisterAccount(email, passphrase);
+            var objectResult = results as ObjectResult;
 
             //Assert
-            Assert.Equal('S', result[0]);
+            Assert.Equal(200, objectResult.StatusCode);
         }
-
-
 
         [Theory]
         [InlineData("pammypoor+INcontrollerSendConfirmation1@gmail.com")]
@@ -68,16 +68,17 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             IAccount account = new Account(email, "temporaryPassword");
 
             //Act
-            string result = _registrationController.SendConfirmation(email);
+            IActionResult results = _registrationController.SendConfirmation(email);
+            var objectResult = results as ObjectResult;
 
             //Assert
-            Assert.Equal('S', result[0]);
+            Assert.Equal(200, objectResult.StatusCode);
         }
 
 
         [Theory]
-        [InlineData("pammypoor+INcontrollerConfirm1@gmail.com", "myControllerPass", "www.tresearch.systems/Registration/verify?=", "2022-03-05 21:32:59.910")]
-        [InlineData("pammypoor+INcontrollerConfirm2@gmail.com", "myControllerPassword", "www.tresearch.systems/Registration/verify?=", "2022-03-05 21:32:59.910")]
+        [InlineData("pammypoor+INcontrollerConfirm1@gmail.com", "myControllerPass", "www.tresearch.systems/Registration/verify?=", "2022-03-06 21:32:59.910")]
+        [InlineData("pammypoor+INcontrollerConfirm2@gmail.com", "myControllerPassword", "www.tresearch.systems/Registration/verify?=", "2022-03-06 21:32:59.910")]
         public void confirmAccount(string email, string passphrase, string url, string date)
         {
             //Arrange
@@ -88,11 +89,11 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             _sqlDAO.CreateConfirmationLink(_confirmationLink);
 
             //Act
-            string result = _registrationController.ConfirmAccount(url + _confirmationLink.UniqueIdentifier);
-
+            IActionResult results = _registrationController.ConfirmAccount(url + _confirmationLink.UniqueIdentifier);
+            var objectResult = results as ObjectResult;
 
             //Assert
-            Assert.Equal('S', result[0]);
+            Assert.Equal(200, objectResult.StatusCode);
         }
     }
 }

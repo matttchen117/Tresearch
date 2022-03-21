@@ -1,7 +1,10 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Options;
+using System.Data;
 using System.Data.SqlClient;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Exceptions;
+using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 
@@ -9,29 +12,400 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 {
     public class SqlDAO : ISqlDAO
     {
-        private string _sqlConnectionString { get; }
+        private BuildSettingsOptions _options { get; }
         private IMessageBank _messageBank;
 
-        public SqlDAO(IMessageBank messageBank)
+        public SqlDAO(IMessageBank messageBank, IOptions<BuildSettingsOptions> options)
         {
             _messageBank = messageBank;
-            _sqlConnectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true";
+            _options = options.Value;
         }
 
-        public SqlDAO(string sqlConnectionString, IMessageBank messageBank)
+        public async Task<string> StoreLogAsync(ILog log, CancellationToken cancellationToken = default)
         {
-            _sqlConnectionString = sqlConnectionString;
-            _messageBank = messageBank;
+            cancellationToken.ThrowIfCancellationRequested();
+
+            using(var connection = new SqlConnection(_options.SqlConnectionString))
+            {
+                var procedure = "[StoreLog]";                                                               
+                var value = new { Timestamp = log.Timestamp, Level = log.Level, Username = log.Username, 
+                Category = log.Category, Description = log.Description };   
+                int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                if (affectedRows != 1)
+                {
+                    affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    if (affectedRows != 1)
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.storeLogFail).ConfigureAwait(false);
+                    }
+                }
+            }
+            return await _messageBank.GetMessage(IMessageBank.Responses.generic).ConfigureAwait(false);
         }
+
+
+        /// <summary>
+        ///     DisableAccountAsync()
+        ///         Disables accounts account passed in asynchrnously.
+        /// </summary>
+        /// <param name="account">Account to disable</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>String with statuscode</returns>
+        public async Task<string> DisableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();                                                       // Check if cancellation token has requested cancellation
+                using (var connection = new SqlConnection(_options.SqlConnectionString))                                        // Establish connection with database
+                {
+                    //Perform sql statement
+                    var procedure = "[DisableAccount]";                                                                 // Name of store procedure
+                    var value = new { Username = email, AuthorizationLevel = authorizationLevel };   //Columns to check in database
+                    int affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    //Check if cancellation is requested
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        //Cancellation has been requested, undo everything
+                        string rollbackResult = await EnableAccountAsync(email, authorizationLevel);                                      // Enables account.. result should be generic success
+                        if (rollbackResult != _messageBank.SuccessMessages["generic"])
+                            return _messageBank.ErrorMessages["rollbackFailed"];                                        // Rollback failed, account is still in database
+                        else
+                            return _messageBank.ErrorMessages["cancellationRequested"];                                 // Cancellation requested, successfully rolledback account disable
+                    }
+
+                    //Check rows affected... If account exists, should be 1 otherwise error
+                    if (affectedRows == 0)
+                        return _messageBank.ErrorMessages["accountNotFound"];                                           // Account doesn't exist
+                    else if (affectedRows != 1)
+                        return _messageBank.ErrorMessages["accountDisableFail"];                                        // Could not disable account
+                    return _messageBank.SuccessMessages["generic"];                                                     // Account successfully disabled
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Cancellation requested, nothing to rollback
+                return _messageBank.ErrorMessages["cancellationRequested"];
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+
+        }
+
+        /// <summary>
+        ///     EnableAccountAsync()
+        ///         Enables accounts account passed in asynchrnously.
+        /// </summary>
+        /// <param name="account">Account to enable</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>String with statuscode</returns>
+        public async Task<string> EnableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();                                                           // Check if cancellation token has requested cancellation
+                using (var connection = new SqlConnection(_options.SqlConnectionString))                                            // Establish connection with database
+                {
+                    //Perform sql statement
+                    var procedure = "[EnableAccount]";                                                                      // Store Procedure
+                    var value = new { Username = email, AuthorizationLevel = authorizationLevel };
+                    int affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    // Check if cancellation is requested
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        string rollbackResult = await DisableAccountAsync(email, authorizationLevel);
+                        if (rollbackResult != "200")
+                            return "503";    // 503 Service Unavailable - Roll back failed
+                        else
+                            return "500";    // 500 Generic Failed - Roll back su
+                    }
+
+                    //Check rows affected... If account exists, should be 1 otherwise error
+                    if (affectedRows == 0)
+                        return _messageBank.ErrorMessages["accountNotFound"];                                               // Account doesn't exist
+                    else if (affectedRows != 1)
+                        return _messageBank.ErrorMessages["accountEnableFail"];                                             // Could not enable account
+                    return _messageBank.SuccessMessages["generic"];                                                         // Account successfully disabled
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Cancellation requested, nothing to rollback
+                return _messageBank.ErrorMessages["cancellationRequested"];
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+
+        /// <summary>
+        ///     GetAccountAsync()
+        ///         Returns an account 
+        /// </summary>
+        /// <param name="email">Email of account to find</param>
+        /// <param name="authorizationLevel">Authorization level of account to find</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Tuple containing account found (if not found, null) and string status code</returns>
+        public async Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            IAccount nullAccount = null;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Perform sql statement
+
+                    var procedure = "dbo.[GetAccount]";
+                    var parameters = new { Username = email, AuthorizationLevel = authorizationLevel };
+                    var Accounts = await connection.QueryAsync<Account>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    //Check if account was returned
+                    if (Accounts.Count() == 0)
+                        return Tuple.Create(nullAccount, _messageBank.ErrorMessages["accountNotFound"]);            //Account doesn't exist
+
+                    IAccount account = Accounts.First();
+
+
+                    // Check if cancellation is requested .. no rollback necessary
+                    if (cancellationToken.IsCancellationRequested)
+                        return Tuple.Create(nullAccount, _messageBank.ErrorMessages["cancellationRequested"]);
+                    else
+                        return Tuple.Create(account, _messageBank.SuccessMessages["generic"]);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return Tuple.Create(nullAccount, _messageBank.ErrorMessages["cancellationRequested"]);
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(nullAccount, "500: Database: " + ex.Message);
+            }
+        }
+
+        /// <summary>
+        ///     RemoveRecoveryLinkAsync()
+        ///         Removes recovery link from database.
+        /// </summary>
+        /// <param name="recoveryLink">Recovery link to remove</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>String status code</returns>
+        public async Task<string> RemoveRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Perform sql statement
+                    var procedure = "[RemoveRecoveryLink]";
+                    var value = new { GUIDLink = recoveryLink.GUIDLink };
+                    var affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    //Check if cancellation requested
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        string rollbackResults = await CreateRecoveryLinkAsync(recoveryLink);
+                        if (rollbackResults != _messageBank.SuccessMessages["generic"])
+                            return _messageBank.ErrorMessages["rollbackFailed"];
+                        else
+                            return _messageBank.ErrorMessages["cancellationRequested"];
+                    }
+
+                    //Check if recovery link removed
+                    if (affectedRows == 0)
+                        return _messageBank.ErrorMessages["accountNotFound"];
+                    else if (affectedRows == 1)
+                        return _messageBank.SuccessMessages["generic"];
+                    else
+                        return _messageBank.ErrorMessages["recoveryLinkRemoveFail"];
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return _messageBank.ErrorMessages["cancellationRequested"];
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+
+        /// <summary>
+        ///     GetRecoveryLinkAsync()
+        ///         Return recovery link from database
+        /// </summary>
+        /// <param name="guid">Uniqueidentifier of link in database</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Tuple containing recovery link and string status code</returns>
+        public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(Guid guid, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            IRecoveryLink nullLink = null;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Perform sql statement
+                    var procedure = "[GetRecoveryLink]";                                    // Stored procedure
+                    var value = new { GUIDLink = guid };                                     // Guid to search in table
+                    var links = await connection.QueryAsync<RecoveryLink>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    //Check for cancellation...no rollback necessary
+                    if (cancellationToken.IsCancellationRequested)
+                        return Tuple.Create(nullLink, _messageBank.ErrorMessages["cancellationRequested"]);
+
+                    //Return recoverylink if found
+                    if (links.Count() == 0)
+                        return Tuple.Create(nullLink, _messageBank.ErrorMessages["recoveryLinkNotFound"]);
+                    else
+                    {
+                        IRecoveryLink link = links.First();
+                        return Tuple.Create(link, _messageBank.SuccessMessages["generic"]);
+                    }
+
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return Tuple.Create(nullLink, _messageBank.ErrorMessages["cancellationRequested"]);
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(nullLink, "500: Database: " + ex);
+            }
+        }
+
+        /// <summary>
+        ///     GetTotalRecoveryLinksAsync()
+        ///         Returns an integer count of all recovery links currently in the database matching credentials.
+        /// </summary>
+        /// <param name="email">Email credential of user</param>
+        /// <param name="authorizationLevel">Authorization level of user</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Tuple containing count of all recovery links and string status code</returns>
+        public async Task<Tuple<int, string>> GetTotalRecoveryLinksAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Perform sql statement
+                    var procedure = "[GetTotalRecoveryLinks]";          // Stored procedure
+                    var value = new { Username = email, AuthorizationLevel = authorizationLevel };               // Guid to search in table
+                    int totalLinks = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    //Check for cancellation...no rollback necessary
+                    if (cancellationToken.IsCancellationRequested)
+                        return Tuple.Create(-1, _messageBank.ErrorMessages["cancellationRequested"]);
+
+                    return Tuple.Create(totalLinks, _messageBank.SuccessMessages["generic"]);
+                }
+            }
+            catch (OperationCanceledException ex)
+            {
+                return Tuple.Create(-1, _messageBank.ErrorMessages["cancellationRequested"]);
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(-1, "500: Database: " + ex);
+            }
+        }
+
+        /// <summary>
+        ///     RemoveAllRecoveryLinksAsync()
+        ///         Removes all recovery lists existing in a database with a given email and authorization level 
+        /// </summary>
+        /// <param name="email">Email of user to delete recovery links</param>
+        /// <param name="authorizationLevel">Authorization level of user to delete recover links</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>Tuple containing integer of links removed and string status code</returns>
+        public async Task<Tuple<int, string>> RemoveAllRecoveryLinksAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Perform sql statement
+                    var procedure = "[RemoveUserRecoveryLinks]"; // Stored procedure
+                    var value = new { Username = email, AuthorizationLevel = authorizationLevel };               // Guid to search in table
+                    int linksRemoved = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    //Check if links removed
+                    if (linksRemoved < 0)
+                        return Tuple.Create(-1, _messageBank.ErrorMessages["recoveryLinkRemoveFail"]);
+                    else
+                        return Tuple.Create(linksRemoved, _messageBank.SuccessMessages["generic"]);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return Tuple.Create(-1, _messageBank.ErrorMessages["cancellationRequested"]);
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(-1, "500: Database: " + ex);
+            }
+        }
+
+        /// <summary>
+        ///     CreateRecoveryLinkAsync()
+        ///         Adds recovery link to database.
+        /// </summary>
+        /// <param name="recoveryLink">Recovery link object containing email, Guid, datetime created and authorization level of user</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>String status code</returns>
+        public async Task<string> CreateRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Perform sql statement
+                    var procedure = "[CreateRecoveryLink]";
+                    var value = new { Username = recoveryLink.Username, GUIDLink = recoveryLink.GUIDLink, TimeCreated = recoveryLink.TimeCreated, AuthorizationLevel = recoveryLink.AuthorizationLevel };
+                    var affectedRows = await connection.QueryAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        string rollbackResult = await RemoveRecoveryLinkAsync(recoveryLink);
+                        if (rollbackResult != _messageBank.SuccessMessages["generic"])
+                            return _messageBank.ErrorMessages["rollbackFailed"];
+                        else
+                            return _messageBank.ErrorMessages["cancellationRequested"];
+                    }
+
+                    return _messageBank.SuccessMessages["generic"];
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return _messageBank.ErrorMessages["cancellationRequested"];
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex;
+            }
+        }
+
+
 
         public List<string> CreateConfirmationLink(IConfirmationLink _confirmationlink)
         {
             List<string> result = new List<string>();
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    var insertQuery = "INSERT INTO dbo.confirmation_links (username, GUID, datetime) VALUES (@Username, @UniqueIdentifier, @Datetime)";
+                    var insertQuery = "INSERT INTO dbo.EmailConfirmationLinks (username, GUID, timestamp) VALUES (@Username, @UniqueIdentifier, @Datetime)";
                     int affectedRows = connection.Execute(insertQuery, _confirmationlink);
 
                     if (affectedRows == 1)
@@ -40,9 +414,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         result.Add("Failed - Email already has confirmation link");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                result.Add("Failed - Unable to add confirmation link to database");
+                result.Add("Failed - SQLDAO " + ex);
             }
             return result;
         }
@@ -50,7 +424,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public IConfirmationLink GetConfirmationLink(string url)
         {
 
-            string guidString = url.Substring(url.LastIndexOf('=')+1);
+            string guidString = url.Substring(url.LastIndexOf('=') + 1);
             //Guid guid = new Guid(guidString);
 
 
@@ -58,14 +432,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
 
-                    var readQuery = "SELECT username FROM dbo.confirmation_links WHERE GUID = @guid";
+                    var readQuery = "SELECT username FROM dbo.EmailConfirmationLinks WHERE GUID = @guid";
                     _confirmationLink.Username = connection.ExecuteScalar<string>(readQuery, new { guid = guidString });
-                    readQuery = "SELECT GUID FROM dbo.confirmation_links WHERE GUID = @guid";
+                    readQuery = "SELECT GUID FROM dbo.EmailConfirmationLinks WHERE GUID = @guid";
                     _confirmationLink.UniqueIdentifier = connection.ExecuteScalar<Guid>(readQuery, new { guid = guidString });
-                    readQuery = "SELECT datetime FROM dbo.confirmation_links WHERE GUID = @guid";
+                    readQuery = "SELECT datetime FROM dbo.EmailConfirmationLinks WHERE GUID = @guid";
                     _confirmationLink.Datetime = connection.ExecuteScalar<DateTime>(readQuery, new { guid = guidString });
                 }
             }
@@ -85,9 +459,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    var updateQuery = "UPDATE dbo.user_accounts SET confirmation = 1 WHERE email = @Email and username = @Username";
+                    var updateQuery = "UPDATE dbo.Accounts SET confirmation = 1 WHERE email = @Email and username = @Username";
                     affectedRows = connection.Execute(updateQuery, account);
 
                 }
@@ -107,9 +481,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    var deleteQuery = "DELETE FROM confirmation_links WHERE @Username=username and @Guid=guid and @Timestamp=Timestamp";
+                    var deleteQuery = "DELETE FROM dbo.EmailConfirmationLinks WHERE @Username=username and @Guid=guid and @Timestamp=Timestamp";
                     affectedRows = connection.Execute(deleteQuery, confirmationLink);
                 }
                 if (affectedRows == 1)
@@ -133,9 +507,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    var readQuery = "SELECT COUNT(*) FROM dbo.user_accounts WHERE email = @Email";
+                    var readQuery = "SELECT COUNT(*) FROM dbo.Accounts WHERE Email = @Email";
                     var accounts = connection.ExecuteScalar<int>(readQuery, new { Email = account.Email });
 
                     if (accounts > 0)
@@ -143,7 +517,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         results.Add("Failed - Account already exists in database");
                         return results;
                     }
-                    var insertQuery = "INSERT INTO dbo.user_accounts (username, email, passphrase, authorization_level, account_status, confirmation) " +
+                    var insertQuery = "INSERT INTO dbo.Accounts (Username, Email, Passphrase, AuthorizationLevel, AccountStatus, Confirmed) " +
                         "VALUES (@Username, @Email, @Passphrase, @AuthorizationLevel, @AccountStatus, @Confirmed)";
 
                     affectedRows = connection.Execute(insertQuery, account);
@@ -162,10 +536,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public IAccount GetUnconfirmedAccount(string email)
         {
-            IAccount account = new Account();
+            IAccount account;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var readQuery = "SELECT username FROM dbo.user_accounts WHERE email = @Email and authorization_level = 'User'";
                     string username = connection.ExecuteScalar<string>(readQuery, new { Email = email });
@@ -193,7 +567,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var deleteQuery = "DELETE FROM dbo.confirmation_links WHERE GUID = @guid";
                     affectedRows = connection.Execute(deleteQuery, new { guid = confirmationLink.UniqueIdentifier });
@@ -209,16 +583,17 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             return results;
         }
-        public string DeleteAccount(IRolePrincipal rolePrincipal)
+        public string DeleteAccount()
         {
 
             int affectedRows;
+            string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var readQuery = "SELECT * FROM Accounts WHERE Username = @username AND AuthorizationLevel = @role";
-                    var account = connection.ExecuteScalar<int>(readQuery, new { username = rolePrincipal.RoleIdentity.Name, role = rolePrincipal.RoleIdentity.AuthorizationLevel });
+                    var account = connection.ExecuteScalar<int>(readQuery, new { username = Thread.CurrentPrincipal.Identity.Name, role = userAuthLevel });
                     if (account == 0)
                     {
                         return _messageBank.ErrorMessages["notFoundOrAuthorized"];
@@ -233,7 +608,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             "DELETE FROM EmailConfirmationLinks WHERE username = @username;" +
                             "END";
 
-                        affectedRows = connection.Execute(storedProcedure, rolePrincipal.RoleIdentity.Name);
+                        affectedRows = connection.Execute(storedProcedure, Thread.CurrentPrincipal.Identity.Name);
                     }
 
 
@@ -248,25 +623,30 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     return _messageBank.ErrorMessages["notFoundOrAuthorized"];
                 }
             }
-            catch (Exception ex)
+            catch (AccountDeletionFailedException adfe)
             {
-                return "Exception occurred";
+                return adfe.Message;
             }
 
         }
 
-        public string VerifyAccount(IAccount account)
+        public async Task<string> VerifyAccountAsync(IAccount account, 
+            CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IAccount dbAccount = connection.QueryFirst<Account>(query, new
-                    {
-                        Username = account.Username,
-                        AuthorizationLevel = account.AuthorizationLevel
-                    });
+                    IAccount dbAccount = await connection.QueryFirstAsync<Account>(new CommandDefinition(
+                        query, 
+                        new{
+                            Username = account.Username,
+                            AuthorizationLevel = account.AuthorizationLevel
+                        }, 
+                        cancellationToken: default
+                    )).ConfigureAwait(false);
                     if (dbAccount == null)
                     {
                         return _messageBank.ErrorMessages["notFoundOrAuthorized"];
@@ -294,92 +674,86 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (AccountCreationFailedException acfe)
             {
-                return acfe.Message;
+                return "400: Server: " + acfe.Message;
+                //return acfe.Message;
             }
-            catch(InvalidOperationException ioe)
+            catch (InvalidOperationException ioe)
             {
                 return _messageBank.ErrorMessages["notFoundOrEnabled"];
             }
             catch (Exception ex)
             {
-                return "Database: " + ex.Message;
+                return "500: Database: " + ex.Message;
             }
         }
 
-        public List<string> Authenticate(IOTPClaim otpClaim)
+        public async Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim, 
+            CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             List<string> results = new List<string>();
             int affectedRows = 0;
             try
             {
-                // create connection to database
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    // query to select account
                     string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IAccount dbAccount = connection.QueryFirst<Account>(query, new
-                    {
-                        Username = otpClaim.Username,
-                        AuthorizationLevel = otpClaim.AuthorizationLevel
-                    });
-                    // check if account exists, if it is confirmed, and if it is enabled
-                    if (dbAccount == null)
-                    {
-                        results.Add(_messageBank.ErrorMessages["accountNotFound"]);
-                        return results;
-                    }else if(dbAccount.Confirmed == false)
+                    IAccount dbAccount = await connection.QueryFirstAsync<Account>(new CommandDefinition(
+                        query, 
+                        new{
+                            Username = otpClaim.Username,
+                            AuthorizationLevel = otpClaim.AuthorizationLevel
+                        }, 
+                        cancellationToken: cancellationToken
+                    )).ConfigureAwait(false);
+                    // Just make the decision, multiple calls or leak abstraction
+                    // Do as stored procedure, do all this work in the database, one request and
+                    // encapsulated, and faster - requires database to have concept of stored procedure
+                    // Would need to make a decision again if not using a relational DB
+
+                    // Service layer responsibility - interpret return of DAO
+                    // Service that Creates User - generic logic to be reusable
+                    //  DAO says "row added", Service says "User created"
+
+                    if (dbAccount.Confirmed == false)
                     {
                         results.Add(_messageBank.ErrorMessages["notConfirmed"]);
                         return results;
-                    }else if(dbAccount.AccountStatus == false)
+                    }
+                    if (dbAccount.AccountStatus == false)
                     {
                         results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
                         return results;
                     }
-                    // query to select otp claim
                     query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IOTPClaim dbOTPClaim = connection.QueryFirst<OTPClaim>(query, new 
-                    { 
-                        Username = otpClaim.Username, 
-                        AuthorizationLevel = otpClaim.AuthorizationLevel 
-                    });
-                    // check if null
-                    if(dbOTPClaim == null)
+                    IOTPClaim dbOTPClaim = await connection.QueryFirstAsync<OTPClaim>(new CommandDefinition(
+                        query, 
+                        new{
+                            Username = otpClaim.Username,
+                            AuthorizationLevel = otpClaim.AuthorizationLevel
+                        }, 
+                        cancellationToken: cancellationToken
+                    )).ConfigureAwait(false);
+                    if (dbOTPClaim == null)
                     {
                         results.Add(_messageBank.ErrorMessages["accountNotFound"]);
                         return results;
                     }
-                    // if otps do not match
-                    if(!otpClaim.OTP.Equals(dbOTPClaim.OTP))
+                    if (!otpClaim.OTP.Equals(dbOTPClaim.OTP))
                     {
-                        // increment fail count
                         int failCount = ++dbOTPClaim.FailCount;
-                        // update fail count in db
-                        query = "UPDATE OTPClaims SET FailCount = @FailCount WHERE " +
-                        "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                        affectedRows = connection.Execute(query, new
-                        {
-                            Username = otpClaim.Username,
-                            AuthorizationLevel = otpClaim.AuthorizationLevel,
-                            FailCount = dbOTPClaim.FailCount
-                        });
-                        // update failed
-                        if (affectedRows != 1)
-                        {
-                            results.Add(_messageBank.ErrorMessages["accountNotFound"]);
-                            return results;
-                        }
-                        // if fail count is 5 or more, attempt to disable account
                         if (failCount >= 5)
                         {
                             query = "UPDATE Accounts SET AccountStatus = 0 WHERE " +
                             "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                            affectedRows = connection.Execute(query, new
-                            {
-                                Username = otpClaim.Username,
-                                AuthorizationLevel = otpClaim.AuthorizationLevel,
-                            });
-                            // disable failed
+                            affectedRows = await connection.ExecuteAsync(new CommandDefinition(
+                                query, 
+                                new{
+                                    Username = otpClaim.Username,
+                                    AuthorizationLevel = otpClaim.AuthorizationLevel,
+                                }, 
+                                cancellationToken: cancellationToken
+                            )).ConfigureAwait(false);
                             if (affectedRows != 1)
                             {
                                 results.Add(_messageBank.ErrorMessages["accountDisableFail"]);
@@ -391,14 +765,32 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                                 return results;
                             }
                         }
+                        query = "UPDATE OTPClaims SET FailCount = @FailCount WHERE " +
+                        "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
+                        affectedRows = await connection.ExecuteAsync(new CommandDefinition(
+                            query, 
+                            new{
+                                Username = otpClaim.Username,
+                                AuthorizationLevel = otpClaim.AuthorizationLevel,
+                                FailCount = dbOTPClaim.FailCount++
+                            }, 
+                            cancellationToken: cancellationToken
+                        )).ConfigureAwait(false);
+                        if (affectedRows != 1)
+                        {
+                            results.Add(_messageBank.ErrorMessages["accountNotFound"]);
+                            return results;
+                        }
                         else
                         {
                             results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
                             return results;
                         }
                     }
-                    // check that otp was entered within 2 minutes of being created
-                    else if((otpClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
+                    // This should be done at service level
+                    // (DAO only does a SQL operation then returns results)
+                    // If not related to DB, know it should not be in DAO
+                    else if ((otpClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
                     {
                         results.Add(_messageBank.SuccessMessages["generic"]);
                         results.Add($"username:{otpClaim.Username},authorizationLevel:{otpClaim.AuthorizationLevel}");
@@ -409,42 +801,49 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         results.Add(_messageBank.ErrorMessages["otpExpired"]);
                         return results;
                     }
-                } 
+                }
             }
             catch (OTPClaimCreationFailedException occfe)
             {
-                results.Add(occfe.Message);
+                results.Add(("400: Server: " + occfe.Message));
                 return results;
             }
             catch (InvalidOperationException ioe)
-            { 
-                //results.Add("Database: " + ioe.Message);
+            {
                 results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
                 return results;
             }
             catch (Exception ex)
             {
-                results.Add("Database: " + ex.Message);
+                results.Add("500: Database: " + ex.Message);
                 return results;
             }
         }
-        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredAuthLevel)
+        public async Task<string> VerifyAuthorizedAsync(string requiredAuthLevel, 
+            CancellationToken cancellationToken = default)
         {
+            // In catch block in above layer, need to roll back if cancel requested
+            // check token before operation, if cancelled then dont do op
+            // check token after operation, if cancelled, then rollback (closer to DAO, easier it is to rollback)
+            // design decision to rollback or not
+            // if cancel at end, designate as either cancelled or undo situation
+
+            cancellationToken.ThrowIfCancellationRequested();
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IAccount dbAccount = connection.QueryFirst<Account>(query, new
-                    {
-                        Username = rolePrincipal.RoleIdentity.Name,
-                        AuthorizationLevel = rolePrincipal.RoleIdentity.AuthorizationLevel
-                    });
-                    if (dbAccount == null)
-                    {
-                        return _messageBank.ErrorMessages["notFoundOrAuthorized"];
-                    }
-                    else if (dbAccount.Confirmed == false)
+                    IAccount dbAccount = await connection.QueryFirstAsync<Account>(new CommandDefinition(
+                        query, 
+                        new{
+                            Username = Thread.CurrentPrincipal.Identity.Name,
+                            AuthorizationLevel = userAuthLevel
+                        }, 
+                        cancellationToken: cancellationToken
+                    )).ConfigureAwait(false);
+                    if (dbAccount.Confirmed == false)
                     {
                         return _messageBank.ErrorMessages["notConfirmed"];
                     }
@@ -454,44 +853,50 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     }
                     else
                     {
-                        if (rolePrincipal.RoleIdentity.AuthorizationLevel.Equals("admin") || 
-                            rolePrincipal.RoleIdentity.AuthorizationLevel.Equals(requiredAuthLevel))
+                        if (dbAccount.AuthorizationLevel.Equals("admin") ||
+                            dbAccount.AuthorizationLevel.Equals(requiredAuthLevel))
                         {
                             return _messageBank.SuccessMessages["generic"];
                         }
                         else
                         {
-                            return _messageBank.ErrorMessages["notAuthorized"];
+                            return _messageBank.ErrorMessages["notFoundOrAuthorized"];
                         }
                     }
                 }
             }
             catch (AccountCreationFailedException acfe)
             {
-                return acfe.Message;
+                return "400: Server: " + acfe.Message;
+                //return acfe.Message;
             }
             catch (InvalidOperationException ioe)
             {
-                return _messageBank.ErrorMessages["notFoundOrEnabled"];
+                return _messageBank.ErrorMessages["notFoundOrAuthorized"];
             }
             catch (Exception ex)
             {
-                return "Database: " + ex.Message;
+                return "500: Database: " + ex.Message;
             }
         }
 
-        public string StoreOTP(IOTPClaim otpClaim)
+        public async Task<string> StoreOTPAsync(IOTPClaim otpClaim, 
+            CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     string query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IOTPClaim dbOTPClaim = connection.QueryFirst<OTPClaim>(query, new
-                    {
-                        Username = otpClaim.Username,
-                        AuthorizationLevel = otpClaim.AuthorizationLevel
-                    });
+                    IOTPClaim dbOTPClaim = await connection.QueryFirstAsync<OTPClaim>(new CommandDefinition(
+                        query, 
+                        new{
+                            Username = otpClaim.Username,
+                            AuthorizationLevel = otpClaim.AuthorizationLevel
+                        }, 
+                        cancellationToken: cancellationToken
+                    )).ConfigureAwait(false);
                     if (dbOTPClaim == null)
                     {
                         return _messageBank.ErrorMessages["notFound"];
@@ -499,21 +904,24 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     else
                     {
                         int failCount = dbOTPClaim.FailCount;
-                        if(otpClaim.TimeCreated > dbOTPClaim.TimeCreated.AddDays(1))
+                        if (otpClaim.TimeCreated > dbOTPClaim.TimeCreated.AddDays(1))
                         {
                             failCount = 0;
                         }
                         query = "UPDATE OTPClaims SET OTP = @OTP,TimeCreated = @TimeCreated, " +
                         "FailCount = @FailCount WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                        var affectedRows = connection.Execute(query, new
-                        {
-                            Username = otpClaim.Username,
-                            AuthorizationLevel = otpClaim.AuthorizationLevel,
-                            OTP = otpClaim.OTP,
-                            TimeCreated = otpClaim.TimeCreated,
-                            FailCount = otpClaim.FailCount
-                        });
-                        if(affectedRows != 1)
+                        var affectedRows = await connection.ExecuteAsync(new CommandDefinition(
+                            query, 
+                            new{
+                                Username = otpClaim.Username,
+                                AuthorizationLevel = otpClaim.AuthorizationLevel,
+                                OTP = otpClaim.OTP,
+                                TimeCreated = otpClaim.TimeCreated,
+                                FailCount = otpClaim.FailCount
+                            }, 
+                            cancellationToken: cancellationToken
+                        )).ConfigureAwait(false);
+                        if (affectedRows != 1)
                         {
                             return _messageBank.ErrorMessages["otpFail"];
                         }
@@ -526,7 +934,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (OTPClaimCreationFailedException occfe)
             {
-                return occfe.Message;
+                return "400: Server: " + occfe.Message;
+                //return occfe.Message;
             }
             catch (InvalidOperationException ioe)
             {
@@ -534,97 +943,419 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return "Database: " + ex.Message;
+                return "500: Database: " + ex.Message;
             }
         }
 
-        public List<IKPI> LoadKPI(DateTime now)
+        /*public List<IKPI> LoadKPI(DateTime now)
         {
-            throw new NotImplementedException();
+            List<IKPI> kpiList = new List<IKPI>();
+            kpiList.Add(GetViewKPI());
+            kpiList.Add(GetViewDurationKPI());
+            kpiList.Add(GetNodeKPI(now));
+            kpiList.Add(GetLoginKPI(now));
+            kpiList.Add(GetRegistrationKPI(now));
+            kpiList.Add(GetSearchKPI(now));
+            return kpiList;
+        }*/
+
+
+        //1/6
+        public async Task<IViewKPI> GetViewKPIAsync(CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            IViewKPI vKPI = new ViewKPI();
+            try
+            {
+                IList<View> views = await GetAllViewsAsync(cancellationToken).ConfigureAwait(false);
+                if (views.Count == 0)
+                {
+                    vKPI.result = "No Database Entires";
+                }
+                int n = views.Count;
+                for(int i = 1; i <= 5; i++){
+                    vKPI.views.Add(views[(n-i)]);
+                }
+                vKPI.result = "Success";
+                return vKPI;
+            }
+            catch (Exception ex)
+            {
+                vKPI.result = ("500: Database: " + ex.Message);
+                return vKPI;
+            }
         }
 
+        //2/6
+        public async Task<IViewDurationKPI> GetViewDurationKPIAsync(CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            IViewDurationKPI vDKPI = new ViewDurationKPI();
+            try
+            {
+                IList<View> views = await GetAllViewsAsync(cancellationToken).ConfigureAwait(false);
+                if(views.Count == 0)
+                {
+                    vDKPI.result = "No Database Entries";
+                    return vDKPI;
+                }
+                int n = views.Count;
+                for(int i = 1; i < 5; i++)
+                {
+                    vDKPI.views.Add(views[(n - i)]);
+                }
+                vDKPI.result = "Success";
+                return vDKPI;
+            }
+            catch(Exception ex)
+            {
+                vDKPI.result = ("500: Database: " + ex.Message);
+                return vDKPI;
+            }
+        }
 
-        /*
-            Ian's Methods
-         */
+        /*public INodeKPI GetNodeKPI(DateTime now)
+        {
+            INodeKPI nodeKPI = new NodeKPI();
+            IList<INodesCreated> nC = GetNodesCreated(now);
+            if (nC.Count == 0)
+            {
+                nodeKPI.result = "Error";
+                return nodeKPI;
+            }
+            for (int i = 1; i < nC.Count; i++)
+            {
+                nodeKPI.nodesCreated.Add(nC[(nC.Count - 1)]);
+            }
+            nodeKPI.result = "success";
+            return nodeKPI;
+        }*/
 
-        
+        /*public INodeKPI GetNodeKPI(DateTime now)
+        {
+            INodeKPI nodeKPI = new NodeKPI();
+            int counter = 1;
+            INodesCreated nCreated = GetNodesCreated(now);
+            if (nCreated.nodeCreationCount == -1)
+            {
+                nodeKPI.result = "Error";
+                return nodeKPI;
+            }
+            while((counter < 29) && (nCreated.nodeCreationCount != -1))
+            {
+                nodeKPI.nodesCreated.Add(nCreated);
+                DateTime past = now.AddDays((counter * -1));
+                nCreated = GetNodesCreated(past);
+                counter++;
+            }
+            nodeKPI.result = "success";
+            return nodeKPI;
+        }*/
 
-        public string CreateNodesCreated(INodesCreated nodesCreated)
+        //3/6
+        public async Task<INodeKPI> GetNodeKPIAsync(DateTime now, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            INodeKPI nKPI = new NodeKPI();
+            try
+            {
+                IList<NodesCreated> nodes = await GetNodesCreatedAsync(now, cancellationToken).ConfigureAwait(false);
+                if(nodes.Count == 0)
+                {
+                    nKPI.result = "No Database Entries";
+                    return nKPI;
+                }
+                foreach(var x in nodes)
+                {
+                    nKPI.nodesCreated.Add(x);
+                }
+                nKPI.result = "Success";
+                return nKPI;
+            }
+            catch(Exception ex)
+            {
+                nKPI.result = ("500: Database: " + ex.Message);
+                return nKPI;
+            }
+        }
+
+        /*//4/6
+        public async Task<ILoginKPI> GetLoginKPI(DateTime now)
+        {
+            ILoginKPI loginKPI = new LoginKPI();
+            int counter = 1;
+            IList<IailyLogin> dLogin = GetDailyLogin(now);
+            if (dLogin.loginCount == -1)
+            {
+                loginKPI.result = "Error";
+                return loginKPI;
+            }
+            while ((counter <= 90) && (dLogin.loginCount != -1))
+            {
+                loginKPI.dailyLogins.Add(dLogin);
+                DateTime past = now.AddDays((counter * -1));
+                dLogin = GetDailyLogin(past);
+                counter++;
+            }
+            loginKPI.result = "success";
+            return loginKPI;
+        }*/
+
+        //4/6
+        public async Task<ILoginKPI> GetLoginKPIAsync(DateTime now, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ILoginKPI lKPI = new LoginKPI();
+            try
+            {
+                IList<DailyLogin> logins = new List<DailyLogin>();
+                logins = await GetDailyLoginAsync(now, cancellationToken).ConfigureAwait(false);
+                if(logins.Count == 0)
+                {
+                    lKPI.result = "No Database Entries";
+                    return lKPI;
+                }
+                foreach(var x in logins)
+                {
+                    lKPI.dailyLogins.Add(x);
+                }
+                lKPI.result = "Success";
+                return lKPI;
+            }
+            catch(Exception ex)
+            {
+                lKPI.result = ("500: Database: " + ex.Message);
+                return lKPI;
+            }
+        }
+
+        /*public IRegistrationKPI GetRegistrationKPI(DateTime now)
+        {
+            IRegistrationKPI registrationKPI = new RegistrationKPI();
+            int counter = 1;
+            IDailyRegistration dRegistration = GetDailyRegistration(now);
+            if (dRegistration.registrationCount == -1)
+            {
+                registrationKPI.result = "Error";
+                return registrationKPI;
+            }
+            while ((counter <= 90) && (dRegistration.registrationCount != -1))
+            {
+                registrationKPI.dailyRegistrations.Add(dRegistration);
+                DateTime past = now.AddDays((counter * -1));
+                dRegistration = GetDailyRegistration(past);
+                counter++;
+            }
+            registrationKPI.result = "success";
+            return registrationKPI;
+        }*/
+        //5/6
+        public async Task<IRegistrationKPI> GetRegistrationKPIAsync(DateTime now, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            IRegistrationKPI rKPI = new RegistrationKPI();
+            try
+            {
+                IList<DailyRegistration> registrations = new List<DailyRegistration>();
+                registrations = await GetDailyRegistrationAsync(now, cancellationToken).ConfigureAwait(false);
+                if(registrations.Count == 0)
+                {
+                    rKPI.result = "No Database Entries";
+                    return rKPI;
+                }
+                foreach(var x in registrations)
+                {
+                    rKPI.dailyRegistrations.Add(x);
+                }
+                rKPI.result = "Success";
+                return rKPI;
+            }
+            catch(Exception ex)
+            {
+                rKPI.result = ("500: Database: " + ex.Message);
+                return rKPI;
+            }
+        }
+
+        /*//6/6
+        public ISearchKPI GetSearchKPI(DateTime now)
+        {
+            ISearchKPI searchKPI = new SearchKPI();
+            int counter = 1;
+            ITopSearch sCreated = GetTopSearch(now);//Initial Check to see if InMemoryDatabase is not empty
+            List<ITopSearch> preSort = new List<ITopSearch>();
+            if (sCreated.searchCount == -1)
+            {
+                searchKPI.result = "Error";
+                return searchKPI;
+            }
+
+            while ((counter <= 28) && (sCreated.searchCount != -1))
+            {
+                preSort.Add(sCreated);
+                DateTime past = now.AddDays((counter * -1));
+                sCreated = GetTopSearch(past);
+                counter++;
+            }
+
+            List<ITopSearch> afterSort = preSort.OrderBy(x => x.searchCount).ToList();
+            int n = (afterSort.Count);
+            for (int i = 1; i <= 5 || i < n; i++)
+            {
+                Console.WriteLine(n);
+                searchKPI.topSearches.Add(afterSort[(n - i)]);
+            }
+            searchKPI.result = "success";
+            return searchKPI;
+        }*/
+
+        //6/6
+        public async Task<ISearchKPI> GetSearchKPIAsync(DateTime now, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ISearchKPI sKPI = new SearchKPI();
+            try
+            {
+                IList<TopSearch> searches = new List<TopSearch>();
+                searches = await GetTopSearchAsync(now, cancellationToken).ConfigureAwait(false);
+                if(searches.Count == 0)
+                {
+                    sKPI.result = "No Database Entries";
+                    return sKPI;
+                }
+                IList<TopSearch> sorted = searches.OrderBy(x => x.searchCount).ToList();
+                int n = sorted.Count;
+                for(int i = 1; i <= 5 || i < n; i++)
+                {
+                    sKPI.topSearches.Add(sorted[(n-i)]);
+                }
+                sKPI.result = "Success";
+                return sKPI;
+            }
+            catch(Exception ex)
+            {
+                sKPI.result = ("500: Database: " + ex.Message);
+                return sKPI;
+            }
+        }
+
+        //Done
+        public async Task<List<View>> GetAllViewsAsync(CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            List<View> results = new List<View>();
+            try
+            {
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //return connection.Execute<IView>("SELECT DateCreated, ViewName, Visits, AverageDuration from dbo.ViewTable").ToList();
+                    var selectQuery = "SELECT DateCreated, ViewName, Visits, AverageDuration FROM dbo.ViewTable";
+                    results = (await connection.QueryAsync<View>(new CommandDefinition(selectQuery, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+                    return results;
+                }
+            }
+            catch (Exception ex)
+            {
+                return results;
+            }
+        }
+
+        public string CreateView(IView view)
         {
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    var insertQuery = @"INSERT INTO Tresearch.NodesCreated (node_creation_date, node_creation_count)
-Values (@node_creation_date, @node_creation_count)";
-
-                    affectedRows = connection.Execute(insertQuery,
-                                    new { node_creation_date = nodesCreated.nodeCreationDate,
-                                        node_creation_count = nodesCreated.nodeCreationCount
-                                    });
+                    var insertQuery = @"INSERT INTO dbo.ViewTable (DateCreated, ViewName, Visits, AverageDuration)" +
+                        "Values (@DateCreated, @ViewName, @Visits, @AverageDuration)";
+                    affectedRows = connection.Execute(insertQuery, new
+                    {
+                        DateCreated = view.date,
+                        ViewName = view.viewName,
+                        Visits = view.visits,
+                        AverageDuration = view.averageDuration
+                    });
                 }
                 if (affectedRows == 1)
+                {
+                    return "View Creation Successful";
+                }
+                else
+                {
+                    return "View Creation Failed";
+                }
+            }
+            catch (Exception ex)
+            {
+                return "Fail";
+            }
+        }
+
+        public string CreateNodesCreated(INodesCreated nodesCreated)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var selectQuery = "SELECT * FROM Tresearch.nodes_created" +
+                                      "WHERE _node_creation_date >= @node_creation_date - 30";
+
+                    int affectedRows = connection.Execute(selectQuery,
+                                    new
+                                    {
+                                        nodesCreatedDate = nodesCreated.nodeCreationDate,
+                                        nodesCreatedCount = nodesCreated.nodeCreationCount
+                                    });
+                }
+                return _messageBank.SuccessMessages["generic"];
+            }
+            catch (Exception ex)
+            {
+                return _messageBank.ErrorMessages["createdNodesExists"];
+            }
+        }
+
+        public async Task<List<NodesCreated>> GetNodesCreatedAsync(DateTime nodesCreatedDate, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            List<NodesCreated> results = new List<NodesCreated>();
+            try
+            {
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var selectQuery = "SELECT * FROM tresearchStudentServer.dbo.nodesCreated WHERE nodesCreatedDate BETWEEN DATEADD(day, -30, @nodeCreationDate) AND @nodeCreationDate";
+                    results = (await connection.QueryAsync<NodesCreated>(new CommandDefinition(selectQuery, new { nodeCreationDate = nodesCreatedDate }, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+                    return results;
+                }
+            }
+            catch
+            {
+                return results;
+            }
+        }
+
+        public string UpdateNodesCreated(INodesCreated nodesCreated)
+        {
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
+            {
+                string updateQuery = @"UPDATE tresearchStudentServer.dbo.nodesCreated SET nodesCreatedCount = @nodesCreatedCount WHERE nodesCreatedDate = @nodesCreatedDate";
+
+                int rowsAffected = connection.Execute(updateQuery,
+                            new
+                            {
+                                nodesCreatedDate = nodesCreated.nodeCreationDate,
+                                nodesCreatedCount = nodesCreated.nodeCreationCount
+                            }
+                            );
+                if (rowsAffected == 1)
                 {
                     return _messageBank.SuccessMessages["generic"];
                 }
                 else
                 {
-                    return _messageBank.ErrorMessages["createdNodeNotInserted"];
+                    return _messageBank.ErrorMessages["createdNodesNotExists"];
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
-            }
-        }
-
-        public IList<INodesCreated> GetNodesCreated(DateTime nodeCreationDate)
-        {
-            IList<INodesCreated> nodesCreated;
-
-            using (var connection = new SqlConnection(_sqlConnectionString))
-            {
-                var selectQuery = "SELECT * FROM Tresearch.nodes_created" +
-                                  "WHERE _node_creation_date >= @node_creation_date - 30";
-
-                nodesCreated = (List<INodesCreated>)connection.Query<INodesCreated>(selectQuery, new {node_creation_date = nodeCreationDate});
-            }
-
-            return nodesCreated;
-        }
-
-        public string UpdateNodesCreated(INodesCreated nodesCreated)
-        {
-            try
-            {
-                using (var connection = new SqlConnection(_sqlConnectionString))
-                {
-                    var updateQuery = @"UPDATE Tresearch.nodes_created (nodes_created_date, nodes_created_count)" +
-                                        "VALUES (@nodes_created_date, @nodes_created_count)";
-
-                    var result = connection.Execute(updateQuery,
-                                new
-                                {
-                                    nodes_created_date = nodesCreated.nodeCreationDate,
-                                    nodes_created_count = nodesCreated.nodeCreationCount
-                                }
-                                );
-
-                    if (result == 1)
-                    {
-                        return _messageBank.SuccessMessages["generic"];
-                    }
-                    else
-                    {
-                        return _messageBank.ErrorMessages["createdNodeNotExist"];
-                    }
-                }
-            } catch(Exception ex) {
-                Console.WriteLine(ex.Message);
-                return null;
             }
         }
 
@@ -632,158 +1363,138 @@ Values (@node_creation_date, @node_creation_count)";
 
         public string CreateDailyLogin(IDailyLogin dailyLogin)
         {
-            int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    var insertQuery = @"INSERT INTO Tresearch.DailyLogins (login_date, login_count)
-                                        Values (@loginDate, @loginCount)";           
-                    affectedRows = connection.Execute(insertQuery,
-                                        new { login_date = dailyLogin.loginDate,
-                                            login_count = dailyLogin.loginCount
+                    string insertQuery = @"INSERT INTO tresearchStudentServer.dbo.dailyLogins (loginDate, loginCount)
+                                        Values (@loginDate, @loginCount)";
+                    int affectedRows = connection.Execute(insertQuery,
+                                        new
+                                        {
+                                            loginDate = dailyLogin.loginDate,
+                                            loginCount = dailyLogin.loginCount
                                         });
                 }
-                if (affectedRows == 1)
+                return _messageBank.SuccessMessages["generic"];
+            }
+            catch (Exception ex)
+            {
+                return _messageBank.ErrorMessages["dailyLoginsExists"];
+            }
+        }
+
+        public async Task<List<DailyLogin>> GetDailyLoginAsync(DateTime getDate, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            List<DailyLogin> results = new List<DailyLogin>();
+            try
+            {
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var selectQuery = "SELECT * FROM tresearchStudentServer.dbo.dailyLogins WHERE loginDate BETWEEN DATEADD(day, -30, @loginDate) AND @loginDate";
+                    results = (await connection.QueryAsync<DailyLogin>(new CommandDefinition(selectQuery, new { loginDate = getDate }, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+                    return results;
+                }
+            }
+            catch
+            {
+                return results;
+            }
+        }
+
+        public string UpdateDailyLogin(IDailyLogin dailyLogin)
+        {
+            IDailyLogin logins;
+
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
+            {
+                string updateQuery = @"UPDATE tresearchStudentServer.dbo.dailyLogins SET loginCount = @loginCount WHERE loginDate = @loginDate";
+
+                int rowsAffected = connection.Execute(updateQuery, new
+                {
+                    loginDate = dailyLogin.loginDate,
+                    loginCount = dailyLogin.loginCount
+                });
+
+                if (rowsAffected == 1)
                 {
                     return _messageBank.SuccessMessages["generic"];
                 }
                 else
                 {
-                    return _messageBank.ErrorMessages["dailyLoginNotInserted"];
+                    return _messageBank.ErrorMessages["dailyLoginsNotExists"];
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
-            }
-        }
-
-        public IList<IDailyLogin> GetDailyLogin(DateTime loginDate)
-        {
-            IList<IDailyLogin> dailyLogin;
-
-            using (var connection = new SqlConnection(_sqlConnectionString))
-            {
-                var selectQuery = "SELECT * FROM Tresearch.daily_logins" +
-                                    "WHERE _loginDate >= @login_date - 30";
-
-                dailyLogin = (List<IDailyLogin>)connection.Query<IDailyLogin>(selectQuery, new { login_date = loginDate });
-            }
-
-            return dailyLogin;
-        }
-
-        public string UpdateDailyLogin(IDailyLogin dailyLogin)
-        {
-            try
-            {
-                using (var connection = new SqlConnection(_sqlConnectionString))
-                {
-                    var updateQuery = @"UPDATE Tresearch.daily_logins (login_date, login_count) " +
-                                        "VALUES (@login_date, @login_count)";
-
-                    var result = connection.Execute(updateQuery, new
-                    {
-                        login_date = dailyLogin.loginDate,
-                        login_count = dailyLogin.loginCount
-                    });
-
-                    if (result == 1)
-                    {
-                        return _messageBank.SuccessMessages["generic"];
-                    } else
-                    {
-                        return _messageBank.ErrorMessages["dailyLoginNotExist"];
-                    }
-                }
-            } catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
-            }
-
-                return "Daily Login Update Successful";
         }
 
 
 
         public string CreateTopSearch(ITopSearch topSearch)
         {
-            int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    var insertQuery = @"INSERT INTO Tresearch.TopSearch (top_search_date, top_search_string, top_search_countl)" +
-                                        "Values (@top_search_date, @top_search_string, @top_search_count)";
-                    affectedRows = connection.Execute(insertQuery,
-                                        new { top_search_date = topSearch.topSearchDate,
-                                            top_search_string = topSearch.searchString,
-                                            top_search_count = topSearch.searchCount
+                    string insertQuery = @"INSERT INTO tresearchStudentServer.dbo.TopSearches (topSearchDate, topSearchString, topSearchCount) VALUES (@topSearchDate, @topSearchString, @topSearchCount)";
+
+                    int affectedRows = connection.Execute(insertQuery,
+                                        new
+                                        {
+                                            topSearchDate = topSearch.topSearchDate,
+                                            topSearchString = topSearch.searchString,
+                                            topSearchCount = topSearch.searchCount
                                         });
                 }
-                if (affectedRows == 1)
+
+                return _messageBank.SuccessMessages["generic"];
+            }
+            catch (Exception ex)
+            {
+                return _messageBank.ErrorMessages["topSearchesExists"];
+            }
+        }
+
+        public async Task<List<TopSearch>> GetTopSearchAsync(DateTime getTopSearchDate, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            List<TopSearch> result = new List<TopSearch>();
+            try
+            {
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    string selectQuery = "SELECT * FROM tresearchStudentServer.dbo.topSearches WHERE topSearchDate BETWEEN DATEADD(day, -30, @topSearchDate) AND @topSearchDate;";
+                    result = (await connection.QueryAsync<TopSearch>(new CommandDefinition(selectQuery, new { topSearchDate = getTopSearchDate }, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+                    return result;
+                }
+            }
+            catch
+            {
+                return result;
+            }
+        }
+
+        public string UpdateTopSearch(ITopSearch topSearch)
+        {
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
+            {
+                string updateQuery = @"UPDATE tresearchStudentServer.dbo.topSearches SET topSearchCount = @topSearchCount, topSearchString = @topSearchString WHERE topSearchDate = @topSearchDate;";
+
+                int rowsAffected = connection.Execute(updateQuery,
+                                                    new
+                                                    {
+                                                        topSearchDate = topSearch.topSearchDate,
+                                                        topSearchString = topSearch.searchCount,
+                                                        topSearchCount = topSearch.searchCount
+                                                    });
+                if (rowsAffected == 1)
                 {
                     return _messageBank.SuccessMessages["generic"];
                 }
                 else
                 {
-                    return _messageBank.ErrorMessages["topSearchNotInserted"];
+                    return _messageBank.ErrorMessages["topSearchesNotExists"];
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
-            }
-        }
-
-        public IList<ITopSearch> GetTopSearch(DateTime topSearchDate)
-        {
-            IList<ITopSearch> topSearch;
-            
-            using (var connection = new SqlConnection(_sqlConnectionString))
-            {
-                var selectQuery = "SELECT * FROM Tresearch.top_search" +
-                                    "WHERE topSearchDate >= @top_search_date - 30";
-                topSearch = (List<ITopSearch>)connection.Query<ITopSearch>(selectQuery, new {top_search_date = topSearchDate});
-            }
-
-            return topSearch;
-        }
-
-        public string UpdateTopSearch(ITopSearch topSearch)
-        {
-            try
-            {
-                using (var connection = new SqlConnection(_sqlConnectionString))
-                {
-                    var updateQuery = @"UPDATE Tresearch.top_search (top_search_date, search_string, search_count)" +
-                                        "VALUES (@top_search_date, @search_string, @search_count)";
-
-                    var result = connection.Execute(updateQuery,
-                                                        new
-                                                        {
-                                                            top_search_date = topSearch.topSearchDate,
-                                                            search_string = topSearch.searchCount,
-                                                            search_count = topSearch.searchCount
-                                                        });
-
-                    if (result == 1)
-                    {
-                        return _messageBank.SuccessMessages["generic"];
-                    }
-                    else
-                    {
-                        return _messageBank.ErrorMessages["topSearchNotExist"];
-                    }
-                }
-            } catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
             }
         }
 
@@ -794,73 +1505,65 @@ Values (@node_creation_date, @node_creation_count)";
             int affectedRows;
             try
             {
-                using (var connection = new SqlConnection(_sqlConnectionString))
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    var insertQuery = @"INSERT INTO Tresearch.DailyRegistrations (registration_date, registration_countl)" + 
-                                        "Values (@registrationDate, @registrationCount)";
-                   affectedRows = connection.Execute(insertQuery,
-                                    new
-                                    {
-                                        registration_date = dailyRegistration.registrationDate,
-                                        registration_count = dailyRegistration.registrationCount
-                                    });
+                    var insertQuery = @"INSERT INTO tresearchStudentServer.dbo.dailyRegistrations (registrationDate, registrationCount) VALUES (@registrationDate, @registrationCount)";
+                    affectedRows = connection.Execute(insertQuery,
+                                     new
+                                     {
+                                         registrationDate = dailyRegistration.registrationDate,
+                                         registrationCount = dailyRegistration.registrationCount
+                                     });
                 }
-                if (affectedRows == 1)
+                return _messageBank.SuccessMessages["generic"];
+            }
+            catch (Exception ex)
+            {
+                return _messageBank.ErrorMessages["dailyRegistrationsExists"];
+            }
+        }
+
+        public async Task<List<DailyRegistration>> GetDailyRegistrationAsync(DateTime getRegistrationDate, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            List<DailyRegistration> results = new List<DailyRegistration>();
+            try
+            {
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var selectQuery = "SELECT * FROM tresearchStudentServer.dbo.dailyRegistrations WHERE registrationDate BETWEEN DATEADD(day, -30, @registrationDate) AND @registrationDate";
+                    results = (await connection.QueryAsync<DailyRegistration>(new CommandDefinition(selectQuery, new { registrationDate = getRegistrationDate }, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+                    return results;
+                }
+            }
+            catch
+            {
+                return results;
+            }
+        }
+
+        public string UpdateDailyRegistration(IDailyRegistration dailyRegistration)
+        {
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
+            {
+                string updateQuery = @"UPDATE tresearchStudentServer.dbo.dailyRegistrations SET registrationCount = @registrationCount WHERE registrationDate = @registrationDate";
+
+                int rowsAffected = connection.Execute(updateQuery,
+                                new
+                                {
+                                    registrationDate = dailyRegistration.registrationDate,
+                                    registrationCount = dailyRegistration.registrationCount
+                                });
+
+                if (rowsAffected == 1)
                 {
                     return _messageBank.SuccessMessages["generic"];
                 }
                 else
                 {
-                    return _messageBank.ErrorMessages["dailyRegistrationNotInserted"];
+                    return _messageBank.ErrorMessages["dailyRegistrationsNotExists"];
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
-            }
-        }
-
-        public IList<IDailyRegistration> GetDailyRegistration(DateTime dailyRegistrationDate)
-        {
-            IList<IDailyRegistration> dailyRegistration;
-
-            using (var connection = new SqlConnection(_sqlConnectionString))
-            {
-                var selectQuery = "SELECT * FROM Tresearch.daily_registrations" +
-                                    "WHERE _registrationDate >= @registration_date - 30";
-
-                dailyRegistration = (List<IDailyRegistration>)connection.Query<IDailyRegistration>(selectQuery, new { registration_date = dailyRegistrationDate });
-            }
-
-            return dailyRegistration;
-        }
-
-        public string UpdateDailyRegistration(IDailyRegistration dailyRegistration)
-        {
-            try
-            {
-                using (var connection = new SqlConnection(_sqlConnectionString))
-                {
-                    var updateQuery = @"UPDATE Tresearch.daily_registrations (registration_date, registration_count)" +
-                                        "VALUES (@registration_date, @registration_count)";
-
-                    var result = connection.Execute(updateQuery,
-                                    new { registration_date = dailyRegistration.registrationDate });
-
-                    if(result == 1)
-                    {
-                        return _messageBank.SuccessMessages["generic"];
-                    } else
-                    {
-                        return _messageBank.ErrorMessages["dailyRegistrationNotExist"];
-                    }
-                }
-            } catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
-            }  
         }
     }
 }

@@ -1,0 +1,45 @@
+:root {
+    --app-background-color: white;
+    --app-title-color: #788770;
+    --app-notif-color: #9FB08D;
+    
+}
+
+.title-text {
+    padding-top: 20px;
+    display: flex;
+    width: 200%;
+}
+
+.deleted-title {
+    width: 50%;
+    text-align: center;
+    font-size: 25px;
+    font-weight: 500;
+    color: var(--app-title-color);
+}
+
+.deleted-container{
+    display: flext;
+}
+
+.deleted-notif{
+    text-align: center;
+}
+
+.deleted-notif hr{
+    width:70%;
+}
+
+.deleted-container h1{
+    text-align: center;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--app-title-color);
+}
+
+.deleted-notif p{
+    padding: 20 0 50px;
+    font-size: 15px;
+    color: var(--app-notif-color);
+}

@@ -6,37 +6,45 @@ using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
+using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
+using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
+using Microsoft.AspNetCore.Mvc;
+using Xunit;
 
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 {
-    public class RegistrationControllerShould
+    public class RegistrationControllerShould : IntegrationTestDependencies
     {
-        public ISqlDAO _sqlDAO { get; set; }
-        public ILogService _logService { get; set; }
-        public IMailService _mailService { get; set; }
         public IRegistrationService _registrationService { get; set; }
 
-        public IValidationService _validationService { get; set; }
-
-        public IMessageBank _messageBank { get; set; }
-
+        public IMailService _mailService { get; set; }
         public IRegistrationManager _registrationManager { get; set; }
-        public void RegisterTheUser(string _username, string passphrase)
+
+        public IRegistrationController _registrationController { get; set; }
+
+        public RegistrationControllerShould() : base()
+        {
+            _mailService = new MailService(MessageBank);
+            _registrationService = new RegistrationService(SqlDAO, LogService);
+            _registrationManager = new RegistrationManager(SqlDAO, LogService, _registrationService, _mailService, ValidationService, MessageBank);
+            _registrationController = new RegistrationController(SqlDAO, LogService, _registrationService, _mailService, MessageBank, ValidationService, _registrationManager);
+        }
+
+        [Theory]
+        [InlineData("fezAshtray@gmail.com", "myRegisterPassword")]
+        [InlineData("cassieKat@hotmail.com", "unFortunateName")]
+        public void RegisterTheUser(string email, string passphrase)
         {
             // Arrange
-            IMessageBank _messageBank = new MessageBank();
-            ISqlDAO _sqlDAO = new SqlDAO(_messageBank);
-            ILogService _logService = new SqlLogService(_sqlDAO);
-            IRegistrationService _accountService = new RegistrationService(_sqlDAO, _logService);
-            IMailService _mailService = new MailService(_messageBank);
-            //IRegistrationManager _accountManager = new RegistrationManager(_sqlDAO, _logService, _accountService, _mailService, validationService, );
+
 
             //Act
-
-            //_accountManager.CreatePreConfirmedAccount("pammypoor@gmail.com", "myPassword");
+            IActionResult results = _registrationController.RegisterAccount(email, passphrase);
+            var objectResult = results as ObjectResult;
 
             //Assert
+            Assert.Equal(200, objectResult.StatusCode);
         }
 
         public void ConfirmTheUser(string url)
