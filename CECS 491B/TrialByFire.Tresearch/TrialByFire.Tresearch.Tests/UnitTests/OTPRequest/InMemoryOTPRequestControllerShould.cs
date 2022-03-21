@@ -42,7 +42,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             "has been disabled.")]
         [InlineData("earry@gmail.com", "abcDEF123", "user", "guest", "guest", "401: Database: Please confirm your " +
             "account before attempting to login.")]
-        public async Task RequestTheOTPAsync(string username, string passphrase, string authorizationLevel, string currentIdentity, string currentRole, 
+        public async Task RequestTheOTPAsync(string username, string passphrase, string authorizationLevel, string currentIdentity, string currentRole,
             string expected)
         {
             // Arrange

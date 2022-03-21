@@ -33,7 +33,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 			IAuthenticationService authenticationService = new AuthenticationService(SqlDAO, LogService, messageBank);
 			IAuthorizationService authorizationService = new AuthorizationService(SqlDAO, LogService);
 			IUADService uadService = new UADService(SqlDAO, LogService);
-			IUADManager uadManager = new UADManager(SqlDAO, LogService, uadService, authenticationService, authorizationService);
+			IUADManager uadManager = new UADManager(SqlDAO, LogService, uadService, authenticationService, authorizationService, messageBank);
 			IUADController uadController = new UADController(SqlDAO, LogService, uadManager);
 
 			// Act

@@ -25,12 +25,11 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
         public async Task LoadKPIs(int year, int month, int day, string expected)
         {
             // Arrange
-            IUADService uadService = new UADService(sqlDAO, logService);
-            IAuthenticationService authenticationService = new AuthenticationService(sqlDAO, logService, messageBank);
-            IAuthorizationService authorizationService = new AuthorizationService(sqlDAO, logService);
-            IUADManager uadManager = new UADManager(sqlDAO, logService, uadService, authenticationService, authorizationService, messageBank);
-            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
             IUADService uadService = new UADService(SqlDAO, LogService);
+            IAuthenticationService authenticationService = new AuthenticationService(SqlDAO, LogService, MessageBank);
+            IAuthorizationService authorizationService = new AuthorizationService(SqlDAO, LogService);
+            IUADManager uadManager = new UADManager(SqlDAO, LogService, uadService, authenticationService, authorizationService, MessageBank);
+            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
 
             // Act
             List<IKPI> results = new List<IKPI>();

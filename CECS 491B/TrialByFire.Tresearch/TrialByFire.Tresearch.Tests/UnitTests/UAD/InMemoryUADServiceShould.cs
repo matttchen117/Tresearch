@@ -25,7 +25,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 		public async Task LoadKPI(int year, int month, int day, string expected)
 		{
 			// Arrange
-			IUADService uadService = new UADService(sqlDAO, logService);
+			IUADService uadService = new UADService(SqlDAO, LogService);
+			CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
 
 			// Act
 			List<IKPI> results = new List<IKPI>();

@@ -30,6 +30,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
             IUADService uadService = new UADService(SqlDAO, LogService);
             CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
 
+
             // Act
             List<IKPI> results = new List<IKPI>();
             results = await uadService.LoadKPIAsync(new DateTime(year, month, day), cts.Token);

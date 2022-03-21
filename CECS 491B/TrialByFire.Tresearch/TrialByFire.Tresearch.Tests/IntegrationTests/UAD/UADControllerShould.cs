@@ -28,12 +28,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 		[InlineData(2021, 12, 12, "Error")]
 		public async void LoadKPI(int year, int month, int day, string expected)
 		{
-			// Arrange
-
 			IUADService uadService = new UADService(SqlDAO, LogService);
-			IUADManager uadManager = new UADManager(SqlDAO, LogService, uadService, AuthenticationService, AuthorizationService);
+			IUADManager uadManager = new UADManager(SqlDAO, LogService, uadService, AuthenticationService, AuthorizationService, MessageBank);
 			IUADController uadController = new UADController(SqlDAO, LogService, uadManager);
-
 
 			// Act
 			List<IKPI> results = new List<IKPI>();
