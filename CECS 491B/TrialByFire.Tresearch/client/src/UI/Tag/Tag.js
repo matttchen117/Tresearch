@@ -10,7 +10,7 @@ const Tag = ({name = "name",  onClick}) => {
 
     return(
         <div className="tag-container">
-            <li><a href="#" class = "tag">{name}</a></li>
+            <li><a href="#" class = "tag">{name}&emsp;&times;</a></li>
         </div>
     )
 }

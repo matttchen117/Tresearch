@@ -11,8 +11,15 @@
 
 .close-icon {
     cursor: pointer;
-    position: absolute;
-    z-index: 1;
-    top: 20px;
-    right: 300px;
-}
+    position: fixed;
+    right: calc(36%);
+    top: calc(100vh - 70vh);
+    background: white;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    line-height: 20px;
+    text-align: center;
+    border: 1px solid #788770;
+    z-index: 3;
+  }

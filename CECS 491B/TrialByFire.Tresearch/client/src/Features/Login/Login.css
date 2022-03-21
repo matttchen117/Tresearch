@@ -70,15 +70,15 @@
 }
 
 .input-container input:focus {
-    box-shadow: inset 0 0 5px var(--input-container-focused-background-color);
+    box-shadow: inset 0 0 5px #788770;
 }
 
 .input-container input::placeholder {
-    color: var(--input-container-placeholder-color);
+    color: #788770;
 }
 
 .input-container input:focus::placeholder {
-    color: var(--input-container-focused-placeholder-color);
+    color: #788770;
 }
 
 .login-button-container {
