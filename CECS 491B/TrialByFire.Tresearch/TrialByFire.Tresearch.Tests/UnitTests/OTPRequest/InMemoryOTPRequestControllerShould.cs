@@ -42,7 +42,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             "has been disabled.")]
         [InlineData("earry@gmail.com", "abcDEF123", "user", "guest", "guest", "401: Database: Please confirm your " +
             "account before attempting to login.")]
-        public async Task RequestTheOTPAsync(string username, string passphrase, string authorizationLevel, string currentIdentity, string currentRole, 
+        public async Task RequestTheOTPAsync(string username, string passphrase, string authorizationLevel, string currentIdentity, string currentRole,
             string expected)
         {
             // Arrange
@@ -54,16 +54,17 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             }
             IMailService mailService = new MailService(MessageBank);
             IOTPRequestService otpRequestService = new OTPRequestService(SqlDAO, LogService, MessageBank);
-            IOTPRequestManager otpRequestManager = new OTPRequestManager(SqlDAO, LogService, ValidationService, 
+            IOTPRequestManager otpRequestManager = new OTPRequestManager(SqlDAO, LogService, ValidationService,
                 AuthenticationService, otpRequestService, MessageBank, mailService);
-            IOTPRequestController otpRequestController = new OTPRequestController(SqlDAO, LogService, 
+            IOTPRequestController otpRequestController = new OTPRequestController(SqlDAO, LogService,
                 otpRequestManager, MessageBank);
             string[] expecteds = expected.Split(": ");
-            ObjectResult expectedResult = new ObjectResult(expecteds[2]) 
+            ObjectResult expectedResult = new ObjectResult(expecteds[2])
             { StatusCode = Convert.ToInt32(expecteds[0]) };
 
             // Act
-            IActionResult result = await otpRequestController.RequestOTPAsync(username, passphrase, authorizationLevel);
+            IActionResult result = await otpRequestController.RequestOTPAsync(username, passphrase,
+                authorizationLevel).ConfigureAwait(false);
             var objectResult = result as ObjectResult;
 
             // Assert

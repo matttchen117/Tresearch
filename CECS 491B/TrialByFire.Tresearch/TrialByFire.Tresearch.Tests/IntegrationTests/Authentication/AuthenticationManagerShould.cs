@@ -50,7 +50,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
                 Thread.CurrentPrincipal = rolePrincipal;
             }
             IAuthenticationManager authenticationManager = new AuthenticationManager(SqlDAO,
-                SqlLogService, ValidationService, AuthenticationService, MessageBank);
+                LogService, ValidationService, AuthenticationService, MessageBank);
             DateTime now = new DateTime(year, month, day, hour, minute, second);
             CancellationTokenSource cancellationTokenSource = 
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));

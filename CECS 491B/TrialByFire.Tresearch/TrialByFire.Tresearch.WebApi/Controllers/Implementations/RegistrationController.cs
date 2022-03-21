@@ -42,12 +42,33 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
 
         [HttpPost("register")]
-        public string RegisterAccount(string email, string passphrase)
+        public IActionResult RegisterAccount(string email, string passphrase)
         {
+            
             List<string> results = new List<string>();
             try
             {
                 results.AddRange(_registrationManager.CreatePreConfirmedAccount(email, passphrase));
+                
+                //Assign Status Codes
+                if(results.Last() == "Success - Registration Manager created account")
+                {
+                    results.Add("Success - Account successfully created");
+                } else
+                {
+                    if (results.First() == "Failed - Account already exists in database")
+                    {
+                        results.Add("Failed - Account already exists");
+                        return StatusCode(409, results.Last());
+                    } else if (results.First() == "Failed - Account not created in database")
+                    {
+
+                    }
+                }
+
+
+
+
                 if (results.Last() == "Success - Registration Manager created account")
                     results.Add("Success - Registration Controller created account");
                 else
@@ -67,11 +88,11 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             //SendConfirmation(email);
 
             _logService.CreateLog(DateTime.Now, "Info", email, "Business", results.Last());
-            return results.Last();
+            return Ok(results.Last());
         }
 
         [HttpPost("confirmation")]
-        public string SendConfirmation(string email)
+        public IActionResult SendConfirmation(string email)
         {
             IAccount account = new Account();
             account.Email = email;
@@ -97,24 +118,17 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 error = true;
                 results.Add("Failed - Registration Controller " + ex);
             }
-            string r = "";
-            for (int i = 0; i < results.Count(); i++)
-            {
-                r += "\t" + results[i];
-            }
-
-            results.Add(r);
 
             if (!error)
                 _logService.CreateLog(DateTime.Now, "Info", email, "Business", results.Last());
             else
                 _logService.CreateLog(DateTime.Now, "Info", email, "Error", results.Last());
-            return results.Last();
+            return Ok(results.Last());
 
         }
 
         [HttpPost("confirm")]
-        public string ConfirmAccount(string url)
+        public IActionResult ConfirmAccount(string url)
         {
             List<string> results = new List<string>();
             bool error = false;
@@ -135,15 +149,11 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 error = true;
                 results.Add("Failed - Registration Controller " + ex);
             }
-            for (int i = 0; i < results.Count(); i++)
-            {
-                Console.WriteLine(results[i]);
-            }
             if (!error)
                 _logService.CreateLog(DateTime.Now, "Info", results.First(), "Business", results.Last());
             else
                 _logService.CreateLog(DateTime.Now, "Info", results.First(), "Error", results.Last());
-            return results.Last();
+            return Ok(results.Last());
         }
     }
 }

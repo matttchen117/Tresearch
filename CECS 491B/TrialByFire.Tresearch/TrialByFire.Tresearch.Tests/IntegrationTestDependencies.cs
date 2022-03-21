@@ -19,12 +19,16 @@ namespace TrialByFire.Tresearch.Tests
         private BuildSettingsOptions _buildSettingsOptions { get; }
         public IOptions<BuildSettingsOptions> BuildSettingsOptions { get; }
         public ISqlDAO SqlDAO { get; }
-        public ILogService SqlLogService { get; }
+        public ILogService LogService { get; }
         public IMessageBank MessageBank { get; }
         public IAuthenticationService AuthenticationService { get; }
         public IAuthorizationService AuthorizationService { get; }
         public IValidationService ValidationService { get; }
         public IAccountDeletionService AccountDeletionService { get; }
+
+
+        private string _connectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true";
+
 
         public IntegrationTestDependencies()
         {
@@ -34,16 +38,14 @@ namespace TrialByFire.Tresearch.Tests
                 SqlConnectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true",
                 SendGridAPIKey = ""
             };
-            BuildSettingsOptions = Options.Create(_buildSettingsOptions);
-
-
+            BuildSettingsOptions = Options.Create(_buildSettingsOptions) as IOptions<BuildSettingsOptions>;
             MessageBank = new MessageBank();
             SqlDAO = new SqlDAO(MessageBank, BuildSettingsOptions);
-            SqlLogService = new SqlLogService(SqlDAO);
-            AuthenticationService = new AuthenticationService(SqlDAO, SqlLogService, MessageBank);
-            AuthorizationService = new AuthorizationService(SqlDAO, SqlLogService);
+            LogService = new LogService(SqlDAO);
+            AuthenticationService = new AuthenticationService(SqlDAO, LogService, MessageBank);
+            AuthorizationService = new AuthorizationService(SqlDAO, LogService);
             ValidationService = new ValidationService(MessageBank);
-            AccountDeletionService = new AccountDeletionService(SqlDAO, SqlLogService);
+            AccountDeletionService = new AccountDeletionService(SqlDAO, LogService);
         }
     }
 }

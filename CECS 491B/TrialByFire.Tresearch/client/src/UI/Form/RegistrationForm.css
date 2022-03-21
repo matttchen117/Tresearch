@@ -1,0 +1,44 @@
+.form-register-wrapper {
+    position: relative;
+    max-width: 350px;
+    margin: 0 auto 100px;
+    text-align:center;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.25);
+    padding: 30px;
+    border-radius: 5px;
+    --form-container-bkg-color: white;
+    --form-container-input-color: #f2f2f2;
+    background-color: var(--form-container-bkg-color);
+}
+
+.register-title {
+    font-size: 45px;
+    font-weight: 500;
+    color: #788770;
+}
+
+.form-register-wrapper input[type='text'] {
+    outline: 0;
+    border: 0;
+    background: var(--form-input-color);
+    width: 100%;
+    margin: 0 0 15px;
+    padding: 15px;
+    box-sizing: border-box;
+    background-color: var(--form-container-input-color);
+}
+
+.input-check {
+    margin-bottom: 20px;
+}
+
+.form-register-wrapper input[type='checkbox']{
+   float: left;
+}
+
+.form-register-wrapper label {
+    float: center;
+    margin-right: 150px;
+    width: 200px;
+    color: #788770;
+}

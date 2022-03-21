@@ -39,8 +39,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
             //IAccountDeletionService accountDeletionService = new AccountDeletionService(sqlDAO, logService, rolePrincipal);
-            IAccountDeletionManager accountDeletionManager = new AccountDeletionManager(SqlDAO, SqlLogService, AccountDeletionService);
-            IAccountDeletionController accountDeletionController = new AccountDeletionController(SqlDAO, SqlLogService, accountDeletionManager);
+            IAccountDeletionManager accountDeletionManager = new AccountDeletionManager(SqlDAO, LogService, AccountDeletionService);
+            IAccountDeletionController accountDeletionController = new AccountDeletionController(SqlDAO, LogService, accountDeletionManager);
 
             // Act
             string result = accountDeletionController.DeleteAccount();

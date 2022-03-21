@@ -9,14 +9,14 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class Log : ILog
     {
-        public DateTime TimeStamp { get; }
+        public DateTime Timestamp { get; }
         public string Level { get; }
         public string Username { get; }
         public string Category { get; }
         public string Description { get; }
         public Log(DateTime timestamp, string level, string username, string category, string description)
         {
-            TimeStamp = timestamp;
+            Timestamp = timestamp;
             Level = level;
             Username = username;
             Category = category;

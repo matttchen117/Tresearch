@@ -21,8 +21,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public RegistrationManagerShould() : base()
         {
             _mailService = new MailService(MessageBank);
-            _registrationService = new RegistrationService(SqlDAO, SqlLogService);
-            _registrationManager = new RegistrationManager(SqlDAO, SqlLogService, _registrationService, _mailService, ValidationService, MessageBank);
+            _registrationService = new RegistrationService(SqlDAO, LogService);
+            _registrationManager = new RegistrationManager(SqlDAO, LogService, _registrationService, _mailService, ValidationService, MessageBank);
         }
         [Theory]
         [InlineData("skiPatrol@gmail.com", "myRegisterPassword")]

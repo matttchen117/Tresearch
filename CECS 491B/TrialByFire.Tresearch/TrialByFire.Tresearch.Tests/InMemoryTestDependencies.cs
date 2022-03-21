@@ -36,7 +36,7 @@ namespace TrialByFire.Tresearch.Tests
             };
             BuildSettingsOptions = Options.Create(_buildSettingsOptions) as IOptions<BuildSettingsOptions>;
             SqlDAO = new InMemorySqlDAO();
-            LogService = new InMemoryLogService(SqlDAO);
+            LogService = new LogService(SqlDAO);
             MessageBank = new MessageBank();
             AuthenticationService = new AuthenticationService(SqlDAO, LogService, MessageBank);
             AuthorizationService = new AuthorizationService(SqlDAO, LogService);

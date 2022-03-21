@@ -37,7 +37,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
         public async Task RequestTheOTP(string username, string passphrase, string authorizationLevel, string expected)
         {
             // Arrange
-            IOTPRequestService otpRequestService = new OTPRequestService(SqlDAO, SqlLogService, MessageBank);
+            IOTPRequestService otpRequestService = new OTPRequestService(SqlDAO, LogService, MessageBank);
             IAccount account = new Account(username, passphrase, authorizationLevel);
             IOTPClaim otpClaim = new OTPClaim(account);
             CancellationTokenSource cancellationTokenSource =
