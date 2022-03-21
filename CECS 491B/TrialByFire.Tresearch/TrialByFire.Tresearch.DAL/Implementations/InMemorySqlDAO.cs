@@ -757,7 +757,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return _messageBank.ErrorMessages["dailyRegistrationNotExist"];
         }
 
-<<<<<<< HEAD
+
         public string CreateView(IView view)
         {
             foreach (IView view1 in InMemoryDatabase.Views)
@@ -778,7 +778,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             List<View> viewList = new List<View>();
             return viewList;
         }
-=======
+
         public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(Guid guid, CancellationToken cancellationToken)
         {
             IRecoveryLink nullLink = null;
@@ -820,7 +820,5 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             return "500";
         }
-
->>>>>>> origin/Pammy-to-Merge
     }
 }

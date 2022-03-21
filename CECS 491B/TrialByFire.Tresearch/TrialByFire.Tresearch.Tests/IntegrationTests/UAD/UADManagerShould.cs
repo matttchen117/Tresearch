@@ -27,13 +27,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
         public async Task LoadKPIs(int year, int month, int day, string expected)
         {
             // Arrange
-<<<<<<< HEAD
             IUADService uadService = new UADService(SqlDAO, LogService);
-
-=======
-            IUADService uadService = new UADService(sqlDAO, logService);
             CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
->>>>>>> origin/JessieTestMerge
 
             // Act
             List<IKPI> results = new List<IKPI>();

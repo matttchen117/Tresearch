@@ -43,20 +43,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 			List<IKPI> result = new List<IKPI>();
 			if (Thread.CurrentPrincipal != null)
             {
-
-<<<<<<< HEAD
-		public async Task<List<KPI>> KPIsFetchedAsync(DateTime now)
-		{
-			string result;
-			string authorizeResult;
-			// Matthew - Commented out for build
-			authorizeResult = ""; //await _authorizationService.VerifyAuthorizedAsync(_authorizationLevel);
-			if (authorizeResult == "success")
-			{
-				Task t1 = Task.Run(() =>
-=======
 				try
->>>>>>> origin/JessieTestMerge
 				{
 					result = await _uadService.LoadKPIAsync(now, cancellationToken).ConfigureAwait(false);
 					return result;

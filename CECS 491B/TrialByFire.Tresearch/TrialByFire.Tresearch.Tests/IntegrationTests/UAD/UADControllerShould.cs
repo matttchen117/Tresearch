@@ -29,15 +29,11 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 		public async void LoadKPI(int year, int month, int day, string expected)
 		{
 			// Arrange
-<<<<<<< HEAD
+
 			IUADService uadService = new UADService(SqlDAO, LogService);
 			IUADManager uadManager = new UADManager(SqlDAO, LogService, uadService, AuthenticationService, AuthorizationService);
 			IUADController uadController = new UADController(SqlDAO, LogService, uadManager);
-=======
-			IUADService uadService = new UADService(sqlDAO, logService);
-			IUADManager uadManager = new UADManager(sqlDAO, logService, uadService, authenticationService, authorizationService, messageBank);
-			IUADController uadController = new UADController(sqlDAO, logService, uadManager);
->>>>>>> origin/JessieTestMerge
+
 
 			// Act
 			List<IKPI> results = new List<IKPI>();
