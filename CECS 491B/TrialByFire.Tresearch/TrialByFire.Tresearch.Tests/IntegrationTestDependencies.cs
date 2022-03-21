@@ -19,7 +19,7 @@ namespace TrialByFire.Tresearch.Tests
         private BuildSettingsOptions _buildSettingsOptions { get; }
         public IOptions<BuildSettingsOptions> BuildSettingsOptions { get; }
         public ISqlDAO SqlDAO { get; }
-        public ILogService SqlLogService { get; }
+        public ILogService LogService { get; }
         public IMessageBank MessageBank { get; }
         public IAuthenticationService AuthenticationService { get; }
         public IAuthorizationService AuthorizationService { get; }
@@ -32,13 +32,20 @@ namespace TrialByFire.Tresearch.Tests
 
         public IntegrationTestDependencies()
         {
-            messageBank = new MessageBank();
-            sqlDAO = new SqlDAO(_connectionString, messageBank);
-            logService = new SqlLogService(sqlDAO);
-            authenticationService = new AuthenticationService(sqlDAO, logService, messageBank);
-            authorizationService = new AuthorizationService(sqlDAO, logService);
-            validationService = new ValidationService(messageBank);
-            accountDeletionService = new AccountDeletionService(sqlDAO, logService, rolePrincipal);
+            _buildSettingsOptions = new BuildSettingsOptions()
+            {
+                Environment = "Test",
+                SqlConnectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true",
+                SendGridAPIKey = ""
+            };
+            BuildSettingsOptions = Options.Create(_buildSettingsOptions) as IOptions<BuildSettingsOptions>;
+            MessageBank = new MessageBank();
+            SqlDAO = new SqlDAO(MessageBank, BuildSettingsOptions);
+            LogService = new LogService(SqlDAO);
+            AuthenticationService = new AuthenticationService(SqlDAO, LogService, MessageBank);
+            AuthorizationService = new AuthorizationService(SqlDAO, LogService);
+            ValidationService = new ValidationService(MessageBank);
+            AccountDeletionService = new AccountDeletionService(SqlDAO, LogService);
         }
     }
 }

@@ -9,11 +9,11 @@ using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
-    public class SqlLogService : ILogService
+    public class LogService : ILogService
     {
         private  ISqlDAO _sqlDAO { get; }
 
-        public SqlLogService(ISqlDAO sqlDAO)
+        public LogService(ISqlDAO sqlDAO)
         {
             _sqlDAO = sqlDAO;
         }

@@ -45,7 +45,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             throw new NotImplementedException();
         }*/
 
-        public async Task<string> StoreLog(ILog log, CancellationToken cancellationToken = default)
+        public async Task<string> StoreLogAsync(ILog log, CancellationToken cancellationToken = default)
         {
             InMemoryDatabase.Logs.Add(log);
             return await _messageBank.GetMessage(IMessageBank.Responses.generic).ConfigureAwait(false);

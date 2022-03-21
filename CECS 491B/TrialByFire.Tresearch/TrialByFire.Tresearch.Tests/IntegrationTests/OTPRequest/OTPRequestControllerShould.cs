@@ -53,10 +53,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
                 Thread.CurrentPrincipal = rolePrincipal;
             }
             IMailService mailService = new MailService(MessageBank);
-            IOTPRequestService otpRequestService = new OTPRequestService(SqlDAO, SqlLogService, MessageBank);
-            IOTPRequestManager otpRequestManager = new OTPRequestManager(SqlDAO, SqlLogService, ValidationService,
+            IOTPRequestService otpRequestService = new OTPRequestService(SqlDAO, LogService, MessageBank);
+            IOTPRequestManager otpRequestManager = new OTPRequestManager(SqlDAO, LogService, ValidationService,
                 AuthenticationService, otpRequestService, MessageBank, mailService);
-            IOTPRequestController otpRequestController = new OTPRequestController(SqlDAO, SqlLogService,
+            IOTPRequestController otpRequestController = new OTPRequestController(SqlDAO, LogService,
                 otpRequestManager, MessageBank);
             string[] expecteds = expected.Split(": ");
             ObjectResult expectedResult = new ObjectResult(expecteds[2])
