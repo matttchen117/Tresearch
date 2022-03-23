@@ -15,7 +15,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         private BuildSettingsOptions _options { get; }
         private IMessageBank _messageBank;
 
-        public SqlDAO(IMessageBank messageBank, IOptions<BuildSettingsOptions> options)
+        public SqlDAO(IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> options)
         {
             _messageBank = messageBank;
             _options = options.Value;
