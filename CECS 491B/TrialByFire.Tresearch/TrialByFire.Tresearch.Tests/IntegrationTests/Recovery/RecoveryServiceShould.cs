@@ -11,8 +11,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         public RecoveryServiceShould() : base() { }
 
         [Theory]
-        [InlineData("IntegrationRecoveryService1@gmail.com", "200: Server: success", "user")]
-        [InlineData("IntegrationRecoveryService2@gmail.com", "200: Server: success", "user")]
+        [InlineData("IntegrationRecoveryService1@gmail.com", "200: Server: success", "user")]               
+        [InlineData("IntegrationRecoveryService2@gmail.com", "200: Server: success", "admin")]
         public async Task GetAccountAsync(string username, string statusCode, string authorizationLevel)
         {
             //Arrange
