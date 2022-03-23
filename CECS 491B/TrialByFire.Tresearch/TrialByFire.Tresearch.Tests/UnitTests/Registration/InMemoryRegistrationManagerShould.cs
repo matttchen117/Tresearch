@@ -7,35 +7,22 @@ using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Managers.Implementations;
 using TrialByFire.Tresearch.Services.Implementations;
 using TrialByFire.Tresearch.Models.Implementations;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
 {
-    public class InMemoryRegistrationManagerShould
+    public class InMemoryRegistrationManagerShould : TestBaseClass
     {
 
-        ISqlDAO _sqlDAO { get; set; }
-        ILogService _logService { get; set; }
-
-        IRegistrationService _registrationService { get; set; }
-
-        IMailService _mailService { get; set; }
-
-        IValidationService _validationService { get; set; }
-
-        IMessageBank _messageBank { get; set; }
-
-        IRegistrationManager _registrationManager { get; set; }
-        public InMemoryRegistrationManagerShould()
+        
+        public InMemoryRegistrationManagerShould() : base(new string[] { })
         {
-            _sqlDAO = new InMemorySqlDAO();
-            _logService = new LogService(_sqlDAO);
-            _registrationService = new RegistrationService(_sqlDAO, _logService);
-
-            _messageBank = new MessageBank();
-            _mailService = new MailService(_messageBank);
-            _validationService = new ValidationService(_messageBank);
-            _registrationManager = new RegistrationManager(_sqlDAO, _logService, _registrationService, _mailService, _validationService, _messageBank);
+            TestBuilder.Services.AddScoped<IMailService, MailService>();
+            TestBuilder.Services.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestBuilder.Services.AddScoped<IRegistrationService, RegistrationService>();
+            TestBuilder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
+            TestApp = TestBuilder.Build();
         }
 
 
@@ -48,7 +35,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             //Act
             DateTime time = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day + daySubtraction, DateTime.Now.Hour, DateTime.Now.Minute, 0);
             IConfirmationLink link = new ConfirmationLink(username, Guid.NewGuid(), time);
-            _sqlDAO.CreateConfirmationLink(link);
+            ISqlDAO sqlDAO = TestApp.Services.GetService<ISqlDAO>();
+            IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
+
+            sqlDAO.CreateConfirmationLink(link);
             bool expected;
 
             int hours = (-daySubtraction * 24);
@@ -58,7 +48,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
                 expected = true;
 
             //Act
-            bool result = _registrationManager.IsConfirmationLinkValid(link);
+            bool result = registrationManager.IsConfirmationLinkValid(link);
 
             //Assert
             Assert.Equal(expected, result);
@@ -71,9 +61,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public void CreateTheUserAccount(string email, string passphrase)
         {
             //Arrange
-
+            IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
             //Act
-            List<string> result = _registrationManager.CreatePreConfirmedAccount(email, passphrase);
+            List<string> result = registrationManager.CreatePreConfirmedAccount(email, passphrase);
 
             //Assert
             Assert.Equal('S', result.Last()[0]);
@@ -84,12 +74,13 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         [InlineData("pammmmyyyy@gmail.com", "www.tresearch.systems")]
         public void SendEmailConfirmation(string email, string baseUrl)
         {
-
+            //Arrange
+            IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
             IAccount account = new Account(email, "temporaryPassword");
 
 
             //Act
-            List<string> result = _registrationManager.SendConfirmation(email, baseUrl);
+            List<string> result = registrationManager.SendConfirmation(email, baseUrl);
 
             //Assert
             Assert.Equal('S', result.Last()[0]);
@@ -102,16 +93,17 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         {
             IConfirmationLink _confirmationLink = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Parse(date));
             IAccount _account = new Account(email, email, passphrase, "user", true, false);
-
-            _sqlDAO.CreateAccount(_account);
-            _sqlDAO.CreateConfirmationLink(_confirmationLink);
+            ISqlDAO sqlDAO = TestApp.Services.GetService<ISqlDAO>();
+            IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
+            sqlDAO.CreateAccount(_account);
+            sqlDAO.CreateConfirmationLink(_confirmationLink);
 
             string link = baseUrl + _confirmationLink.UniqueIdentifier;
 
             List<string> results = new List<string>();
 
             //Act
-            results.AddRange(_registrationManager.ConfirmAccount(link));
+            results.AddRange(registrationManager.ConfirmAccount(link));
 
             //Assert
             Assert.Equal('S', results.Last()[0]);

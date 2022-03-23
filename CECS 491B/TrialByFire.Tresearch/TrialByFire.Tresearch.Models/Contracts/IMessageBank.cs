@@ -36,6 +36,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             recoveryLinkRemoveFail,
             recoveryLinkCreateFail,
             recoveryLinkExists,
+            recoveryLinkExpired,
             otpFail,
             databaseFail,
             logoutFail,

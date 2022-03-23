@@ -59,33 +59,32 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 using (var connection = new SqlConnection(_options.SqlConnectionString))                                        // Establish connection with database
                 {
                     //Perform sql statement
-                    var procedure = "[DisableAccount]";                                                                 // Name of store procedure
+                    var procedure = "dbo.[DisableAccount]";                                                                 // Name of store procedure
                     var value = new { Username = email, AuthorizationLevel = authorizationLevel };   //Columns to check in database
-                    int affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                     //Check if cancellation is requested
                     if (cancellationToken.IsCancellationRequested)
                     {
                         //Cancellation has been requested, undo everything
                         string rollbackResult = await EnableAccountAsync(email, authorizationLevel);                                      // Enables account.. result should be generic success
-                        if (rollbackResult != _messageBank.SuccessMessages["generic"])
-                            return _messageBank.ErrorMessages["rollbackFailed"];                                        // Rollback failed, account is still in database
+                        if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                            return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;                                       // Rollback failed, account is still in database
                         else
-                            return _messageBank.ErrorMessages["cancellationRequested"];                                 // Cancellation requested, successfully rolledback account disable
+                            throw new OperationCanceledException();                                 // Cancellation requested, successfully rolledback account disable
                     }
 
                     //Check rows affected... If account exists, should be 1 otherwise error
-                    if (affectedRows == 0)
-                        return _messageBank.ErrorMessages["accountNotFound"];                                           // Account doesn't exist
-                    else if (affectedRows != 1)
-                        return _messageBank.ErrorMessages["accountDisableFail"];                                        // Could not disable account
-                    return _messageBank.SuccessMessages["generic"];                                                     // Account successfully disabled
+                    if (affectedRows < 1)
+                        return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+                    else
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
                 }
             }
             catch (OperationCanceledException)
             {
                 // Cancellation requested, nothing to rollback
-                return _messageBank.ErrorMessages["cancellationRequested"];
+                throw;
             }
             catch (Exception ex)
             {
@@ -106,35 +105,43 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();                                                           // Check if cancellation token has requested cancellation
-                using (var connection = new SqlConnection(_options.SqlConnectionString))                                            // Establish connection with database
+                using (var connection = new SqlConnection(_options.SqlConnectionString))                                    // Establish connection with database
                 {
                     //Perform sql statement
-                    var procedure = "[EnableAccount]";                                                                      // Store Procedure
+                    var procedure = "dbo.[EnableAccount]";                                                                      // Store Procedure
                     var value = new { Username = email, AuthorizationLevel = authorizationLevel };
-                    int affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                     // Check if cancellation is requested
                     if (cancellationToken.IsCancellationRequested)
                     {
                         string rollbackResult = await DisableAccountAsync(email, authorizationLevel);
-                        if (rollbackResult != "200")
-                            return "503";    // 503 Service Unavailable - Roll back failed
+                        if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                            return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
                         else
-                            return "500";    // 500 Generic Failed - Roll back su
+                            throw new OperationCanceledException();
                     }
 
-                    //Check rows affected... If account exists, should be 1 otherwise error
-                    if (affectedRows == 0)
-                        return _messageBank.ErrorMessages["accountNotFound"];                                               // Account doesn't exist
-                    else if (affectedRows != 1)
-                        return _messageBank.ErrorMessages["accountEnableFail"];                                             // Could not enable account
-                    return _messageBank.SuccessMessages["generic"];                                                         // Account successfully disabled
+                    if(affectedRows < 1)
+                        return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+                    else
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                }
+            }
+            catch (SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    case 547:   //Adding recovery link violates foreign key constraint (AKA NO ACCOUNT)
+                        return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+                    default:
+                        return "500: Database: " + ex.Message;
                 }
             }
             catch (OperationCanceledException)
             {
                 // Cancellation requested, nothing to rollback
-                return _messageBank.ErrorMessages["cancellationRequested"];
+                throw;
             }
             catch (Exception ex)
             {
@@ -298,79 +305,128 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        /// <summary>
-        ///     GetTotalRecoveryLinksAsync()
-        ///         Returns an integer count of all recovery links currently in the database matching credentials.
-        /// </summary>
-        /// <param name="email">Email credential of user</param>
-        /// <param name="authorizationLevel">Authorization level of user</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Tuple containing count of all recovery links and string status code</returns>
-        public async Task<Tuple<int, string>> GetTotalRecoveryLinksAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<int> GetRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
-
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    //Perform sql statement
-                    var procedure = "[GetTotalRecoveryLinks]";          // Stored procedure
-                    var value = new { Username = email, AuthorizationLevel = authorizationLevel };               // Guid to search in table
-                    int totalLinks = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    //Check for cancellation...no rollback necessary
+                    var procedure = "[GetRecoveryLinksCreated]";      //INSERT on duplicate key update linkscreted++
+                    var value = new { Username = email, AuthorizationLevel = authorizationLevel };
+                    var total = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     if (cancellationToken.IsCancellationRequested)
-                        return Tuple.Create(-1, _messageBank.ErrorMessages["cancellationRequested"]);
-
-                    return Tuple.Create(totalLinks, _messageBank.SuccessMessages["generic"]);
+                        throw new OperationCanceledException();
+                    return total;
+                }
+            }
+            catch (SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    case 547:   //Adding recovery link violates foreign key constraint (AKA NO ACCOUNT)
+                        return 0;
+                    default:
+                        return -1;
                 }
             }
             catch (OperationCanceledException ex)
             {
-                return Tuple.Create(-1, _messageBank.ErrorMessages["cancellationRequested"]);
+                //No rollback necessary
+                throw;
             }
             catch (Exception ex)
             {
-                return Tuple.Create(-1, "500: Database: " + ex);
+                return -1;
             }
         }
 
-        /// <summary>
-        ///     RemoveAllRecoveryLinksAsync()
-        ///         Removes all recovery lists existing in a database with a given email and authorization level 
-        /// </summary>
-        /// <param name="email">Email of user to delete recovery links</param>
-        /// <param name="authorizationLevel">Authorization level of user to delete recover links</param>
-        /// <param name="cancellationToken">Cancellation Token</param>
-        /// <returns>Tuple containing integer of links removed and string status code</returns>
-        public async Task<Tuple<int, string>> RemoveAllRecoveryLinksAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> DecrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    //Perform sql statement
-                    var procedure = "[RemoveUserRecoveryLinks]"; // Stored procedure
-                    var value = new { Username = email, AuthorizationLevel = authorizationLevel };               // Guid to search in table
-                    int linksRemoved = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-
-                    //Check if links removed
-                    if (linksRemoved < 0)
-                        return Tuple.Create(-1, _messageBank.ErrorMessages["recoveryLinkRemoveFail"]);
-                    else
-                        return Tuple.Create(linksRemoved, _messageBank.SuccessMessages["generic"]);
+                    var procedure = "[DecrementRecoveryLinksCreated]";      //INSERT on duplicate key update linkscreted++
+                    var value = new { Username = email, AuthorizationLevel = authorizationLevel };
+                    var affectedRows = await connection.QueryAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        string rollbackResult = await IncrementRecoveryLinkCountAsync(email, authorizationLevel);
+                        if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                            return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                        else
+                            throw new OperationCanceledException();
+                    }
+                    
+                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
                 }
             }
-            catch (OperationCanceledException)
+            catch (SqlException ex)
             {
-                return Tuple.Create(-1, _messageBank.ErrorMessages["cancellationRequested"]);
+                switch (ex.Number)
+                {
+                    case 547:   //Adding recovery link violates foreign key constraint (AKA NO ACCOUNT)
+                        return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+                    default:
+                        return "500: Database: " + ex.Message;
+                }
+            }
+            catch (OperationCanceledException ex)
+            {
+                //No rollback necessary
+                throw;
             }
             catch (Exception ex)
             {
-                return Tuple.Create(-1, "500: Database: " + ex);
+                return "500: Database: " + ex.Message;
             }
         }
+
+        public async Task<string> IncrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var procedure = "[IncrementRecoveryLinksCreated]";      //INSERT on duplicate key update linkscreted++
+                    var value = new { Username = email, AuthorizationLevel = authorizationLevel };
+                    var affectedRows = await connection.QueryAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        string rollbackResult = await DecrementRecoveryLinkCountAsync(email, authorizationLevel);
+                        if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                            return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                        else
+                            throw new OperationCanceledException();
+                    }
+                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                }
+            }
+            catch(SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    case 547:   //Adding recovery link violates foreign key constraint (AKA NO ACCOUNT)
+                        return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+                    default:
+                        return "500: Database: " + ex.Message;
+                }
+            }
+            catch (OperationCanceledException ex)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+
+       
 
         /// <summary>
         ///     CreateRecoveryLinkAsync()

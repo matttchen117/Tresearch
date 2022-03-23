@@ -23,7 +23,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _mailService = mailService;
         }
 
-        public async Task<string> SendRecoveryEmail(string email, string baseurl, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> SendRecoveryEmailAsync(string email, string baseurl, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
            
             try
@@ -45,11 +45,22 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 if (account.Item1.AccountStatus == true)          
                     return _messageBank.GetMessage(IMessageBank.Responses.alreadyEnabled).Result;
 
+                //Check if account has less than five links
+                int linkTotal = await _recoveryService.GetRecoveryLinkCountAsync(email, authorizationLevel, cancellationToken);
+
+                
+
+                if (linkTotal >= 5)
+                    return _messageBank.GetMessage(IMessageBank.Responses.recoveryLinkLimitReached).Result;
+
+                //Check if cancelled
+                if (cancellationToken.IsCancellationRequested)
+                    throw new OperationCanceledException();
+
                 // Create the recovery link
                 Tuple<IRecoveryLink, string> recoveryLink = await _recoveryService.CreateRecoveryLinkAsync(account.Item1, cancellationToken);
 
-
-                if (cancellationToken.IsCancellationRequested)
+                if (cancellationToken.IsCancellationRequested && recoveryLink.Item2 == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                 {
                     string rollBackresult = await _recoveryService.RemoveRecoveryLinkAsync(recoveryLink.Item1);
                     if (rollBackresult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
@@ -58,18 +69,20 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                         throw new OperationCanceledException();    //rollback taken care of
                 }
 
+
                 //Check if recovery link created in database
                 if (recoveryLink.Item2 != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                     return recoveryLink.Item2;
 
                 //Send Recovery Link --> no possible rollback at this point but can still cancel
-                string mailResults = await _mailService.SendRecoveryAsync(email, baseurl+recoveryLink.Item1.GUIDLink, cancellationToken);
+                string link = baseurl +  recoveryLink.Item1.GUIDLink.ToString();
+                string mailResults = await _mailService.SendRecoveryAsync(email, link, cancellationToken);
                 return mailResults;
             }
             catch (OperationCanceledException)
             {
                 // Nothing to rollback
-                return _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result;
+                throw;
             }
             catch (Exception ex)
             {
@@ -77,36 +90,69 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             }
         }
 
-        public async Task<string> EnableAccountAsync(string guid, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> EnableAccountAsync(string url, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
+                string guid = url.Substring(url.LastIndexOf('=') + 1);
+                
                 cancellationToken.ThrowIfCancellationRequested();
 
                 //Get recoverylink from database
                 Tuple<IRecoveryLink, string> recoveryLink = await _recoveryService.GetRecoveryLinkAsync(guid, cancellationToken);
 
                 if (cancellationToken.IsCancellationRequested)
-                    return _messageBank.ErrorMessages["cancellationRequested"]; //No rollback necessary
+                    throw new OperationCanceledException(); //No rollback necessary
 
-                if (recoveryLink.Item2 != _messageBank.SuccessMessages["generic"])
+                if (recoveryLink.Item2 != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                     return recoveryLink.Item2;
 
+                
+
+                //Check if recovery link is older than 24 hours
+                if (recoveryLink.Item1.isValid())
+                    return _messageBank.GetMessage(IMessageBank.Responses.recoveryLinkExpired).Result;
                 //Enable Account
                 string enableResult = await _recoveryService.EnableAccountAsync(recoveryLink.Item1.Username, recoveryLink.Item1.AuthorizationLevel, cancellationToken);
 
                 if (cancellationToken.IsCancellationRequested)
                 {
                     string rollBack = await _recoveryService.DisableAccountAsync(recoveryLink.Item1.Username, recoveryLink.Item1.AuthorizationLevel);
-                    if(rollBack != _messageBank.SuccessMessages["generic"])
-                        return _messageBank.ErrorMessages["rollbackFailed"]; 
+                    if (rollBack != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result;
                     else
-                        return _messageBank.ErrorMessages["cancellationRequested"];
+                        throw new OperationCanceledException();
                 }
 
-                //Make sure to remove recovery link from database and increment database
+                if (enableResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                    return enableResult;
 
-                return enableResult;
+                //Remove old link and increment
+                string removeResult = await _recoveryService.RemoveRecoveryLinkAsync(recoveryLink.Item1, cancellationToken).ConfigureAwait(false);
+                
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result;
+                }
+
+                if (removeResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                    return removeResult;
+                
+                string incrementResult = await _recoveryService.IncrementRecoveryLinkCountAsync(recoveryLink.Item1.Username, recoveryLink.Item1.AuthorizationLevel, cancellationToken).ConfigureAwait(false); ;
+                
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    string rollBack = await _recoveryService.DecrementRecoveryLinkCountAsync(recoveryLink.Item1.Username, recoveryLink.Item1.AuthorizationLevel);
+                    if (rollBack != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result;
+                    else
+                        throw new OperationCanceledException();
+                }
+
+                if (incrementResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                    return incrementResult;
+
+                return incrementResult;
 
             }
             catch (OperationCanceledException)

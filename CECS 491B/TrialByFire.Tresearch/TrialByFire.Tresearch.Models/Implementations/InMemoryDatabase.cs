@@ -124,17 +124,17 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<INode> InitializeNodes()
         {
             List<INode> nodes = new List<INode>();
-            nodes.Add(new Node(100000, 100001, "Title 1", "Summary 1", "Private", "larry@gmail.com"));
-            nodes.Add(new Node(100001, 100002, "Title 2", "Summary 2", "Private", "larry@gmail.com"));
-            nodes.Add(new Node(100002, 100003, "Title 3", "Summary 3", "Private", "larry@gmail.com"));
-            nodes.Add(new Node(100003, 100004, "Title 4", "Summary 4", "Public", "larry@gmail.com"));
-            nodes.Add(new Node(100004, 100004, "Title 5", "Summary 5", "Public", "larry@gmail.com"));
+            nodes.Add(new Node(100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com"));
+            nodes.Add(new Node(100001, 100002, "Title 2", "Summary 2", false, "larry@gmail.com"));
+            nodes.Add(new Node(100002, 100003, "Title 3", "Summary 3", false, "larry@gmail.com"));
+            nodes.Add(new Node(100003, 100004, "Title 4", "Summary 4", true, "larry@gmail.com"));
+            nodes.Add(new Node(100004, 100004, "Title 5", "Summary 5", true, "larry@gmail.com"));
 
-            nodes.Add(new Node(200000, 200001, "Title 1", "Summary 1", "Private", "billy@yahoo.com"));
-            nodes.Add(new Node(200001, 200002, "Title 2", "Summary 2", "Private", "billy@yahoo.com"));
-            nodes.Add(new Node(200002, 200003, "Title 3", "Summary 3", "Private", "billy@yahoo.com"));
-            nodes.Add(new Node(200003, 200004, "Title 4", "Summary 4", "Public", "billy@yahoo.com"));
-            nodes.Add(new Node(200004, 200004, "Title 5", "Summary 5", "Public", "billy@yahoo.com"));
+            nodes.Add(new Node(200000, 200001, "Title 1", "Summary 1", false, "billy@yahoo.com"));
+            nodes.Add(new Node(200001, 200002, "Title 2", "Summary 2", false, "billy@yahoo.com"));
+            nodes.Add(new Node(200002, 200003, "Title 3", "Summary 3", false, "billy@yahoo.com"));
+            nodes.Add(new Node(200003, 200004, "Title 4", "Summary 4", true, "billy@yahoo.com"));
+            nodes.Add(new Node(200004, 200004, "Title 5", "Summary 5", true, "billy@yahoo.com"));
 
             return nodes;
         }

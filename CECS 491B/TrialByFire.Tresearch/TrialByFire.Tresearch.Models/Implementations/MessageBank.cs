@@ -56,8 +56,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "403: Server: Account is already enabled.";
                 case Responses.recoveryLinkLimitReached:
                     return "403: Server: Account has reached limit of five attempts this month";
-                case Responses.recoveryLinkExists:
-                    return "403: Database: The recovery link arealdy exists.";
                 case Responses.accountNotFound:
                     return "404: Database: The account was not found.";
                 case Responses.notFoundOrEnabled:
@@ -69,6 +67,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "404: Database: The recovery link was not found";
                 case Responses.cancellationRequested:
                     return "408: Server: Cancellation token requested cancellation.";
+                case Responses.recoveryLinkExists:
+                    return "409: Database: The recovery link arealdy exists.";
+                case Responses.recoveryLinkExpired:
+                    return "410: Server: The recovery link has expired.";
                 case Responses.cookieFail:
                     return "503: Server: Authentication Cookie creation failed.";
                 case Responses.sendEmailFail:

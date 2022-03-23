@@ -67,7 +67,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 if (recoveryLink == null)
-                    return "404";
+                    return _messageBank.GetMessage(IMessageBank.Responses.recoveryLinkNotFound).Result;
                 string result = await _sqlDAO.RemoveRecoveryLinkAsync(recoveryLink, cancellationToken);
                 return result;
             }
@@ -152,13 +152,13 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 
                 result = await _sqlDAO.EnableAccountAsync(email, authorizationLevel, cancellationToken);
                 
-                if(cancellationToken.IsCancellationRequested && result == _messageBank.SuccessMessages["generic"])
+                if(cancellationToken.IsCancellationRequested && result == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                 {
                     string rollbackResult = await _sqlDAO.DisableAccountAsync(email, authorizationLevel, cancellationToken);
-                    if (rollbackResult != _messageBank.SuccessMessages["generic"])
+                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                         return rollbackResult;
                 } else if(cancellationToken.IsCancellationRequested)
-                    return _messageBank.ErrorMessages["cancellationRequested"];
+                    throw new OperationCanceledException();
                 return result;
             }
             catch (OperationCanceledException ex)
@@ -174,30 +174,110 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
         public async Task<string> DisableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
-            string result = "";
+            
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                result = await _sqlDAO.DisableAccountAsync(email, authorizationLevel, cancellationToken);
-                if (cancellationToken.IsCancellationRequested && result == _messageBank.SuccessMessages["generic"])
+                string result = await _sqlDAO.DisableAccountAsync(email, authorizationLevel, cancellationToken);
+                if (cancellationToken.IsCancellationRequested && result == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                 {
                     string rollbackResult = await _sqlDAO.DisableAccountAsync(email, authorizationLevel, cancellationToken);
-                    if (rollbackResult != _messageBank.SuccessMessages["generic"])
+                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                         return rollbackResult;
                 }
                 else if (cancellationToken.IsCancellationRequested)
-                    return _messageBank.ErrorMessages["cancellationRequested"];
+                    throw new OperationCanceledException();
                 return result;
             }
             catch (OperationCanceledException)
             {
-                return _messageBank.ErrorMessages["cancellationRequested"];
+                // No rollback necessary
+                throw;
             }
             catch (Exception ex)
             {
                 return "500: Server: " + ex;
             }
 
+        }
+
+        public async Task<string> DecrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                string result = await _sqlDAO.DecrementRecoveryLinkCountAsync(email, authorizationLevel, cancellationToken).ConfigureAwait(false);
+                if (cancellationToken.IsCancellationRequested && result == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                {
+                    string rollbackResult = await _sqlDAO.IncrementRecoveryLinkCountAsync(email, authorizationLevel);
+                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                    else
+                        throw new OperationCanceledException();
+                }
+                else if (cancellationToken.IsCancellationRequested)
+                    throw new OperationCanceledException();
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                // No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Server: " + ex;
+            }
+        }
+
+        public async Task<string> IncrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                string result = await _sqlDAO.IncrementRecoveryLinkCountAsync(email, authorizationLevel, cancellationToken).ConfigureAwait(false);
+                if (cancellationToken.IsCancellationRequested && result == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                {
+                    string rollbackResult = await _sqlDAO.DecrementRecoveryLinkCountAsync(email, authorizationLevel);
+                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                    else
+                        throw new OperationCanceledException();
+                }
+                else if (cancellationToken.IsCancellationRequested)
+                    throw new OperationCanceledException();
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                // No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Server: " + ex;
+            }
+        }
+
+        public async Task<int> GetRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                int result = await _sqlDAO.GetRecoveryLinkCountAsync(email, authorizationLevel, cancellationToken).ConfigureAwait(false);
+                if (cancellationToken.IsCancellationRequested)
+                    throw new OperationCanceledException();
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                // No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return -1;
+            }
         }
     }
 }

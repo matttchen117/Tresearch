@@ -20,9 +20,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
         private ISqlDAO _sqlDAO { get; set; }
-
         private ILogService _logService { get; set; }
-
         private IMessageBank _messageBank { get; set; }
         private IRecoveryManager _recoveryManager { get; set; }
 
@@ -41,16 +39,10 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             try
             {
                 string baseUrl = "https://localhost:7010/Recovery/recover?guid=";
-                string result = await _recoveryManager.SendRecoveryEmail(email, baseUrl, authorizationLevel, _cancellationTokenSource.Token);
+                string result = await _recoveryManager.SendRecoveryEmailAsync(email, baseUrl, authorizationLevel, _cancellationTokenSource.Token);
                 string[] split;
                 split = result.Split(":");
-                if(result == _messageBank.SuccessMessages["generic"])
-                {
-                    return new OkObjectResult(split[1]) { StatusCode = Convert.ToInt32(split[0]) };
-                } else
-                {
-                    return StatusCode(Convert.ToInt32(split[0]), split[2]);
-                }
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
 
             } 
             catch(Exception ex)
@@ -60,11 +52,11 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         }
 
         [HttpPost("recover")]
-        public async Task<IActionResult> EnableAccountAsync(string guid)
+        public async Task<IActionResult> EnableAccountAsync(string url)
         {
             try
             {
-                string result = await _recoveryManager.EnableAccountAsync(guid, _cancellationTokenSource.Token);
+                string result = await _recoveryManager.EnableAccountAsync(url, _cancellationTokenSource.Token);
                 string[] split;
                 split = result.Split(":");
                 return StatusCode(Convert.ToInt32(split[0]), split[2]);

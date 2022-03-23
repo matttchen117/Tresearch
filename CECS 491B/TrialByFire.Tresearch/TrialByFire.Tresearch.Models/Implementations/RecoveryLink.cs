@@ -21,7 +21,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public bool isValid()
         {
             DateTime now = System.DateTime.Now;
-            return (TimeCreated > now.AddHours(-24) && TimeCreated <=now);
+            return (TimeCreated <=now.AddMinutes(1) && TimeCreated > now.AddDays(-1));
         }
     }
 }
