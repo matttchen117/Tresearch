@@ -152,35 +152,38 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// <returns>Tuple containing account found (if not found, null) and string status code</returns>
         public async Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
+            
             IAccount nullAccount = null;
             try
             {
+
                 cancellationToken.ThrowIfCancellationRequested();
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     //Perform sql statement
-
+                    await connection.OpenAsync();
                     var procedure = "dbo.[GetAccount]";
                     var parameters = new { Username = email, AuthorizationLevel = authorizationLevel };
+
                     var Accounts = await connection.QueryAsync<Account>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-          
+                    
                     //Check if account was returned
-                    if (Accounts.Count() == 0)
+                    if (Accounts.Count() < 1)
                         return Tuple.Create(nullAccount, _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result);            //Account doesn't exist
 
-                    IAccount account = Accounts.First();
+                    IAccount account = Accounts.FirstOrDefault();
 
 
                     // Check if cancellation is requested .. no rollback necessary
                     if (cancellationToken.IsCancellationRequested)
-                        return Tuple.Create(nullAccount, _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result);
+                        throw new OperationCanceledException();
                     else
                         return Tuple.Create(account, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
                 }
             }
             catch (OperationCanceledException)
             {
-                return Tuple.Create(nullAccount, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
+                throw;
             }
             catch (Exception ex)
             {
@@ -214,21 +217,20 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         if (rollbackResults != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                             return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
                         else
-                            return _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result;
+                            throw new OperationCanceledException();
                     }
 
                     //Check if recovery link removed
-                    if (affectedRows == 0)
-                        return _messageBank.GetMessage(IMessageBank.Responses.recoveryLinkNotFound).Result;
-                    else if (affectedRows == 1)
-                        return _messageBank.SuccessMessages["generic"];
+                    if (affectedRows >= 0)
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
                     else
-                        return _messageBank.ErrorMessages["recoveryLinkRemoveFail"];
+                        return _messageBank.GetMessage(IMessageBank.Responses.recoveryLinkRemoveFail).Result;
                 }
             }
             catch (OperationCanceledException)
             {
-                return _messageBank.ErrorMessages["cancellationRequested"];
+                //No rollback required
+                throw;
             }
             catch (Exception ex)
             {
@@ -243,7 +245,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// <param name="guid">Uniqueidentifier of link in database</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Tuple containing recovery link and string status code</returns>
-        public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(string guidlink, CancellationToken cancellationToken = default(CancellationToken))
         {
             IRecoveryLink nullLink = null;
             try
@@ -251,33 +253,48 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    //Perform sql statement
-                    var procedure = "[GetRecoveryLink]";                                    // Stored procedure
-                    var value = new { GUIDLink = guid };                                     // Guid to search in table
-                    var links = await connection.QueryAsync<RecoveryLink>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     
-                    //Check for cancellation...no rollback necessary
-                    if (cancellationToken.IsCancellationRequested)
-                        return Tuple.Create(nullLink, _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result);
+                    //Perform sql statement
+                    var procedureUsername = "dbo.[GetRecoveryLinkUsername]";                                    // Stored procedure
+                    var procedureTimeCreated = "dbo.[GetRecoveryLinkTimeCreated]";
+                    var procedureAuthorizationLevel = "dbo.[GetRecoveryLinkAuthorizationLevel]";
+                    var value = new { GUIDLink = new Guid(guidlink) };
+                    var parameters = new DynamicParameters();
+                    parameters.Add("@GUIDLink", Guid.Parse(guidlink),DbType.Guid);
+                    //command.Parameters.Add("@GUIDLink", SqlDbType.UniqueIdentifier).Value = new Guid(guidlink);
+                    string username =  await connection.ExecuteScalarAsync<string>(new CommandDefinition(procedureUsername, parameters,commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    string timeCreated = await connection.ExecuteScalarAsync<string>(new CommandDefinition(procedureTimeCreated, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    string authorizationLevel = await connection.ExecuteScalarAsync<string>(new CommandDefinition(procedureAuthorizationLevel, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
-                    //Return recoverylink if found
-                    if (links.Count() == 0)
+                    if(username == null || timeCreated == null || authorizationLevel == null)
                         return Tuple.Create(nullLink, _messageBank.GetMessage(IMessageBank.Responses.recoveryLinkNotFound).Result);
-                    else
-                    {
-                        IRecoveryLink link = links.First();
-                        return Tuple.Create(link, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
-                    }
 
+                    IRecoveryLink link = new RecoveryLink(username, authorizationLevel, DateTime.Parse(timeCreated), new Guid(guidlink));
+
+                    if (cancellationToken.IsCancellationRequested)
+                        throw new OperationCanceledException();
+                    else
+                        return Tuple.Create(link, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
+                }
+            }
+            catch(SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    case 547:   //Adding recovery link violates foreign key constraint (AKA NO ACCOUNT)
+                        return Tuple.Create(nullLink, _messageBank.GetMessage(IMessageBank.Responses.recoveryLinkNotFound).Result);
+                    default:
+                        return Tuple.Create(nullLink, "500: Database: " + ex.Message);
                 }
             }
             catch (OperationCanceledException)
             {
-                return Tuple.Create(nullLink, _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result);
+                //No rollback necessary
+                throw;
             }
             catch (Exception ex)
             {
-                return Tuple.Create(nullLink, "500: Database: " + ex);
+                return Tuple.Create(nullLink, "500: Database: " + ex.Message);
             }
         }
 
@@ -373,22 +390,37 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var procedure = "[CreateRecoveryLink]";
                     var value = new { Username = recoveryLink.Username, GUIDLink = recoveryLink.GUIDLink, TimeCreated = recoveryLink.TimeCreated, AuthorizationLevel = recoveryLink.AuthorizationLevel };
                     var affectedRows = await connection.QueryAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-
+                    
+                    //Check if cancellation is requested
                     if (cancellationToken.IsCancellationRequested)
                     {
+                        //Perform rollback
                         string rollbackResult = await RemoveRecoveryLinkAsync(recoveryLink);
-                        if (rollbackResult != _messageBank.SuccessMessages["generic"])
-                            return _messageBank.ErrorMessages["rollbackFailed"];
+                        if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                            return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
                         else
-                            return _messageBank.ErrorMessages["cancellationRequested"];
+                            throw new OperationCanceledException();
                     }
 
-                    return _messageBank.SuccessMessages["generic"];
+                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                }
+            }
+            catch(SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    case 2627:  //Recovery link already exists in database
+                        return _messageBank.GetMessage(IMessageBank.Responses.recoveryLinkExists).Result;
+                    case 547:   //Adding recovery link violates foreign key constraint (AKA NO ACCOUNT)
+                        return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+                    default:
+                        return _messageBank.GetMessage(IMessageBank.Responses.recoveryLinkCreateFail).Result;
                 }
             }
             catch (OperationCanceledException)
             {
-                return _messageBank.ErrorMessages["cancellationRequested"];
+                //No rollback necessary
+                throw;
             }
             catch (Exception ex)
             {

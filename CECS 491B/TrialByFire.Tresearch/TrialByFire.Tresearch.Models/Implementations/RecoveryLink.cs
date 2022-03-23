@@ -6,13 +6,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
     {
         public string Username { get; set; }
 
+        public string AuthorizationLevel { get; set; }
+        public DateTime TimeCreated { get; set; }
         public Guid GUIDLink { get; set; }
 
-        public DateTime TimeCreated { get; set; }
-
-        public string AuthorizationLevel { get; set; }
-
-        public RecoveryLink(string username, Guid uniqueIdentifier, DateTime datetime, string authorizationLevel)
+        public RecoveryLink(string username, string authorizationLevel, DateTime datetime, Guid uniqueIdentifier)
         {
             Username = username;
             GUIDLink = uniqueIdentifier;

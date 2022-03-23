@@ -90,7 +90,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
                 Tuple<IAccount, string> accountTuple = await _sqlDAO.GetAccountAsync(email, authorizationLevel, cancellationToken);
                 if (cancellationToken.IsCancellationRequested)                                                  //No rollback necessary if canceled
-                    return Tuple.Create(nullAccount, _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result);                                 // Request cancelled
+                    throw new OperationCanceledException();
                 else
                     return accountTuple;
             }
@@ -105,31 +105,6 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        public async Task<Tuple<bool, string>> IsAccountDisabledAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            try
-            {
-                if (account.AccountStatus == false)
-                    return Tuple.Create(true, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
-                else
-                    return Tuple.Create(false, _messageBank.GetMessage(IMessageBank.Responses.alreadyEnabled).Result);
-            }
-            catch (ArgumentNullException ex)
-            {
-                //Account passed in is null
-                return Tuple.Create(false, _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result);
-            }
-            catch (OperationCanceledException ex)
-            {
-                //Service has been cancelled
-                //No need to make changes (no changes made to db)
-                return Tuple.Create(false, _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result);
-            }
-            catch (Exception ex)
-            {
-                return Tuple.Create(false, "500: Server: " + ex);
-            }
-        }
 
         public async Task<Tuple<IRecoveryLink, string>> CreateRecoveryLinkAsync(IAccount account, CancellationToken cancellationToken=default(CancellationToken))
         {
@@ -140,7 +115,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                linkCreated  = new RecoveryLink(account.Email, Guid.NewGuid(), DateTime.Now, account.AuthorizationLevel);
+                linkCreated  = new RecoveryLink(account.Email, account.AuthorizationLevel, DateTime.Now, Guid.NewGuid());
                 result = await _sqlDAO.CreateRecoveryLinkAsync(linkCreated, cancellationToken);
                 
                 if (cancellationToken.IsCancellationRequested && result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
@@ -151,14 +126,15 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                         return Tuple.Create(nullLink, _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result);    // 503 Service Unavailable - Roll back failed
                     else
-                        return Tuple.Create(nullLink, _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result);    // 500 Generic Failed - Roll back su
+                        throw new OperationCanceledException();
                 }
                 return Tuple.Create(linkCreated, result);
 
             } catch (OperationCanceledException ex)
             {
-                // Cancelled before execution
-                return Tuple.Create(nullLink, _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result);    // 500 Generic Failed - Roll back su
+                // No rollback necessary
+                throw;
+                
 
             }
             catch (Exception ex)

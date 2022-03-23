@@ -56,6 +56,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "403: Server: Account is already enabled.";
                 case Responses.recoveryLinkLimitReached:
                     return "403: Server: Account has reached limit of five attempts this month";
+                case Responses.recoveryLinkExists:
+                    return "403: Database: The recovery link arealdy exists.";
                 case Responses.accountNotFound:
                     return "404: Database: The account was not found.";
                 case Responses.notFoundOrEnabled:
