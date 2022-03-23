@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,10 +20,16 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
 {
-    public class InMemoryOTPRequestControllerShould : InMemoryTestDependencies
+    public class InMemoryOTPRequestControllerShould : TestBaseClass
     {
-        public InMemoryOTPRequestControllerShould() : base()
+        public InMemoryOTPRequestControllerShould() : base(new string[] { })
         {
+            TestBuilder.Services.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestBuilder.Services.AddScoped<IMailService, MailService>();
+            TestBuilder.Services.AddScoped<IOTPRequestService, OTPRequestService>();
+            TestBuilder.Services.AddScoped<IOTPRequestManager, OTPRequestManager>();
+            TestBuilder.Services.AddScoped<IOTPRequestController, OTPRequestController>();
+            TestApp = TestBuilder.Build();
         }
 
         [Theory]
@@ -52,12 +59,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }
-            IMailService mailService = new MailService(MessageBank);
-            IOTPRequestService otpRequestService = new OTPRequestService(SqlDAO, LogService, MessageBank);
-            IOTPRequestManager otpRequestManager = new OTPRequestManager(SqlDAO, LogService, ValidationService,
-                AuthenticationService, otpRequestService, MessageBank, mailService);
-            IOTPRequestController otpRequestController = new OTPRequestController(SqlDAO, LogService,
-                otpRequestManager, MessageBank);
+            IOTPRequestController otpRequestController = TestApp.Services.GetService<IOTPRequestController>();
             string[] expecteds = expected.Split(": ");
             ObjectResult expectedResult = new ObjectResult(expecteds[2])
             { StatusCode = Convert.ToInt32(expecteds[0]) };

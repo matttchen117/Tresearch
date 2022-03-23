@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,10 +15,12 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
 {
-    public class OTPRequestServiceShould : IntegrationTestDependencies
+    public class OTPRequestServiceShould : TestBaseClass
     {
-        public OTPRequestServiceShould() : base()
+        public OTPRequestServiceShould() : base(new string[] { })
         {
+            TestBuilder.Services.AddScoped<IOTPRequestService, OTPRequestService>();
+            TestApp = TestBuilder.Build();
         }
 
         [Theory]
@@ -37,7 +41,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
         public async Task RequestTheOTP(string username, string passphrase, string authorizationLevel, string expected)
         {
             // Arrange
-            IOTPRequestService otpRequestService = new OTPRequestService(SqlDAO, LogService, MessageBank);
+            IOTPRequestService otpRequestService = TestApp.Services.GetService<IOTPRequestService>();
             IAccount account = new Account(username, passphrase, authorizationLevel);
             IOTPClaim otpClaim = new OTPClaim(account);
             CancellationTokenSource cancellationTokenSource =

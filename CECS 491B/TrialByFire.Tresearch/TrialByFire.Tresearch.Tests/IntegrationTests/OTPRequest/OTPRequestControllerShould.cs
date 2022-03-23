@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,10 +20,15 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
 {
-    public class OTPRequestControllerShould : IntegrationTestDependencies
+    public class OTPRequestControllerShould : TestBaseClass
     {
-        public OTPRequestControllerShould() : base()
+        public OTPRequestControllerShould() : base(new string[] { })
         {
+            TestBuilder.Services.AddScoped<IMailService, MailService>();
+            TestBuilder.Services.AddScoped<IOTPRequestService, OTPRequestService>();
+            TestBuilder.Services.AddScoped<IOTPRequestManager, OTPRequestManager>();
+            TestBuilder.Services.AddScoped<IOTPRequestController, OTPRequestController>();
+            TestApp = TestBuilder.Build();
         }
 
         [Theory]
@@ -52,12 +58,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }
-            IMailService mailService = new MailService(MessageBank);
-            IOTPRequestService otpRequestService = new OTPRequestService(SqlDAO, LogService, MessageBank);
-            IOTPRequestManager otpRequestManager = new OTPRequestManager(SqlDAO, LogService, ValidationService,
-                AuthenticationService, otpRequestService, MessageBank, mailService);
-            IOTPRequestController otpRequestController = new OTPRequestController(SqlDAO, LogService,
-                otpRequestManager, MessageBank);
+            IOTPRequestController otpRequestController = TestApp.Services.GetService<IOTPRequestController>();
             string[] expecteds = expected.Split(": ");
             ObjectResult expectedResult = new ObjectResult(expecteds[2])
             { StatusCode = Convert.ToInt32(expecteds[0]) };

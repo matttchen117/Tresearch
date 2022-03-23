@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -16,10 +17,15 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
 {
-    public class InMemoryOTPRequestManagerShould : InMemoryTestDependencies
+    public class InMemoryOTPRequestManagerShould : TestBaseClass
     {
-        public InMemoryOTPRequestManagerShould() : base()
+        public InMemoryOTPRequestManagerShould() : base(new string[] { })
         {
+            TestBuilder.Services.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestBuilder.Services.AddScoped<IMailService, MailService>();
+            TestBuilder.Services.AddScoped<IOTPRequestService, OTPRequestService>();
+            TestBuilder.Services.AddScoped<IOTPRequestManager, OTPRequestManager>();
+            TestApp = TestBuilder.Build();
         }
 
         [Theory]
@@ -48,10 +54,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }
-            IMailService mailService = new MailService(MessageBank);
-            IOTPRequestService otpRequestService = new OTPRequestService(SqlDAO, LogService, MessageBank);
-            IOTPRequestManager otpRequestManager = new OTPRequestManager(SqlDAO, LogService, ValidationService,
-                AuthenticationService, otpRequestService, MessageBank, mailService);
+            IOTPRequestManager otpRequestManager = TestApp.Services.GetService<IOTPRequestManager>();
             CancellationTokenSource cancellationTokenSource =
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));
 

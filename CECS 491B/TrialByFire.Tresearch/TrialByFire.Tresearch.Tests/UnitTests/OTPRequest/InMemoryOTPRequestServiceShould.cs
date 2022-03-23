@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,14 +13,18 @@ using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Services.Implementations;
+using TrialByFire.Tresearch.WebApi;
 using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
 {
-    public class InMemoryOTPRequestServiceShould : InMemoryTestDependencies
+    public class InMemoryOTPRequestServiceShould : TestBaseClass
     {
-        public InMemoryOTPRequestServiceShould() : base()
+        public InMemoryOTPRequestServiceShould() : base(new string[] { })
         {
+            TestBuilder.Services.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestBuilder.Services.AddScoped<IOTPRequestService, OTPRequestService>();
+            TestApp = TestBuilder.Build();
         }
 
         [Theory]
@@ -38,7 +45,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
         public async Task RequestTheOTPAsync(string username, string passphrase, string authorizationLevel, string expected)
         {
             // Arrange
-            IOTPRequestService otpRequestService = new OTPRequestService(SqlDAO, LogService, MessageBank);
+            IOTPRequestService otpRequestService = TestApp.Services.GetService<IOTPRequestService>();
             IAccount account = new Account(username, passphrase, authorizationLevel);
             IOTPClaim otpClaim = new OTPClaim(account);
             CancellationTokenSource cancellationTokenSource =
