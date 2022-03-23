@@ -1,9 +1,12 @@
 .recover-form-container {
     position: relative;
     z-index: 1;
+    
+    
 }
 
 .recovery-nav-bar{
+    position: relative;
     z-index: 3;
 }
 
