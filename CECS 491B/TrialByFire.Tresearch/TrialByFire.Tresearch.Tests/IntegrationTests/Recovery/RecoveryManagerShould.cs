@@ -20,7 +20,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         }
 
         [Theory]
-        [InlineData("pammypoor+IntegrationRecoveryManager1@gmail.com", "user", "https://trialbyfiretresearch.azurewebsites.net/Recover/RecoverConfirm?guid=", "200: Server: success")]
+        [InlineData("pammypoor+IntegrationRecoveryManager1@gmail.com", "user", "https://trialbyfiretresearch.azurewebsites.net/Recover/Enable?guid=", "200: Server: success")]
         public async Task SendRecoveryEmailAsync(string username,string authorizationLevel, string baseUrl, string statusCode)
         {
             //Arrange
@@ -36,7 +36,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         }
 
         [Theory]
-        [InlineData("pammypoor+IntegrationRecoveryManager6@gmail.com", "user", "https://trialbyfiretresearch.azurewebsites.net/Recover/RecoverConfirm?guid=8ee31b44-c823-4256-a613-cfb1611f0b79", "200: Server: success")]
+        [InlineData("pammypoor+IntegrationRecoveryManager6@gmail.com", "user", "https://trialbyfiretresearch.azurewebsites.net/Recover/Enable?guid=8ee31b44-c823-4256-a613-cfb1611f0b79", "200: Server: success")]
         public async Task EnableAccountAsync(string username, string authorizationLevel, string url, string statusCode)
         {
             //Arrange

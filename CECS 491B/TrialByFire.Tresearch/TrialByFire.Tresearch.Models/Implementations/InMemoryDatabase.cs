@@ -11,6 +11,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
     {
         public IList<IOTPClaim> OTPClaims { get; set; }
         public IList<IAccount> Accounts { get; set; }
+        public IList<IConfirmationLink> ConfirmationLinks { get; set; }
+        public IList<Tuple<IConfirmationLink, int>> ConfirmationLinksCreated { get; set; }
+        public IList<IRecoveryLink> RecoveryLinks { get; set; }
+        public IList<Tuple<IConfirmationLink, int>> RecoveryLinksCreated { get; set; }
         public IList<INode> Nodes { get; set; }
         public IList<ITag> Tags { get; set; }
         public IList<INodeTag> NodeTags { get; set; }
@@ -21,10 +25,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public IList<IDailyLogin> DailyLogins { get; set; }
         public IList<ITopSearch> TopSearches { get; set; }
         public IList<INodesCreated> NodesCreated { get; set; }
-
         public IList<IDailyRegistration> DailyRegistrations { get; set; }
-
-        public IList<IConfirmationLink> ConfirmationLinks { get; set; }
         public IList<IView> Views { get; set; }
 
         public IList<ILog> Logs { get; set; }
@@ -44,11 +45,20 @@ namespace TrialByFire.Tresearch.Models.Implementations
             ConfirmationLinks = InitializeConfirmationLinks();
             Views = InitializeViews();
             Logs = InitializeLogs();
+            RecoveryLinks = InitializeRecoveryLinks();
         }
 
         /*
             In memory database initialization methods
          */
+
+        private List<IRecoveryLink> InitializeRecoveryLinks()
+        {
+            List<IRecoveryLink> recoveryLinks = new List<IRecoveryLink>();
+            recoveryLinks.Add(new RecoveryLink("pammypoor+recoverService1", "user", DateTime.Now.AddDays(-2), Guid.NewGuid()));
+
+            return recoveryLinks;
+        }
 
         private List<IOTPClaim> InitializeOTPClaims()
         {

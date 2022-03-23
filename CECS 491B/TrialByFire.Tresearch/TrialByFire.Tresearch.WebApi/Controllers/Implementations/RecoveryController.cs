@@ -38,7 +38,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
-                string baseUrl = "https://localhost:7010/Recovery/recover?guid=";
+                string baseUrl = "https://trialbyfiretresearch.azurewebsites.net/Recover/Enable?guid=";
                 string result = await _recoveryManager.SendRecoveryEmailAsync(email, baseUrl, authorizationLevel, _cancellationTokenSource.Token);
                 string[] split;
                 split = result.Split(":");

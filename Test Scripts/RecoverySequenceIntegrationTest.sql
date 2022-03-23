@@ -106,14 +106,17 @@
   DELETE EmailRecoveryLinks WHERE Username = 'pammypoor+IntegrationRecoveryManager1@gmail.com';
   DELETE EmailRecoveryLinks WHERE Username = 'pammypoor+IntegrationRecoveryManager6@gmail.com';
   DELETE EmailRecoveryLinks WHERE Username = 'pammypoor+IntRecoveryController1@gmail.com';
+  DELETE EmailRecoveryLinks WHERE Username = 'pammypoor+IntRecoveryController6@gmail.com';
 
   DELETE EmailRecoveryLinksCreated WHERE Username = 'pammypoor+IntegrationRecoveryManager1@gmail.com';
   DELETE EmailRecoveryLinksCreated WHERE Username = 'pammypoor+IntegrationRecoveryManager6@gmail.com';
   DELETE EmailRecoveryLinksCreated WHERE Username = 'pammypoor+IntRecoveryController1@gmail.com';
+  DELETE EmailRecoveryLinksCreated WHERE Username = 'pammypoor+IntRecoveryController6@gmail.com';
   
   DELETE Accounts WHERE Username='pammypoor+IntegrationRecoveryManager1@gmail.com';
   DELETE Accounts WHERE Username='pammypoor+IntegrationRecoveryManager6@gmail.com';
   DELETE Accounts WHERE Username='pammypoor+IntRecoveryController1@gmail.com';
+  DELETE Accounts WHERE Username='pammypoor+IntRecoveryController6@gmail.com';
 
   INSERT INTO Accounts(Username, Email, Passphrase, AuthorizationLevel, AccountStatus, Confirmed)
 		 VALUES('pammypoor+IntegrationRecoveryManager1@gmail.com', 'pammypoor+IntegrationRecoveryManager1@gmail.com', 'myPassphrase', 'user', '0', '1');
@@ -124,6 +127,12 @@
   INSERT INTO Accounts(Username, Email, Passphrase, AuthorizationLevel, AccountStatus, Confirmed)
 		 VALUES('pammypoor+IntRecoveryController1@gmail.com', 'pammypoor+IntRecoveryController1@gmail.com', 'myPassphrase', 'user', '0', '1');
 
-	INSERT INTO EmailRecoveryLinks(Username, AuthorizationLevel, TimeCreated, GUIDLink)
+  INSERT INTO Accounts(Username, Email, Passphrase, AuthorizationLevel, AccountStatus, Confirmed)
+		 VALUES('pammypoor+IntRecoveryController6@gmail.com', 'pammypoor+IntRecoveryController6@gmail.com', 'myPassphrase', 'user', '0', '1');
+
+  INSERT INTO EmailRecoveryLinks(Username, AuthorizationLevel, TimeCreated, GUIDLink)
 		 VALUES('pammypoor+IntegrationRecoveryManager6@gmail.com', 'user', 
 		 GETDATE(), (Convert(uniqueidentifier, N'8ee31b44-c823-4256-a613-cfb1611f0b79')));
+  INSERT INTO EmailRecoveryLinks(Username, AuthorizationLevel, TimeCreated, GUIDLink)
+		 VALUES('pammypoor+IntRecoveryController6@gmail.com', 'user', 
+		 GETDATE(), (Convert(uniqueidentifier, N'4609be84-8f64-46c1-bc42-751abcf92a4e')));
