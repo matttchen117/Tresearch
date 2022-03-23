@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -15,10 +16,13 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
 {
-    public class InMemoryAuthenticationManagerShould : InMemoryTestDependencies
+    public class InMemoryAuthenticationManagerShould : TestBaseClass
     {
-        public InMemoryAuthenticationManagerShould() : base()
+        public InMemoryAuthenticationManagerShould() : base(new string[] { })
         {
+            TestBuilder.Services.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestBuilder.Services.AddScoped<IAuthenticationManager, AuthenticationManager>();
+            TestApp = TestBuilder.Build();
         }
 
         [Theory]
@@ -50,8 +54,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             {
                 Thread.CurrentPrincipal = new ClaimsPrincipal(rolePrincipal);
             }
-            IAuthenticationManager authenticationManager = new AuthenticationManager(SqlDAO,
-                LogService, ValidationService, AuthenticationService, MessageBank);
+            IAuthenticationManager authenticationManager = TestApp.Services.GetService<IAuthenticationManager>();
             DateTime now = new DateTime(year, month, day, hour, minute, second);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(
                 TimeSpan.FromSeconds(5));

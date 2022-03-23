@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using TrialByFire.Tresearch.DAL.Contracts;
+using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
@@ -12,10 +15,13 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
 {
-    public class InMemoryLogoutServiceShould : InMemoryTestDependencies
+    public class InMemoryLogoutServiceShould : TestBaseClass
     {
-        public InMemoryLogoutServiceShould() : base()
+        public InMemoryLogoutServiceShould() : base(new string[] { })
         {
+            TestBuilder.Services.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestBuilder.Services.AddScoped<IOTPRequestService, OTPRequestService>();
+            TestApp = TestBuilder.Build();
         }
 
         [Theory]
@@ -26,7 +32,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
-            ILogoutService logoutService = new LogoutService(SqlDAO, LogService, MessageBank);
+            ILogoutService logoutService = TestApp.Services.GetService<ILogoutService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(
                 TimeSpan.FromSeconds(5));
 

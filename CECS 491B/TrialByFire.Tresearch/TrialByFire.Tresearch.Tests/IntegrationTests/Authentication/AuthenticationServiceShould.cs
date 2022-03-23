@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
@@ -13,10 +14,11 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
 {
-    public class AuthenticationServiceShould : IntegrationTestDependencies
+    public class AuthenticationServiceShould : TestBaseClass
     {
-        public AuthenticationServiceShould() : base()
+        public AuthenticationServiceShould() : base(new string[] { })
         {
+            TestApp = TestBuilder.Build();
         }
 
         [Theory]
@@ -40,11 +42,12 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
         {
             // Arrange
             IOTPClaim otpClaim = new OTPClaim(username, otp, authorizationLevel, new DateTime(year, month, day, hour, minute, second));
+            IAuthenticationService authenticationService = TestApp.Services.GetService<IAuthenticationService>();
             CancellationTokenSource cancellationTokenSource =
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             // Act
-            List<string> results = await AuthenticationService.AuthenticateAsync(otpClaim, 
+            List<string> results = await authenticationService.AuthenticateAsync(otpClaim, 
                 cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert

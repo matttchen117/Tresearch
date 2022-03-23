@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -15,10 +16,11 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authorization
 {
-    public class AuthorizationServiceShould : IntegrationTestDependencies
+    public class AuthorizationServiceShould : TestBaseClass
     {
-        public AuthorizationServiceShould() : base()
+        public AuthorizationServiceShould() : base(new string[] { })
         {
+            TestApp = TestBuilder.Build();
         }
 
         [Theory]
@@ -33,11 +35,12 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authorization
             IRoleIdentity roleIdentity = new RoleIdentity(true, username, authorizationLevel);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
+            IAuthorizationService authorizationService = TestApp.Services.GetService<IAuthorizationService>();
             CancellationTokenSource cancellationTokenSource =
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             // Act
-            string result = await AuthorizationService.VerifyAuthorizedAsync(requiredAuthLevel, 
+            string result = await authorizationService.VerifyAuthorizedAsync(requiredAuthLevel, 
                 cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,10 +21,13 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
 {
-    public class AuthenticationControllerShould : IntegrationTestDependencies
+    public class AuthenticationControllerShould : TestBaseClass
     {
-        public AuthenticationControllerShould() : base()
+        public AuthenticationControllerShould() : base(new string[] { })
         {
+            TestBuilder.Services.AddScoped<IAuthenticationManager, AuthenticationManager>();
+            TestBuilder.Services.AddScoped<IAuthenticationController, AuthenticationController>();
+            TestApp = TestBuilder.Build();
         }
 
         [Theory]
@@ -55,10 +59,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }
-            IAuthenticationManager authenticationManager = new AuthenticationManager(SqlDAO,
-                LogService, ValidationService, AuthenticationService, MessageBank);
-            IAuthenticationController authenticationController = new AuthenticationController(SqlDAO,
-                LogService, authenticationManager, MessageBank, BuildSettingsOptions);
+            IAuthenticationController authenticationController = TestApp.Services.
+                GetService<IAuthenticationController>();
             DateTime now = new DateTime(year, month, day, hour, minute, second);
             string[] expecteds = expected.Split(": ");
             ObjectResult expectedResult = new ObjectResult(expecteds[2])

@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using TrialByFire.Tresearch.DAL.Contracts;
+using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
 using TrialByFire.Tresearch.Models.Contracts;
@@ -14,10 +17,14 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
 {
-    public class InMemoryLogoutManagerShould : InMemoryTestDependencies
+    public class InMemoryLogoutManagerShould : TestBaseClass
     {
-        public InMemoryLogoutManagerShould() : base()
+        public InMemoryLogoutManagerShould() : base(new string[] { })
         {
+            TestBuilder.Services.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestBuilder.Services.AddScoped<ILogoutService, LogoutService>();
+            TestBuilder.Services.AddScoped<ILogoutManager, LogoutManager>();
+            TestApp = TestBuilder.Build();
         }
 
         [Theory]
@@ -32,9 +39,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }
-            ILogoutService logoutService = new LogoutService(SqlDAO, LogService, MessageBank);
-            ILogoutManager logoutManager = new LogoutManager(SqlDAO, LogService, MessageBank, 
-                logoutService);
+            ILogoutManager logoutManager = TestApp.Services.GetService<ILogoutManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(
                 TimeSpan.FromSeconds(5));
 
