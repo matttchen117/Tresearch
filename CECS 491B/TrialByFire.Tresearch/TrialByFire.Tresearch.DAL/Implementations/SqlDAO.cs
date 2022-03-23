@@ -173,14 +173,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                     // Check if cancellation is requested .. no rollback necessary
                     if (cancellationToken.IsCancellationRequested)
-                        return Tuple.Create(nullAccount, _messageBank.ErrorMessages["cancellationRequested"]);
+                        return Tuple.Create(nullAccount, _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result);
                     else
-                        return Tuple.Create(account, _messageBank.SuccessMessages["generic"]);
+                        return Tuple.Create(account, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
                 }
             }
             catch (OperationCanceledException)
             {
-                return Tuple.Create(nullAccount, _messageBank.ErrorMessages["cancellationRequested"]);
+                return Tuple.Create(nullAccount, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
             }
             catch (Exception ex)
             {
@@ -203,7 +203,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     //Perform sql statement
-                    var procedure = "[RemoveRecoveryLink]";
+                    var procedure = "dbo.[RemoveRecoveryLink]";
                     var value = new { GUIDLink = recoveryLink.GUIDLink };
                     var affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
@@ -211,15 +211,15 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     if (cancellationToken.IsCancellationRequested)
                     {
                         string rollbackResults = await CreateRecoveryLinkAsync(recoveryLink);
-                        if (rollbackResults != _messageBank.SuccessMessages["generic"])
-                            return _messageBank.ErrorMessages["rollbackFailed"];
+                        if (rollbackResults != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                            return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
                         else
-                            return _messageBank.ErrorMessages["cancellationRequested"];
+                            return _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result;
                     }
 
                     //Check if recovery link removed
                     if (affectedRows == 0)
-                        return _messageBank.ErrorMessages["accountNotFound"];
+                        return _messageBank.GetMessage(IMessageBank.Responses.recoveryLinkNotFound).Result;
                     else if (affectedRows == 1)
                         return _messageBank.SuccessMessages["generic"];
                     else
@@ -254,7 +254,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Perform sql statement
                     var procedure = "[GetRecoveryLink]";                                    // Stored procedure
                     var value = new { GUIDLink = guid };                                     // Guid to search in table
-                    var links = await connection.QueryAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    var links = await connection.QueryAsync<RecoveryLink>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     
                     //Check for cancellation...no rollback necessary
                     if (cancellationToken.IsCancellationRequested)

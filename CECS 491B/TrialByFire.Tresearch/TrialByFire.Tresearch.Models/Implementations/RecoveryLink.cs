@@ -4,13 +4,13 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class RecoveryLink : IRecoveryLink
     {
-        public string? Username { get; set; }
+        public string Username { get; set; }
 
-        public Guid? GUIDLink { get; set; }
+        public Guid GUIDLink { get; set; }
 
-        public DateTime? TimeCreated { get; set; }
+        public DateTime TimeCreated { get; set; }
 
-        public string? AuthorizationLevel { get; set; }
+        public string AuthorizationLevel { get; set; }
 
         public RecoveryLink(string username, Guid uniqueIdentifier, DateTime datetime, string authorizationLevel)
         {

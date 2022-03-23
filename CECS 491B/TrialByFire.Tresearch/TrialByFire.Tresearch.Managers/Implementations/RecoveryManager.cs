@@ -29,39 +29,38 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                
                 //Check the status of account
                 Tuple<IAccount, string> account = await _recoveryService.GetAccountAsync(email, authorizationLevel, cancellationToken);
-                if (cancellationToken.IsCancellationRequested)                                                  //No rollback necessary if canceled
-                    return _messageBank.ErrorMessages["cancellationRequested"];                                 // Request cancelled
-                //Check if able to get account
-                if (account.Item2 != _messageBank.SuccessMessages["generic"])
+                
+                //Check if cancelled
+                if (cancellationToken.IsCancellationRequested)                                                  
+                    throw new OperationCanceledException();     //No rollback necessary                                          
+                
+                //Check if account exists
+                if (account.Item2 != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                     return account.Item2;
-          
-                // Check if account is disabled
-                Tuple<bool, string> IsDisabled = await _recoveryService.IsAccountDisabledAsync(account.Item1, cancellationToken);
-                if (cancellationToken.IsCancellationRequested)                                                  //No rollback necessary if canceled
-                    return _messageBank.ErrorMessages["cancellationRequested"];                                 // Request cancelled
-
-                //Check if valid link
-                if (!IsDisabled.Item1)
-                    return IsDisabled.Item2;
+         
+                //Check if valid account
+                if (account.Item1.AccountStatus == true)          
+                    return _messageBank.GetMessage(IMessageBank.Responses.alreadyEnabled).Result;
 
                 // Create the recovery link
                 Tuple<IRecoveryLink, string> recoveryLink = await _recoveryService.CreateRecoveryLinkAsync(account.Item1, cancellationToken);
 
+
                 if (cancellationToken.IsCancellationRequested)
                 {
                     string rollBackresult = await _recoveryService.RemoveRecoveryLinkAsync(recoveryLink.Item1);
-                    if (rollBackresult != _messageBank.SuccessMessages["generic"])
-                        return _messageBank.ErrorMessages["rollbackFailed"];
+                    if (rollBackresult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
                     else
-                        return _messageBank.ErrorMessages["cancellationRequested"];
+                        throw new OperationCanceledException();    //rollback taken care of
                 }
 
-                if (recoveryLink.Item2 != _messageBank.SuccessMessages["generic"])
-                {
+                //Check if recovery link created in database
+                if (recoveryLink.Item2 != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                     return recoveryLink.Item2;
-                }
 
                 //Send Recovery Link --> no possible rollback at this point but can still cancel
                 string mailResults = await _mailService.SendRecoveryAsync(email, baseurl+recoveryLink.Item1.GUIDLink, cancellationToken);
@@ -70,7 +69,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             catch (OperationCanceledException)
             {
                 // Nothing to rollback
-                return _messageBank.ErrorMessages["cancellationRequested"];
+                return _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result;
             }
             catch (Exception ex)
             {
@@ -104,6 +103,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     else
                         return _messageBank.ErrorMessages["cancellationRequested"];
                 }
+
+                //Make sure to remove recovery link from database and increment database
 
                 return enableResult;
 

@@ -9,7 +9,7 @@ import Register from "./Features/Registration/Registration";
 import Home from "./Pages/Home/Home";
 import Tagger from "./Features/Tagging/Tagger";
 import Recover from "./Features/Recover/Recover";
-
+import RecoveryForm from "./UI/Form/RecoveryForm";
 function App() {
   return (
     <div className="App">

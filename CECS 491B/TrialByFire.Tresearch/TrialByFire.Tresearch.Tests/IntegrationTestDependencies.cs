@@ -25,7 +25,6 @@ namespace TrialByFire.Tresearch.Tests
         public IAuthorizationService AuthorizationService { get; }
         public IValidationService ValidationService { get; }
         public IAccountDeletionService AccountDeletionService { get; }
-        public IRecoveryService RecoveryService { get; set; }
 
         private string _connectionString = "Data Source=tresearchstudentserver.database.windows.net;Initial Catalog=tresearchStudentServer;User ID=tresearchadmin;Password=CECS491B!;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
@@ -45,7 +44,6 @@ namespace TrialByFire.Tresearch.Tests
             AuthorizationService = new AuthorizationService(SqlDAO, LogService);
             ValidationService = new ValidationService(MessageBank);
             AccountDeletionService = new AccountDeletionService(SqlDAO, LogService);
-            RecoveryService = new RecoveryService(SqlDAO, LogService, MessageBank);
         }
     }
 }

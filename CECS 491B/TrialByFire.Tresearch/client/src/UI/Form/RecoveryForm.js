@@ -5,7 +5,6 @@ import axios from 'axios';
 import "./RecoveryForm.css";
 import Button from "../Button/ButtonComponent";
 
-
 const RecoveryForm = () => {
     //States for form input
     const [email, setEmail] = useState("");
@@ -35,7 +34,7 @@ const RecoveryForm = () => {
     }
 
     //Handle clicking submit
-    const handleSubmit = (event) => {
+    const handleRecoverSubmit = (event) => {
         //event.preventDefault();
 
        checkCredentials();
@@ -54,11 +53,11 @@ const RecoveryForm = () => {
     const renderForm = (
         <div className="form-recover-container">
              <form class="recover-form">
-                    <div className="input-container">
+                    <div className="recover-input-container">
                         <input type="text" value={email} required placeholder="Email Address" onChange = {(e) => setEmail(e.target.value)}/>
                     </div>   
                     <div className="recover-button-container">
-                        <Button color="green" name="Recover Account" onClick={handleSubmit} />
+                        <Button color="green" name="Recover Account" onClick={handleRecoverSubmit} />
                     </div>
                     {renderErrorMessage("errorMessage")}
                 </form>
@@ -68,7 +67,9 @@ const RecoveryForm = () => {
     return (
         <div className="form-recover-wrapper">
             <div className="container-recover-text">
-                <h1 className="recover-title">Recover Your Account</h1>
+                <h1 className="recover-title">Your Account has been temporarily disabled</h1>
+                
+                <p className ="recover-text">Due to unusual activity on your account, you will need to recover your account</p>
             </div>
             {renderForm}
         </div>
