@@ -501,37 +501,49 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public List<string> CreateAccount(IAccount account)
+        public async Task<string> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> results = new List<string>();
-            int affectedRows;
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    var readQuery = "SELECT COUNT(*) FROM dbo.Accounts WHERE Email = @Email";
-                    var accounts = connection.ExecuteScalar<int>(readQuery, new { Email = account.Email });
+                    await connection.OpenAsync();
 
-                    if (accounts > 0)
+                    //Perform Sql Statement
+                    var procedure = "dbo.[CreateAccount]";
+                    var value = new
                     {
-                        results.Add("Failed - Account already exists in database");
-                        return results;
-                    }
-                    var insertQuery = "INSERT INTO dbo.Accounts (Username, Email, Passphrase, AuthorizationLevel, AccountStatus, Confirmed) " +
-                        "VALUES (@Username, @Email, @Passphrase, @AuthorizationLevel, @AccountStatus, @Confirmed)";
-
-                    affectedRows = connection.Execute(insertQuery, account);
+                        Username = account.Username,
+                        Email = account.Email,
+                        Passphrase = account.Passphrase,
+                        AuthorizationLevel = account.AuthorizationLevel,
+                        AccountStatus = account.AccountStatus,
+                        Confirmed = account.Confirmed
+                    };
+                    var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    if (affectedRows == 1)
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    else
+                        return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;    //CHECK IF THIS IS ACCOUNT ALREADY EXISTS
                 }
-                if (affectedRows == 1)
-                    results.Add("Success - Account created in database");
-                else
-                    results.Add("Failed - Account not created in database");
+            }
+            catch(SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    default: return "";
+                }
+            }
+            catch(OperationCanceledException)
+            {
+                // Rollback handled
+                throw;
             }
             catch (Exception ex)
             {
-                results.Add("Failed - " + ex);
+                return "500 : Database: " + ex;
             }
-            return results;
         }
 
         public IAccount GetUnconfirmedAccount(string email)
@@ -1541,7 +1553,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return results;
             }
         }
-
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration)
         {
             using (var connection = new SqlConnection(_options.SqlConnectionString))

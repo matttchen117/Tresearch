@@ -14,14 +14,14 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         [Theory]
         [InlineData("pammypoor@gmail.com", "pammypoor@gmail.com", "myPassphrase", "U", true, false)]
         [InlineData("ValasquezJerry@gmail.com", "ValasquezJerry@gmail.com", "oooooPPPPPP", "U", true, false)]
-        public void ConfirmTheAccount(string email, string username, string passphrase, string authenticationLevel, bool status, bool confirmed)
+        public async Task ConfirmTheAccount(string email, string username, string passphrase, string authenticationLevel, bool status, bool confirmed)
         {
             //Arrange
             ISqlDAO _sqlDAO = new InMemorySqlDAO();
             ILogService _logService = new LogService(_sqlDAO);
             IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
             IAccount account = new Account(email, username, passphrase, authenticationLevel, status, confirmed);
-            _sqlDAO.CreateAccount(account);
+            await _sqlDAO.CreateAccountAsync(account);
 
             //Act
             List<string> results = _registrationService.ConfirmAccount(account);
@@ -33,7 +33,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         [Theory]
         [InlineData("pammypoor@gmail.com", "pammypoor@gmail.com", "superSecretPassphrase", "U", true, false)]
         [InlineData("JEdgarHoover@usa.gov", "JEdgarHoover@usa.gov", "helloHello123", "U", true, false)]
-        public void CreateTheUser(string email, string username, string passphrase, string authenticationLevel, bool status, bool confirmed)
+        public async Task CreateTheUser(string email, string username, string passphrase, string authenticationLevel, bool status, bool confirmed)
         {
             //Arrange
             ISqlDAO _sqlDAO = new InMemorySqlDAO();
@@ -42,10 +42,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             IAccount account = new Account(email, username, passphrase, authenticationLevel, status, confirmed);
 
             //Act
-            List<string> results = _registrationService.CreatePreConfirmedAccount(account);
+            string results = await _registrationService.CreateAccountAsync(account);
 
             //Assert
-            Assert.Equal('S', results.Last()[0]);
+            Assert.Equal("Success", results);
         }
 
 
@@ -112,7 +112,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         [Theory]
         [InlineData("pammypoor@gmail.com", "superSecret")]
         [InlineData("tstingtesting@hotmail.com", "bonjourApple")]
-        public void GetUserFromLink(string email, string passphrase)
+        public async Task GetUserFromLink(string email, string passphrase)
         {
             ISqlDAO _sqlDAO = new InMemorySqlDAO();
             ILogService _logService = new LogService(_sqlDAO);
@@ -122,7 +122,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             IAccount expected = new Account(email, email, passphrase, "User", true, false);
             IConfirmationLink link = new ConfirmationLink(email, guid, now);
 
-            _sqlDAO.CreateAccount(expected);
+            await _sqlDAO.CreateAccountAsync(expected);
             _sqlDAO.CreateConfirmationLink(link);
 
             //Act

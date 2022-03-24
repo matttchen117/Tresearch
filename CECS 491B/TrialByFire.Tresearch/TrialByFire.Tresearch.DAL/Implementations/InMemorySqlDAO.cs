@@ -289,19 +289,32 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
 
 
-        public List<string> CreateAccount(IAccount account)
+        public async Task<string> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> results = new List<string>();
-            int numberOfConfirmationsInDatabase = InMemoryDatabase.Accounts.Count();
-            InMemoryDatabase.Accounts.Add(account);
-            int affectedRows = InMemoryDatabase.Accounts.Count() - numberOfConfirmationsInDatabase;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (InMemoryDatabase.Accounts.Contains(account))
+                    return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;
 
-            if (affectedRows == 1)
-                results.Add("Success - Account added to in memomry database");
-            else
-                results.Add("Failed - Could not add account to in memory database");
-
-            return results;
+                InMemoryDatabase.Accounts.Add(account);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    InMemoryDatabase.Accounts.Remove(account);
+                    throw new OperationCanceledException();
+                }
+                
+                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+            }
+            catch (OperationCanceledException)
+            {
+                // No rollback necessary
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return _messageBank.GetMessage(IMessageBank.Responses.accountCreateFail).Result;
+            }
 
         }
 

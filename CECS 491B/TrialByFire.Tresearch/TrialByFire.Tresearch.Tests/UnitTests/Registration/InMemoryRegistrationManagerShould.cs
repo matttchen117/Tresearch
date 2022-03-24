@@ -98,12 +98,12 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         [Theory]
         [InlineData("pammypoor@gmail.com", "NowStreaming", "www.tresearch.systems/Account/Verify?t=", "3/7/2022 7:52:04")]
         [InlineData("pammmmyyyy@gmail.com", "HunterGather", "www.tresearch.systems/Account/Verify?t=", "3/7/2022 5:52:04")]
-        public void ConfirmAccount(string email, string passphrase, string baseUrl, string date)
+        public async Task ConfirmAccount(string email, string passphrase, string baseUrl, string date)
         {
             IConfirmationLink _confirmationLink = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Parse(date));
             IAccount _account = new Account(email, email, passphrase, "user", true, false);
 
-            _sqlDAO.CreateAccount(_account);
+            await _sqlDAO.CreateAccountAsync(_account);
             _sqlDAO.CreateConfirmationLink(_confirmationLink);
 
             string link = baseUrl + _confirmationLink.UniqueIdentifier;

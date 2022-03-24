@@ -79,13 +79,13 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         [Theory]
         [InlineData("pammypoor+INcontrollerConfirm1@gmail.com", "myControllerPass", "www.tresearch.systems/Registration/verify?=", "2022-03-06 21:32:59.910")]
         [InlineData("pammypoor+INcontrollerConfirm2@gmail.com", "myControllerPassword", "www.tresearch.systems/Registration/verify?=", "2022-03-06 21:32:59.910")]
-        public void confirmAccount(string email, string passphrase, string url, string date)
+        public async Task confirmAccount(string email, string passphrase, string url, string date)
         {
             //Arrange
             IAccount _account = new Account(email, email, passphrase, "User", true, false);
             IConfirmationLink _confirmationLink = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Parse(date));
 
-            _sqlDAO.CreateAccount(_account);
+            await _sqlDAO.CreateAccountAsync(_account);
             _sqlDAO.CreateConfirmationLink(_confirmationLink);
 
             //Act

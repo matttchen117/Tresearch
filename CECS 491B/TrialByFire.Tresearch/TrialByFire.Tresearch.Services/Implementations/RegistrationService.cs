@@ -12,35 +12,44 @@ namespace TrialByFire.Tresearch.Services.Implementations
 {
     public class RegistrationService : IRegistrationService
     {
-        public ISqlDAO _sqlDAO { get; set; }
-        public ILogService _logService { get; set; }
+        private ISqlDAO _sqlDAO { get; set; }
+        private ILogService _logService { get; set; }
+        private IMessageBank _messageBank { get; set; }
 
         private int linkActivationLimit = 24;
 
-        public RegistrationService(ISqlDAO _sqlDAO, ILogService _logService)
+        public RegistrationService(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank)
         {
-            this._sqlDAO = _sqlDAO;
-            this._logService = _logService;
+            _sqlDAO = sqlDAO;
+            _logService = logService;
+            _messageBank = messageBank;
         }
 
 
-        public List<string> CreatePreConfirmedAccount(IAccount account)
+        public async Task<string> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> results = new List<string>();
             try
             {
-                results.AddRange(_sqlDAO.CreateAccount(account));
+                cancellationToken.ThrowIfCancellationRequested();
 
-                if (results.Last()[0] == 'S')
-                    results.Add("Success - Register Service created account");
-                else
-                    results.Add("Failed - Register service unable to create account");
+                string createResult = await _sqlDAO.CreateAccountAsync(account, cancellationToken));
+                
+                if(cancellationToken.IsCancellationRequested && createResult == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                {
+                    //Perform Rollback
+                }
+
+                return createResult;
+            }
+            catch (OperationCanceledException)
+            {
+                //Nothing to rollback
+                throw;
             }
             catch (Exception ex)
             {
-                results.Add("Failed - " + ex);
+                return "500: Server: " + ex.Message; 
             }
-            return results;
         }
 
         public List<string> CreateConfirmation(string email, string baseUrl)

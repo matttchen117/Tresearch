@@ -41,14 +41,14 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         [Theory]
         [InlineData("confirmMeMan@gmail.com", "myPassword", "user", true, false)]
         [InlineData("confirmMeMan2@gmail.com", "myPassword", "user", true, false)]
-        public void ConfirmTheUser(string email, string passphrase, string authenticationLevel, bool status, bool confirmed)
+        public async Task ConfirmTheUser(string email, string passphrase, string authenticationLevel, bool status, bool confirmed)
         {
             //Arrange
             IConfirmationLink link = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now);
             string url = link.UniqueIdentifier.ToString();
             SqlDAO.CreateConfirmationLink(link);
             IAccount _account = new Account(email, email, passphrase, authenticationLevel, status, confirmed);
-            SqlDAO.CreateAccount(_account);
+            await SqlDAO.CreateAccountAsync(_account);
 
             //Act
             List<string> results = _registrationManager.ConfirmAccount(url);
