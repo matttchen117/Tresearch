@@ -833,5 +833,20 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             return "500";
         }
+
+        public async Task<string> IncrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "500";
+        }
+
+        public async Task<string> DecrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "500";
+        }
+
+        public async Task<int> GetRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return -1;
+        }
     }
 }

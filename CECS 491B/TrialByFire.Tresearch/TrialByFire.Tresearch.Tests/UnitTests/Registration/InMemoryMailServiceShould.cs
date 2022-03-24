@@ -1,22 +1,18 @@
 ﻿using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Services.Implementations;
 using TrialByFire.Tresearch.Models.Contracts;
-using TrialByFire.Tresearch.Models.Implementations;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
 {
-    public class InMemoryMailServiceShould
+    public class InMemoryMailServiceShould : TestBaseClass
     {
-        public IMailService _mailService;
-
-        public IMessageBank _messageBank;
-
-        public InMemoryMailServiceShould()
+        public InMemoryMailServiceShould() : base(new string[] { })
         {
 
-            _messageBank = new MessageBank();
-            _mailService = new MailService(_messageBank);
+            TestBuilder.Services.AddScoped<IMailService, MailService>();
+            TestApp = TestBuilder.Build();
         }
 
         [Theory]
@@ -24,10 +20,11 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         [InlineData("pammmmyyyy@gmail.com", "https://github.com/Drakat7/Tresearch")]
         public void SendEmail(string email, string url)
         {
-
-
+            //Arrange
+            IMailService mailService = TestApp.Services.GetService<IMailService>();
+            
             //Act
-            string result = _mailService.SendConfirmation(email, url);
+            string result = mailService.SendConfirmation(email, url);
 
             //Assert
             Assert.Equal("Success - Confirmation email sent", result);

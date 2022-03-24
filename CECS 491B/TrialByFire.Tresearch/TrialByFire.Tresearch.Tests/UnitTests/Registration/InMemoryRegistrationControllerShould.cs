@@ -10,38 +10,20 @@ using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
 {
-
-    public class InMemoryRegistrationControllerShould
+    public class InMemoryRegistrationControllerShould : TestBaseClass
     {
-        ISqlDAO _sqlDAO { get; set; }
-        ILogService _logService { get; set; }
-
-        IRegistrationService _registrationService { get; set; }
-
-        IMailService _mailService { get; set; }
-
-        IValidationService _validationService { get; set; }
-
-        IMessageBank _messageBank { get; set; }
-
-        IRegistrationManager _registrationManager { get; set; }
-
-        IRegistrationController _registrationController { get; set; }
-
-        public InMemoryRegistrationControllerShould()
+        public InMemoryRegistrationControllerShould() : base(new string[] { })
         {
-            _sqlDAO = new InMemorySqlDAO();
-            _logService = new LogService(_sqlDAO);
-            _registrationService = new RegistrationService(_sqlDAO, _logService);
-
-            _messageBank = new MessageBank();
-            _mailService = new MailService(_messageBank);
-            _validationService = new ValidationService(_messageBank);
-            _registrationManager = new RegistrationManager(_sqlDAO, _logService, _registrationService, _mailService, _validationService, _messageBank);
-            _registrationController = new RegistrationController(_sqlDAO, _logService, _registrationService, _mailService, _messageBank, _validationService, _registrationManager);
+            TestBuilder.Services.AddScoped<IMailService, MailService>();
+            TestBuilder.Services.AddScoped<ISqlDAO, SqlDAO>();
+            TestBuilder.Services.AddScoped<IRegistrationService, RegistrationService>();
+            TestBuilder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
+            TestBuilder.Services.AddScoped<IRegistrationController, RegistrationController>();
+            TestApp = TestBuilder.Build();
         }
 
         [Theory]
@@ -50,9 +32,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public void RegisterTheUser(string email, string passphrase)
         {
             //Arrange
+            IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
             IAccount account = new Account(email, email, passphrase, "User", true, false);
             //Act
-            IActionResult results = _registrationController.RegisterAccount(email, passphrase);
+            IActionResult results = registrationController.RegisterAccount(email, passphrase);
             var objectResult = results as ObjectResult;
 
             //Assert
@@ -65,10 +48,11 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public void SendConfirmation(string email)
         {
             //Arrange
+            IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
             IAccount account = new Account(email, "temporaryPassword");
 
             //Act
-            IActionResult results = _registrationController.SendConfirmation(email);
+            IActionResult results = registrationController.SendConfirmation(email);
             var objectResult = results as ObjectResult;
 
             //Assert
@@ -84,12 +68,13 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             //Arrange
             IAccount _account = new Account(email, email, passphrase, "User", true, false);
             IConfirmationLink _confirmationLink = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Parse(date));
-
-            await _sqlDAO.CreateAccountAsync(_account);
-            _sqlDAO.CreateConfirmationLink(_confirmationLink);
+            IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
+            ISqlDAO sqlDAO = TestApp.Services.GetService<ISqlDAO>();
+            sqlDAO.CreateAccount(_account);
+            sqlDAO.CreateConfirmationLink(_confirmationLink);
 
             //Act
-            IActionResult results = _registrationController.ConfirmAccount(url + _confirmationLink.UniqueIdentifier);
+            IActionResult results = registrationController.ConfirmAccount(url + _confirmationLink.UniqueIdentifier);
             var objectResult = results as ObjectResult;
 
             //Assert

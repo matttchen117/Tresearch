@@ -8,27 +8,22 @@ using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 {
-    public class RegistrationControllerShould : IntegrationTestDependencies
+    public class RegistrationControllerShould : TestBaseClass
     {
-        public IRegistrationService _registrationService { get; set; }
-
-        public IMailService _mailService { get; set; }
-        public IRegistrationManager _registrationManager { get; set; }
-
-        public IRegistrationController _registrationController { get; set; }
-
-        public RegistrationControllerShould() : base()
+        public RegistrationControllerShould() : base(new string[] { })
         {
-            _mailService = new MailService(MessageBank);
-            _registrationService = new RegistrationService(SqlDAO, LogService);
-            _registrationManager = new RegistrationManager(SqlDAO, LogService, _registrationService, _mailService, ValidationService, MessageBank);
-            _registrationController = new RegistrationController(SqlDAO, LogService, _registrationService, _mailService, MessageBank, ValidationService, _registrationManager);
+            TestBuilder.Services.AddScoped<IMailService, MailService>();
+            TestBuilder.Services.AddScoped<IRegistrationService, RegistrationService>();
+            TestBuilder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
+            TestBuilder.Services.AddScoped<IRegistrationController, RegistrationController>();
+            TestApp = TestBuilder.Build();
         }
 
         [Theory]
@@ -37,10 +32,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public void RegisterTheUser(string email, string passphrase)
         {
             // Arrange
-
+            IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
 
             //Act
-            IActionResult results = _registrationController.RegisterAccount(email, passphrase);
+            IActionResult results = registrationController.RegisterAccount(email, passphrase);
             var objectResult = results as ObjectResult;
 
             //Assert

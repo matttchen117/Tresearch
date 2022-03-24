@@ -69,6 +69,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "408: Server: Cancellation token requested cancellation.";
                 case Responses.accountAlreadyCreated:
                     return "409: Server: Account  already exists";
+                case Responses.recoveryLinkExists:
+                    return "409: Database: The recovery link arealdy exists.";
+                case Responses.recoveryLinkExpired:
+                    return "410: Server: The recovery link has expired.";
                 case Responses.cookieFail:
                     return "503: Server: Authentication Cookie creation failed.";
                 case Responses.sendEmailFail:
