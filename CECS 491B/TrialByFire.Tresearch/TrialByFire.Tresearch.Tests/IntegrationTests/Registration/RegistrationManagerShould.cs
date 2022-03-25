@@ -23,33 +23,28 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         [Theory]
         [InlineData("skiPatrol@gmail.com", "myRegisterPassword")]
         [InlineData("snowboarder@hotmail.com", "unFortunateName")]
-        public void RegisterTheUser(string email, string passphrase)
+        public async Task RegisterTheUser(string email, string passphrase)
         {
             //Arrange 
             IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
             //Act
-            List<string> results = registrationManager.CreatePreConfirmedAccount(email, passphrase);
+            string results = await registrationManager.CreatePreConfirmedAccount(email, passphrase).ConfigureAwait(false);
 
             //Assert
-            Assert.Equal('S', results.Last()[0]);
+            Assert.Equal("success" , results);
         }
 
         [Theory]
-        [InlineData("confirmMeMan@gmail.com", "myPassword", "user", true, false)]
-        [InlineData("confirmMeMan2@gmail.com", "myPassword", "user", true, false)]
-        public async Task ConfirmTheUser(string email, string passphrase, string authenticationLevel, bool status, bool confirmed)
+        [InlineData("confirmMeMan@gmail.com", "")]
+        [InlineData("confirmMeMan2@gmail.com", "")]
+        public async Task ConfirmTheUser(string username, string guid)
         {
             //Arrange
-            IConfirmationLink link = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now);
             IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
-            ISqlDAO sqlDAO = TestApp.Services.GetService<ISqlDAO>();
-            string url = link.UniqueIdentifier.ToString();
-            sqlDAO.CreateConfirmationLink(link);
-            IAccount _account = new Account(email, email, passphrase, authenticationLevel, status, confirmed);
-            await SqlDAO.CreateAccountAsync(_account);
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
             //Act
-            List<string> results = registrationManager.ConfirmAccount(url);
+            List<string> results = registrationManager.ConfirmAccount(guid);
 
             //Assert
             Assert.Equal('S', results.Last()[0]);

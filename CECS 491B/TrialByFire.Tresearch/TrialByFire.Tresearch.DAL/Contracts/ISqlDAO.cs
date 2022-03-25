@@ -15,21 +15,17 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public Task<string> DisableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
         public Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken= default(CancellationToken));
         public Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken));
-
         public Task<string> DecrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> IncrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
         public Task<int> GetRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> RemoveRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> CreateRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken));
-        public List<string> CreateConfirmationLink(IConfirmationLink _confirmationlink);
-
-        public List<string> ConfirmAccount(IAccount account);
-
-        public List<string> RemoveConfirmationLink(IConfirmationLink confirmationLink);
-        public IConfirmationLink GetConfirmationLink(string url);
-
-        public IAccount GetUnconfirmedAccount(string email);
+        public Task<string> CreateConfirmationLinkAsync(IConfirmationLink _confirmationlink, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> UpdateAccountToUnconfirmedAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> UpdateAccountToConfirmedAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> RemoveConfirmationLinkAsync(IConfirmationLink confirmationLink, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<IConfirmationLink, string>> GetConfirmationLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken));
 
         // Authentication
         public Task<string> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken = default);

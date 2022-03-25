@@ -18,7 +18,7 @@ namespace TrialByFire.Tresearch.Managers.Contracts
 
         public List<string> SendConfirmation(string email, string baseUrl);
 
-        public List<string> CreatePreConfirmedAccount(string email, string passphrase);
+        public Task<string> CreatePreConfirmedAccount(string email, string passphrase, CancellationToken cancellationToken = default(CancellationToken));
 
         public List<string> ConfirmAccount(string url);
 

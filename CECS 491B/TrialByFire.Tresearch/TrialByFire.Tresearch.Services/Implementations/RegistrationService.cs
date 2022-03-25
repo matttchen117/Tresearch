@@ -32,7 +32,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                string createResult = await _sqlDAO.CreateAccountAsync(account, cancellationToken));
+                string createResult = await _sqlDAO.CreateAccountAsync(account, cancellationToken).ConfigureAwait(false);
                 
                 if(cancellationToken.IsCancellationRequested && createResult == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                 {
@@ -87,26 +87,44 @@ namespace TrialByFire.Tresearch.Services.Implementations
             return results;
         }
 
-        public List<string> ConfirmAccount(IAccount account)
+        public async Task<string> ConfirmAccount(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> results = new List<string>();
             try
             {
-                results = _sqlDAO.ConfirmAccount(account);
-                if (results.Last()[0] == 'S')
-                    results.Add("Success - Account service confirmed account");
-                else
-                    results.Add("Failed - Account service could not confirm account");
+                cancellationToken.ThrowIfCancellationRequested();
+                string results = await _sqlDAO.UpdateAccountToConfirmedAsync(account);
+                if(cancellationToken.IsCancellationRequested && results == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                {
+                    //Implement rollback
+                    string rollbackResults = await _sqlDAO.UpdateAccountToUnconfirmedAsync(account).ConfigureAwait(false);
+                    if (rollbackResults != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                    else
+                        throw new OperationCanceledException();
+                }
+                return results;
             }
-            catch
+            catch (OperationCanceledException)
             {
-                results.Add("Failed - Account service could not confirm account");
+                //No rollback necessary (or taken care of)
+                throw;
             }
-            return results;
+            catch(Exception ex)
+            {
+                return "500: Server: " + ex.Message;
+            }
         }
 
-        public IConfirmationLink GetConfirmationLink(string url)
+        public async Task<Tuple<IConfirmationLink, string>> GetConfirmationLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken))
         {
+            try
+            {
+
+            }
+            catch(Exception ex)
+            {
+
+            }
             IConfirmationLink _confirmationLink = _sqlDAO.GetConfirmationLink(url);
             return _confirmationLink;
         }

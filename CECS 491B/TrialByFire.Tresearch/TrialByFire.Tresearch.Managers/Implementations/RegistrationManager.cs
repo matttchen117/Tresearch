@@ -12,12 +12,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         public ILogService _logService { get; set; }
         public IMailService _mailService { get; set; }
         public IRegistrationService _registrationService { get; set; }
-
         public IValidationService _validationService { get; set; }
-
         public IMessageBank _messageBank { get; set; }
-
-        private string defaultAuthorization = "user";
 
         private int linkActivationLimit = 24;
 
@@ -31,34 +27,31 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _messageBank = messageBank;
         }
 
-        public List<string> CreatePreConfirmedAccount(string email, string passphrase)
+        public async Task<string> CreatePreConfirmedAccount(string email, string passphrase, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> results = new List<string>();
+            
             try
             {
-                //Verify that the user has correct credentials
-                Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-                keyValuePairs.Add("username", email);
-                keyValuePairs.Add("otp", passphrase);
-                string result = _validationService.ValidateInput(keyValuePairs);
-                if (result.Equals(_messageBank.SuccessMessages["generic"]))
+                cancellationToken.ThrowIfCancellationRequested();
+                IAccount _account = new Account(email, email, passphrase, "user", true, false);
+                string result = await _registrationService.CreateAccountAsync(_account);
+                if(cancellationToken.IsCancellationRequested && result == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                 {
-                    IAccount _account = new Account(email, email, passphrase, defaultAuthorization, true, false);
-                    results.AddRange(_registrationService.CreatePreConfirmedAccount(_account));
-                    if (results.Last()[0] == 'F')
-                    {
-                        results.Add("Failed - Unable to Create Account in Account Manager");
-                        return results;
-                    }
+                    //Perform Rollback
                 }
+                return result;
             }
-            catch
+            catch (OperationCanceledException)
             {
-                results.Add("Failed - Unable to Create Account in Account Manager");
-                return results;
+                //Rollback taken care of 
+                throw;
             }
-            results.Add("Success - Registration Manager created account");
-            return results;
+
+            catch(Exception ex)
+            {
+                return "500: Server: " + ex.Message;
+            }
+            
         }
 
         public List<string> ConfirmAccount(string url)
@@ -145,7 +138,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         {
             DateTime now = DateTime.Now;
             DateTime yesterday = now.AddDays(-1);
-            if (confirmationLink.Datetime <= now && confirmationLink.Datetime >= yesterday)
+            if (confirmationLink.TimeCreated <= now && confirmationLink.TimeCreated >= yesterday)
                 return true;
             else
                 return false;

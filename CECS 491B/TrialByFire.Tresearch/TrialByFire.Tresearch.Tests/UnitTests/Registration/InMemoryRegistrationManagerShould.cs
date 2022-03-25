@@ -58,15 +58,15 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         [InlineData("wonderbread@gmail.com", "travelPlans123")]
         [InlineData("catcherInTheRye@hotmail.com", "undergroundBasketWeaving")]
         [InlineData("windows365@gmail.com", "myPassphrase123")]
-        public void CreateTheUserAccount(string email, string passphrase)
+        public async Task CreateTheUserAccount(string email, string passphrase)
         {
             //Arrange
             IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
             //Act
-            List<string> result = registrationManager.CreatePreConfirmedAccount(email, passphrase);
+            string result = await registrationManager.CreatePreConfirmedAccount(email, passphrase);
 
             //Assert
-            Assert.Equal('S', result.Last()[0]);
+            Assert.Equal("success", result);
         }
 
         [Theory]
@@ -93,13 +93,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         {
             IConfirmationLink _confirmationLink = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Parse(date));
             IAccount _account = new Account(email, email, passphrase, "user", true, false);
-            ISqlDAO sqlDAO = TestApp.Services.GetService<ISqlDAO>();
             IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
-            sqlDAO.CreateAccount(_account);
-            sqlDAO.CreateConfirmationLink(_confirmationLink);
+    
 
-
-            string link = baseUrl + _confirmationLink.UniqueIdentifier;
+            string link = baseUrl + _confirmationLink.GUIDLink;
 
             List<string> results = new List<string>();
 

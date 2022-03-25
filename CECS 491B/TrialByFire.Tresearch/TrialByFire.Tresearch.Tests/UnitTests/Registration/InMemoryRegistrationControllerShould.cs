@@ -29,13 +29,13 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         [Theory]
         [InlineData("pammypoor@gmail.com", "myValidPassphrase")]
         [InlineData("pammypoor@gmail.com", "ApplePie!")]
-        public void RegisterTheUser(string email, string passphrase)
+        public async Task RegisterTheUser(string email, string passphrase)
         {
             //Arrange
             IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
             IAccount account = new Account(email, email, passphrase, "User", true, false);
             //Act
-            IActionResult results = registrationController.RegisterAccount(email, passphrase);
+            IActionResult results = await registrationController.RegisterAccount(email, passphrase).ConfigureAwait(false);
             var objectResult = results as ObjectResult;
 
             //Assert
@@ -69,12 +69,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             IAccount _account = new Account(email, email, passphrase, "User", true, false);
             IConfirmationLink _confirmationLink = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Parse(date));
             IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
-            ISqlDAO sqlDAO = TestApp.Services.GetService<ISqlDAO>();
-            sqlDAO.CreateAccount(_account);
-            sqlDAO.CreateConfirmationLink(_confirmationLink);
-
+  
+            
             //Act
-            IActionResult results = registrationController.ConfirmAccount(url + _confirmationLink.UniqueIdentifier);
+            IActionResult results = registrationController.ConfirmAccount(url + _confirmationLink.GUIDLink);
             var objectResult = results as ObjectResult;
 
             //Assert

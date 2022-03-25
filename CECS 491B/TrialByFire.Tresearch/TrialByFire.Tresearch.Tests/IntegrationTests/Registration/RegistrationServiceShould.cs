@@ -5,33 +5,36 @@ using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Services.Implementations;
 using TrialByFire.Tresearch.Models.Implementations;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 {
-    public class RegistrationServiceShould : IntegrationTestDependencies
+    public class RegistrationServiceShould : TestBaseClass
     {
-
-        public IRegistrationService _registrationService { get; set; }
-
-        public RegistrationServiceShould() : base()
+        public RegistrationServiceShould() : base(new string[] { })
         {
-            _registrationService = new RegistrationService(SqlDAO, LogService);
+            TestBuilder.Services.AddScoped<IRegistrationService, RegistrationService>();
+            TestApp = TestBuilder.Build();
         }
 
 
         [Theory]
         [InlineData("wonderbread@gmail.com", "myRegisterPassword")]
         [InlineData("orowheat@hotmail.com", "unFortunateName")]
-        public void RegisterTheUser(string email, string passphrase)
+        public async Task RegisterTheUser(string email, string passphrase)
         {
+
             //Arrange 
             IAccount account = new Account(email, email, passphrase, "user", true, false);
+            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+
 
             //Act
-            List<string> results = _registrationService.CreatePreConfirmedAccount(account);
+            string results = await registrationService.CreateAccountAsync(account);
 
             //Assert
-            Assert.Equal('S', results.Last()[0]);
+            Assert.Equal("Success", results);
         }
 
 
@@ -42,9 +45,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         {
             //Arrange
             IAccount _account = new Account(email, username, passphrase, authenticationLevel, status, confirmed);
+            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
             //Act
-            List<string> results = _registrationService.CreateConfirmation(email, baseUrl);
+            List<string> results = registrationService.CreateConfirmation(email, baseUrl);
 
             //Assert
             Assert.Equal('S', results.Last()[0]);        // GUID contains 36 characters
@@ -56,12 +61,12 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public void ConfirmTheUser(string email, string passphrase, string authenticationLevel, bool status, bool confirmed)
         {
             //Arrange
-            SqlDAO.CreateConfirmationLink(new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now));
-
             IAccount _account = new Account(email, email, passphrase, authenticationLevel, status, confirmed);
-            SqlDAO.CreateAccount(_account);
+            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+
             //Act
-            List<string> results = _registrationService.ConfirmAccount(_account);
+            List<string> results = registrationService.ConfirmAccount(_account);
 
             //Assert
             Assert.Equal('S', results.Last()[0]);
@@ -75,10 +80,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
             //Arrange
             Guid myguid = Guid.NewGuid();
             string guid = myguid.ToString();
-            SqlDAO.CreateConfirmationLink(new ConfirmationLink(email, myguid, DateTime.Now));
+            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
             //Act
-            IConfirmationLink link = _registrationService.GetConfirmationLink(guid);
+            IConfirmationLink link = registrationService.GetConfirmationLink(guid);
 
             //Assert
             Assert.Equal(email, link.Username);
@@ -91,10 +97,12 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         {
             //Arrange
             IConfirmationLink link = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now);
-            SqlDAO.CreateConfirmationLink(link);
+            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+
 
             //Act
-            List<string> results = _registrationService.RemoveConfirmationLink(link);
+            List<string> results = registrationService.RemoveConfirmationLink(link);
 
             //Assert
             Assert.Equal('S', results.Last()[0]);

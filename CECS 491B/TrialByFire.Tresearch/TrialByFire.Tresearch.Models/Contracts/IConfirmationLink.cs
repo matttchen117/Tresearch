@@ -4,10 +4,9 @@ namespace TrialByFire.Tresearch.Models.Contracts
 {
     public interface IConfirmationLink
     {
-        string Username { get; set; }
-
-        Guid UniqueIdentifier { get; set; }
-
-        DateTime Datetime { get; set; }
+        public string Username { get; set; }
+        public string AuthorizationLevel { get; set; }
+        public Guid GUIDLink { get; set; }
+        public DateTime TimeCreated { get; set; }
     }
 }

@@ -54,6 +54,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "403: Database: You are not authorized to perform this operation.";
                 case Responses.alreadyEnabled:
                     return "403: Server: Account is already enabled.";
+                case Responses.accountAlreadyConfirmed:
+                    return "403: Server: Account is already confirmed";
+                case Responses.accountAlreadyUnconfirmed:
+                    return "403: Server: Account is already unconfirmed";
                 case Responses.recoveryLinkLimitReached:
                     return "403: Server: Account has reached limit of five attempts this month";
                 case Responses.accountNotFound:
@@ -77,12 +81,20 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "503: Server: Authentication Cookie creation failed.";
                 case Responses.sendEmailFail:
                     return "503: Server: Email failed to send.";
+                case Responses.accountConfirmedFail:
+                    return "503: Database: Failed to confirm the account";
+                case Responses.accountUnconfirmedFail:
+                    return "503: Database: Failed to unconfirm the account";
                 case Responses.accountDisableFail:
                     return "503: Database: Failed to disable the account.";
                 case Responses.accountEnableFail:
                     return "503: Database: Failed to enable the account.";
                 case Responses.recoveryLinkRemoveFail:
                     return "503: Database: Failed to remove recovery link.";
+                case Responses.confirmationLinkRemoveFail:
+                    return "503: Database: Failed to remove confirmation link.";
+                case Responses.confirmationLinkCreateFail:
+                    return "504: Database: Failed to create confirmation linik.";
                 case Responses.recoveryLinkCreateFail:
                     return "504: Database: Failed to create recovery link.";
                 case Responses.otpFail:

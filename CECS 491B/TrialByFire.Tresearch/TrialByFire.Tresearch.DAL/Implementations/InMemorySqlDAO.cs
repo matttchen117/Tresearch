@@ -318,56 +318,130 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         }
 
-        public IAccount GetUnconfirmedAccount(string email)
+        public async Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> results = new List<string>();
-            for (int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
-                if (email.Equals(InMemoryDatabase.Accounts[i].Email))
-                    return InMemoryDatabase.Accounts[i];
-            return null;
-
-        }
-
-        public List<string> RemoveConfirmationLink(IConfirmationLink _confirmationLink)
-        {
-            List<string> results = new List<string>();
-            int numberOfConfirmationsInDatabase = InMemoryDatabase.ConfirmationLinks.Count();
-            InMemoryDatabase.ConfirmationLinks.Remove(_confirmationLink);
-            int affectedRows = InMemoryDatabase.ConfirmationLinks.Count() - numberOfConfirmationsInDatabase;
-            if (affectedRows == -1)
-                results.Add("Success - Confirmation link removed from in memory database");
-            else
-                results.Add("Failed - Confirmation link could not be removed from in memory database");
-            return results;
-        }
-
-        public List<string> ConfirmAccount(IAccount account)
-        {
-            List<string> results = new List<string>();
-            int indexOfAccount = InMemoryDatabase.Accounts.IndexOf(account);
-            if (indexOfAccount == -1)
-                results.Add("Failed - Account not found in database");
-            else
+            IAccount nullAccount = null;
+            try
             {
-                InMemoryDatabase.Accounts[indexOfAccount].Confirmed = true;
-                results.Add("Success - Account confirmed in database");
+                cancellationToken.ThrowIfCancellationRequested();
+                for (int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
+                    if (email.Equals(InMemoryDatabase.Accounts[i].Email))
+                        return Tuple.Create(InMemoryDatabase.Accounts[i], _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
+                if (cancellationToken.IsCancellationRequested)
+                    throw new OperationCanceledException();
+                return Tuple.Create(nullAccount, _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result);
             }
-            return results;
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return Tuple.Create(nullAccount, "500: Database: " + ex.Message);
+            }
         }
-        public List<string> CreateConfirmationLink(IConfirmationLink _confirmationlink)
+
+        public async Task<string> RemoveConfirmationLinkAsync(IConfirmationLink confirmationLink, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> results = new List<string>();
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                InMemoryDatabase.ConfirmationLinks.Remove(confirmationLink);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    string rollbackResult = await CreateConfirmationLink(confirmationLink);
+                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                    else
+                        throw new OperationCanceledException();
+                }
+                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
 
-            int numberOfConfirmationsInDatabase = InMemoryDatabase.ConfirmationLinks.Count();
-            InMemoryDatabase.ConfirmationLinks.Add(_confirmationlink);
-            int affectedRows = InMemoryDatabase.ConfirmationLinks.Count() - numberOfConfirmationsInDatabase;
-
-            if (affectedRows == 1)
-                results.Add("Success - Confirmation link added to in memomry database");
-            else
-                results.Add("Failed - Could not add confirmation link to in memory database");
-
-            return results;
+        public async Task<string> UpdateAccountToUnconfirmedAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                for (int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
+                {
+                    if (account.Equals(InMemoryDatabase.Accounts[i]))
+                    {
+                        InMemoryDatabase.Accounts[i].Confirmed = false;
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    }
+                }
+                return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+        public async Task<string> UpdateAccountToConfirmedAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                for(int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
+                {
+                    if (account.Equals(InMemoryDatabase.Accounts[i]))
+                    {
+                        InMemoryDatabase.Accounts[i].Confirmed = true;
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    }
+                }
+                return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+        public async Task<string> CreateConfirmationLink(IConfirmationLink confirmationLink, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                InMemoryDatabase.ConfirmationLinks.Add(confirmationLink);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    string rollbackResult = await RemoveConfirmationLinkAsync(confirmationLink);
+                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                    else
+                        throw new OperationCanceledException();
+                }
+                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
         }
 
         public IConfirmationLink GetConfirmationLink(string url)
@@ -375,7 +449,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             string guidString = url.Substring(url.LastIndexOf('=') + 1);
             Guid guid = new Guid(guidString);
             for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count(); i++)
-                if (guid.Equals(InMemoryDatabase.ConfirmationLinks[i].UniqueIdentifier))
+                if (guid.Equals(InMemoryDatabase.ConfirmationLinks[i].GUIDLink))
                     return InMemoryDatabase.ConfirmationLinks[i];
             return null;
         }

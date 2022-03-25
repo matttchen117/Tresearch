@@ -190,6 +190,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (OperationCanceledException)
             {
+                //No rollback necessary
                 throw;
             }
             catch (Exception ex)
@@ -341,6 +342,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+        /// <summary>
+        ///     DecrementRecoveryLinkCountAsync(email, authorizationLevel, cancellationToken)
+        ///         Decrements the count of recovery links a user has 
+        /// </summary>
+        /// <param name="email"> Email address of user to decrement</param>
+        /// <param name="authorizationLevel">Authorization Level of user</param>
+        /// <param name="cancellationToken">Cancellation Token </param>
+        /// <returns></returns>
         public async Task<string> DecrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -384,6 +393,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+        /// <summary>
+        ///     IncrementRecoveryLinkCountAsync(email, authorizationLevel, cancellationToken)
+        ///         Increments the count of recovery links a user has 
+        /// </summary>
+        /// <param name="email">Email of user</param>
+        /// <param name="authorizationLevel">Authorization Level of user</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns></returns>
         public async Task<string> IncrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -484,108 +501,196 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-
-
-        public List<string> CreateConfirmationLink(IConfirmationLink _confirmationlink)
-        {
-            List<string> result = new List<string>();
+        public async Task<string> CreateConfirmationLinkAsync(IConfirmationLink confirmationlink, CancellationToken cancellationToken = default(CancellationToken))
+        { 
             try
             {
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    var insertQuery = "INSERT INTO dbo.EmailConfirmationLinks (username, GUID, timestamp) VALUES (@Username, @UniqueIdentifier, @Datetime)";
-                    int affectedRows = connection.Execute(insertQuery, _confirmationlink);
-
-                    if (affectedRows == 1)
-                        result.Add("Success - Confirmation Link added to database");
-                    else
-                        result.Add("Failed - Email already has confirmation link");
+                    var procedure = "[CreateConfirmationLink]";
+                    var value = new { Username = confirmationlink.Username, GUIDLink = confirmationlink.GUIDLink, TimeCreated = confirmationlink.TimeCreated, AuthorizationLevel = confirmationlink.AuthorizationLevel };
+                    var affectedRows = await connection.QueryAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        string rollbackResult = await RemoveConfirmationLinkAsync(confirmationlink);
+                        if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                            return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                        else
+                            throw new OperationCanceledException();
+                    }
+                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
                 }
+            }
+            catch(SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    default: return "500: Database: " + ex.Message;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
-                result.Add("Failed - SQLDAO " + ex);
+                return "500: Database: " + ex.Message;
             }
-            return result;
         }
 
-        public IConfirmationLink GetConfirmationLink(string url)
+        public async Task<Tuple<IConfirmationLink, string>> GetConfirmationLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken))
         {
-
-            string guidString = url.Substring(url.LastIndexOf('=') + 1);
-            //Guid guid = new Guid(guidString);
-
-
-            IConfirmationLink _confirmationLink = new ConfirmationLink();
-
+            IConfirmationLink nullLink = null;
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
 
-                    var readQuery = "SELECT username FROM dbo.EmailConfirmationLinks WHERE GUID = @guid";
-                    _confirmationLink.Username = connection.ExecuteScalar<string>(readQuery, new { guid = guidString });
-                    readQuery = "SELECT GUID FROM dbo.EmailConfirmationLinks WHERE GUID = @guid";
-                    _confirmationLink.UniqueIdentifier = connection.ExecuteScalar<Guid>(readQuery, new { guid = guidString });
-                    readQuery = "SELECT datetime FROM dbo.EmailConfirmationLinks WHERE GUID = @guid";
-                    _confirmationLink.Datetime = connection.ExecuteScalar<DateTime>(readQuery, new { guid = guidString });
+                    var procedure = "[GetConfirmationLink]";      //INSERT on duplicate key update linkscreted++
+                    var value = new { GUIDLink = guid };
+                    var link = await connection.QueryFirstAsync<IConfirmationLink>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    if (cancellationToken.IsCancellationRequested)
+                        throw new OperationCanceledException();
+                    return Tuple.Create(link, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
                 }
+            }
+            catch(SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    default: return Tuple.Create(nullLink, "500: Database: " + ex.Message);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                //Rollbackc taken care of
+                throw;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                return _confirmationLink;
+                return Tuple.Create(nullLink, "500: Server: " + ex.Message);
             }
 
-            return _confirmationLink;
         }
 
-
-        public List<string> ConfirmAccount(IAccount account)
+        public async Task<string> UpdateAccountToUnconfirmedAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> results = new List<string>();
-            int affectedRows;
             try
             {
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    var updateQuery = "UPDATE dbo.Accounts SET confirmation = 1 WHERE email = @Email and username = @Username";
-                    affectedRows = connection.Execute(updateQuery, account);
+                    var procedure = "[UnConfirmAccount]";      //INSERT on duplicate key update linkscreted++
+                    var value = new { Username = account.Username, AuthorizationLevel = account.AuthorizationLevel };
+                    var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        string rollbackResult = await UpdateAccountToConfirmedAsync(account);
+                        if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                            return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                        else
+                            throw new OperationCanceledException();
+                    }
+
+                    if (affectedRows >= 1)
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    else
+                        return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
                 }
-                if (affectedRows == 1)
-                    results.Add("Success - Account confirmed in database");
-                else
-                    results.Add("Failed - Account doesn't exist in database");
             }
-            catch
+
+            catch (OperationCanceledException)
             {
-                results.Add("Failed - SQLDAO  could not be confirm account in database");
+                //Rolback taken care of 
+                throw;
             }
-            return results;
+            catch (Exception ex)
+            {
+                return "500: Server " + ex.Message;
+            }
         }
-        public bool DeleteConfirmationLink(IConfirmationLink confirmationLink)
+
+        public async Task<string> UpdateAccountToConfirmedAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
-            int affectedRows;
             try
             {
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    var deleteQuery = "DELETE FROM dbo.EmailConfirmationLinks WHERE @Username=username and @Guid=guid and @Timestamp=Timestamp";
-                    affectedRows = connection.Execute(deleteQuery, confirmationLink);
-                }
-                if (affectedRows == 1)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
+                    var procedure = "[ConfirmAccount]";      //INSERT on duplicate key update linkscreted++
+                    var value = new { Username = account.Username, AuthorizationLevel = account.AuthorizationLevel };
+                    var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        string rollbackResult = await UpdateAccountToUnconfirmedAsync(account);
+                        if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                            return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                        else
+                            throw new OperationCanceledException();
+                    }
+
+                    if (affectedRows >= 1)
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    else
+                        return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
                 }
             }
-            catch
+             
+            catch (OperationCanceledException)
             {
-                return false;
+                //Rolback taken care of 
+                throw;
+            }
+            catch(Exception ex)
+            {
+                    return "500: Server " + ex.Message;   
+            }
+        }
+        public async Task<string> RemoveConfirmationLinkAsync(IConfirmationLink confirmationLink, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var procedure = "dbo.[RemoveConfirmationLink]";
+                    var value = new { GUIDLink = confirmationLink.GUIDLink };
+                    var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    //Check if cancellation requested
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        string rollbackResults = await CreateConfirmationLinkAsync(confirmationLink);
+                        if (rollbackResults != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                            return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                        else
+                            throw new OperationCanceledException();
+                    }
+
+                    //Check if recovery link removed
+                    if (affectedRows >= 0)
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    else
+                        return _messageBank.GetMessage(IMessageBank.Responses.recoveryLinkRemoveFail).Result;
+
+                }
+            }
+            catch(SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    default: return "500: Database: " + ex.Message;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback taken care of
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return "500: Server: " + ex.Message;
             }
         }
 
@@ -632,56 +737,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 return "500 : Database: " + ex;
             }
-        }
-
-        public IAccount GetUnconfirmedAccount(string email)
-        {
-            IAccount account;
-            try
-            {
-                using (var connection = new SqlConnection(_options.SqlConnectionString))
-                {
-                    var readQuery = "SELECT username FROM dbo.user_accounts WHERE email = @Email and authorization_level = 'User'";
-                    string username = connection.ExecuteScalar<string>(readQuery, new { Email = email });
-                    readQuery = "SELECT passphrase FROM dbo.user_accounts WHERE email = @Email and authorization_level = 'User'";
-                    string passphrase = connection.ExecuteScalar<string>(readQuery, new { Email = email });
-                    readQuery = "SELECT account_status FROM dbo.user_accounts WHERE email = @Email and authorization_level = 'User'";
-                    bool status = connection.ExecuteScalar<bool>(readQuery, new { Email = email });
-                    account = new Account(email, username, passphrase, "User", status, false);
-                    return account;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Write(ex);
-                return null;
-            }
-
-        }
-
-
-        public List<string> RemoveConfirmationLink(IConfirmationLink confirmationLink)
-        {
-            List<string> results = new List<string>();
-            int affectedRows;
-
-            try
-            {
-                using (var connection = new SqlConnection(_options.SqlConnectionString))
-                {
-                    var deleteQuery = "DELETE FROM dbo.confirmation_links WHERE GUID = @guid";
-                    affectedRows = connection.Execute(deleteQuery, new { guid = confirmationLink.UniqueIdentifier });
-                }
-                if (affectedRows == 1)
-                    results.Add("Success - Confirmation Link removed from database");
-                else
-                    results.Add("Failed - Confirmation link unable to be removed from database");
-            }
-            catch (Exception ex)
-            {
-                results.Add("Failed - Confirmation link not removed in database" + ex);
-            }
-            return results;
         }
         public string DeleteAccount()
         {
