@@ -22,9 +22,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
     {
         public InMemoryOTPRequestServiceShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<ISqlDAO, InMemorySqlDAO>();
-            TestBuilder.Services.AddScoped<IOTPRequestService, OTPRequestService>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestServices.AddScoped<IOTPRequestService, OTPRequestService>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -45,7 +45,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
         public async Task RequestTheOTPAsync(string username, string passphrase, string authorizationLevel, string expected)
         {
             // Arrange
-            IOTPRequestService otpRequestService = TestApp.Services.GetService<IOTPRequestService>();
+            IOTPRequestService otpRequestService = TestProvider.GetRequiredService<IOTPRequestService>();
             IAccount account = new Account(username, passphrase, authorizationLevel);
             IOTPClaim otpClaim = new OTPClaim(account);
             CancellationTokenSource cancellationTokenSource =

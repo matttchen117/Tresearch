@@ -19,8 +19,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authorization
     {
         public InMemoryAuthorizationServiceShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<ISqlDAO, InMemorySqlDAO>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -35,7 +35,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authorization
             IRoleIdentity roleIdentity = new RoleIdentity(true, username, authorizationLevel);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
-            IAuthorizationService authorizationService = TestApp.Services.GetService<IAuthorizationService>();
+            IAuthorizationService authorizationService = TestProvider.GetService<IAuthorizationService>();
             CancellationTokenSource cancellationTokenSource =
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));
 

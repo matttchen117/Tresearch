@@ -25,9 +25,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
     {
         public AuthenticationControllerShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<IAuthenticationManager, AuthenticationManager>();
-            TestBuilder.Services.AddScoped<IAuthenticationController, AuthenticationController>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<IAuthenticationManager, AuthenticationManager>();
+            TestServices.AddScoped<IAuthenticationController, AuthenticationController>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -59,7 +59,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }
-            IAuthenticationController authenticationController = TestApp.Services.
+            IAuthenticationController authenticationController = TestProvider.
                 GetService<IAuthenticationController>();
             DateTime now = new DateTime(year, month, day, hour, minute, second);
             string[] expecteds = expected.Split(": ");

@@ -78,6 +78,11 @@ app.UseCors(MyAllowSpecificOrigins);
 
 app.UseCookieAuthentication();
 
+/*app.Use((context, next) =>
+{
+
+});*/
+
 app.MapControllers();
 
 app.Run();

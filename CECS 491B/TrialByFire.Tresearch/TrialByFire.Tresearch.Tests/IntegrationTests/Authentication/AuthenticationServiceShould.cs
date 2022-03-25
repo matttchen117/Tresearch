@@ -18,7 +18,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
     {
         public AuthenticationServiceShould() : base(new string[] { })
         {
-            TestApp = TestBuilder.Build();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -42,7 +42,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
         {
             // Arrange
             IOTPClaim otpClaim = new OTPClaim(username, otp, authorizationLevel, new DateTime(year, month, day, hour, minute, second));
-            IAuthenticationService authenticationService = TestApp.Services.GetService<IAuthenticationService>();
+            IAuthenticationService authenticationService = TestProvider.GetService<IAuthenticationService>();
             CancellationTokenSource cancellationTokenSource =
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));
 

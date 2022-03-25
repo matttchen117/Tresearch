@@ -19,8 +19,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
     {
         public OTPRequestServiceShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<IOTPRequestService, OTPRequestService>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<IOTPRequestService, OTPRequestService>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -41,7 +41,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
         public async Task RequestTheOTP(string username, string passphrase, string authorizationLevel, string expected)
         {
             // Arrange
-            IOTPRequestService otpRequestService = TestApp.Services.GetService<IOTPRequestService>();
+            IOTPRequestService otpRequestService = TestProvider.GetService<IOTPRequestService>();
             IAccount account = new Account(username, passphrase, authorizationLevel);
             IOTPClaim otpClaim = new OTPClaim(account);
             CancellationTokenSource cancellationTokenSource =

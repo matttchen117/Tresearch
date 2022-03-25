@@ -19,9 +19,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
     {
         public InMemoryLogoutServiceShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<ISqlDAO, InMemorySqlDAO>();
-            TestBuilder.Services.AddScoped<IOTPRequestService, OTPRequestService>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestServices.AddScoped<IOTPRequestService, OTPRequestService>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -32,7 +32,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
-            ILogoutService logoutService = TestApp.Services.GetService<ILogoutService>();
+            ILogoutService logoutService = TestProvider.GetService<ILogoutService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(
                 TimeSpan.FromSeconds(5));
 

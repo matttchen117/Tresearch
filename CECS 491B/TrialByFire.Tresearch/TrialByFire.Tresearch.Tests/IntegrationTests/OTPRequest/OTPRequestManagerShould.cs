@@ -21,10 +21,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
     {
         public OTPRequestManagerShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<IMailService, MailService>();
-            TestBuilder.Services.AddScoped<IOTPRequestService, OTPRequestService>();
-            TestBuilder.Services.AddScoped<IOTPRequestManager, OTPRequestManager>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<IMailService, MailService>();
+            TestServices.AddScoped<IOTPRequestService, OTPRequestService>();
+            TestServices.AddScoped<IOTPRequestManager, OTPRequestManager>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -53,7 +53,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }
-            IOTPRequestManager otpRequestManager = TestApp.Services.GetService<IOTPRequestManager>();
+            IOTPRequestManager otpRequestManager = TestProvider.GetService<IOTPRequestManager>();
             CancellationTokenSource cancellationTokenSource =
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));
 

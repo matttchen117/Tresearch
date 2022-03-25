@@ -24,12 +24,12 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
     {
         public InMemoryOTPRequestControllerShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<ISqlDAO, InMemorySqlDAO>();
-            TestBuilder.Services.AddScoped<IMailService, MailService>();
-            TestBuilder.Services.AddScoped<IOTPRequestService, OTPRequestService>();
-            TestBuilder.Services.AddScoped<IOTPRequestManager, OTPRequestManager>();
-            TestBuilder.Services.AddScoped<IOTPRequestController, OTPRequestController>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestServices.AddScoped<IMailService, MailService>();
+            TestServices.AddScoped<IOTPRequestService, OTPRequestService>();
+            TestServices.AddScoped<IOTPRequestManager, OTPRequestManager>();
+            TestServices.AddScoped<IOTPRequestController, OTPRequestController>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -59,7 +59,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }
-            IOTPRequestController otpRequestController = TestApp.Services.GetService<IOTPRequestController>();
+            IOTPRequestController otpRequestController = TestProvider.GetService<IOTPRequestController>();
             string[] expecteds = expected.Split(": ");
             ObjectResult expectedResult = new ObjectResult(expecteds[2])
             { StatusCode = Convert.ToInt32(expecteds[0]) };

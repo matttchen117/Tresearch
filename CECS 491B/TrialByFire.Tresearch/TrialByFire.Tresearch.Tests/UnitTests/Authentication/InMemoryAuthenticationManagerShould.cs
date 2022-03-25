@@ -20,9 +20,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
     {
         public InMemoryAuthenticationManagerShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<ISqlDAO, InMemorySqlDAO>();
-            TestBuilder.Services.AddScoped<IAuthenticationManager, AuthenticationManager>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestServices.AddScoped<IAuthenticationManager, AuthenticationManager>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -54,7 +54,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             {
                 Thread.CurrentPrincipal = new ClaimsPrincipal(rolePrincipal);
             }
-            IAuthenticationManager authenticationManager = TestApp.Services.GetService<IAuthenticationManager>();
+            IAuthenticationManager authenticationManager = TestProvider.GetService<IAuthenticationManager>();
             DateTime now = new DateTime(year, month, day, hour, minute, second);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(
                 TimeSpan.FromSeconds(5));
