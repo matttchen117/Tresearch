@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
@@ -11,6 +12,6 @@ namespace TrialByFire.Tresearch.Services.Contracts
 {
     public interface IAccountDeletionService
     {
-        string DeleteAccount();
+        public Task<List<string>> DeleteAccountAsync(CancellationToken cancellationToken = default);
     }
 }

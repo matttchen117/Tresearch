@@ -19,8 +19,10 @@ namespace TrialByFire.Tresearch.Services.Implementations
         private ILogService LogService { get; }
 
 
+        Thread.CurrentPrincipal
 
-        public AccountDeletionService(ISqlDAO sqlDAO, ILogService logService)
+
+        public AccountDeletionService(ISqlDAO sqlDAO, ILogService logService, CancellationToken cancellationToken = default)
         {
             this.SqlDAO = sqlDAO;
             this.LogService = logService;
@@ -28,10 +30,18 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
 
 
-        public string DeleteAccount()
+        public string DeleteAccountAsync(CancellationToken cancellationToken = default)
         {
-            string _results = SqlDAO.DeleteAccount();
-            return _results;
+            try
+            {
+
+            }
+            catch ()
+            {
+
+            }
+            string results = SqlDAO.DeleteAccountAsync(cancellationToken);
+            return results;
         }
 
 

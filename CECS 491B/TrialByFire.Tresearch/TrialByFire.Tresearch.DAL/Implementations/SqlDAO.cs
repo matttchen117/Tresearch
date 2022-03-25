@@ -583,7 +583,72 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             return results;
         }
-        public string DeleteAccount()
+
+
+        /// <summary>
+        /// VIET GETAMOUNTOFADMINS STORED PROCEDURE
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        /// 
+        //if i get an error, just throw, status code part of error message, if error, catch here or layer above.
+        //task of type int, custom exceptions for my specific feature,
+        //just make return type a string, return success or failure
+        //specific success message for feature, rn just generic success, for logs, we should know what operation succeeded,
+        public async Task<string> GetAmountOfAdminsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            int affectedRows = 0;
+            //might not need to get authorization level here
+            //string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
+            try
+            {
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var procedure = "dbo.[GetAmountOfAdmins]";
+                    affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    //modifying databsae, have cancellationToken
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        //change into enumeration, messageBank.getMessage()
+                        return Tuple.Create(affectedRows, _messageBank.ErrorMessages["cancellationRequested"]);
+                    }
+
+                    if (affectedRows > 1)
+                    {
+                        return Tuple.Create(affectedRows, _messageBank.SuccessMessages["generic"]);
+                    }
+                    else
+                    {
+                        //need to add messagebank message for 
+                        return Tuple.Create(affectedRows, _messageBank.ErrorMessages["lastAdmin"]);
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return Tuple.Create(0, _messageBank.ErrorMessages["cancellationRequested"]);
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(0, "500: Database " + ex.Message);
+            }
+
+        }
+
+
+        /// <summary>
+        /// VIET DELETEACCOUNTASYNC STORED PROCEDURE
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+
+        //do string, return -1 from query
+        //do logic necessary to make distinction from rowsaffected = 0 from success or failure, 
+        //could first look for it, might have to do it nested, select first and then check, if row back or not, if row back then delete, if not then cancel and 
+        //dont waste resources going into delete
+        //check for what their role is in beforehand, using isInRole method.
+        public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default)
         {
 
             int affectedRows;
@@ -609,6 +674,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             "END";
 
                         affectedRows = connection.Execute(storedProcedure, Thread.CurrentPrincipal.Identity.Name);
+
                     }
 
 
