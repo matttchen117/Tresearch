@@ -37,7 +37,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     url = url
                 });
                 var result = client.SendEmailAsync(confirmation).Result;
-                return _messageBank.GetMessage(IMessageBank.Responses.sendEmailFail).Result;
+                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
             } 
             catch(Exception ex)
             {

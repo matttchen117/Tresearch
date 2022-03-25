@@ -38,6 +38,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             confirmationLinkRemoveFail,
             confirmationLinkNotFound,
             confirmationLinkExpired,
+            confirmationLinkExists,
             cookieFail,
             sendEmailFail,
             accountCreateFail,

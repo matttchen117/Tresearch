@@ -509,7 +509,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     var procedure = "[CreateConfirmationLink]";
                     var value = new { Username = confirmationlink.Username, GUIDLink = confirmationlink.GUIDLink, TimeCreated = confirmationlink.TimeCreated, AuthorizationLevel = confirmationlink.AuthorizationLevel };
-                    var affectedRows = await connection.QueryAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     if (cancellationToken.IsCancellationRequested)
                     {
                         string rollbackResult = await RemoveConfirmationLinkAsync(confirmationlink);
@@ -525,7 +525,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 switch (ex.Number)
                 {
-                    default: return "500: Database: " + ex.Message;
+                    case 2627: return _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkExists).Result;
+                    case 547: return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;    //Foreign key constraint  AKA NO ACCOUNT EXISTS
+                    default: return "500: Database: " + ex.Number;
                 }
             }
             catch (OperationCanceledException)
@@ -581,7 +583,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    var procedure = "[UnConfirmAccount]";      //INSERT on duplicate key update linkscreted++
+                    var procedure = "[UnconfirmAccount]";      //INSERT on duplicate key update linkscreted++
                     var value = new { Username = username, AuthorizationLevel = authorizationlevel };
                     var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
@@ -594,13 +596,22 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             throw new OperationCanceledException();
                     }
 
-                    if (affectedRows >= 1)
-                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
-                    else
+                    if (affectedRows < 1)
                         return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+                    else
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
                 }
             }
-
+            catch (SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    case 547:   //Adding recovery link violates foreign key constraint (AKA NO ACCOUNT)
+                        return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+                    default:
+                        return "500: Database: " + ex.Message;
+                }
+            }
             catch (OperationCanceledException)
             {
                 //Rolback taken care of 
@@ -631,13 +642,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             throw new OperationCanceledException();
                     }
 
-                    if (affectedRows >= 1)
-                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
-                    else
+                    if (affectedRows < 1)
                         return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+                    else
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
                 }
-            }
-             
+            }  
             catch (OperationCanceledException)
             {
                 //Rolback taken care of 
@@ -725,7 +735,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 switch (ex.Number)
                 {
-                    default: return "";
+                    case 2627: return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;
+                    default: return "500: Database: " + ex.Message;
                 }
             }
             catch(OperationCanceledException)

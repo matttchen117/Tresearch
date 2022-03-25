@@ -19,9 +19,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 
 
         [Theory]
-        [InlineData("wonderbread@gmail.com", "myRegisterPassword", "user", "")]
-        [InlineData("orowheat@hotmail.com", "unFortunateName", "user", "")]
-        public async Task RegisterTheUserAsync(string email, string passphrase, string authorizationLevel, string statusCode)
+        [InlineData("IntegrationRegistrationService1@gmail.com", "myRegisterPassword", "user", "200: Server: success")]
+        [InlineData("IntegrationRegistrationService2@gmail.com", "unFortunateName", "user", "200: Server: success")]        
+        [InlineData("IntegrationRegistrationService3@gmail.com", "unFortunateName", "user", "409: Server: Account  already exists")]
+        public async Task CreateTheAccountAsync(string email, string passphrase, string authorizationLevel, string statusCode)
         {
 
             //Arrange 
@@ -39,8 +40,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 
 
         [Theory]
-        [InlineData("wheatIsGreat@gmail.com", "wheatIsGreat@gmail.com", "")]
-        [InlineData("whitebread@hotmail.com", "whitebread@hotmail.com", "")]
+        [InlineData("IntegrationRegistrationService4@gmail.com", "user", "200: Server: success")]
+        [InlineData("IntegrationRegistrationService5@gmail.com", "user", "409: Database: The confirmation link already exists.")]
+        [InlineData("IntegrationRegistrationService99@gmail.com", "user", "404: Database: The account was not found.")]
         public async Task CreateTheLinkAsync(string email, string authorizationLevel, string statusCode)
         {
             //Arrange
@@ -55,8 +57,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         }
 
         [Theory]
-        [InlineData("confirmMe@gmail.com", "user", "")]
-        [InlineData("confirmMe2@gmail.com", "user", "")]
+        [InlineData("IntegrationRegistrationService6@gmail.com", "user", "200: Server: success")]
+        [InlineData("IntegrationRegistrationService7@gmail.com", "user", "200: Server: success")]
+        [InlineData("IntegrationRegistrationService99@gmail.com", "user", "404: Database: The account was not found.")]
         public async Task ConfirmTheUserAsync(string email, string authenticationLevel, string statusCode)
         {
             //Arrange

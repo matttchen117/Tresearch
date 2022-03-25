@@ -16,8 +16,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         }
 
         [Theory]
-        [InlineData("pammypoor@gmail.com", "www.google.com")]
-        [InlineData("pammmmyyyy@gmail.com", "https://github.com/Drakat7/Tresearch")]
+        [InlineData("pammypoor@gmail.com", "https://trialbyfiretresearch.azurewebsites.net/")]
+        [InlineData("pammmmyyyy@gmail.com", "https://trialbyfiretresearch.azurewebsites.net/")]
         public async Task SendEmail(string email, string url)
         {
             //Arrange
