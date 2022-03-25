@@ -350,7 +350,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 InMemoryDatabase.ConfirmationLinks.Remove(confirmationLink);
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    string rollbackResult = await CreateConfirmationLink(confirmationLink);
+                    string rollbackResult = await CreateConfirmationLinkAsync(confirmationLink);
                     if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                         return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
                     else
@@ -369,13 +369,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> UpdateAccountToUnconfirmedAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> UpdateAccountToUnconfirmedAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 for (int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
                 {
-                    if (account.Equals(InMemoryDatabase.Accounts[i]))
+                    if (email == InMemoryDatabase.Accounts[i].Email && authorizationLevel == InMemoryDatabase.Accounts[i].AuthorizationLevel)
                     {
                         InMemoryDatabase.Accounts[i].Confirmed = false;
                         return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
@@ -393,13 +393,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return "500: Database: " + ex.Message;
             }
         }
-        public async Task<string> UpdateAccountToConfirmedAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> UpdateAccountToConfirmedAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 for(int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
                 {
-                    if (account.Equals(InMemoryDatabase.Accounts[i]))
+                    if (email == InMemoryDatabase.Accounts[i].Email && authorizationLevel == InMemoryDatabase.Accounts[i].AuthorizationLevel)
                     {
                         InMemoryDatabase.Accounts[i].Confirmed = true;
                         return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
@@ -417,7 +417,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return "500: Database: " + ex.Message;
             }
         }
-        public async Task<string> CreateConfirmationLink(IConfirmationLink confirmationLink, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> CreateConfirmationLinkAsync(IConfirmationLink confirmationLink, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -444,14 +444,29 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public IConfirmationLink GetConfirmationLink(string url)
+        public async Task<Tuple<IConfirmationLink, string>> GetConfirmationLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken))
         {
-            string guidString = url.Substring(url.LastIndexOf('=') + 1);
-            Guid guid = new Guid(guidString);
-            for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count(); i++)
-                if (guid.Equals(InMemoryDatabase.ConfirmationLinks[i].GUIDLink))
-                    return InMemoryDatabase.ConfirmationLinks[i];
-            return null;
+            IConfirmationLink nullLink = null;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                string guidString = guid.Substring(guid.LastIndexOf('=') + 1);
+                Guid toFind = new Guid(guidString);
+                for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count(); i++)
+                    if (toFind.Equals(InMemoryDatabase.ConfirmationLinks[i].GUIDLink))
+                        return Tuple.Create(InMemoryDatabase.ConfirmationLinks[i], _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
+                if (cancellationToken.IsCancellationRequested)
+                    throw new OperationCanceledException();
+                return Tuple.Create(nullLink, _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkNotFound).Result);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(nullLink, "500: Database: " + ex.Message);
+            }
         }
 
         /*public List<IKPI> LoadKPI(DateTime now)
@@ -870,12 +885,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             IRecoveryLink nullLink = null;
             return Tuple.Create(nullLink, "200");
-        }
-
-        public async Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authenticationLevel, CancellationToken cancellationToken)
-        {
-            IAccount nullAccount = null;
-            return Tuple.Create(nullAccount, "500");
         }
 
         public async Task<Tuple<int, string>> GetTotalRecoveryLinksAsync(string email, string authorizationLevel, CancellationToken cancellationToken)

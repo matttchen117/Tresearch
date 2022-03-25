@@ -14,9 +14,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         public IRegistrationService _registrationService { get; set; }
         public IValidationService _validationService { get; set; }
         public IMessageBank _messageBank { get; set; }
-
         private int linkActivationLimit = 24;
-
         public RegistrationManager(ISqlDAO sqlDAO, ILogService logService, IRegistrationService accountService, IMailService mailService, IValidationService validationService, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
@@ -27,19 +25,45 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _messageBank = messageBank;
         }
 
-        public async Task<string> CreatePreConfirmedAccount(string email, string passphrase, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> CreateAndSendConfirmationAsync(string email, string passphrase, string authorizationLevel, string baseUrl, CancellationToken cancellationToken = default(CancellationToken))
         {
-            
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                IAccount _account = new Account(email, email, passphrase, "user", true, false);
-                string result = await _registrationService.CreateAccountAsync(_account);
-                if(cancellationToken.IsCancellationRequested && result == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                cancellationToken.ThrowIfCancellationRequested();              
+                
+                string resultCreate = await _registrationService.CreateAccountAsync(email, passphrase, authorizationLevel, cancellationToken);
+                
+                //Check if request is cancelled and acccount was already created
+                if(cancellationToken.IsCancellationRequested && resultCreate == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                 {
-                    //Perform Rollback
+                    //Perform account removal
                 }
-                return result;
+
+                //Check if account  was created
+                if (resultCreate != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                    return resultCreate;
+
+                Tuple<IConfirmationLink, string> confirmationLink = await _registrationService.CreateConfirmationAsync(email, authorizationLevel, cancellationToken).ConfigureAwait(false);
+               
+                //Check if request is cancelled and confirmation link was already created
+                if(cancellationToken.IsCancellationRequested && confirmationLink.Item2 == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                {
+                    //Perform account removal
+                    string rollbackResult = await _registrationService.RemoveConfirmationLinkAsync(confirmationLink.Item1, cancellationToken).ConfigureAwait(false);
+                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                    else
+                        throw new OperationCanceledException();
+                }
+
+                if (confirmationLink.Item2 != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                    return confirmationLink.Item2;
+
+                //Beyond point of no return cannot cancel
+                string linkUrl = $"{baseUrl}{confirmationLink.Item1.GUIDLink.ToString()}";
+                string mailResult = await _mailService.SendConfirmationAsync(email, linkUrl).ConfigureAwait(false);
+
+                return mailResult;
             }
             catch (OperationCanceledException)
             {
@@ -54,85 +78,66 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             
         }
 
-        public List<string> ConfirmAccount(string url)
+        public async Task<string> ConfirmAccountAsync(string guid, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> results = new List<string>();
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
+                Tuple<IConfirmationLink, string> confirmationLink = await _registrationService.GetConfirmationLinkAsync(guid).ConfigureAwait(false);
+                
+                if (confirmationLink.Item2 != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                    return confirmationLink.Item2;
 
-                IConfirmationLink _confirmationLink = _registrationService.GetConfirmationLink(url);
-                if (_confirmationLink == null)
-                {
-                    results.Add("Failed - Registration Manager unable to create confirmation link object");
-                    return results;
-                }
-                results.Add(_confirmationLink.Username);
-                IAccount account = _registrationService.GetUserFromConfirmationLink(_confirmationLink);
-                if (account.Email == null)
-                {
-                    results.Add("Failed - Registration Manager could not get Account with tied to confirmation link");
-                    return results;
-                }
+                if (cancellationToken.IsCancellationRequested)
+                    throw new OperationCanceledException();
 
-                results.Insert(0, account.Email);
-
-                if (!IsConfirmationLinkValid(_confirmationLink))
+                //Check if confirmation link is valid
+                if (!IsConfirmationLinkValid(confirmationLink.Item1))
                 {
-                    // Confirmation link is older than 24 days old
-                    results.AddRange(_registrationService.RemoveConfirmationLink(_confirmationLink));
-                    results.Add("Failed - Registration Manager determined confirmation link to be old");
-                    return results;
-                }
-                else
-                {
-                    results.AddRange(_registrationService.ConfirmAccount(account));
-                    results.AddRange(_registrationService.RemoveConfirmationLink(_confirmationLink));
-                    if (results.Last()[0] == 'S')
-                        results.Add("Success - Registration Manager confirmed account");
+                    // Remove confirmation link
+                    string removeOld = await _registrationService.RemoveConfirmationLinkAsync(confirmationLink.Item1, cancellationToken).ConfigureAwait(false);
+                    if (removeOld != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkRemoveFail).Result;
                     else
-                        results.Add("Failed - Registration Manager could not confirm account");
+                        return _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkExpired).Result;
                 }
+
+                
+
+                IConfirmationLink linkInfo = confirmationLink.Item1;
+                string confirmResult = await _registrationService.ConfirmAccountAsync(linkInfo.Username, linkInfo.AuthorizationLevel, cancellationToken).ConfigureAwait(false);
+
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    //PEFORM ROLLBACK
+                }
+
+                if (confirmResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                    return confirmResult;
+
+                string removeResult = await _registrationService.RemoveConfirmationLinkAsync(confirmationLink.Item1, cancellationToken).ConfigureAwait(false);
+
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    //Rollback confirm
+                    //Rollback removal
+                }
+                
+                if (removeResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                    return _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkRemoveFail).Result;
+                else
+                    return confirmResult;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
             }
             catch (Exception ex)
             {
-                results.Add("Failed - Registration Manager " + ex);
+                return "500: Server: " + ex.Message;
             }
-            return results;
         }
-
-        public List<string> SendConfirmation(string email, string baseUrl)
-        {
-            List<string> results = new List<string>();
-            try
-            {
-                results.AddRange(_registrationService.CreateConfirmation(email, baseUrl));
-                if (results.Last()[0] == 'F')
-                {
-                    if (results.First() == "Failed - Email already has confirmation link")
-                        results.Add("Failed - Account manager could not create confirmation link. confirmation link already exists");
-                    else
-                        results.Add("Failed - Registration Manager unable to create confirmation link");
-                    return results;
-                }
-
-                results.Add(_mailService.SendConfirmation(email, results.First()));
-                if (results.Last()[0] == 'F')
-                {
-                    results.Add("Failed - Registration Manager unable to send confirmation email");
-                }
-                else
-                {
-                    results.Add("Success - Registration Manager sent email confirmation");
-                }
-            }
-            catch (Exception ex)
-            {
-                results.Add("Failed - Account Manager" + ex);
-            }
-            return results;
-        }
-
-
 
         public bool IsConfirmationLinkValid(IConfirmationLink confirmationLink)
         {

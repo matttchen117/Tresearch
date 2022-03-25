@@ -64,6 +64,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "404: Database: The account was not found.";
                 case Responses.notFoundOrEnabled:
                     return "404: Database: The account was not found or it has been disabled.";
+                case Responses.confirmationLinkNotFound:
+                    return "404: Database: The confirmation link was not found.";
                 case Responses.notFoundOrAuthorized:
                     return "404: Database: Account not found or not authorized to perform the " +
                 "operation.";
@@ -77,6 +79,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "409: Database: The recovery link arealdy exists.";
                 case Responses.recoveryLinkExpired:
                     return "410: Server: The recovery link has expired.";
+                case Responses.confirmationLinkExpired:
+                    return "410: Server: The confirmation link has expired.";
                 case Responses.cookieFail:
                     return "503: Server: Authentication Cookie creation failed.";
                 case Responses.sendEmailFail:

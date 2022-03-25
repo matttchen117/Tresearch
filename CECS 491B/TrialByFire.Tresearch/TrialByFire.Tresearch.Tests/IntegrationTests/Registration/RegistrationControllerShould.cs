@@ -27,24 +27,32 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         }
 
         [Theory]
-        [InlineData("fezAshtray@gmail.com", "myRegisterPassword")]
-        [InlineData("cassieKat@hotmail.com", "unFortunateName")]
+        [InlineData("@gmail.com", "")]
+        [InlineData("@hotmail.com", "")]
         public async Task RegisterTheUser(string email, string passphrase)
         {
             // Arrange
             IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
 
             //Act
-            IActionResult results = await registrationController.RegisterAccount(email, passphrase).ConfigureAwait(false); ;
+            IActionResult results = await registrationController.RegisterAccountAsync(email, passphrase).ConfigureAwait(false); 
             var objectResult = results as ObjectResult;
 
             //Assert
             Assert.Equal(200, objectResult.StatusCode);
         }
 
-        public void ConfirmTheUser(string url)
+        public async void ConfirmTheUser(string guid)
         {
+            //Arrange
+            IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
 
+            //Act
+            IActionResult results = await registrationController.ConfirmAccountAsync(guid).ConfigureAwait(false);
+            var objectResult = results as ObjectResult;
+
+            //Assert
+            Assert.Equal(200, objectResult.StatusCode);
         }
 
     }

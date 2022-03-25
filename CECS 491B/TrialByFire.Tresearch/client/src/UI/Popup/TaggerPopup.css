@@ -1,0 +1,15 @@
+.tagger-popup-page{
+    max-width: 400px;
+    margin: auto;
+    padding: 10% 0 0 ;
+}
+
+
+.close-icon-tagger-popup {
+    position: relative;
+    float: right;
+    right: 10px;
+    top: 10px;
+    z-index: 3;
+    cursor: pointer;
+  }

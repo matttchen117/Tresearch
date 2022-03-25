@@ -3,6 +3,7 @@ import React, { useCallback, useState, useEffect } from "react";
 
 import logo from './logo.png';
 import Register from "../../Features/Registration/Registration.js";
+import RegistrationPopup from "../Popup/RegistrationPopup";
 import Authentication from "../../Features/Login/Authentication";
 import Login from "../../Features/Login/Login";
 import Popup from "../../UI/Popup/Popup";
@@ -40,7 +41,7 @@ function NavigationBar() {
   return (
     <div className="Home"> 
         {renderNav}
-        {isSignUpOpen && <Popup content = {<Register/> } handleClose = {NavToggleSignUp}/>}
+        {isSignUpOpen && <Popup content = {<RegistrationPopup onClick = {NavToggleSignUp}/> } />}
         {isSignInOpen && <Popup content = {<Login/> } handleClose = {NavToggleSignIn}/>}
     </div>
   );

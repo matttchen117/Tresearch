@@ -21,113 +21,54 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
 
 
         [Theory]
-        [InlineData("pammypoor@gmail.com", "pammypoor@gmail.com", "myPassphrase", "U", true, false)]
-        [InlineData("ValasquezJerry@gmail.com", "ValasquezJerry@gmail.com", "oooooPPPPPP", "U", true, false)]
-        public async Task ConfirmTheAccount(string email, string username, string passphrase, string authenticationLevel, bool status, bool confirmed)
-        {
-            //Arrange
-            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
-            IAccount account = new Account(email, username, passphrase, authenticationLevel, status, confirmed);
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-
-            //Act
-            List<string> results = registrationService.ConfirmAccount(account);
-
-            //Assert
-            Assert.Equal('S', results.Last()[0]);
-        }
-
-        [Theory]
-        [InlineData("pammypoor@gmail.com", "pammypoor@gmail.com", "superSecretPassphrase", "U", true, false)]
-        [InlineData("JEdgarHoover@usa.gov", "JEdgarHoover@usa.gov", "helloHello123", "U", true, false)]
-        public async Task CreateTheUser(string email, string username, string passphrase, string authenticationLevel, bool status, bool confirmed)
-        {
-            //Arrange
-            //Arrange
-            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>(); 
-            IAccount account = new Account(email, username, passphrase, authenticationLevel, status, confirmed);
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-
-            //Act
-            string results = await registrationService.CreateAccountAsync(account, cancellationTokenSource.Token).ConfigureAwait(false);
-
-            //Assert
-            Assert.Equal("Success", results);
-        }
-
-
-        [Theory]
-        [InlineData("pammypoor@gmail.com", "pammypoor@gmail.com", "myPassphrase", "U", true, false, "www.Tresearch.systems/")]
-        [InlineData("h.poor@cox.net", "h.poor@cox.net", "password123", "U", true, false, "www.Tresearch.systems/")]
-        public async Task CreateTheLink(string email, string username, string passphrase, string authenticationLevel, bool status, bool confirmed, string baseUrl)
+        [InlineData("", "user", "")]
+        [InlineData("", "user", "")]
+        public async Task ConfirmTheAccount(string email, string authorizationLevel, string statusCode)
         {
             //Arrange
             IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-            IAccount account = new Account(email, username, passphrase, authenticationLevel, status, confirmed);
+            string expected = statusCode;
 
             //Act
-            List<string> results = registrationService.CreateConfirmation(email, baseUrl);
+            string result = await registrationService.ConfirmAccountAsync(email, authorizationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
-            Assert.Equal('S', results.Last()[0]);
+            Assert.Equal(expected, result);
         }
 
         [Theory]
-        [InlineData("wilburt@gmail.com", "www.Tresearch.systems/")]
-        [InlineData("maxwell123@hotmails=.com", "www.Tresearch.systems/")]
-        public async Task GetTheLink(string username, string url)
+        [InlineData("", "", "", "user", "")]
+        [InlineData("", "", "", "user", "")]
+        public async Task CreateTheUser(string email, string username, string passphrase, string authorizationLevel, string statusCode)
+        {
+            //Arrange
+            //Arrange
+            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            string expected = statusCode;
+
+            //Act
+            string results = await registrationService.CreateAccountAsync(email, passphrase, authorizationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
+
+            //Assert
+            Assert.Equal(expected, results);
+        }
+
+
+        [Theory]
+        [InlineData("", "", "")]
+        [InlineData("", "", "")]
+        public async Task CreateTheLink(string email,  string authorizationLevel, string statusCode)
         {
             //Arrange
             IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-            IConfirmationLink _expected = new ConfirmationLink(username, Guid.NewGuid(), DateTime.Now);
-
-            string linkUrl = linkUrl = $"{url}/Account/Verify?t={_expected.GUIDLink}";
+            string expected = statusCode;
 
             //Act
-            IConfirmationLink _confirmationLink = registrationService.GetConfirmationLink(linkUrl);
-
-            //Assert
-            Assert.Equal(_expected, _confirmationLink);
-        }
-
-        [Theory]
-        [InlineData("HunterS@gmail.com")]
-        [InlineData("pammypoor@gmail.com")]
-        [InlineData("Fez@hotmail.com")]
-        public async Task RemoveConfirmationLink(string username)
-        {
-            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-            Guid guid = Guid.NewGuid();
-            DateTime now = DateTime.Now;
-            IConfirmationLink link = new ConfirmationLink(username, guid, now);
-           
-
-            //Act
-            List<string> results = registrationService.RemoveConfirmationLink(link);
-
-            //Assert
-            Assert.Equal('S', results.Last()[0]);
-        }
-
-        [Theory]
-        [InlineData("pammypoor@gmail.com", "superSecret")]
-        [InlineData("tstingtesting@hotmail.com", "bonjourApple")]
-        public async Task GetUserFromLink(string email, string passphrase)
-        {
-            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-            Guid guid = Guid.NewGuid();
-            DateTime now = DateTime.Now;
-            IAccount expected = new Account(email, email, passphrase, "User", true, false);
-            IConfirmationLink link = new ConfirmationLink(email, guid, now);
-
-            
-
-            //Act
-            IAccount result = registrationService.GetUserFromConfirmationLink(link);
+            Tuple<IConfirmationLink, string> results = await registrationService.CreateConfirmationAsync(email, authorizationLevel);
+            string result = results.Item2;
 
             //Assert
             Assert.Equal(expected, result);

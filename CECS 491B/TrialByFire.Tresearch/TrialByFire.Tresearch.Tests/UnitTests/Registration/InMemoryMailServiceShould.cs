@@ -18,13 +18,13 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         [Theory]
         [InlineData("pammypoor@gmail.com", "www.google.com")]
         [InlineData("pammmmyyyy@gmail.com", "https://github.com/Drakat7/Tresearch")]
-        public void SendEmail(string email, string url)
+        public async Task SendEmail(string email, string url)
         {
             //Arrange
             IMailService mailService = TestApp.Services.GetService<IMailService>();
             
             //Act
-            string result = mailService.SendConfirmation(email, url);
+            string result = await mailService.SendConfirmationAsync(email, url).ConfigureAwait(false);
 
             //Assert
             Assert.Equal("Success - Confirmation email sent", result);

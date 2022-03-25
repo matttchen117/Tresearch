@@ -23,7 +23,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _options = options.Value;
         }
 
-        public string SendConfirmation(string email, string url)
+        public async Task<string> SendConfirmationAsync(string email, string url, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -36,12 +36,13 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 {
                     url = url
                 });
+                var result = client.SendEmailAsync(confirmation).Result;
                 return _messageBank.GetMessage(IMessageBank.Responses.sendEmailFail).Result;
-            } catch
+            } 
+            catch(Exception ex)
             {
-                return "Failed - Couldn't send confirmation email";
+                return "500: Server: " + ex.Message;
             }
-            return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
         }
 
         public async Task<string> SendOTPAsync(string email, string subject, string plainBody, string htmlBody, 

@@ -33,50 +33,29 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         {
             //Arrange
             IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
-            IAccount account = new Account(email, email, passphrase, "User", true, false);
-            //Act
-            IActionResult results = await registrationController.RegisterAccount(email, passphrase).ConfigureAwait(false);
-            var objectResult = results as ObjectResult;
-
-            //Assert
-            Assert.Equal(200, objectResult.StatusCode);
-        }
-
-        [Theory]
-        [InlineData("pammypoor+INcontrollerSendConfirmation1@gmail.com")]
-        [InlineData("pammypoor+INcontrollerSendConfirmation2@gmail.com")]
-        public void SendConfirmation(string email)
-        {
-            //Arrange
-            IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
-            IAccount account = new Account(email, "temporaryPassword");
-
-            //Act
-            IActionResult results = registrationController.SendConfirmation(email);
-            var objectResult = results as ObjectResult;
-
-            //Assert
-            Assert.Equal(200, objectResult.StatusCode);
-        }
-
-
-        [Theory]
-        [InlineData("pammypoor+INcontrollerConfirm1@gmail.com", "myControllerPass", "www.tresearch.systems/Registration/verify?=", "2022-03-06 21:32:59.910")]
-        [InlineData("pammypoor+INcontrollerConfirm2@gmail.com", "myControllerPassword", "www.tresearch.systems/Registration/verify?=", "2022-03-06 21:32:59.910")]
-        public async Task confirmAccount(string email, string passphrase, string url, string date)
-        {
-            //Arrange
-            IAccount _account = new Account(email, email, passphrase, "User", true, false);
-            IConfirmationLink _confirmationLink = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Parse(date));
-            IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
-  
             
             //Act
-            IActionResult results = registrationController.ConfirmAccount(url + _confirmationLink.GUIDLink);
+            IActionResult results = await registrationController.RegisterAccountAsync(email, passphrase).ConfigureAwait(false);
             var objectResult = results as ObjectResult;
 
             //Assert
             Assert.Equal(200, objectResult.StatusCode);
+        }
+
+        [Theory]
+        [InlineData("", "statusCode")]
+        [InlineData("", "")]
+        public async Task confirmAccount(string guid, string statusCode)
+        {
+            //Arrange
+            IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
+  
+            //Act
+            IActionResult results = await registrationController.ConfirmAccountAsync(guid);
+            var objectResult = results as ObjectResult;
+
+            //Assert
+            Assert.Equal(statusCode, objectResult.Value);
         }
     }
 }

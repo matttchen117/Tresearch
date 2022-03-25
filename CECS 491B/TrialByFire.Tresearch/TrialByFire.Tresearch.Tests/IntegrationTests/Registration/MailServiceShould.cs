@@ -20,13 +20,13 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 
         [Theory]
         [InlineData("pammypoor@gmail.com", "www.google.com", "200: Server: success")]
-        public void SendEmail(string email, string url, string statusCode)
+        public async Task SendEmail(string email, string url, string statusCode)
         {
             //Arrange
             IMailService mailService = TestApp.Services.GetService<IMailService>();
             string expected = statusCode;
             //Act
-            string result = mailService.SendConfirmation(email, url);
+            string result = await mailService.SendConfirmationAsync(email, url).ConfigureAwait(false);
 
             //Assert
             Assert.Equal(expected, result);

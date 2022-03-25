@@ -22,8 +22,8 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public Task<string> CreateRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> CreateConfirmationLinkAsync(IConfirmationLink _confirmationlink, CancellationToken cancellationToken = default(CancellationToken));
-        public Task<string> UpdateAccountToUnconfirmedAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken));
-        public Task<string> UpdateAccountToConfirmedAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> UpdateAccountToUnconfirmedAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> UpdateAccountToConfirmedAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> RemoveConfirmationLinkAsync(IConfirmationLink confirmationLink, CancellationToken cancellationToken = default(CancellationToken));
         public Task<Tuple<IConfirmationLink, string>> GetConfirmationLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken));
 

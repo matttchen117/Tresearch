@@ -575,19 +575,19 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         }
 
-        public async Task<string> UpdateAccountToUnconfirmedAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> UpdateAccountToUnconfirmedAsync(string username, string authorizationlevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var procedure = "[UnConfirmAccount]";      //INSERT on duplicate key update linkscreted++
-                    var value = new { Username = account.Username, AuthorizationLevel = account.AuthorizationLevel };
+                    var value = new { Username = username, AuthorizationLevel = authorizationlevel };
                     var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        string rollbackResult = await UpdateAccountToConfirmedAsync(account);
+                        string rollbackResult = await UpdateAccountToConfirmedAsync(username, authorizationlevel);
                         if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                             return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
                         else
@@ -612,19 +612,19 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> UpdateAccountToConfirmedAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> UpdateAccountToConfirmedAsync(string username, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var procedure = "[ConfirmAccount]";      //INSERT on duplicate key update linkscreted++
-                    var value = new { Username = account.Username, AuthorizationLevel = account.AuthorizationLevel };
+                    var value = new { Username = username, AuthorizationLevel = authorizationLevel };
                     var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        string rollbackResult = await UpdateAccountToUnconfirmedAsync(account);
+                        string rollbackResult = await UpdateAccountToUnconfirmedAsync(username, authorizationLevel);
                         if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                             return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
                         else
