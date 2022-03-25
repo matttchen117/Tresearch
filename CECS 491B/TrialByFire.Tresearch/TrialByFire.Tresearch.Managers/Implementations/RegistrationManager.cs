@@ -92,7 +92,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     throw new OperationCanceledException();
 
                 //Check if confirmation link is valid
-                if (!IsConfirmationLinkValid(confirmationLink.Item1))
+                if (IsConfirmationLinkInvalid(confirmationLink.Item1))
                 {
                     // Remove confirmation link
                     string removeOld = await _registrationService.RemoveConfirmationLinkAsync(confirmationLink.Item1, cancellationToken).ConfigureAwait(false);
@@ -139,7 +139,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             }
         }
 
-        public bool IsConfirmationLinkValid(IConfirmationLink confirmationLink)
+        public bool IsConfirmationLinkInvalid(IConfirmationLink confirmationLink)
         {
             DateTime now = DateTime.Now;
             DateTime yesterday = now.AddDays(-1);

@@ -21,22 +21,24 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
             TestApp = TestBuilder.Build();
         }
         [Theory]
-        [InlineData("skiPatrol@gmail.com", "myRegisterPassword", "", "")]
-        [InlineData("snowboarder@hotmail.com", "unFortunateName", "", "")]
-        public async Task RegisterTheUser(string email, string passphrase, string authorizationLevel, string baseUrl)
+        [InlineData("trialbyfire.tresearch+IntRegMan1@gmail.com", "myPassword","user", "200: Server: success")]
+        [InlineData("trialbyfire.tresearch+IntRegMan2@gmail.com", "unFortunateName","user", "409: Server: Account  already exists")]
+        public async Task RegisterTheUser(string email, string passphrase, string authorizationLevel, string statusCode)
         {
             //Arrange 
+            string baseUrl = "https://trialbyfiretresearch.azurewebsites.net/Register/Confirm?guid=";
             IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
             //Act
             string results = await registrationManager.CreateAndSendConfirmationAsync(email, passphrase, authorizationLevel, baseUrl).ConfigureAwait(false);
 
             //Assert
-            Assert.Equal("success" , results);
+            Assert.Equal(statusCode , results);
         }
 
         [Theory]
-        [InlineData("confirmMeMan@gmail.com", "", "" )]
-        [InlineData("confirmMeMan2@gmail.com", "", "")]
+        [InlineData("trialbyfire.tresearch+IntRegMan4@gmail.com", "7f5c634a-ef48-49c2-a20c-adde83b6837d", "200: Server: success")]
+        [InlineData("trialbyfire.tresearch+IntRegMan5@gmail.com", "5278f32c-353f-487d-9145-4320125fc433", "200: Server: success")] //User is already enabled
+        [InlineData("trialbyfire.tresearch+IntRegMan5@gmail.com", "7f5c634a-ef47-49c2-a20c-adde85b6837d", "404: Database: The confirmation link was not found.")]
         public async Task ConfirmTheUser(string username, string guid, string statusCode)
         {
             //Arrange
@@ -55,7 +57,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         [InlineData(-24)]
         [InlineData(-23)]
         [InlineData(0)]
-        public void checkLinkValidity(int minusHours)
+        public void checkLinkInValidity(int minusHours)
         {
             //Arrange
             IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
@@ -67,7 +69,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
                 expected = true;
 
             //Act
-            bool actual = registrationManager.IsConfirmationLinkValid(confirmationLink);
+            bool actual = registrationManager.IsConfirmationLinkInvalid(confirmationLink);
 
             //Assert
             Assert.Equal(expected, actual);

@@ -551,9 +551,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                     var procedure = "[GetConfirmationLink]";      //INSERT on duplicate key update linkscreted++
                     var value = new { GUIDLink = guid };
-                    var link = await connection.QueryFirstAsync<IConfirmationLink>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    IConfirmationLink link = await connection.QuerySingleOrDefaultAsync<ConfirmationLink>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     if (cancellationToken.IsCancellationRequested)
                         throw new OperationCanceledException();
+                    if(link == null)
+                        return Tuple.Create(link, _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkNotFound).Result);
                     return Tuple.Create(link, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
                 }
             }
@@ -572,7 +574,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                return Tuple.Create(nullLink, "500: Server: " + ex.Message);
+                return Tuple.Create(nullLink, "500: Database: " +  ex.Message);
             }
 
         }
@@ -666,7 +668,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     var procedure = "dbo.[RemoveConfirmationLink]";
                     var value = new { GUIDLink = confirmationLink.GUIDLink };
-                    var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    var affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                     //Check if cancellation requested
                     if (cancellationToken.IsCancellationRequested)

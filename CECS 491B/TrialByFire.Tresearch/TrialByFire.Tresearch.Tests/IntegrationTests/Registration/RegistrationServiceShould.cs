@@ -75,8 +75,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         }
 
         [Theory]
-        [InlineData("", "")]
-        [InlineData("", "")]
+        [InlineData("7eeb0847-f9f7-4ff4-b7e1-de4a4160c965", "200: Server: success")]
+        [InlineData("7eeb0847-f9f7-4ff4-b7e1-ab4a4160c965", "404: Database: The confirmation link was not found.")]
         public async Task GetConfirmationLink(string guid, string statusCode)
         {
             //Arrange

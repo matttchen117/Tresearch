@@ -27,11 +27,15 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         }
 
         [Theory]
-        [InlineData("@gmail.com", "")]
-        [InlineData("@hotmail.com", "")]
-        public async Task RegisterTheUser(string email, string passphrase)
+        [InlineData("trialbyfire.tresearch+IntRegCon1@gmail.com", "myPassword", "200: Server: success")]
+        [InlineData("trialbyfire.tresearch+IntRegCon2@gmail.com", "myPassword", "409: Server: Account  already exists")]
+        public async Task RegisterTheUser(string email, string passphrase, string statusCode)
         {
             // Arrange
+            string[] splitExpectation;
+            splitExpectation = statusCode.Split(":");
+            ObjectResult expectedResult = new ObjectResult(splitExpectation[2])
+            { StatusCode = Convert.ToInt32(splitExpectation[0]) };
             IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
 
             //Act
@@ -39,12 +43,21 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
             var objectResult = results as ObjectResult;
 
             //Assert
-            Assert.Equal(200, objectResult.StatusCode);
+            Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);
+            Assert.Equal(expectedResult.Value, objectResult.Value);
         }
 
-        public async void ConfirmTheUser(string guid)
+        [Theory]
+        [InlineData("f92c1817-a3b0-4bce-b96a-5deb38ccf05d", "200: Server: success")]
+        [InlineData("3404629b-af83-4d70-8cd2-bd5cfd65e9ea", "200: Server: success")]
+        [InlineData("7d8929f6-40b9-441d-9b48-1ea24e60fcf1", "404: Database: The confirmation link was not found.")]
+        public async void ConfirmTheUser(string guid, string statusCode)
         {
             //Arrange
+            string[] splitExpectation;
+            splitExpectation = statusCode.Split(":");
+            ObjectResult expectedResult = new ObjectResult(splitExpectation[2])
+            { StatusCode = Convert.ToInt32(splitExpectation[0]) };
             IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
 
             //Act
@@ -52,7 +65,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
             var objectResult = results as ObjectResult;
 
             //Assert
-            Assert.Equal(200, objectResult.StatusCode);
+            Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);
+            Assert.Equal(expectedResult.Value, objectResult.Value);
         }
 
     }

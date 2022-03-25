@@ -16,6 +16,6 @@ namespace TrialByFire.Tresearch.Managers.Contracts
         public IValidationService _validationService { get; set; }
         public Task<string> CreateAndSendConfirmationAsync(string email, string passphrases, string authorizationLevel, string baseUrl, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> ConfirmAccountAsync(string guid, CancellationToken cancellationToken = default(CancellationToken));
-        public bool IsConfirmationLinkValid(IConfirmationLink confirmationLink);
+        public bool IsConfirmationLinkInvalid(IConfirmationLink confirmationLink);
     }
 }
