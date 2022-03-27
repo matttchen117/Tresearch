@@ -52,6 +52,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             dailyRegistrationNotInserted,
             dailyRegistrationNotExist,
             storeLogFail,
+            lastAdminFail,
         }
         public Task<string> GetMessage(Responses response);
     }

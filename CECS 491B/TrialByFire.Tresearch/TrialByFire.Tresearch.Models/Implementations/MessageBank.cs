@@ -111,6 +111,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "Fail - Daily Registration Not Inserted";
                 case Responses.dailyRegistrationNotExist:
                     return "Fail - Daily Registration to Update Does Not Exist";
+                case Responses.lastAdminFail:
+                    return "Fail - Cannot delete last admin in system";
                 default:
                     return "error";
             }

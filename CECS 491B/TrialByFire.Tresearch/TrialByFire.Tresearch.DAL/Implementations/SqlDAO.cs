@@ -602,36 +602,44 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             //string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
             try
             {
+                if (Thread.CurrentPrincipal.Equals(null))
+                {
+                    return _messageBank.ErrorMessages["notAuthorized"];
+                }
+
+
+
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
+
+
+
                     var procedure = "dbo.[GetAmountOfAdmins]";
                     affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
-                    //modifying databsae, have cancellationToken
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        //change into enumeration, messageBank.getMessage()
-                        return Tuple.Create(affectedRows, _messageBank.ErrorMessages["cancellationRequested"]);
-                    }
+                    //modifying database, have cancellationToken before and after
+
+                    cancellationToken.ThrowIfCancellationRequested();
 
                     if (affectedRows > 1)
                     {
-                        return Tuple.Create(affectedRows, _messageBank.SuccessMessages["generic"]);
+                        return _messageBank.SuccessMessages["generic"];
                     }
                     else
                     {
                         //need to add messagebank message for 
-                        return Tuple.Create(affectedRows, _messageBank.ErrorMessages["lastAdmin"]);
+                        return _messageBank.ErrorMessages["lastAdminFail"];
                     }
                 }
             }
             catch (OperationCanceledException)
             {
-                return Tuple.Create(0, _messageBank.ErrorMessages["cancellationRequested"]);
+                return _messageBank.ErrorMessages["cancellationRequested"];
             }
             catch (Exception ex)
             {
-                return Tuple.Create(0, "500: Database " + ex.Message);
+                //might need to make specific exception
+                return ("500: Database " + ex.Message);
             }
 
         }
@@ -651,50 +659,52 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default)
         {
 
-            int affectedRows;
+            string result;
+
+
+            if (Thread.CurrentPrincipal.Equals(null))
+            {
+                return _messageBank.ErrorMessages["notAuthorized"];
+            }
+
             string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
+            string userName = Thread.CurrentPrincipal.Identity.Name;
+
+
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
+
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    var readQuery = "SELECT * FROM Accounts WHERE Username = @username AND AuthorizationLevel = @role";
-                    var account = connection.ExecuteScalar<int>(readQuery, new { username = Thread.CurrentPrincipal.Identity.Name, role = userAuthLevel });
-                    if (account == 0)
-                    {
-                        return _messageBank.ErrorMessages["notFoundOrAuthorized"];
-                    }
-                    else
-                    {
-                        var storedProcedure = "CREATE PROCEDURE dbo.deleteAccount @username varchar(25) AS BEGIN" +
-                            "DELETE FROM Accounts WHERE Username = @username;" +
-                            "DELETE FROM OTPClaims WHERE Username = @username;" +
-                            "DELETE FROM Nodes WHERE account_own = @username;" +
-                            "DELETE FROM UserRatings WHERE Username = @username;" +
-                            "DELETE FROM EmailConfirmationLinks WHERE username = @username;" +
-                            "END";
 
-                        affectedRows = connection.Execute(storedProcedure, Thread.CurrentPrincipal.Identity.Name);
+                    cancellationToken.ThrowIfCancellationRequested();
 
-                    }
+                    var procedure = "dbo.[DeleteAccount]";
+                    result = await connection.ExecuteScalarAsync<int>(new CommandDefinition);
+                    //affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
 
                 }
 
-                if (affectedRows >= 1)
-                {
-                    return _messageBank.SuccessMessages["generic"];
-                }
-                else
-                {
-                    return _messageBank.ErrorMessages["notFoundOrAuthorized"];
-                }
             }
-            catch (AccountDeletionFailedException adfe)
+            catch (OperationCanceledException)
             {
-                return adfe.Message;
+                return _messageBank.ErrorMessages["cancellationRequested"];
+            }
+
+
+            catch (Exception ex)
+            {
+                //might need to make specific exception
+                return ("500: Database " + ex.Message);
             }
 
         }
+
+
+
 
         public async Task<string> VerifyAccountAsync(IAccount account, 
             CancellationToken cancellationToken = default)

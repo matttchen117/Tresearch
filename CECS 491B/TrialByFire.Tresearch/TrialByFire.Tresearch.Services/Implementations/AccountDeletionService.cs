@@ -18,9 +18,8 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
         private ILogService LogService { get; }
 
-
-        Thread.CurrentPrincipal
-
+        private IMessageBank _messageBank;
+        
 
         public AccountDeletionService(ISqlDAO sqlDAO, ILogService logService, CancellationToken cancellationToken = default)
         {
@@ -30,18 +29,42 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
 
 
-        public string DeleteAccountAsync(CancellationToken cancellationToken = default)
+        public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default)
         {
+            string admins;
+            string result;
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                admins = await SqlDAO.GetAmountOfAdminsAsync(cancellationToken);
+
+                if (admins.Equals(_messageBank.SuccessMessages["generic"]))
+                {
+                    result = await SqlDAO.DeleteAccountAsync(cancellationToken);
+                                        
+                }
+                else
+                {
+                    return _messageBank.ErrorMessages["lastAdminFail"];
+                }
+
+                if (result.Equals(_messageBank.SuccessMessages["generic"]))
+                {
+                    return _messageBank.SuccessMessages["generic"];
+                }
+
 
             }
-            catch ()
+            catch (OperationCanceledException)
             {
+                return _messageBank.ErrorMessages["cancellationRequested"];
+            }
+            catch (Exception ex)
+            {
+                return ("500: Database " + ex.Message);
 
             }
-            string results = SqlDAO.DeleteAccountAsync(cancellationToken);
-            return results;
         }
 
 

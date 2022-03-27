@@ -50,7 +50,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken));
 
         // Get admins
-        public Task<string> GetAmountOfAdminsAsyn(CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> GetAmountOfAdminsAsync(CancellationToken cancellationToken = default(CancellationToken));
 
 
         // KPI Methods
