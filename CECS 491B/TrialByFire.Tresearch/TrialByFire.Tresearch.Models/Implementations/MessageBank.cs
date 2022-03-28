@@ -32,6 +32,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
             {
                 case Responses.generic:
                     return "200: Server: success";
+                case Responses.nodeTagNodeDoesNotExist:
+                    return "204: No nodes passed in";
                 case Responses.storeLogFail:
                     return "503: Database: Failed to store the log.";
                 case Responses.badNameOrPass:
@@ -59,7 +61,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.accountAlreadyUnconfirmed:
                     return "403: Server: Account is already unconfirmed";
                 case Responses.recoveryLinkLimitReached:
-                    return "403: Server: Account has reached limit of five attempts this month";
+                    return "429: Server: Account has reached limit of five attempts this month";
                 case Responses.accountNotFound:
                     return "404: Database: The account was not found.";
                 case Responses.notFoundOrEnabled:
@@ -79,6 +81,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "409: Database: The recovery link arealdy exists.";
                 case Responses.confirmationLinkExists:
                     return "409: Database: The confirmation link already exists.";
+                case Responses.tagAlreadyExist:
+                    return "409: Database: The tag already exists.";
                 case Responses.recoveryLinkExpired:
                     return "410: Server: The recovery link has expired.";
                 case Responses.confirmationLinkExpired:

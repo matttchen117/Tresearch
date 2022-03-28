@@ -92,7 +92,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     throw new OperationCanceledException();
 
                 //Check if confirmation link is valid
-                if (IsConfirmationLinkInvalid(confirmationLink.Item1))
+                if (!IsConfirmationLinkInvalid(confirmationLink.Item1))
                 {
                     // Remove confirmation link
                     string removeOld = await _registrationService.RemoveConfirmationLinkAsync(confirmationLink.Item1, cancellationToken).ConfigureAwait(false);

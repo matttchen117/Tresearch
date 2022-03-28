@@ -1,15 +1,15 @@
 import React from "react";
 import NavigationBar from "../../UI/Navigation/NavigationBar";
 import email from './email.png';
-import "./ConfirmationSent.css";
+import "./RecoverySent.css";
 
-const ConfirmationSent = () => {
+const RecoverySent = () => {
     
     const renderBody = (
         <div className="confirmation-container">
             <div className = "confirmation-notif">
-                <p>Your account was successfully created. We've sent a confirmation link to your email. </p>
-                <p>Please click the link in your confirmation email to begin using your account.</p>
+                <p>We've sent a confirmation link to your email. </p>
+                <p>Please click the link in your confirmation email to enable your account.</p>
             </div>
         </div>
     );
@@ -28,4 +28,4 @@ const ConfirmationSent = () => {
     );
 }
 
-export default ConfirmationSent;
+export default RecoverySent;

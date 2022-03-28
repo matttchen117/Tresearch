@@ -19,13 +19,15 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
         private IRegistrationManager _registrationManager { get; }
-        private string baseUrl = "https://trialbyfiretresearch.azurewebsites.net/Register/Confirm?guid=";
+        private IMessageBank _messageBank { get; }
+        private string baseUrl = "https://trialbyfiretresearch.azurewebsites.net/Register/Confirm/guid=";
 
-        public RegistrationController(ISqlDAO sqlDAO, ILogService logService, IRegistrationManager registrationManager)
+        public RegistrationController(ISqlDAO sqlDAO, ILogService logService, IRegistrationManager registrationManager, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
             _registrationManager = registrationManager;
+            _messageBank = messageBank;
         }
 
 
@@ -38,6 +40,11 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 string result = await _registrationManager.CreateAndSendConfirmationAsync(email, passphrase, "user", baseUrl).ConfigureAwait(false);
                 string[] split;
                 split = result.Split(":");
+                if(result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
+                {
+                    split = result.Split(": ");
+                    return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
+                }
                 return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
             catch (Exception ex)
@@ -55,6 +62,11 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 string result = await _registrationManager.ConfirmAccountAsync(guid).ConfigureAwait(false);
                 string[] split;
                 split = result.Split(":");
+                if (result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
+                {
+                    split = result.Split(": ");
+                    return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
+                }
                 return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
             catch (Exception ex)

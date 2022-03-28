@@ -39,9 +39,3 @@
     font-weight: 500;
     color: var(--app-title-color);
 }
-
-.confirmation-notif p{
-    padding: 20 0 50px;
-    font-size: 15px;
-    color: var(--app-notif-color);
-}

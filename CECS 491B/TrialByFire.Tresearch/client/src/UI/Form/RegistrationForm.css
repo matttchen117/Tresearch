@@ -11,6 +11,12 @@
     background-color: var(--form-container-bkg-color);
 }
 
+.error-registration{
+    color: red;
+    padding-top: 10px;
+    white-space: pre-line; 
+}
+
 .register-title {
     font-size: 45px;
     font-weight: 500;
@@ -28,12 +34,21 @@
     background-color: var(--form-container-input-color);
 }
 
-.input-check {
-    margin-bottom: 20px;
+.register-input-checkbox{
+    display: block;
+    position: relative;
+    text-align: left;
+    font-size: 10px;
+    padding: 10px 0 10px 0;
 }
 
+.register-input-checkbox label{
+    cursor: pointer;
+}
+
+
 .form-register-wrapper input[type='checkbox']{
-   float: left;
+    cursor: pointer;
 }
 
 .form-register-wrapper label {

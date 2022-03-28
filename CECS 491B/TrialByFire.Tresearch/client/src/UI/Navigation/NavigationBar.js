@@ -28,7 +28,7 @@ function NavigationBar() {
     }
 
     const renderNav = (
-        <nav class = "navbar-container">
+        <nav className = "navbar-container">
            <ul className = "nav-links">
                 <li className="logo"><a href="/" ><img src = {logo}/></a></li>
                 <li className="sec">About</li>

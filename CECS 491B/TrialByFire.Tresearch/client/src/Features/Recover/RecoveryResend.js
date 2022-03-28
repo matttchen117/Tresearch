@@ -5,8 +5,8 @@ import "./RecoveryResend.css";
 
 const RecoveryResend = () => {
     const renderBody = (
-        <div class="recovery-resend-container">
-            <div class = "recovery-resend-notif">
+        <div className="recovery-resend-container">
+            <div className = "recovery-resend-notif">
                 <p>Your account was successfully created. Pleae click the link in your confirmation email to begin using your account.</p>
             </div>
         </div>

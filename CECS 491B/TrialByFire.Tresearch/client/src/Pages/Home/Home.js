@@ -11,7 +11,7 @@ function Home() {
     
 
     const renderHeader = (
-        <div class = "header-image">
+        <div className = "header-image">
             <img src = {front}></img>
         </div>
     );

@@ -10,10 +10,15 @@
     background-color: var(--form-container-bkg-color);
 }
 
+.error-recover{
+    color: red;
+}
+
 .recover-title {
     font-size: 30px;
     font-weight: 500;
     color: #788770;
+    text-align: center;
 }
 
 .recover-text {

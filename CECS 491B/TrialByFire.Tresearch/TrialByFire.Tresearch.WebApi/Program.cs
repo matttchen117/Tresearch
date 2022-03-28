@@ -54,8 +54,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       builder =>
                       {
-                          builder.WithOrigins("http://localhost:3000", 
-                                              "https://localhost:3000")
+                          builder.WithOrigins("https://trialbyfiretresearch.azurewebsites.net",
+                                                "http://localhost:3000",
+                                                "https://localhost:3000")
                                               //.WithHeaders("TresearchAuthenticationCookie")
                                               .AllowAnyHeader()
                                               .AllowAnyMethod()

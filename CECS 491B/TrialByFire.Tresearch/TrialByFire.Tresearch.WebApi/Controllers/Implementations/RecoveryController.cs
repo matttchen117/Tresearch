@@ -38,7 +38,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
-                string baseUrl = "https://trialbyfiretresearch.azurewebsites.net/Recover/Enable?guid=";
+                string baseUrl = "https://trialbyfiretresearch.azurewebsites.net/Recover/Enable/guid=";
                 string result = await _recoveryManager.SendRecoveryEmailAsync(email, baseUrl, authorizationLevel, _cancellationTokenSource.Token);
                 string[] split;
                 split = result.Split(":");
@@ -52,11 +52,11 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         }
 
         [HttpPost("recover")]
-        public async Task<IActionResult> EnableAccountAsync(string url)
+        public async Task<IActionResult> EnableAccountAsync(string guid)
         {
             try
             {
-                string result = await _recoveryManager.EnableAccountAsync(url, _cancellationTokenSource.Token);
+                string result = await _recoveryManager.EnableAccountAsync(guid, _cancellationTokenSource.Token);
                 string[] split;
                 split = result.Split(":");
                 return StatusCode(Convert.ToInt32(split[0]), split[2]);

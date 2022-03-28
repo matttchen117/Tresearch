@@ -16,7 +16,7 @@ const InactiveLink = () => {
     };
 
     const renderBody = (
-        <div class="inactive-container">
+        <div className="inactive-container">
             <div class = "inactive-notif">
                 <hr></hr>
                 <h1>Uh Oh! Looks like your link expired.</h1>
