@@ -129,9 +129,9 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration);
 
-        public Task<string> AddTagToNodesAsync(List<string> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken));
-        public Task<string> RemoveTagFromNodeAsync(List<string> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken));
-        public Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<string> nodeIDs, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> AddTagToNodesAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> RemoveTagFromNodeAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> CreateTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken));
         public Task<Tuple<List<string>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken));

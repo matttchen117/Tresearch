@@ -1733,7 +1733,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> AddTagToNodesAsync(List<string> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> AddTagToNodesAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -1781,7 +1781,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> RemoveTagFromNodeAsync(List<string> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> RemoveTagFromNodeAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -1820,9 +1820,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<string> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> tags = null;
+            List<string> tags = new List<string>();
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -1944,18 +1944,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         else
                             throw new OperationCanceledException();
                     }
-
-                    if (affectedRows == 1)
-                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
-                    else
-                        return _messageBank.GetMessage(IMessageBank.Responses.tagAlreadyExist).Result;    //CHECK IF THIS IS tag ALREADY EXISTS
+                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
                 }
             }
             catch (SqlException ex)
             {
                 switch (ex.Number)
                 {
-                    case 2627: return _messageBank.GetMessage(IMessageBank.Responses.tagAlreadyExist).Result;
+                    case 2627: return _messageBank.GetMessage(IMessageBank.Responses.tagDoesNotExist).Result;
                     default: return "500: Database: " + ex.Message;
                 }
             }

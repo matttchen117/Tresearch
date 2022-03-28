@@ -71,6 +71,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.notFoundOrAuthorized:
                     return "404: Database: Account not found or not authorized to perform the " +
                 "operation.";
+                case Responses.tagDoesNotExist:
+                    return "404: Database: Tag not found.";
                 case Responses.recoveryLinkNotFound:
                     return "404: Database: The recovery link was not found";
                 case Responses.cancellationRequested:

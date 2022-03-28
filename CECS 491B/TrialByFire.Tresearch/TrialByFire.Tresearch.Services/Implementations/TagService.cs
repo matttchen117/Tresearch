@@ -29,7 +29,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _messageBank = messageBank;
         }
 
-        public async Task<string> AddTagToNodesAsync(List<string> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> AddTagToNodesAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -61,7 +61,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        public async Task<string> RemoveTagFromNodesAsync(List<string> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> RemoveTagFromNodesAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -93,9 +93,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<string> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> tags = null;
+            List<string> tags = new List<string>();
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -180,7 +180,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     if (resultRollback.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
                         throw new OperationCanceledException();
                     else
-                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
                 }
                 return result;
             }

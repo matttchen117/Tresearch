@@ -67,6 +67,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             storeLogFail,
             nodeTagNodeDoesNotExist,
             tagAlreadyExist,
+            tagDoesNotExist,
         }
         public Task<string> GetMessage(Responses response);
     }
