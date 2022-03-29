@@ -15,6 +15,7 @@ import AccountConfirmed from "./Features/Registration/AccountConfirmed";
 import RecoveryConfirm from "./Features/Recover/RecoveryConfirm";
 import AccountEnabled from "./Features/Recover/AccountEnabled";
 import RecoverySent from "./Features/Recover/RecoverySent";
+import TagDashboard from "./Features/Tagging/TagDashboard";
 
 class App extends React.Component {
   constructor(props){
@@ -44,6 +45,7 @@ class App extends React.Component {
             <Route path = "/Recover/RecoverySent" element = {<RecoverySent/>} />
             <Route path = "/Recover/Enable/:recoveryConfirm" element = {<RecoveryConfirm guid={this.state.recoveryConfirm}/>}/>
             <Route path = "/Recover/AccountEnabled" element = {<AccountEnabled/>} />
+            <Route path = "/Admin/TagDashboard" element = {<TagDashboard/>} />
           </Routes>
         </Router>
       </div>
