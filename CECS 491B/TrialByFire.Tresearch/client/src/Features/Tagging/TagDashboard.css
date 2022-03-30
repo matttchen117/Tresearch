@@ -20,6 +20,17 @@
     width: 100%;
 }
 
+.row-tag-table{
+    line-height: 20px;
+    display: inline-block;
+}
+
+.tag-dashboard-table span{
+    
+    color: gray;
+    float: left;
+}
+
 .tag-dashboard-table table{
     overflow: auto;
     height: 100px;
@@ -45,12 +56,17 @@
     padding: 10px 10px;
     width: 100%;
 }
+.tag-dashboard-table tr {
+    display: flex;
+    cursor: pointer;
+    width: 100%;
 
-.tag-dashboard-table td, tr{
-    display: block;
+}
+.tag-dashboard-table td{
+
     text-align: left;
     padding: 5px 5px;
-
+    float: right;
 }
 
 .tag-dashboard-table tbody tr:nth-of-type(even){

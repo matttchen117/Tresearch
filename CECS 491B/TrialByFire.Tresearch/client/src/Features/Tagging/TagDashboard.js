@@ -6,6 +6,34 @@ import Button from "../../UI/Button/ButtonComponent";
 
 function TagDashboard() {
     const [data, setData] = useState([]);
+
+    const [createData, setCreateData] = useState(
+        {
+            tagName: ''
+        }
+    )
+
+    const [alertData, setAlertData] = useState(
+        {
+            message: ''
+        }
+    )
+
+    const handleClick = (e) => {
+        var value = e.target.getAttribute('data-item');
+        axios.post("https://localhost:7010/Tag/removeTag?tagName=" + value)
+        .then((response => {
+            fetchTableData();
+        }))
+        .catch((err => {
+            console.log(err);
+        }))
+    }
+
+    const handleChange = (e) => {
+        setAlertData({message: ''});
+        setCreateData(e.target);
+    }
      
     const fetchTableData = () => {
         async function fetchData() {
@@ -17,12 +45,32 @@ function TagDashboard() {
     }
 
     useEffect(() => {
+        fetchTableData();
         //Refresh after every 3 seconds
         const interval = setInterval(() => {
             fetchTableData();
         }, 3000);
         return () => clearInterval(interval);
     }, [])
+
+    const createTag = (e) => {
+        e.preventDefault();
+        console.log(createData);
+        axios.post("https://localhost:7010/Tag/createTag?tagName=" + createData)
+        .then((response => {
+            setCreateData({tagName: ''});
+            setAlertData({message: 'Added'});
+            fetchTableData();
+            setTimeout(() => {
+                console.log('hi');
+                setAlertData({message: ''});
+            }, 1000)
+            
+        }))
+        .catch((err => {
+            console.log(err);
+        }))
+    }
 
     const renderTable = (
         <div className="tag-dashboard-table-container">
@@ -35,8 +83,11 @@ function TagDashboard() {
                 <tbody>
                     {data.map(item =>{
                         return(
-                            <tr key={data.name}>
-                                <td>{item}</td>
+                            <tr key={item} >
+                                <div className = "row-tag-table">
+                                    <span>&#10006;<td data-item = {item} onClick = {handleClick}>{item}</td></span>
+                                </div>
+                                
                             </tr>
                         );
                     })}
@@ -47,13 +98,14 @@ function TagDashboard() {
 
     const renderForm = (
         <div className = "tag-dashboard-form-container">
-            <form className="tag-dashboard-create-form">
+            <form className="tag-dashboard-create-form" onSubmit = {createTag}>
                     <div className="tag-dashboard-create-input-container">
-                        <input type="text" required placeholder="Tag Name"/>
+                        <input type="text" value={createData.tagName} required placeholder="Tag Name" onChange = {handleChange}/>
                     </div>
                     <div className = "tag-dashboard-create-button">
                         <Button type="button" color="green" name="Create"/>
                     </div> 
+                    <div className="create-tag-error"> {alertData.message} </div>
                 </form>
         </div>
     );

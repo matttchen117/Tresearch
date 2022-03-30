@@ -63,5 +63,21 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             }
         }
 
+        [HttpPost("removeTag")]
+        public async Task<IActionResult> DeleteTagAsync(string tagName)
+        {
+            try
+            {
+                string result = await _tagManager.RemoveTagAsync(tagName, _cancellationTokenSource.Token);
+                string[] split;
+                split = result.Split(":");
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
     }
 }
