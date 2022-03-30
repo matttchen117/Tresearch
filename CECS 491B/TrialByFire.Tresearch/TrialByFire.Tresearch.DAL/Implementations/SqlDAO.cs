@@ -602,9 +602,18 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             //string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
             try
             {
+
+                //service layer catches throw
+                cancellationToken.ThrowIfCancellationRequested();
+
+                //for objects being passed in 
+                //do in manager, manager for business rules
+                //maybe unneccessary, check with prof
+
+
                 if (Thread.CurrentPrincipal.Equals(null))
                 {
-                    return _messageBank.ErrorMessages["notAuthorized"];
+                    return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
                 }
 
 
@@ -618,28 +627,33 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                     //modifying database, have cancellationToken before and after
+                    //check after query, if cancellation was requested dont throw, you need to rollback instead of returning error
 
-                    cancellationToken.ThrowIfCancellationRequested();
 
                     if (affectedRows > 1)
                     {
-                        return _messageBank.SuccessMessages["generic"];
+                        return await _messageBank.GetMessage(IMessageBank.Responses.generic).ConfigureAwait(false);
                     }
                     else
                     {
-                        //need to add messagebank message for 
-                        return _messageBank.ErrorMessages["lastAdminFail"];
+                        return await _messageBank.GetMessage(IMessageBank.Responses.lastAdminFail).ConfigureAwait(false);
                     }
                 }
             }
+
+            //subset of exception, there are further subsets, can mess around with it,
+            //able to have it even more specific
+            //be clear in message
             catch (OperationCanceledException)
             {
-                return _messageBank.ErrorMessages["cancellationRequested"];
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
+
             catch (Exception ex)
             {
                 //might need to make specific exception
                 return ("500: Database " + ex.Message);
+
             }
 
         }
@@ -659,9 +673,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default)
         {
 
-            string result;
+            int affectedRows;
 
-
+            //same thing as getadmins
             if (Thread.CurrentPrincipal.Equals(null))
             {
                 return _messageBank.ErrorMessages["notAuthorized"];
@@ -673,26 +687,59 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();
 
+                cancellationToken.ThrowIfCancellationRequested();                                                       // Check if cancellation token has requested cancellation
+
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result;
+
+                }
 
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
 
-                    cancellationToken.ThrowIfCancellationRequested();
 
-                    var procedure = "dbo.[DeleteAccount]";
-                    result = await connection.ExecuteScalarAsync<int>(new CommandDefinition);
+
+
+                    var parameters = new { Username = userName, AuthorizationLevel = userAuthLevel };
+
+                    var procedure = "dbo.[deleteAccountStoredProcedure]";
+                    affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+                    }
+
                     //affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
+                    //RIGHT HERE CHECK IF CANCELLED, IF IT IS DO ROLLBACK
 
                 }
+                return await _messageBank.GetMessage(IMessageBank.Responses.deleteAccountFail).ConfigureAwait(false);
+
 
             }
             catch (OperationCanceledException)
             {
-                return _messageBank.ErrorMessages["cancellationRequested"];
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
+            
+            /*
+            catch (Exception ex)
+            {
+                return _messageBank.GetMessage(IMessageBank.Responses.).Result;
+            }
+
+            catch (Exception ex)
+            {
+                return _messageBank.GetMessage(IMessageBank.)
+            }
+
+
+            */
+
 
 
             catch (Exception ex)

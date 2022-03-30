@@ -19,7 +19,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private ILogService LogService { get; }
         private IAccountDeletionService AccountDeletionService { get; }
 
-        private IMessageBank MessageBank { get; }
+        private IMessageBank _messageBank { get; }
 
         private BuildSettingsOptions BuildSettingOptions { get; }
 
@@ -27,13 +27,13 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         {
             SqlDAO = sqlDAO;
             LogService = logService;
-            MessageBank = messageBank;
+            _messageBank = messageBank;
             AccountDeletionService = accountDeletionService;
         }
 
 
         //here i should be checking for last admin or something useful
-        public async Task<IActionResult> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -41,39 +41,47 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                //placeholder variable for if person trying to delete is last admin in database.
-                //still creating stored procedure for this value
 
-                List<string> results;
+                string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
 
-                int fakeAdminCount = 1;
-                if (fakeAdminCount > 1 && Thread.CurrentPrincipal.Equals("admin"))
+                string results;
+                string admins;
+
+                admins = await AccountDeletionService.GetAmountOfAdmins(cancellationToken).ConfigureAwait(false);
+
+
+                if (userAuthLevel.Equals("admin"))
                 {
-                    results = await AccountDeletionService.DeleteAccountAsync(cancellationToken);
-                }
+                    if (admins.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic)))
+                    {
+                        return await AccountDeletionService.DeleteAccountAsync(cancellationToken).ConfigureAwait(false);
+                    }
 
-
-
-                string split;
-                List<string> results = await connection.QueryAsync
-                String result;
-                Thread.CurrentPrincipal.IsInRole
-                if (Thread.CurrentPrincipal.Equals(null))
-                {
-                    return
+                    return await _messageBank.GetMessage(IMessageBank.Responses.lastAdminFail).ConfigureAwait(false);
+           
                 }
                 else
                 {
-
+                    return await AccountDeletionService.DeleteAccountAsync(cancellationToken).ConfigureAwait(false);
                 }
 
 
-                string results = this.AccountDeletionService.DeleteAccount();
-                return results;
 
+
+
+
+
+
+
+            }
+
+            catch (OperationCanceledException)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
+                return ("500: Database " + ex.Message);
 
             }
 

@@ -18,17 +18,22 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
         private ILogService LogService { get; }
 
+
+
         private IMessageBank _messageBank;
         
-
-        public AccountDeletionService(ISqlDAO sqlDAO, ILogService logService, CancellationToken cancellationToken = default)
+        //cancellation token doesnt go into constructor, only in passed methods
+        //DI MESSAGEBANKN IN CONSTRUCTOR
+        public AccountDeletionService(ISqlDAO sqlDAO, ILogService logService)
         {
             this.SqlDAO = sqlDAO;
             this.LogService = logService;
+
         }
 
-
-
+        //ANOTHER METHOD IN SERVICE, AND MANAGER SHOULD CALL GETADMINS METHOD, MANAGER CALLS SERVICE CALLS DAO, RETURN BACK OPPOSITE WAY
+        //1) CONFIGURE AWAIT(FALSE) FOR ALLASYHC METHOD CALLS, IF NOT THERE THE REQUEST MIGHT NOT START OFF IMMEDIATELY, 
+        //2) 
         public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default)
         {
             string admins;
@@ -41,30 +46,43 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
                 if (admins.Equals(_messageBank.SuccessMessages["generic"]))
                 {
-                    result = await SqlDAO.DeleteAccountAsync(cancellationToken);
-                                        
+                    result = await SqlDAO.DeleteAccountAsync(cancellationToken).ConfigureAwait(false);
+
+                    if (result.Equals(_messageBank.SuccessMessages["generic"]))
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.generic).ConfigureAwait(false);
+                    }
+
                 }
                 else
                 {
-                    return _messageBank.ErrorMessages["lastAdminFail"];
+                    return await _messageBank.GetMessage(IMessageBank.Responses.lastAdminFail).ConfigureAwait(false);
                 }
 
-                if (result.Equals(_messageBank.SuccessMessages["generic"]))
-                {
-                    return _messageBank.SuccessMessages["generic"];
-                }
+
+
+                return await _messageBank.GetMessage(IMessageBank.Responses.deleteAccountFail).ConfigureAwait(false);
+
+
 
 
             }
+
             catch (OperationCanceledException)
             {
-                return _messageBank.ErrorMessages["cancellationRequested"];
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
+
             catch (Exception ex)
             {
-                return ("500: Database " + ex.Message);
-
+                return await _messageBank.GetMessage(IMessageBank.Responses.deleteAccountFail).ConfigureAwait(false); ;
             }
+
+        }
+
+        public async Task<string> GetAmountOfAdmins(CancellationToken cancellationToken = default)
+        {
+            return await SqlDAO.GetAmountOfAdminsAsync(cancellationToken).ConfigureAwait(false);
         }
 
 

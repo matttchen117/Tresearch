@@ -113,6 +113,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "Fail - Daily Registration to Update Does Not Exist";
                 case Responses.lastAdminFail:
                     return "Fail - Cannot delete last admin in system";
+                case Responses.deleteAccountFail:
+                    return "Fail - Unable to delete account";
+                case Responses.accountDeleteFail:
+                    return "503: Database: Failed to delete account.";
                 default:
                     return "error";
             }

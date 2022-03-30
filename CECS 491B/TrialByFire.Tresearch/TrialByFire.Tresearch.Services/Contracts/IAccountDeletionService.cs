@@ -12,6 +12,9 @@ namespace TrialByFire.Tresearch.Services.Contracts
 {
     public interface IAccountDeletionService
     {
-        public Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default);
+        public Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<string> GetAmountOfAdmins(CancellationToken cancellationToken = default(CancellationToken));
+
     }
 }
