@@ -57,13 +57,17 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 split = result.Split(":");
                 return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(408, "Request time out");
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        [HttpPost("removeTag")]
+        [HttpPost("deleteTag")]
         public async Task<IActionResult> DeleteTagAsync(string tagName)
         {
             try
@@ -72,6 +76,71 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 string[] split;
                 split = result.Split(":");
                 return StatusCode(Convert.ToInt32(split[0]), split[2]);
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(408, "Request time out");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("nodeTaglist")]
+        public async Task<IActionResult> GetNodeTagsAsync(List<long> nodeIDs)
+        {
+            try
+            {
+                Tuple<List<string>, string> result = await _tagManager.GetNodeTagsAsync(nodeIDs, _cancellationTokenSource.Token);
+                string[] split;
+                split = result.Item2.Split(":");
+                return StatusCode(Convert.ToInt32(split[0]), result.Item1);
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(408, "Request time out");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost("addTag")]
+        public async Task<IActionResult> AddTagToNodesAsync(List<long> nodeIDs, string tagName)
+        {
+            try
+            {
+                string result = await _tagManager.AddTagToNodesAsync(nodeIDs,tagName, _cancellationTokenSource.Token);
+                string[] split;
+                split = result.Split(":");
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(408, "Request time out");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost("removeTag")]
+        public async Task<IActionResult> RemoveTagFromNodesAsync(List<long> nodeIDs, string tagName)
+        {
+            try
+            {
+                string result = await _tagManager.RemoveTagFromNodesAsync(nodeIDs, tagName, _cancellationTokenSource.Token);
+                string[] split;
+                split = result.Split(":");
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(408, "Request time out");
             }
             catch (Exception ex)
             {

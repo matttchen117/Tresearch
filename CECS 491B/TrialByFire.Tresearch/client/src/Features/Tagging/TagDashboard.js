@@ -21,7 +21,7 @@ function TagDashboard() {
 
     const handleClick = (e) => {
         var value = e.target.getAttribute('data-item');
-        axios.post("https://localhost:7010/Tag/removeTag?tagName=" + value)
+        axios.post("https://localhost:7010/Tag/deleteTag?tagName=" + value)
         .then((response => {
             fetchTableData();
         }))
