@@ -1,59 +1,85 @@
+.tag-dashboard-wrapper{
+    position: relative;
+}
+
 .tag-dashboard-table-container{
     margin-right: auto;
     margin-left: auto;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 90vh;
+    max-width: 50%;
 }
 
 .tag-dashboard-table {
-    border: 1px solid;
+    border: 1px  solid #f3f3f3;
     border-collapse: collapse;
     font-size: 1em;
     margin: 25px;
+    min-width: 400px;
     width: 100%;
 }
+
+.tag-dashboard-table table{
+    overflow: auto;
+    height: 100px;
+}
+
 
 .tag-dashboard-table thead{
     background-color: #788770;
     color: #ffffff;
+    display: block;
+    
+}
+
+.tag-dashboard-table tbody{
+    display: block;
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .tag-dashboard-table th {
-    display:flex;
-    padding: 5px 5px;
+    font-size: 20px;
+    padding: 10px 10px;
     width: 100%;
 }
 
 .tag-dashboard-table td, tr{
-    display:flex;
+    display: block;
+    text-align: left;
     padding: 5px 5px;
-    width: 100%;
+
 }
 
 .tag-dashboard-table tbody tr:nth-of-type(even){
     background-color: #f3f3f3;
 }
 
-.react-contextmenu {
-    background-color: white;
-    background-clip: padding-box;
-    border: 1px solid rgba(0,0,0,.15);
-    border-radius: .10rem;
-    color: #283618;
-    margin: 2px 0 0;
-    min-width: 150px;
-    padding: 5px 0;
-    text-align: left;
+.tag-dashboard-create-form {
+    display: inline-block;
+   
 }
 
-.react-contextmenu-item {
-    cursor: pointer;
+.tag-dashboard-create-input-container {
+    display: block; 
+    float: left;
 }
 
-.react-contextmenu-item.react-contextmenu-item:hover{
-    color: white;
-    background-color: #283618;
-    border-color: #283618;
+.tag-dashboard-create-input-container input{
+    background-color: #f2f2f2;
+    border: 0;
+    box-sizing: border-box;
+    outline: 0;
+    padding: 15px 15px 15px 15px;
+    
+    
+}
+
+.tag-dashboard-create-button {
+    
+    display: block;
+    float: right;
+
 }

@@ -1,82 +1,74 @@
-import React, { Component } from "react";
-import {useNavigate} from 'react-router-dom';
-import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
-import axios, {AxiosResponse, AxiosError} from 'axios';
+import axios from "axios";
+import React, {useState, useEffect } from "react";
 
 import "./TagDashboard.css";
 import Button from "../../UI/Button/ButtonComponent";
 
-class TagDashboard extends Component  {
-    Data = [
-        {name: "acting", count: 10},
-        {name: "art", count: 1},
-        {name: "agile", count: 22},
-        {name: "cooking", count: 30},
-        {name: "tennis", count:22},
-        {name: "yoga", count: 11}
-    ];
-
-    onSubmitHandler = (e) => {
-        
+function TagDashboard() {
+    const [data, setData] = useState([]);
+     
+    const fetchTableData = () => {
+        async function fetchData() {
+            const request = await axios.get("https://localhost:7010/Tag/taglist");
+            const responseData = await request.data;
+            setData(responseData);
+        }
+        fetchData();
     }
 
-    handleClick = (e, data) => {
-        console.log(data.item);
-    }
+    useEffect(() => {
+        //Refresh after every 3 seconds
+        const interval = setInterval(() => {
+            fetchTableData();
+        }, 3000);
+        return () => clearInterval(interval);
+    }, [])
 
-    render() {   
-        const renderForm = (
-            <div className = "tag-dashboard-form-container">
-                <form className = "tag-dashboard-form">
-                    <input type="text" className = "tag-dashboard-input"/>
+    const renderTable = (
+        <div className="tag-dashboard-table-container">
+            <table className = "tag-dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {data.map(item =>{
+                        return(
+                            <tr key={data.name}>
+                                <td>{item}</td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
+        </div>
+    );
+
+    const renderForm = (
+        <div className = "tag-dashboard-form-container">
+            <form className="tag-dashboard-create-form">
+                    <div className="tag-dashboard-create-input-container">
+                        <input type="text" required placeholder="Tag Name"/>
+                    </div>
+                    <div className = "tag-dashboard-create-button">
+                        <Button type="button" color="green" name="Create"/>
+                    </div> 
                 </form>
-            </div>
-        )
-        
-        const renderTable = (
-            <div className="tag-dashboard-table-container">
-                <table className = "tag-dashboard-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Count</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.Data.map(item =>{
-                            return(
-                                <tr onClick={() => this.onSubmitHandler(item)}>
-                                    <td>{item.name}</td>
-                                    <td>{item.count}</td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
-            </div>
-        );
+        </div>
+    );
 
-        return (
-            <div className="tag-dashboard-wrapper">
-                <div>
-                    <ContextMenuTrigger id = "tag-dashboard-context-menu">
-                        <div className="trigger-div">
-                           {renderTable}
-                        </div>
-                    </ContextMenuTrigger>
-                    
-                    <ContextMenu id="tag-dashboard-context-menu">
-                        <MenuItem data={{item: 'item 1'}} onClick={this.handleClick} className = "tag-menu-item"> Edit </MenuItem>
-                        <MenuItem divider/>
-                        <MenuItem data={{item: 'item 2'}} onClick={this.handleClick} className = "tag-menu-item"> Delete </MenuItem>
-                    </ContextMenu>
-                </div>
-                {renderForm}
-                
-                
+    return (
+        
+        <div className="tag-dashboard-wrapper">
+            <div className = "tag-dashboard-table-wrapper">
+                {renderTable}
             </div>
-        );
-    }
+            <div className = "tag-dashboard-form-wrapper">
+                {renderForm}
+            </div>
+        </div>
+    )
 }
 
-export default(TagDashboard);
+export default TagDashboard;
