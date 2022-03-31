@@ -27,10 +27,12 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
             TestServices.AddScoped<IMailService, MailService>();
             TestServices.AddScoped<IOTPRequestService, OTPRequestService>();
+            TestServices.AddScoped<IAccountVerificationService, AccountVerificationService>();
             TestServices.AddScoped<IOTPRequestManager, OTPRequestManager>();
             TestServices.AddScoped<IOTPRequestController, OTPRequestController>();
             TestProvider = TestServices.BuildServiceProvider();
         }
+
 
         [Theory]
         [InlineData("drakat7@gmail.com", "abcDEF123", "user", "guest", "guest", "503: Server: Email failed to send.")]
@@ -41,12 +43,11 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             "Passphrase. Please try again.")]
         [InlineData("aarry@gmail.com", "abcdEF123", "user", "guest", "guest", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "guest", "guest", "404: Database: The account was not found or " +
-            "it has been disabled.")]
+        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "guest", "guest", "500: Database: The Account was not found.")]
         [InlineData("barry@gmail.com", "abcDEF123", "admin", "billy@yahoo.com", "admin", "403: Server: Active session found. " +
             "Please logout and try again.")]
-        [InlineData("darry@gmail.com", "abcDEF123", "user", "guest", "guest", "404: Database: The account was not found or it " +
-            "has been disabled.")]
+        [InlineData("darry@gmail.com", "abcDEF123", "user", "guest", "guest", "401: Database: Account disabled. " +
+            "Perform account recovery or contact system admin.")]
         [InlineData("earry@gmail.com", "abcDEF123", "user", "guest", "guest", "401: Database: Please confirm your " +
             "account before attempting to login.")]
         public async Task RequestTheOTPAsync(string username, string passphrase, string authorizationLevel, string currentIdentity, string currentRole,

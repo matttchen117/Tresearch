@@ -42,7 +42,7 @@ namespace TrialByFire.Tresearch.Tests
             MessageBank = new MessageBank();
             //SqlDAO = new SqlDAO(MessageBank, BuildSettingsOptions);
             LogService = new LogService(SqlDAO);
-            AuthenticationService = new AuthenticationService(SqlDAO, LogService, MessageBank);
+            //AuthenticationService = new AuthenticationService(SqlDAO, LogService, MessageBank);
             AuthorizationService = new AuthorizationService(SqlDAO, LogService);
             ValidationService = new ValidationService(MessageBank);
             AccountDeletionService = new AccountDeletionService(SqlDAO, LogService);

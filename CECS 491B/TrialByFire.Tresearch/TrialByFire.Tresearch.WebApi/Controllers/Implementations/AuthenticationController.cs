@@ -76,25 +76,24 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             string[] split;
             List<string> results = await _authenticationManager.AuthenticateAsync(username, otp, authorizationLevel, 
-                DateTime.Now, _cancellationTokenSource.Token).ConfigureAwait(false);
+                DateTime.Now.ToUniversalTime(), _cancellationTokenSource.Token).ConfigureAwait(false);
             string result = results[0];
-            if (result.Equals(_messageBank.SuccessMessages["generic"]))
+            if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.authenticationSuccess).
+                    ConfigureAwait(false)))
             {
                 if (_buildSettingsOptions.Environment.Equals("Test"))
                 {
                     split = result.Split(": ");
                     return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                 }
-                IRoleIdentity roleIdentity = new RoleIdentity(true, username, authorizationLevel);
-                IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-                HttpContext.User = new ClaimsPrincipal(rolePrincipal);
-                Response.Cookies.Append("TresearchAuthenticationCookie", results[1], CreateCookieOptions());
-                //_logService.CreateLog(DateTime.Now, "Server", username, "Info", "Authentication Succeeded");
+                HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "Authorization");
+                HttpContext.Response.Headers.Add("Authorization", results[1]);
+                //_logService.CreateLog(DateTime.Now.ToUniversalTime(), "Server", username, "Info", "Authentication Succeeded");
                 split = result.Split(": ");
                 return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
             }
             // {category}: {error message}
-            //_logService.CreateLog(DateTime.Now, "Error", username, error[1], error[2]);
+            //_logService.CreateLog(DateTime.Now.ToUniversalTime(), "Error", username, error[1], error[2]);
             split = result.Split(": ");
             return StatusCode(Convert.ToInt32(split[0]), split[2]);
         }
@@ -110,15 +109,18 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 List<string> results = await _authenticationManager.AuthenticateAsync(username, 
                     otp, authorizationLevel, now, _cancellationTokenSource.Token).ConfigureAwait(false);
                 result = results[0];
-                if (result.Equals(_messageBank.SuccessMessages["generic"]))
+                if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.authenticationSuccess).
+                    ConfigureAwait(false)))
                 {
                     if (_buildSettingsOptions.Environment.Equals("Test"))
                     {
                         split = result.Split(": ");
                         return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                     }
-                    Response.Cookies.Append("TresearchAuthenticationCookie", results[1], CreateCookieOptions());
-                    //_logService.CreateLog(DateTime.Now, "Server", username, "Info", "Authentication Succeeded");
+                    //Response.Cookies.Append("TresearchAuthenticationCookie", results[1], CreateCookieOptions());
+                    Response.Headers.Add("Access-Control-Allow-Headers", "Authorization");
+                    Response.Headers.Add("Authorization", results[1]);
+                    //_logService.CreateLog(DateTime.Now.ToUniversalTime(), "Server", username, "Info", "Authentication Succeeded");
                     split = result.Split(": ");
                     return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                 }
@@ -132,7 +134,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 return StatusCode(400, ex.Message);
             }
             // {category}: {error message}
-            //_logService.CreateLog(DateTime.Now, "Error", username, error[0], error[1]);
+            //_logService.CreateLog(DateTime.Now.ToUniversalTime(), "Error", username, error[0], error[1]);
             split = result.Split(": ");
             return StatusCode(Convert.ToInt32(split[0]), split[2]);
         }
@@ -148,7 +150,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             CookieOptions cookieOptions = new CookieOptions();
             cookieOptions.IsEssential = true;
-            cookieOptions.Expires = DateTime.Now.AddDays(5);
+            cookieOptions.Expires = DateTime.Now.ToUniversalTime().AddDays(5);
             //cookieOptions.Path = "/";
             cookieOptions.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
             cookieOptions.Secure = true;

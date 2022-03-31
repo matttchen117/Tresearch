@@ -54,7 +54,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             Username = account.Username;
             AuthorizationLevel = account.AuthorizationLevel;
             OTP = GenerateRandomOTP();
-            TimeCreated = DateTime.Now;
+            TimeCreated = DateTime.Now.ToUniversalTime().ToUniversalTime();
             FailCount = 0;
         }
 

@@ -10,6 +10,33 @@ const Login = () => {
     const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/
     const validSpecialCharacters = /[`.,@!`]/
 
+    function handleInput() {
+        // [username]@[domain name].[domain]
+        // Username: a-z, A-Z, 0-9, .-
+        // Domain Name: a-z, A-Z, 0-9, .-
+        // Domain: a-z, A-Z
+        // Satisfy all three requirements
+        var regexUsername = new RegExp("^[a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{3}$");
+
+        //  passphrase: a-z, A-Z, 0-9, .,@! space
+        var regexPassphrase = new RegExp("^[a-zA-Z0-9.,@!\s]+$");
+
+        if(this.state.passphrase.length < 8){
+            this.setState({errorMessage: 'Password must be at least 8 characters'});
+            return false;
+        }
+
+        if(!regexUsername.test(this.state.username)){
+            this.setState({errorMessage: 'Invalid email'});
+            return false;
+        }
+
+        if(!regexPassphrase.test(this.state.passphrase)){
+            this.setState({errorMessage: 'Your password can only contain: \nblank space\na-z\nA-Z\n.,@!'});
+            return false;
+        }
+        return true; 
+    }
 
     function validateLoginForm(){
         // still allowing invalid special characters
@@ -39,6 +66,10 @@ const Login = () => {
 
     const [error, setError] = useState(false)
     const [verified, setVerified] = useState(false)
+    const [token, setToken] = useState('');
+
+    if(token != '')
+        axios.defaults.headers.common['Authorization'] = localStorage.getItem('authorization');
 
     const onSubmit = (event) => {
         event.preventDefault();
@@ -51,8 +82,10 @@ const Login = () => {
                 + '&authorizationLevel=' + authorizationLevel)
                 .then(response => {
                         console.log(response.data);
-                        console.log(response.headers["TresearchAuthenticationCookie"])
-                        console.log(response.headers)
+                        console.log(response.headers['authorization']);
+                        localStorage.setItem('authorization', response.headers['authorization']);
+                        setToken(response.headers['authorization']);
+                        console.log(token);
                         //navigate('/Login/Authentication');
                 }).catch(err => {
                         console.log(err.data);
@@ -64,6 +97,7 @@ const Login = () => {
                 + '&authorizationLevel=' + authorizationLevel)
                 .then(response => {
                         console.log(response.data);
+                        console.log(response.headers['authorization']);
                         setVerified(true)
                         //navigate('/Login/Authentication');
                 }).catch(err => {
