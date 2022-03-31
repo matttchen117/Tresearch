@@ -34,6 +34,17 @@
     background-color: var(--form-container-input-color);
 }
 
+.form-register-wrapper input[type='password'] {
+    outline: 0;
+    border: 0;
+    background: var(--form-input-color);
+    width: 100%;
+    margin: 0 0 15px;
+    padding: 15px;
+    box-sizing: border-box;
+    background-color: var(--form-container-input-color);
+}
+
 .register-input-checkbox{
     display: block;
     position: relative;

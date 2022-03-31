@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {useNavigate} from 'react-router-dom';
 import axios, {AxiosResponse, AxiosError} from 'axios';
+import pbkdf2 from "pbkdf2/lib/sync";
 
 import "./RegistrationForm.css";
 import Button from "../Button/ButtonComponent";
@@ -43,8 +44,6 @@ class RegistrationForm extends React.Component  {
             this.setState({errorMessage: 'Your password can only contain: \nblank space\na-z\nA-Z\n.,@!'});
             return false;
         }
-
-
         return true; 
     }
 
@@ -63,13 +62,21 @@ class RegistrationForm extends React.Component  {
         this.setState({agreement: updatedAgreement});
     }
 
+    hashInput = (value) => {
+        var pbkdf2 = require('pbkdf2');      
+        const pbkdfKey = pbkdf2.pbkdf2Sync(value, '',  10000,  64, 'sha512');
+        return pbkdfKey.toString('hex').toUpperCase();
+    }
+
 
     onSubmitHandler = (e) => {
         e.preventDefault();
-        console.log(this.handleInput());
+
+        // pbkdf2 uses callbacks not promises, need to wrap in a promise object
+
         if(this.handleInput()){
             this.setState({errorMessage: ''})
-            axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/Registration/register?email=' + this.state.email.toLowerCase() + '&passphrase=' + this.state.passphrase)
+            axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/Registration/register?email=' + this.state.email.toLowerCase() + '&passphrase=' + this.hashInput(this.state.passphrase.toLowerCase()))
             .then(res => {
                 window.location = '/Register/ConfirmationSent';
             })
@@ -91,7 +98,7 @@ class RegistrationForm extends React.Component  {
                             <input type="text" value={this.state.email} required placeholder="Email Address" onChange = {this.inputEmailHandler}/>
                         </div>
                         <div className="input-container">
-                            <input type="text" value={this.state.passphrase} required placeholder="Password" onChange = {this.inputPassphraseHandler}/>
+                            <input type="password" value={this.state.passphrase} required placeholder="Password" onChange = {this.inputPassphraseHandler}/>
                         </div>
                         <div className="register-input-checkbox">
                             <label>

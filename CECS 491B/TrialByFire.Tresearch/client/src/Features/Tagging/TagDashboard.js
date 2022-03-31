@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, {useState, useEffect } from "react";
 
+
 import "./TagDashboard.css";
 import Button from "../../UI/Button/ButtonComponent";
 
@@ -24,6 +25,7 @@ function TagDashboard() {
         axios.post("https://localhost:7010/Tag/deleteTag?tagName=" + value)
         .then((response => {
             fetchTableData();
+            console.log('deleted');
         }))
         .catch((err => {
             console.log(err);

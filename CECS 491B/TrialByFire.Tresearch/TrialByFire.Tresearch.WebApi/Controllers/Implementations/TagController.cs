@@ -87,8 +87,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             }
         }
 
-        [HttpGet]
-        [Route("nodeTaglist")]
+        [HttpPost("nodeTaglist")]
         public async Task<IActionResult> GetNodeTagsAsync(List<long> nodeIDs)
         {
             try
