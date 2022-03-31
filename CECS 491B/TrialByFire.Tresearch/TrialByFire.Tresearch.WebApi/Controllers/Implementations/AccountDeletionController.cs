@@ -23,8 +23,10 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         private ISqlDAO SqlDAO { get; }
         private ILogService LogService { get; }
 
-        private IMessageBank MessageBank { get; }
+        private IMessageBank _messageBank { get; }
         private IAccountDeletionManager AccountDeletionManager { get; }
+
+        private BuildSettingsOptions _buildSettingsOptions { get; }
 
 
 
@@ -34,7 +36,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             this.SqlDAO = sqlDAO;
             this.LogService = logService;
-            this.MessageBank = messageBank;
+            this._messageBank = messageBank;
             this.AccountDeletionManager = accountDeletionManager;
             this.BuildSettingsOptions = buildSettingsOptions;
         }
@@ -45,7 +47,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         /// <returns></returns>
 
         [HttpPost("DeleteAccount")]
-        public async Task<List<string>> DeleteAccountAsync()
+        public async Task<IActionResult> DeleteAccountAsync()
         {
 
             string[] split;
@@ -53,28 +55,27 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
             try
             {
+                result = await AccountDeletionManager.DeleteAccountAsync(CancellationTokenSource.Token).ConfigureAwait(false);
 
-                List<string> results = await AccountDeletionManager.DeleteAccountAsync(CancellationTokenSource.Token).ConfigureAwait(false);
-                result = results[0];
-                if (result.Equals(MessageBank.SuccessMessages["generic"]))
+                if (result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic)))
                 {
-                    if (BuildSettingsOptions.Environment.Equals("Test"))
+                    if (_buildSettingsOptions.Environment.Equals("Test"))
                     {
                         split = result.Split(": ");
                         return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                     }
 
-                    split = result.Split(": ");
-                    //LogService.CreateLog(DateTime.Now, "Server", principal.Identity.Name, "Account Deletion Successful");
-                    return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                 }
 
                 split = result.Split(": ");
                 return new OkObjectResult(StatusCode(Convert.ToInt32(split[0]), split[2]));
 
+
             }
             catch (Exception ex)
             {
+                return StatusCode(500, ex.Message);
+
             }
 
 

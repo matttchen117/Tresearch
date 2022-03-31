@@ -43,8 +43,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
 
                 string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
-
-                string results;
                 string admins;
 
                 admins = await AccountDeletionService.GetAmountOfAdmins(cancellationToken).ConfigureAwait(false);

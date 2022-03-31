@@ -223,11 +223,31 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
 
-        public string DeleteAccount()
+        public async Task<string> GetAmountOfAdminsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            int adminsLeft = InMemoryDatabase.Accounts.Count();
+
+            if(adminsLeft > 1)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.generic).ConfigureAwait(false);
+            }
+
+            return await _messageBank.GetMessage(IMessageBank.Responses.lastAdminFail).ConfigureAwait(false);
+
+            
+
+        }
+
+        public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
             bool accountExists = false;
             string accountName = Thread.CurrentPrincipal.Identity.Name;
             string accountRole = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
+
             try
             {
                 for (int i = 0; i < InMemoryDatabase.Accounts.Count; i++)
@@ -235,53 +255,60 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     if ((InMemoryDatabase.Accounts[i].Username.Equals(accountName)) && (InMemoryDatabase.Accounts[i].AuthorizationLevel.Equals(accountRole)))
                     {
                         accountExists = true;
+                        if (accountExists)
+                        {
+
+                            for (int j = 0; j < InMemoryDatabase.OTPClaims.Count; j++)
+                            {
+                                if (InMemoryDatabase.OTPClaims[j].Username.Equals(accountName))
+
+                                {
+                                    InMemoryDatabase.OTPClaims.RemoveAt(j);
+                                    break;
+                                }
+                            }
+                            //in memory database removing nodes and nodetags
+                            for (int j = 0; j < InMemoryDatabase.Nodes.Count; j++)
+                            {
+                                if (InMemoryDatabase.Nodes[j].accountOwner.Equals(accountName))
+                                {
+                                    if (InMemoryDatabase.NodeTags[j].nodeID.Equals(InMemoryDatabase.Nodes[j].nodeID))
+                                    {
+                                        InMemoryDatabase.NodeTags.RemoveAt(j);
+                                    }
+                                    InMemoryDatabase.Nodes.RemoveAt(j);
+                                }
+                            }
+                            for (int j = 0; j < InMemoryDatabase.Ratings.Count; j++)
+                            {
+                                if (InMemoryDatabase.Ratings[j].username.Equals(accountName))
+                                {
+                                    InMemoryDatabase.Ratings.RemoveAt(j);
+                                }
+                            }
+                            for (int j = 0; j < InMemoryDatabase.ConfirmationLinks.Count; j++)
+                            {
+                                if (InMemoryDatabase.ConfirmationLinks[j].Username.Equals(accountName))
+                                {
+                                    InMemoryDatabase.ConfirmationLinks.RemoveAt(j);
+                                    break;
+                                }
+                            }
+                            return await _messageBank.GetMessage(IMessageBank.Responses.generic).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).ConfigureAwait(false);
+                        }
                         InMemoryDatabase.Accounts.RemoveAt(i);
                         break;
                     }
                 }
-                if (accountExists)
-                {
-                    for (int i = 0; i < InMemoryDatabase.OTPClaims.Count; i++)
-                    {
-                        if (InMemoryDatabase.OTPClaims[i].Username.Equals(accountName))
-
-                        {
-                            InMemoryDatabase.OTPClaims.RemoveAt(i);
-                            break;
-                        }
-                    }
-                    for (int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
-                    {
-                        if (InMemoryDatabase.Nodes[i].accountOwner.Equals(accountName))
-                        {
-                            InMemoryDatabase.Nodes.RemoveAt(i);
-                        }
-                    }
-                    for (int i = 0; i < InMemoryDatabase.Ratings.Count; i++)
-                    {
-                        if (InMemoryDatabase.Ratings[i].username.Equals(accountName))
-                        {
-                            InMemoryDatabase.Ratings.RemoveAt(i);
-                        }
-                    }
-                    for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count; i++)
-                    {
-                        if (InMemoryDatabase.ConfirmationLinks[i].Username.Equals(accountName))
-                        {
-                            InMemoryDatabase.ConfirmationLinks.RemoveAt(i);
-                            break;
-                        }
-                    }
-                    return _messageBank.SuccessMessages["generic"];
-                }
-                else
-                {
-                    return _messageBank.ErrorMessages["accountNotFound"];
-                }
+                return await _messageBank.GetMessage(IMessageBank.Responses.deleteAccountFail).ConfigureAwait(false);
             }
             catch (AccountDeletionFailedException adfe)
             {
-                return adfe.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false);
             }
 
         }

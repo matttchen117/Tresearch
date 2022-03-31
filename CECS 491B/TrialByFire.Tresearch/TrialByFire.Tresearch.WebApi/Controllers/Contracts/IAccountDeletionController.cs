@@ -5,7 +5,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
 {
     public interface IAccountDeletionController
     {
-        public Task<List<string>> DeleteAccountAsync();
+        public Task<IActionResult> DeleteAccountAsync();
 
     }
 }

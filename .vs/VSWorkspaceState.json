@@ -4,10 +4,13 @@
     "\\CECS 491B",
     "\\CECS 491B\\TrialByFire.Tresearch",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\Implementations",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\Contracts",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\Contracts",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\Implementations",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\Implementations"
   ],
-  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\Implementations\\AccountDeletionService.cs",
+  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.sln",
   "PreviewInSolutionExplorer": false
 }
