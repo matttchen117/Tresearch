@@ -38,7 +38,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
 
 
             // Act
-            string result = await logoutService.Logout(cancellationTokenSource.Token).ConfigureAwait(false);
+            string result = await logoutService.LogoutAsync(cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, result);

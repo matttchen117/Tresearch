@@ -25,6 +25,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
 
         public AccountDeletionControllerShould() : base(new string[] { })
         {
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
             TestServices.AddScoped<IAccountDeletionService, AccountDeletionService>();
             TestServices.AddScoped<IAccountDeletionManager, AccountDeletionManager>();
             TestServices.AddScoped<IAccountDeletionController, AccountDeletionController>();
@@ -39,7 +40,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
         //[InlineData("violetKeyCard@gmail.com", "admin", "Database: The account was not found.")]
 
 
-        public async Task DeleteTheUser(string currentIdentity, string currentRole, string expected)
+        public async Task DeleteTheUserAsync(string currentIdentity, string currentRole, string expected)
         {
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));

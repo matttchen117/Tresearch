@@ -24,7 +24,6 @@ namespace TrialByFire.Tresearch.Tests
         public IAuthenticationService AuthenticationService { get; }
         public IAuthorizationService AuthorizationService { get; }
         public IValidationService ValidationService { get; }
-        public IAccountDeletionService AccountDeletionService { get; }
 
 
         private string _connectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true";
@@ -45,7 +44,6 @@ namespace TrialByFire.Tresearch.Tests
             //AuthenticationService = new AuthenticationService(SqlDAO, LogService, MessageBank);
             AuthorizationService = new AuthorizationService(SqlDAO, LogService);
             ValidationService = new ValidationService(MessageBank);
-            AccountDeletionService = new AccountDeletionService(SqlDAO, LogService);
         }
     }
 }

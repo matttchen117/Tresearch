@@ -20,6 +20,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
 {
     public class AccountDeletionServiceShould : IntegrationTestDependencies
     {
+
+        /*
         public AccountDeletionServiceShould() : base()
         {
         }
@@ -28,6 +30,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
         [InlineData("altyn@gmail.com", "user", "success")]
         [InlineData("ryst@gmail.com", "admin", "success")]
         [InlineData("redKeyCard@gmail.com", "admin", "Database: The account was not found.")]
+
+
 
 
         public void DeleteTheUser(string currentIdentity, string currentRole, string expected)
@@ -44,6 +48,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
             // Assert
             Assert.Equal(expected, result);
         }
+
+        */
 
 
 

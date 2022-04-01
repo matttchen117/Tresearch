@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Models;
@@ -32,13 +33,13 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
 
 
-        public AccountDeletionController(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, IAccountDeletionManager accountDeletionManager, BuildSettingsOptions buildSettingsOptions)
+        public AccountDeletionController(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, IAccountDeletionManager accountDeletionManager, IOptionsSnapshot<BuildSettingsOptions>  buildSettingsOptions)
         {
             this.SqlDAO = sqlDAO;
             this.LogService = logService;
             this._messageBank = messageBank;
             this.AccountDeletionManager = accountDeletionManager;
-            this.BuildSettingsOptions = buildSettingsOptions;
+            this.BuildSettingsOptions = buildSettingsOptions.Value;
         }
 
         /// <summary>
@@ -46,7 +47,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         /// </summary>
         /// <returns></returns>
 
-        [HttpPost("DeleteAccount")]
+        [HttpPost]
+        [Route("DeleteAccount")]
         public async Task<IActionResult> DeleteAccountAsync()
         {
 
@@ -72,11 +74,27 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
 
             }
+
+
+            //an exception is happening here
+            /*
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
 
             }
+            */
+
+            catch (OperationCanceledException tce)
+            {
+                return StatusCode(400, tce.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(400, ex.Message);
+            }
+            split = result.Split(": ");
+            return StatusCode(Convert.ToInt32(split[0]), split[2]);
 
 
 

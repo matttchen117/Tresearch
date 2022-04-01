@@ -49,7 +49,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
             { StatusCode = Convert.ToInt32(expecteds[0]) };
 
             // Act
-            IActionResult result = await logoutController.Logout().ConfigureAwait(false);
+            IActionResult result = await logoutController.LogoutAsync().ConfigureAwait(false);
             var objectResult = result as ObjectResult;
 
             // Assert
