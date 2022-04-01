@@ -34,7 +34,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         //ANOTHER METHOD IN SERVICE, AND MANAGER SHOULD CALL GETADMINS METHOD, MANAGER CALLS SERVICE CALLS DAO, RETURN BACK OPPOSITE WAY
         //1) CONFIGURE AWAIT(FALSE) FOR ALLASYHC METHOD CALLS, IF NOT THERE THE REQUEST MIGHT NOT START OFF IMMEDIATELY, 
         //2) 
-        public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default)
+        public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             string admins;
             string result;
@@ -44,11 +44,11 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
                 admins = await SqlDAO.GetAmountOfAdminsAsync(cancellationToken);
 
-                if (admins.Equals(_messageBank.SuccessMessages["generic"]))
+                if (admins.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic)))
                 {
                     result = await SqlDAO.DeleteAccountAsync(cancellationToken).ConfigureAwait(false);
 
-                    if (result.Equals(_messageBank.SuccessMessages["generic"]))
+                    if (result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic)))
                     {
                         return await _messageBank.GetMessage(IMessageBank.Responses.generic).ConfigureAwait(false);
                     }
@@ -60,10 +60,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 }
 
 
-
                 return await _messageBank.GetMessage(IMessageBank.Responses.deleteAccountFail).ConfigureAwait(false);
-
-
 
 
             }

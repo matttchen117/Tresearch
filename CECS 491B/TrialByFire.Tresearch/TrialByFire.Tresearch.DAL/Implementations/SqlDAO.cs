@@ -726,19 +726,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             
-            /*
-            catch (Exception ex)
-            {
-                return _messageBank.GetMessage(IMessageBank.Responses.).Result;
-            }
 
-            catch (Exception ex)
-            {
-                return _messageBank.GetMessage(IMessageBank.)
-            }
-
-
-            */
 
 
 

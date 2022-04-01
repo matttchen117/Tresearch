@@ -7,31 +7,33 @@ using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Services.Implementations;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 
 namespace TrialByFire.Tresearch.Tests
 {
     public class TestBaseClass
     {
         public IServiceCollection TestServices;
-        public WebApplicationBuilder TestBuilder;
-        public WebApplication TestApp;
+        public IServiceProvider TestProvider;
 
         public TestBaseClass(string[] args)
         {
-            TestBuilder = WebApplication.CreateBuilder();
+            IConfiguration config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();
 
-            // Add Configuration File to DI
-            TestBuilder.Services.Configure<BuildSettingsOptions>(
-                TestBuilder.Configuration.GetSection(nameof(BuildSettingsOptions)));
+            TestServices = new ServiceCollection();
+            TestServices.Configure<BuildSettingsOptions>(
+                config.GetSection(nameof(BuildSettingsOptions)));
             // Add services to the container.
-            TestBuilder.Services.AddScoped<IMessageBank, MessageBank>();
-            TestBuilder.Services.AddScoped<ISqlDAO, SqlDAO>();
+            TestServices.AddScoped<IMessageBank, MessageBank>();
+            TestServices.AddScoped<ISqlDAO, SqlDAO>();
             // Service
-            TestBuilder.Services.AddScoped<IValidationService, ValidationService>();
-            TestBuilder.Services.AddScoped<ILogService, LogService>();
-            TestBuilder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-            TestBuilder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
-            TestServices = TestBuilder.Services;
+            TestServices.AddScoped<IValidationService, ValidationService>();
+            TestServices.AddScoped<ILogService, LogService>();
+            TestServices.AddScoped<IAuthenticationService, AuthenticationService>();
+            TestServices.AddScoped<IAuthorizationService, AuthorizationService>();
         }
     }
 }
