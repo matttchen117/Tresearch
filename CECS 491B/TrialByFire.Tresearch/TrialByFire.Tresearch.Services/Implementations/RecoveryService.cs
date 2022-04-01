@@ -194,7 +194,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     return Tuple.Create(linkCreated, _messageBank.ErrorMessages["recoveryLinkLimitReached"]); // 403 Forbidden - Account has more than 5 links and cannot create more this calendar month
                 } else
                 {
-                    linkCreated  = new RecoveryLink(account.Email, Guid.NewGuid(), DateTime.Now, account.AuthorizationLevel);
+                    linkCreated  = new RecoveryLink(account.Email, Guid.NewGuid(), DateTime.Now.ToUniversalTime(), account.AuthorizationLevel);
                     result = await _sqlDAO.CreateRecoveryLinkAsync( linkCreated, cancellationToken);
                     if (cancellationToken.IsCancellationRequested && result == "200")
                     {

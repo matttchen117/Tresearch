@@ -21,23 +21,19 @@ namespace TrialByFire.Tresearch.Managers.Implementations
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
-
-        private IValidationService _validationService { get; }
-        private IAuthenticationService _authenticationService { get; }
         private IOTPRequestService _otpRequestService { get; }
+        private IAccountVerificationService _accountVerificationService { get; }
         private IMessageBank _messageBank { get; }
 
         private IMailService _mailService { get; }
 
-        public OTPRequestManager(ISqlDAO sqlDAO, ILogService logService, IValidationService validationService, 
-            IAuthenticationService authenticationService, IOTPRequestService otpRequestService, 
-            IMessageBank messageBank, IMailService mailService)
+        public OTPRequestManager(ISqlDAO sqlDAO, ILogService logService, IOTPRequestService otpRequestService, 
+            IAccountVerificationService accountVerificationService, IMessageBank messageBank, IMailService mailService)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
-            _validationService = validationService;
-            _authenticationService = authenticationService;
             _otpRequestService = otpRequestService;
+            _accountVerificationService = accountVerificationService;
             _messageBank = messageBank;
             _mailService = mailService;
         }
@@ -79,20 +75,27 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     {*/
                     IAccount account = new Account(username, passphrase, authorizationLevel);
                     IOTPClaim otpClaim = new OTPClaim(account);
-                    result = await _otpRequestService.RequestOTPAsync(account, otpClaim, 
-                        cancellationToken).ConfigureAwait(false);
-                    if(result.Equals(_messageBank.SuccessMessages["generic"]))
+                    result = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken)
+                        .ConfigureAwait(false);
+                    if(result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)
+                        .ConfigureAwait(false)))
                     {
-                        // No API Key right now
-                        result = await _mailService.SendOTPAsync(account.Username, otpClaim.OTP, 
-                            otpClaim.OTP, otpClaim.OTP, cancellationToken).ConfigureAwait(false);
+                        result = await _otpRequestService.RequestOTPAsync(account, otpClaim,
+                        cancellationToken).ConfigureAwait(false);
+                        if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.storeOTPSuccess)
+                            .ConfigureAwait(false)))
+                        {
+                            // No API Key right now
+                            result = await _mailService.SendOTPAsync(account.Username, otpClaim.OTP,
+                                otpClaim.OTP, otpClaim.OTP, cancellationToken).ConfigureAwait(false);
+                        }
                     }
-                    //}
                     return result;
                 }
                 else
                 {
-                    return _messageBank.ErrorMessages["alreadyAuthenticated"];
+                    return await _messageBank.GetMessage(IMessageBank.Responses.alreadyAuthenticated)
+                        .ConfigureAwait(false);
                 }
             }catch(AccountCreationFailedException acfe)
             {

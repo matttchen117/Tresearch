@@ -13,18 +13,33 @@ namespace TrialByFire.Tresearch.Models.Contracts
         public enum Responses
         {
             generic,
-            badNameOrPass,
-            badNameOrOTP,
-            badEmail,
-            tooManyFails,
-            otpExpired,
-            notAuthenticated,
+
+            verifySuccess,
+            notEnabled,
             notConfirmed,
+            accountNotFound,
+
+            authenticationSuccess,
+            otpExpired,
+            tooManyFails,
+            badNameOrOTP,
+            duplicateAccountData,
+
+            storeOTPSuccess,
+            otpClaimNotFound,
+            duplicateOTPClaimData,
+
+            logoutSuccess,
+            unknownRole,
+            logoutFail,
+
+            badNameOrPass,
+            badEmail,
+            notAuthenticated,
             alreadyAuthenticated,
             notAuthorized,
             alreadyEnabled,
             recoveryLinkLimitReached,
-            accountNotFound,
             notFoundOrEnabled,
             notFoundOrAuthorized,
             recoveryLinkNotFound,
@@ -37,7 +52,6 @@ namespace TrialByFire.Tresearch.Models.Contracts
             recoveryLinkCreateFail,
             otpFail,
             databaseFail,
-            logoutFail,
             rollbackFailed,
             createdNodesExists,
             createdNodeNotExist,

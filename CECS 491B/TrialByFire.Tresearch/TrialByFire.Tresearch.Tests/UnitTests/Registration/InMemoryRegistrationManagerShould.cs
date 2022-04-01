@@ -46,7 +46,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public void CheckConfirmationLinkValidity(string username, int daySubtraction)
         {
             //Act
-            DateTime time = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day + daySubtraction, DateTime.Now.Hour, DateTime.Now.Minute, 0);
+            DateTime time = new DateTime(DateTime.Now.ToUniversalTime().Year, DateTime.Now.ToUniversalTime().Month, DateTime.Now.ToUniversalTime().Day + daySubtraction, DateTime.Now.ToUniversalTime().Hour, DateTime.Now.ToUniversalTime().Minute, 0);
             IConfirmationLink link = new ConfirmationLink(username, Guid.NewGuid(), time);
             _sqlDAO.CreateConfirmationLink(link);
             bool expected;

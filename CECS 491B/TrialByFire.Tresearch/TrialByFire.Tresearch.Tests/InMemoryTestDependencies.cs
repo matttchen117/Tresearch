@@ -38,7 +38,7 @@ namespace TrialByFire.Tresearch.Tests
             SqlDAO = new InMemorySqlDAO();
             LogService = new LogService(SqlDAO);
             MessageBank = new MessageBank();
-            AuthenticationService = new AuthenticationService(SqlDAO, LogService, MessageBank);
+            //AuthenticationService = new AuthenticationService(SqlDAO, LogService, MessageBank);
             AuthorizationService = new AuthorizationService(SqlDAO, LogService);
             ValidationService = new ValidationService(MessageBank);
             AccountDeletionService = new AccountDeletionService(SqlDAO, LogService);

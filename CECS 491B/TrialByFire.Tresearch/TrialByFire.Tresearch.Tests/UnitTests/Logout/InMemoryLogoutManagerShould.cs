@@ -21,10 +21,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
     {
         public InMemoryLogoutManagerShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<ISqlDAO, InMemorySqlDAO>();
-            TestBuilder.Services.AddScoped<ILogoutService, LogoutService>();
-            TestBuilder.Services.AddScoped<ILogoutManager, LogoutManager>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestServices.AddScoped<ILogoutService, LogoutService>();
+            TestServices.AddScoped<ILogoutManager, LogoutManager>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -39,7 +39,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }
-            ILogoutManager logoutManager = TestApp.Services.GetService<ILogoutManager>();
+            ILogoutManager logoutManager = TestProvider.GetService<ILogoutManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(
                 TimeSpan.FromSeconds(5));
 

@@ -56,7 +56,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public void ConfirmTheUser(string email, string passphrase, string authenticationLevel, bool status, bool confirmed)
         {
             //Arrange
-            SqlDAO.CreateConfirmationLink(new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now));
+            SqlDAO.CreateConfirmationLink(new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now.ToUniversalTime()));
 
             IAccount _account = new Account(email, email, passphrase, authenticationLevel, status, confirmed);
             SqlDAO.CreateAccount(_account);
@@ -75,7 +75,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
             //Arrange
             Guid myguid = Guid.NewGuid();
             string guid = myguid.ToString();
-            SqlDAO.CreateConfirmationLink(new ConfirmationLink(email, myguid, DateTime.Now));
+            SqlDAO.CreateConfirmationLink(new ConfirmationLink(email, myguid, DateTime.Now.ToUniversalTime()));
 
             //Act
             IConfirmationLink link = _registrationService.GetConfirmationLink(guid);
@@ -90,7 +90,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public void RemoveConfirmationLink(string email)
         {
             //Arrange
-            IConfirmationLink link = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now);
+            IConfirmationLink link = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now.ToUniversalTime());
             SqlDAO.CreateConfirmationLink(link);
 
             //Act

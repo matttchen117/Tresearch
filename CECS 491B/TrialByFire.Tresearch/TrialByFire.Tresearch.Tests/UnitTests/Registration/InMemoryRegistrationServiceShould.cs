@@ -76,7 +76,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             ISqlDAO _sqlDAO = new InMemorySqlDAO();
             ILogService _logService = new LogService(_sqlDAO);
             IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
-            IConfirmationLink _expected = new ConfirmationLink(username, Guid.NewGuid(), DateTime.Now);
+            IConfirmationLink _expected = new ConfirmationLink(username, Guid.NewGuid(), DateTime.Now.ToUniversalTime());
             _sqlDAO.CreateConfirmationLink(_expected);
 
             string linkUrl = linkUrl = $"{url}/Account/Verify?t={_expected.UniqueIdentifier}";
@@ -98,7 +98,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             ILogService _logService = new LogService(_sqlDAO);
             IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
             Guid guid = Guid.NewGuid();
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.Now.ToUniversalTime();
             IConfirmationLink link = new ConfirmationLink(username, guid, now);
             _sqlDAO.CreateConfirmationLink(link);
 
@@ -118,7 +118,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             ILogService _logService = new LogService(_sqlDAO);
             IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
             Guid guid = Guid.NewGuid();
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.Now.ToUniversalTime();
             IAccount expected = new Account(email, email, passphrase, "User", true, false);
             IConfirmationLink link = new ConfirmationLink(email, guid, now);
 

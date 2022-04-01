@@ -7,8 +7,8 @@ using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Services.Contracts
 {
-    public interface ILogoutService
+    public interface IAccountVerificationService
     {
-        public Task<string> LogoutAsync(CancellationToken cancellationToken);
+        public Task<string> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken = default);
     }
 }

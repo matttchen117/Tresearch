@@ -53,7 +53,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 activationGuid = Guid.NewGuid();
                 linkUrl = $"{baseUrl}{activationGuid}";
                 results.Add(linkUrl);
-                IConfirmationLink _confirmationLink = new ConfirmationLink(email, activationGuid, DateTime.Now);
+                IConfirmationLink _confirmationLink = new ConfirmationLink(email, activationGuid, DateTime.Now.ToUniversalTime());
 
                 if (_confirmationLink == null)
                 {

@@ -24,11 +24,11 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
     {
         public InMemoryLogoutControllerShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<ISqlDAO, InMemorySqlDAO>();
-            TestBuilder.Services.AddScoped<ILogoutService, LogoutService>();
-            TestBuilder.Services.AddScoped<ILogoutManager, LogoutManager>();
-            TestBuilder.Services.AddScoped<ILogoutController, LogoutController>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestServices.AddScoped<ILogoutService, LogoutService>();
+            TestServices.AddScoped<ILogoutManager, LogoutManager>();
+            TestServices.AddScoped<ILogoutController, LogoutController>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -43,7 +43,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }
-            ILogoutController logoutController = TestApp.Services.GetService<ILogoutController>();
+            ILogoutController logoutController = TestProvider.GetService<ILogoutController>();
             string[] expecteds = expected.Split(": ");
             ObjectResult expectedResult = new ObjectResult(expecteds[2])
             { StatusCode = Convert.ToInt32(expecteds[0]) };

@@ -22,7 +22,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public bool isValid()
         {
-            DateTime now = System.DateTime.Now;
+            DateTime now = System.DateTime.Now.ToUniversalTime();
             return (TimeCreated > now.AddHours(-24) && TimeCreated <=now);
         }
     }

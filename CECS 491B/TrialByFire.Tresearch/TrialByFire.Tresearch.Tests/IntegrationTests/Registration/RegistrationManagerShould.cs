@@ -44,7 +44,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public void ConfirmTheUser(string email, string passphrase, string authenticationLevel, bool status, bool confirmed)
         {
             //Arrange
-            IConfirmationLink link = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now);
+            IConfirmationLink link = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now.ToUniversalTime());
             string url = link.UniqueIdentifier.ToString();
             SqlDAO.CreateConfirmationLink(link);
             IAccount _account = new Account(email, email, passphrase, authenticationLevel, status, confirmed);
@@ -76,7 +76,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public void checkLinkValidity(string email, int sub)
         {
             //Arrange
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.Now.ToUniversalTime();
             IConfirmationLink link = new ConfirmationLink(email, Guid.NewGuid(), now.AddDays(sub));
             Boolean expected;
             if (sub < 0)

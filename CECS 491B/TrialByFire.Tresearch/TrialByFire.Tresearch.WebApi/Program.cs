@@ -19,6 +19,7 @@ builder.Services.AddScoped<IMessageBank, MessageBank>();
 builder.Services.AddScoped<ISqlDAO, SqlDAO>();
 // Service
 builder.Services.AddScoped<ILogService, LogService>();
+builder.Services.AddScoped<IAccountVerificationService, AccountVerificationService>();
 builder.Services.AddScoped<IAccountDeletionService, AccountDeletionService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
@@ -52,12 +53,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       builder =>
                       {
-                          builder.WithOrigins("http://localhost:3000", 
+                          builder.WithOrigins("http://localhost:3000",
                                               "https://localhost:3000")
                                               //.WithHeaders("TresearchAuthenticationCookie")
                                               .AllowAnyHeader()
                                               .AllowAnyMethod()
-                                              .AllowAnyOrigin();
+                                              .AllowCredentials();
                       });
 });
 
@@ -76,7 +77,12 @@ app.UseHttpsRedirection();
 
 app.UseCors(MyAllowSpecificOrigins);
 
-app.UseCookieAuthentication();
+app.UseTokenAuthentication();
+
+/*app.Use((context, next) =>
+{
+
+});*/
 
 app.MapControllers();
 
@@ -84,9 +90,9 @@ app.Run();
 
 public static class AuthExtensions
 {
-    public static IApplicationBuilder UseCookieAuthentication(this IApplicationBuilder host)
+    public static IApplicationBuilder UseTokenAuthentication(this IApplicationBuilder host)
     {
-        return host.UseMiddleware<CookieAuthentication>();
+        return host.UseMiddleware<TokenAuthentication>();
     }
 
 }

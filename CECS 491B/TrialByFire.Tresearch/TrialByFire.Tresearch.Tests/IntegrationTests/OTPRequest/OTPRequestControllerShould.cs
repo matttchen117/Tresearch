@@ -24,11 +24,12 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
     {
         public OTPRequestControllerShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<IMailService, MailService>();
-            TestBuilder.Services.AddScoped<IOTPRequestService, OTPRequestService>();
-            TestBuilder.Services.AddScoped<IOTPRequestManager, OTPRequestManager>();
-            TestBuilder.Services.AddScoped<IOTPRequestController, OTPRequestController>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<IMailService, MailService>();
+            TestServices.AddScoped<IOTPRequestService, OTPRequestService>();
+            TestServices.AddScoped<IAccountVerificationService, AccountVerificationService>();
+            TestServices.AddScoped<IOTPRequestManager, OTPRequestManager>();
+            TestServices.AddScoped<IOTPRequestController, OTPRequestController>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -40,12 +41,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
             "Passphrase. Please try again.")]
         [InlineData("aarry@gmail.com", "abcdEF123", "user", "guest", "guest", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "guest", "guest", "404: Database: The account was not found or " +
-            "it has been disabled.")]
+        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "guest", "guest", "500: Database: The Account was not found.")]
         [InlineData("barry@gmail.com", "abcDEF123", "admin", "billy@yahoo.com", "admin", "403: Server: Active session found. " +
             "Please logout and try again.")]
-        [InlineData("darry@gmail.com", "abcDEF123", "user", "guest", "guest", "404: Database: The account was not found or it " +
-            "has been disabled.")]
+        [InlineData("darry@gmail.com", "abcDEF123", "user", "guest", "guest", "401: Database: Account disabled. " +
+            "Perform account recovery or contact system admin.")]
         [InlineData("earry@gmail.com", "abcDEF123", "user", "guest", "guest", "401: Database: Please confirm your " +
             "account before attempting to login.")]
         public async Task RequestTheOTP(string username, string passphrase, string authorizationLevel, string currentIdentity, string currentRole,
@@ -58,7 +58,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }
-            IOTPRequestController otpRequestController = TestApp.Services.GetService<IOTPRequestController>();
+            IOTPRequestController otpRequestController = TestProvider.GetService<IOTPRequestController>();
             string[] expecteds = expected.Split(": ");
             ObjectResult expectedResult = new ObjectResult(expecteds[2])
             { StatusCode = Convert.ToInt32(expecteds[0]) };
