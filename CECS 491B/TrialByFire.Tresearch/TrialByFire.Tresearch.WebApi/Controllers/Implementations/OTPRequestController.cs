@@ -60,7 +60,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 string[] split;
                 string result = await _otpRequestManager.RequestOTPAsync(username, passphrase, authorizationLevel,
                     _cancellationTokenSource.Token).ConfigureAwait(false);
-                if (result.Equals(_messageBank.SuccessMessages["generic"]))
+                if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.storeOTPSuccess)
+                    .ConfigureAwait(false)))
                 {
                     split = result.Split(": ");
                     return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };

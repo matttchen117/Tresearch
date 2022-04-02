@@ -20,16 +20,32 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = messageBank;
             _options = options.Value;
         }
-
+        public async Task<int> LogoutAsync(IAccount account, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
+            {
+                //Perform sql statement
+                var procedure = "[Logout]";
+                var parameters = new DynamicParameters();
+                parameters.Add("Username", account.Username);
+                parameters.Add("AuthorizationLevel", account.AuthorizationLevel);
+                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
+                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                    .ConfigureAwait(false);
+                return parameters.Get<int>("Result");
+            }
+        }
         public async Task<string> StoreLogAsync(ILog log, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             using(var connection = new SqlConnection(_options.SqlConnectionString))
             {
-                var procedure = "[StoreLog]";                                                               
-                var value = new { Timestamp = log.Timestamp, Level = log.Level, Username = log.Username, 
-                Category = log.Category, Description = log.Description };   
+                var procedure = "[StoreLog]";
+                var value = new { Timestamp = log.Timestamp, Level = log.Level, Username = log.Username,
+                Category = log.Category, Description = log.Description };
                 int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
                 if (affectedRows != 1)
                 {
@@ -55,8 +71,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();                                                       // Check if cancellation token has requested cancellation
-                using (var connection = new SqlConnection(_options.SqlConnectionString))                                        // Establish connection with database
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString)) 
                 {
                     //Perform sql statement
                     var procedure = "dbo.[DisableAccount]";                                                                 // Name of store procedure
@@ -151,7 +167,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         /// <summary>
         ///     GetAccountAsync()
-        ///         Returns an account 
+        ///         Returns an account
         /// </summary>
         /// <param name="email">Email of account to find</param>
         /// <param name="authorizationLevel">Authorization level of account to find</param>
@@ -159,7 +175,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// <returns>Tuple containing account found (if not found, null) and string status code</returns>
         public async Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
-            
+
             IAccount nullAccount = null;
             try
             {
@@ -173,7 +189,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var parameters = new { Username = email, AuthorizationLevel = authorizationLevel };
 
                     var Accounts = await connection.QueryAsync<Account>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    
+
                     //Check if account was returned
                     if (Accounts.Count() < 1)
                         return Tuple.Create(nullAccount, _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result);            //Account doesn't exist
@@ -261,7 +277,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    
+
                     //Perform sql statement
                     var procedureUsername = "dbo.[GetRecoveryLinkUsername]";                                    // Stored procedure
                     var procedureTimeCreated = "dbo.[GetRecoveryLinkTimeCreated]";
@@ -344,7 +360,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         /// <summary>
         ///     DecrementRecoveryLinkCountAsync(email, authorizationLevel, cancellationToken)
-        ///         Decrements the count of recovery links a user has 
+        ///         Decrements the count of recovery links a user has
         /// </summary>
         /// <param name="email"> Email address of user to decrement</param>
         /// <param name="authorizationLevel">Authorization Level of user</param>
@@ -368,7 +384,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         else
                             throw new OperationCanceledException();
                     }
-                    
+
                     return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
                 }
             }
@@ -395,7 +411,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         /// <summary>
         ///     IncrementRecoveryLinkCountAsync(email, authorizationLevel, cancellationToken)
-        ///         Increments the count of recovery links a user has 
+        ///         Increments the count of recovery links a user has
         /// </summary>
         /// <param name="email">Email of user</param>
         /// <param name="authorizationLevel">Authorization Level of user</param>
@@ -443,7 +459,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-       
+
 
         /// <summary>
         ///     CreateRecoveryLinkAsync()
@@ -463,7 +479,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var procedure = "[CreateRecoveryLink]";
                     var value = new { Username = recoveryLink.Username, GUIDLink = recoveryLink.GUIDLink, TimeCreated = recoveryLink.TimeCreated, AuthorizationLevel = recoveryLink.AuthorizationLevel };
                     var affectedRows = await connection.QueryAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    
+
                     //Check if cancellation is requested
                     if (cancellationToken.IsCancellationRequested)
                     {
@@ -502,7 +518,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
         public async Task<string> CreateConfirmationLinkAsync(IConfirmationLink confirmationlink, CancellationToken cancellationToken = default(CancellationToken))
-        { 
+        {
             try
             {
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
@@ -616,7 +632,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (OperationCanceledException)
             {
-                //Rolback taken care of 
+                //Rolback taken care of
                 throw;
             }
             catch (Exception ex)
@@ -649,15 +665,15 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     else
                         return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
                 }
-            }  
+            }
             catch (OperationCanceledException)
             {
-                //Rolback taken care of 
+                //Rolback taken care of
                 throw;
             }
             catch(Exception ex)
             {
-                    return "500: Server " + ex.Message;   
+                    return "500: Server " + ex.Message;
             }
         }
         public async Task<string> RemoveConfirmationLinkAsync(IConfirmationLink confirmationLink, CancellationToken cancellationToken = default(CancellationToken))
@@ -798,320 +814,88 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         }
 
-        public async Task<string> VerifyAccountAsync(IAccount account, 
+        public async Task<int> VerifyAccountAsync(IAccount account,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            try
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
             {
-                using (var connection = new SqlConnection(_options.SqlConnectionString))
-                {
-                    string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IAccount dbAccount = await connection.QueryFirstAsync<Account>(new CommandDefinition(
-                        query, 
-                        new{
-                            Username = account.Username,
-                            AuthorizationLevel = account.AuthorizationLevel
-                        }, 
-                        cancellationToken: default
-                    )).ConfigureAwait(false);
-                    if (dbAccount == null)
-                    {
-                        return _messageBank.ErrorMessages["notFoundOrAuthorized"];
-                    }
-                    else if (dbAccount.Confirmed == false)
-                    {
-                        return _messageBank.ErrorMessages["notConfirmed"];
-                    }
-                    else if (dbAccount.AccountStatus == false)
-                    {
-                        return _messageBank.ErrorMessages["notFoundOrEnabled"];
-                    }
-                    else
-                    {
-                        if (account.Passphrase.Equals(dbAccount.Passphrase))
-                        {
-                            return _messageBank.SuccessMessages["generic"];
-                        }
-                        else
-                        {
-                            return _messageBank.ErrorMessages["badNameOrPass"];
-                        }
-                    }
-                }
-            }
-            catch (AccountCreationFailedException acfe)
-            {
-                return "400: Server: " + acfe.Message;
-                //return acfe.Message;
-            }
-            catch (InvalidOperationException ioe)
-            {
-                return _messageBank.ErrorMessages["notFoundOrEnabled"];
-            }
-            catch (Exception ex)
-            {
-                return "500: Database: " + ex.Message;
+                //Perform sql statement
+                var procedure = "[VerifyAccount]";
+                var parameters = new DynamicParameters();
+                parameters.Add("Username", account.Username);
+                parameters.Add("AuthorizationLevel", account.AuthorizationLevel);
+                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
+                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                    .ConfigureAwait(false);
+
+                return parameters.Get<int>("Result");
             }
         }
 
-        public async Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim, 
+        public async Task<int> AuthenticateAsync(IOTPClaim otpClaim, string jwtToken,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            List<string> results = new List<string>();
-            int affectedRows = 0;
-            try
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
             {
-                using (var connection = new SqlConnection(_options.SqlConnectionString))
-                {
-                    string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IAccount dbAccount = await connection.QueryFirstAsync<Account>(new CommandDefinition(
-                        query, 
-                        new{
-                            Username = otpClaim.Username,
-                            AuthorizationLevel = otpClaim.AuthorizationLevel
-                        }, 
-                        cancellationToken: cancellationToken
-                    )).ConfigureAwait(false);
-                    // Just make the decision, multiple calls or leak abstraction
-                    // Do as stored procedure, do all this work in the database, one request and
-                    // encapsulated, and faster - requires database to have concept of stored procedure
-                    // Would need to make a decision again if not using a relational DB
+                //Perform sql statement
+                var procedure = "[Authenticate]";
+                var parameters = new DynamicParameters();
+                parameters.Add("Username", otpClaim.Username);
+                parameters.Add("OTP", otpClaim.OTP);
+                parameters.Add("AuthorizationLevel", otpClaim.AuthorizationLevel);
+                parameters.Add("TimeCreated", otpClaim.TimeCreated);
+                parameters.Add("Token", jwtToken);
+                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
+                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                    .ConfigureAwait(false);
 
-                    // Service layer responsibility - interpret return of DAO
-                    // Service that Creates User - generic logic to be reusable
-                    //  DAO says "row added", Service says "User created"
+                return parameters.Get<int>("Result");
 
-                    if (dbAccount.Confirmed == false)
-                    {
-                        results.Add(_messageBank.ErrorMessages["notConfirmed"]);
-                        return results;
-                    }
-                    if (dbAccount.AccountStatus == false)
-                    {
-                        results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
-                        return results;
-                    }
-                    query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IOTPClaim dbOTPClaim = await connection.QueryFirstAsync<OTPClaim>(new CommandDefinition(
-                        query, 
-                        new{
-                            Username = otpClaim.Username,
-                            AuthorizationLevel = otpClaim.AuthorizationLevel
-                        }, 
-                        cancellationToken: cancellationToken
-                    )).ConfigureAwait(false);
-                    if (dbOTPClaim == null)
-                    {
-                        results.Add(_messageBank.ErrorMessages["accountNotFound"]);
-                        return results;
-                    }
-                    if (!otpClaim.OTP.Equals(dbOTPClaim.OTP))
-                    {
-                        int failCount = ++dbOTPClaim.FailCount;
-                        if (failCount >= 5)
-                        {
-                            query = "UPDATE Accounts SET AccountStatus = 0 WHERE " +
-                            "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                            affectedRows = await connection.ExecuteAsync(new CommandDefinition(
-                                query, 
-                                new{
-                                    Username = otpClaim.Username,
-                                    AuthorizationLevel = otpClaim.AuthorizationLevel,
-                                }, 
-                                cancellationToken: cancellationToken
-                            )).ConfigureAwait(false);
-                            if (affectedRows != 1)
-                            {
-                                results.Add(_messageBank.ErrorMessages["accountDisableFail"]);
-                                return results;
-                            }
-                            else
-                            {
-                                results.Add(_messageBank.ErrorMessages["tooManyFails"]);
-                                return results;
-                            }
-                        }
-                        query = "UPDATE OTPClaims SET FailCount = @FailCount WHERE " +
-                        "Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                        affectedRows = await connection.ExecuteAsync(new CommandDefinition(
-                            query, 
-                            new{
-                                Username = otpClaim.Username,
-                                AuthorizationLevel = otpClaim.AuthorizationLevel,
-                                FailCount = dbOTPClaim.FailCount++
-                            }, 
-                            cancellationToken: cancellationToken
-                        )).ConfigureAwait(false);
-                        if (affectedRows != 1)
-                        {
-                            results.Add(_messageBank.ErrorMessages["accountNotFound"]);
-                            return results;
-                        }
-                        else
-                        {
-                            results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
-                            return results;
-                        }
-                    }
-                    // This should be done at service level
-                    // (DAO only does a SQL operation then returns results)
-                    // If not related to DB, know it should not be in DAO
-                    else if ((otpClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
-                    {
-                        results.Add(_messageBank.SuccessMessages["generic"]);
-                        results.Add($"username:{otpClaim.Username},authorizationLevel:{otpClaim.AuthorizationLevel}");
-                        return results;
-                    }
-                    else
-                    {
-                        results.Add(_messageBank.ErrorMessages["otpExpired"]);
-                        return results;
-                    }
-                }
-            }
-            catch (OTPClaimCreationFailedException occfe)
-            {
-                results.Add(("400: Server: " + occfe.Message));
-                return results;
-            }
-            catch (InvalidOperationException ioe)
-            {
-                results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
-                return results;
-            }
-            catch (Exception ex)
-            {
-                results.Add("500: Database: " + ex.Message);
-                return results;
-            }
-        }
-        public async Task<string> VerifyAuthorizedAsync(string requiredAuthLevel, 
-            CancellationToken cancellationToken = default)
-        {
-            // In catch block in above layer, need to roll back if cancel requested
-            // check token before operation, if cancelled then dont do op
-            // check token after operation, if cancelled, then rollback (closer to DAO, easier it is to rollback)
-            // design decision to rollback or not
-            // if cancel at end, designate as either cancelled or undo situation
+                // Just make the decision, multiple calls or leak abstraction
+                // Do as stored procedure, do all this work in the database, one request and
+                // encapsulated, and faster - requires database to have concept of stored procedure
+                // Would need to make a decision again if not using a relational DB
 
-            cancellationToken.ThrowIfCancellationRequested();
-            try
-            {
-                string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
-                using (var connection = new SqlConnection(_options.SqlConnectionString))
-                {
-                    string query = "SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IAccount dbAccount = await connection.QueryFirstAsync<Account>(new CommandDefinition(
-                        query, 
-                        new{
-                            Username = Thread.CurrentPrincipal.Identity.Name,
-                            AuthorizationLevel = userAuthLevel
-                        }, 
-                        cancellationToken: cancellationToken
-                    )).ConfigureAwait(false);
-                    if (dbAccount.Confirmed == false)
-                    {
-                        return _messageBank.ErrorMessages["notConfirmed"];
-                    }
-                    else if (dbAccount.AccountStatus == false)
-                    {
-                        return _messageBank.ErrorMessages["notFoundOrEnabled"];
-                    }
-                    else
-                    {
-                        if (dbAccount.AuthorizationLevel.Equals("admin") ||
-                            dbAccount.AuthorizationLevel.Equals(requiredAuthLevel))
-                        {
-                            return _messageBank.SuccessMessages["generic"];
-                        }
-                        else
-                        {
-                            return _messageBank.ErrorMessages["notFoundOrAuthorized"];
-                        }
-                    }
-                }
-            }
-            catch (AccountCreationFailedException acfe)
-            {
-                return "400: Server: " + acfe.Message;
-                //return acfe.Message;
-            }
-            catch (InvalidOperationException ioe)
-            {
-                return _messageBank.ErrorMessages["notFoundOrAuthorized"];
-            }
-            catch (Exception ex)
-            {
-                return "500: Database: " + ex.Message;
+                // Service layer responsibility - interpret return of DAO
+                // Service that Creates User - generic logic to be reusable
+                //  DAO says "row added", Service says "User created"
+
+                // This should be done at service level
+                // (DAO only does a SQL operation then returns results)
+                // If not related to DB, know it should not be in DAO
+
+                // In catch block in above layer, need to roll back if cancel requested
+                // check token before operation, if cancelled then dont do op
+                // check token after operation, if cancelled, then rollback (closer to DAO, easier it is to rollback)
+                // design decision to rollback or not
+                // if cancel at end, designate as either cancelled or undo situation
             }
         }
 
-        public async Task<string> StoreOTPAsync(IOTPClaim otpClaim, 
+        public async Task<int> StoreOTPAsync(IAccount account, IOTPClaim otpClaim,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            try
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
             {
-                using (var connection = new SqlConnection(_options.SqlConnectionString))
-                {
-                    string query = "SELECT * FROM OTPClaims WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                    IOTPClaim dbOTPClaim = await connection.QueryFirstAsync<OTPClaim>(new CommandDefinition(
-                        query, 
-                        new{
-                            Username = otpClaim.Username,
-                            AuthorizationLevel = otpClaim.AuthorizationLevel
-                        }, 
-                        cancellationToken: cancellationToken
-                    )).ConfigureAwait(false);
-                    if (dbOTPClaim == null)
-                    {
-                        return _messageBank.ErrorMessages["notFound"];
-                    }
-                    else
-                    {
-                        int failCount = dbOTPClaim.FailCount;
-                        if (otpClaim.TimeCreated > dbOTPClaim.TimeCreated.AddDays(1))
-                        {
-                            failCount = 0;
-                        }
-                        query = "UPDATE OTPClaims SET OTP = @OTP,TimeCreated = @TimeCreated, " +
-                        "FailCount = @FailCount WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel";
-                        var affectedRows = await connection.ExecuteAsync(new CommandDefinition(
-                            query, 
-                            new{
-                                Username = otpClaim.Username,
-                                AuthorizationLevel = otpClaim.AuthorizationLevel,
-                                OTP = otpClaim.OTP,
-                                TimeCreated = otpClaim.TimeCreated,
-                                FailCount = otpClaim.FailCount
-                            }, 
-                            cancellationToken: cancellationToken
-                        )).ConfigureAwait(false);
-                        if (affectedRows != 1)
-                        {
-                            return _messageBank.ErrorMessages["otpFail"];
-                        }
-                        else
-                        {
-                            return _messageBank.SuccessMessages["generic"];
-                        }
-                    }
-                }
-            }
-            catch (OTPClaimCreationFailedException occfe)
-            {
-                return "400: Server: " + occfe.Message;
-                //return occfe.Message;
-            }
-            catch (InvalidOperationException ioe)
-            {
-                return _messageBank.ErrorMessages["notFoundOrEnabled"];
-            }
-            catch (Exception ex)
-            {
-                return "500: Database: " + ex.Message;
+                //Perform sql statement
+                var procedure = "[StoreOTP]";
+                var parameters = new DynamicParameters();
+                parameters.Add("Username", otpClaim.Username);
+                parameters.Add("AuthorizationLevel", otpClaim.AuthorizationLevel);
+                parameters.Add("Passphrase", account.Passphrase);
+                parameters.Add("OTP", otpClaim.OTP);
+                parameters.Add("TimeCreated", otpClaim.TimeCreated);
+                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
+                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                    .ConfigureAwait(false);
+
+                return parameters.Get<int>("Result");
             }
         }
 
@@ -1844,7 +1628,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         }
                         tags = tags.Intersect(results).ToList();
                     }
-                    
+
                     return Tuple.Create(tags, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
                 }
             }
@@ -1882,7 +1666,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         TagName = tagName
                     };
                     var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    
+
                     if(cancellationToken.IsCancellationRequested && affectedRows > 0)
                     {
                         //Rollback
@@ -1892,7 +1676,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         else
                             throw new OperationCanceledException();
                     }
-                    
+
                     if (affectedRows == 1)
                         return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
                     else
@@ -1978,7 +1762,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var procedure = "dbo.[GetTags]";
                     var value = new { };
                     List<string> results = new List<string>(await connection.QueryAsync<string>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
-                   
+
 
                     return Tuple.Create(results, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
                 }

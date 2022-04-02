@@ -32,24 +32,55 @@ namespace TrialByFire.Tresearch.Models.Implementations
             {
                 case Responses.generic:
                     return "200: Server: success";
-                case Responses.nodeTagNodeDoesNotExist:
-                    return "204: No nodes passed in";
-                case Responses.storeLogFail:
-                    return "503: Database: Failed to store the log.";
-                case Responses.badNameOrPass:
-                    return "400: Data: Invalid Username or Passphrase. Please try again.";
+
+                case Responses.verifySuccess:
+                    return "200: Server: Account Verification success.";
+                case Responses.notEnabled:
+                    return "401: Database: Account disabled. Perform account recovery or contact system admin.";
+                case Responses.notConfirmed:
+                    return "401: Database: Please confirm your account before attempting to login.";
+                case Responses.accountNotFound:
+                    return "500: Database: The Account was not found.";
+
+                case Responses.authenticationSuccess:
+                    return "200: Server: Authentication success.";
                 case Responses.badNameOrOTP:
                     return "400: Data: Invalid Username or OTP. Please try again.";
-                case Responses.badEmail:
-                    return "400: Data: Invalid Email. Please try again.";
                 case Responses.tooManyFails:
                     return "400: Database: Too many fails have occurred. The account has been disabled.";
                 case Responses.otpExpired:
                     return "400: Data: The OTP has expired. Please request a new one.";
+                case Responses.duplicateAccountData:
+                    return "500: Database: Duplicate Account found.";
+                case Responses.authenticationRollback:
+                    return "400: Database: Authentication rollback occurred.";
+
+                case Responses.storeOTPSuccess:
+                    return "200: Server: StoreOTP success.";
+                case Responses.otpClaimNotFound:
+                    return "500: Database: The OTP Claim was not found.";
+                case Responses.duplicateOTPClaimData:
+                    return "500: Database: Duplicate OTP Claim found.";
+                case Responses.storeOTPRollback:
+                    return "400: Database: StoreOTP rollback occurred.";
+
+                case Responses.logoutSuccess:
+                    return "200: Server: Logout success.";
+                case Responses.unknownRole:
+                    return "400: Server: Unknown role used.";
+                case Responses.logoutFail:
+                    return "503: Server: Logout failed.";
+                case Responses.logoutRollback:
+                    return "400: Database: Logout rollback occurred.";
+
+                case Responses.storeLogFail:
+                    return "503: Database: Failed to store the log.";
+                case Responses.badNameOrPass:
+                    return "400: Data: Invalid Username or Passphrase. Please try again.";
+                case Responses.badEmail:
+                    return "400: Data: Invalid Email. Please try again.";
                 case Responses.notAuthenticated:
                     return "401: Server: No active session found. Please login and try again.";
-                case Responses.notConfirmed:
-                    return "401: Database: Please confirm your account before attempting to login.";
                 case Responses.alreadyAuthenticated:
                     return "403: Server: Active session found. Please logout and try again.";
                 case Responses.notAuthorized:
@@ -61,9 +92,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.accountAlreadyUnconfirmed:
                     return "403: Server: Account is already unconfirmed";
                 case Responses.recoveryLinkLimitReached:
-                    return "429: Server: Account has reached limit of five attempts this month";
-                case Responses.accountNotFound:
-                    return "404: Database: The account was not found.";
+                    return "403: Server: Account has reached limit of five attempts this month";
                 case Responses.notFoundOrEnabled:
                     return "404: Database: The account was not found or it has been disabled.";
                 case Responses.confirmationLinkNotFound:
@@ -113,8 +142,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "503: Database: Failed to create OTP.";
                 case Responses.databaseFail:
                     return "503: Database: The database is down. Please try again later.";
-                case Responses.logoutFail:
-                    return "503: Server: Logout failed.";
                 case Responses.rollbackFailed:
                     return "504: Server rollback failed";
                 case Responses.createdNodesExists:
@@ -172,11 +199,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("recoveryLinkNotFound", "404: Database: The recovery link was not found");
             // 408 Errors - Server side timeout
             errorMessages.Add("cancellationRequested", "408: Server: Cancellation token requested cancellation.");
-            
+
 
             //503 Errors - Service Unavailable (Server unable to handle request)
             errorMessages.Add("cookieFail", "503: Server: Authentication Cookie creation failed.");
-            errorMessages.Add("sendEmailFail", "503: Server: Email failed to send.");            
+            errorMessages.Add("sendEmailFail", "503: Server: Email failed to send.");
             errorMessages.Add("accountDisableFail", "503: Database: Failed to disable the account.");
             errorMessages.Add("accountEnableFail", "503: Database: Failed to enable the account.");
             errorMessages.Add("recoveryLinkRemoveFail", "503: Database: Failed to remove recovery link.");
@@ -185,8 +212,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("databaseFail", "503: Database: The database is down. Please try again later.");
             errorMessages.Add("logoutFail", "503: Server: Logout failed.");
             errorMessages.Add("rollbackFailed", "504: Server rollback failed");
-            
-    
+
+
 
 
             errorMessages.Add("createdNodesExists", "Fail - Created Nodes Already Exists");

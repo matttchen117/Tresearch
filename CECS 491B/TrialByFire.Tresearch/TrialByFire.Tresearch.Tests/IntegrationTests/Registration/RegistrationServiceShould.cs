@@ -20,12 +20,12 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 
         [Theory]
         [InlineData("IntegrationRegistrationService1@gmail.com", "myRegisterPassword", "user", "200: Server: success")]
-        [InlineData("IntegrationRegistrationService2@gmail.com", "unFortunateName", "user", "200: Server: success")]        
+        [InlineData("IntegrationRegistrationService2@gmail.com", "unFortunateName", "user", "200: Server: success")]
         [InlineData("IntegrationRegistrationService3@gmail.com", "unFortunateName", "user", "409: Server: Account  already exists")]
         public async Task CreateTheAccountAsync(string email, string passphrase, string authorizationLevel, string statusCode)
         {
 
-            //Arrange 
+            //Arrange
             IAccount account = new Account(email, email, passphrase, "user", true, false);
             IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
             string expected = statusCode;

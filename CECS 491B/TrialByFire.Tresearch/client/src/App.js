@@ -3,8 +3,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
 
 import ConfirmationSent from './Features/Registration/ConfirmationSent';
-import LogoutForm from "./Features/Logout/LogoutForm";
-import LoginForm from "./Features/Login/Login";
+import InactiveLink from './Features/Registration/InactiveLink';
+import Logout from "./Features/Logout/Logout";
+import Login from "./Features/Login/Login";
 import Authentication from "./Features/Login/Authentication";
 import Register from "./Features/Registration/Registration";
 import Home from "./Pages/Home/Home";

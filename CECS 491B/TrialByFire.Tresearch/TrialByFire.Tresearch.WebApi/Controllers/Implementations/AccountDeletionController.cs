@@ -28,7 +28,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             string result = AccountDeletionManager.DeleteAccount();
             if (result.Equals("success"))
             {
-                //LogService.CreateLog(DateTime.Now, "Server", principal.Identity.Name, "Account Deletion Successful");
+                //LogService.CreateLog(DateTime.Now.ToUniversalTime(), "Server", principal.Identity.Name, "Account Deletion Successful");
                 return result;
             }
             //might need to create log here

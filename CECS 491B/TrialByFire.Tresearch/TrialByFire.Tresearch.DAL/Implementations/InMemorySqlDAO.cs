@@ -45,12 +45,26 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             throw new NotImplementedException();
         }*/
 
+        public async Task<int> LogoutAsync(IAccount account, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            int index = InMemoryDatabase.Accounts.IndexOf(account);
+            if(index != -1)
+            {
+                InMemoryDatabase.Accounts[index].Token = null;
+            }
+            if(InMemoryDatabase.Accounts[index].Token == null)
+            {
+                return 1;
+            }
+            return 0;
+        }
         public async Task<string> StoreLogAsync(ILog log, CancellationToken cancellationToken = default)
         {
             InMemoryDatabase.Logs.Add(log);
             return await _messageBank.GetMessage(IMessageBank.Responses.generic).ConfigureAwait(false);
         }
-        public async Task<string> VerifyAccountAsync(IAccount account, 
+        public async Task<int> VerifyAccountAsync(IAccount account, 
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -58,60 +72,32 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             if (index != -1)
             {
                 IAccount dbAccount = InMemoryDatabase.Accounts[index];
-                if ((account.Passphrase != null) && account.Passphrase.Equals(dbAccount.Passphrase))
+                if (dbAccount.Confirmed != false)
                 {
-                    if (dbAccount.Confirmed != false)
+                    if (dbAccount.AccountStatus != false)
                     {
-                        if (dbAccount.AccountStatus != false)
-                        {
-                            return _messageBank.SuccessMessages["generic"];
-                        }
-                        return _messageBank.ErrorMessages["notFoundOrEnabled"];
+                        return 1;
                     }
-                    return _messageBank.ErrorMessages["notConfirmed"];
+                    return 3;
                 }
-                return _messageBank.ErrorMessages["badNameOrPass"];
+                return 2;
             }
-            return _messageBank.ErrorMessages["notFoundOrEnabled"];
+            return 0;
         }
 
-        public async Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim, 
+        public async Task<int> AuthenticateAsync(IOTPClaim otpClaim, string jwtToken,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             List<string> results = new List<string>();
-            try
+            IAccount account = new Account(otpClaim.Username, otpClaim.AuthorizationLevel);
+            // Find account in db
+            int index = InMemoryDatabase.Accounts.IndexOf(account);
+            if (index >= 0)
             {
-                IAccount account = new Account(otpClaim.Username, otpClaim.AuthorizationLevel);
-                // Find account in db
-                int index = InMemoryDatabase.Accounts.IndexOf(account);
-                // no account found
-                if (index == -1)
-                {
-                    results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
-                    return results;
-                }
                 IAccount dbAccount = InMemoryDatabase.Accounts[index];
-                // check if confirmed
-                if (dbAccount.Confirmed == false)
-                {
-                    results.Add(_messageBank.ErrorMessages["notConfirmed"]);
-                    return results;
-                }
-                // check if enabled
-                if (dbAccount.AccountStatus == false)
-                {
-                    results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
-                    return results;
-                }
                 // find otp claim in db
                 index = InMemoryDatabase.OTPClaims.IndexOf(otpClaim);
-                // no account found
-                if (index == -1)
-                {
-                    results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
-                    return results;
-                }
                 IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[index];
                 // if otps do not match
                 if (!otpClaim.OTP.Equals(dbOTPClaim.OTP))
@@ -121,105 +107,55 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     // if fail count is 5 or more, disable account
                     if (InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount >= 5)
                     {
-                        InMemoryDatabase.Accounts[InMemoryDatabase.Accounts.IndexOf(account)].AccountStatus = false;
-                        results.Add(_messageBank.ErrorMessages["tooManyFails"]);
-                        return results;
+                        return 4;
                     }
                     else
                     {
-                        results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
-                        return results;
+                        return 3;
                     }
                 }
                 // check that the otp was entered within 2 minutes of being created
                 if ((otpClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
                 {
-                    results.Add(_messageBank.SuccessMessages["generic"]);
-                    results.Add($"username:{dbAccount.Username},authorizationLevel:{dbAccount.AuthorizationLevel}");
-                    return results;
+                    InMemoryDatabase.Accounts[index].Token = jwtToken;
+                    return 1;
                 }
                 else
                 {
-                    results.Add(_messageBank.ErrorMessages["otpExpired"]);
-                    return results;
+                    return 2;
                 }
             }
-            catch (AccountCreationFailedException acfe)
+            else
             {
-                results.Add(acfe.Message);
-                return results;
-            }
-            catch (OTPClaimCreationFailedException ocfe)
-            {
-                results.Add(ocfe.Message);
-                return results;
+                return 0;
             }
         }
 
-        public async Task<string> VerifyAuthorizedAsync(string requiredAuthLevel, 
+        public async Task<int> StoreOTPAsync(IAccount account, IOTPClaim otpClaim, 
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            try
-            {
-                string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
-                IAccount account = new Account(Thread.CurrentPrincipal.Identity.Name, userAuthLevel);
-                // Find account in db
-                int index = InMemoryDatabase.Accounts.IndexOf(account);
-                if (index != -1)
-                {
-                    IAccount dbAccount = InMemoryDatabase.Accounts[index];
-                    // check if confirmed
-                    if (dbAccount.Confirmed != false)
-                    {
-                        // check if enabled
-                        if (dbAccount.AccountStatus != false)
-                        {
-                            if (dbAccount.AuthorizationLevel.Equals("admin") || dbAccount.AuthorizationLevel.Equals(requiredAuthLevel))
-                            {
-                                return _messageBank.SuccessMessages["generic"];
-                            }
-                            else
-                            {
-                                return _messageBank.ErrorMessages["notAuthorized"];
-                            }
-                        }
-                        else
-                        {
-                            return _messageBank.ErrorMessages["notFoundOrEnabled"];
-                        }
-                    }
-                    else
-                    {
-                        return _messageBank.ErrorMessages["notConfirmed"];
-                    }
-                }
-                return _messageBank.ErrorMessages["notFoundOrEnabled"];
-            }
-            catch (AccountCreationFailedException acfe)
-            {
-                return acfe.Message;
-            }
-        }
-
-        public async Task<string> StoreOTPAsync(IOTPClaim otpClaim, 
-            CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            string result;
-            int index = InMemoryDatabase.OTPClaims.IndexOf(otpClaim);
+            int index = InMemoryDatabase.Accounts.IndexOf(account);
             if (index >= 0)
             {
-                IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)];
-                IAccount account = new Account(dbOTPClaim.Username, dbOTPClaim.AuthorizationLevel);
-                if (!(otpClaim.TimeCreated >= dbOTPClaim.TimeCreated.AddDays(1)))
+                if(account.Passphrase.Equals(InMemoryDatabase.Accounts[index].Passphrase))
                 {
-                    otpClaim.FailCount = dbOTPClaim.FailCount;
+                    index = InMemoryDatabase.OTPClaims.IndexOf(otpClaim);
+                    if (index >= 0)
+                    {
+                        IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)];
+                        if (!(otpClaim.TimeCreated >= dbOTPClaim.TimeCreated.AddDays(1)))
+                        {
+                            otpClaim.FailCount = dbOTPClaim.FailCount;
+                        }
+                        InMemoryDatabase.OTPClaims[index] = otpClaim;
+                        return 1;
+                    }
+                    return 3;
                 }
-                InMemoryDatabase.OTPClaims[index] = otpClaim;
-                return _messageBank.SuccessMessages["generic"];
+                return 2;
             }
-            return _messageBank.ErrorMessages["notFoundOrEnabled"];
+            return 0;
         }
 
 

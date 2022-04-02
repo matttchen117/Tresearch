@@ -11,7 +11,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public DailyLogin()
         {
-            loginDate = DateTime.Now;
+            loginDate = DateTime.Now.ToUniversalTime();
             loginCount = -1;
         }
 

@@ -33,7 +33,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
                 IAccount account = new Account(email, email, passphrase, authorizationLevel, true, false);
                 string createResult = await _sqlDAO.CreateAccountAsync(account, cancellationToken).ConfigureAwait(false);
-                
+
                 if(cancellationToken.IsCancellationRequested && createResult == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                 {
                     //Perform Rollback
@@ -48,7 +48,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch (Exception ex)
             {
-                return "500: Server: " + ex.Message; 
+                return "500: Server: " + ex.Message;
             }
         }
 

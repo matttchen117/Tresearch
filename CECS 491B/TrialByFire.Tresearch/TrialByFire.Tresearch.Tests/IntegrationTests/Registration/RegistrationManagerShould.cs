@@ -25,7 +25,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         [InlineData("trialbyfire.tresearch+IntRegMan2@gmail.com", "unFortunateName","user", "409: Server: Account  already exists")]
         public async Task RegisterTheUser(string email, string passphrase, string authorizationLevel, string statusCode)
         {
-            //Arrange 
+            //Arrange
             string baseUrl = "https://trialbyfiretresearch.azurewebsites.net/Register/Confirm?guid=";
             IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
             //Act

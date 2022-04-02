@@ -18,13 +18,12 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
+namespace TrialByFire.Tresearch.Tests.IntegrationTests.Logout
 {
-    public class InMemoryLogoutControllerShould : TestBaseClass 
+    public class LogoutControllerShould : TestBaseClass 
     {
-        public InMemoryLogoutControllerShould() : base(new string[] { })
+        public LogoutControllerShould() : base(new string[] { })
         {
-            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
             TestServices.AddScoped<ILogoutService, LogoutService>();
             TestServices.AddScoped<ILogoutManager, LogoutManager>();
             TestServices.AddScoped<ILogoutController, LogoutController>();
@@ -39,7 +38,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            if (!currentIdentity.Equals("guest"))
+            if(!currentIdentity.Equals("guest"))
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }

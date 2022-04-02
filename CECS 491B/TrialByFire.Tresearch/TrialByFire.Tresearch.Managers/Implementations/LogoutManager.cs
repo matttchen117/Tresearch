@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
+using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Services.Contracts;
 
@@ -20,14 +22,16 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
         private IMessageBank _messageBank { get; }
         private ILogoutService _logoutService { get; }
+        private BuildSettingsOptions _options { get; }
 
         public LogoutManager(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, 
-            ILogoutService logoutService)
+            ILogoutService logoutService, IOptionsSnapshot<BuildSettingsOptions> options)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
             _messageBank = messageBank;
             _logoutService = logoutService;
+            _options = options.Value;
         }
 
         //
@@ -37,20 +41,21 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         //
         // Returns:
         //     The result of the operation.
-        public async Task<string> Logout(CancellationToken cancellationToken)
+        public async Task<string> LogoutAsync(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if(Thread.CurrentPrincipal != null)
             {
                 try
                 {
-                    return await _logoutService.Logout(cancellationToken).ConfigureAwait(false);
+                    return await _logoutService.LogoutAsync(cancellationToken).ConfigureAwait(false);
                 }catch (Exception ex)
                 {
-                    return "400: Server: Logout Error Occurred";
+                    return _options.UncaughtExceptionMessage + ex.Message;
                 }
             }
-            return _messageBank.ErrorMessages["notAuthenticated"];
+            return await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated)
+                .ConfigureAwait(false);
         }
     }
 }

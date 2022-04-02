@@ -10,6 +10,8 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 {
     public interface ISqlDAO
     {
+
+        public Task<int> LogoutAsync(IAccount account, CancellationToken cancellationToken = default);
         public Task<string> StoreLogAsync(ILog log, CancellationToken cancellationToken = default);
         public Task<string> EnableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> DisableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
@@ -28,14 +30,11 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public Task<Tuple<IConfirmationLink, string>> GetConfirmationLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken));
 
         // Authentication
-        public Task<string> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken = default);
-        public Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim, CancellationToken cancellationToken = default);
-
-        // Authorization
-        public Task<string> VerifyAuthorizedAsync(string requiredAuthLevel, CancellationToken cancellation);
+        public Task<int> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken = default);
+        public Task<int> AuthenticateAsync(IOTPClaim otpClaim, string jwtToken, CancellationToken cancellationToken = default);
 
         // Request OTP
-        public Task<string> StoreOTPAsync(IOTPClaim otpClaim, CancellationToken cancellationToken = default);
+        public Task<int> StoreOTPAsync(IAccount account, IOTPClaim otpClaim, CancellationToken cancellationToken = default);
 
         // Usage Analysis Dashboard
         //public List<IKPI> LoadKPI(DateTime now);

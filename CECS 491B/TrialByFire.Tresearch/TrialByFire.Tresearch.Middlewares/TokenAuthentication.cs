@@ -7,15 +7,19 @@ using System.Text;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using TrialByFire.Tresearch.Models;
 
 namespace TrialByFire.Tresearch.Middlewares
 {
-    public class CookieAuthentication
+    public class TokenAuthentication
     {
         private RequestDelegate _next { get; }
-        public CookieAuthentication(RequestDelegate next)
+        private IOptionsMonitor<BuildSettingsOptions> _options { get; }
+        public TokenAuthentication(RequestDelegate next, IOptionsMonitor<BuildSettingsOptions> options)
         {
             _next = next;
+            _options = options;
         }
 
         public async Task InvokeAsync(HttpContext httpContext)
@@ -27,13 +31,21 @@ namespace TrialByFire.Tresearch.Middlewares
                 // The Thread.CurrentPrincipal could be running on a different thread from the logout
 
                 // This is not working, is always not null, but has no values
-                if (httpContext.User != null)
+
+                // Authorization is usually used default header - gets transferred all the time
+                // ALL hardcoding should be in config
+                // for custom headers, follow format X-{HeaderName}
+
+                if(httpContext.Request.Headers.ContainsKey(_options.CurrentValue.JWTHeaderName))
                 {
-                    if(httpContext.Request.Cookies["TresearchAuthenticationCookie"] != null)
+                    if(!httpContext.Request.Headers[_options.CurrentValue.JWTHeaderName].Equals("null"))
                     {
-                        string jwt = httpContext.Request.Cookies["TresearchAuthenticationCookie"];
+                        // if can modify permissions, always need to check db
+                        // for access, would need to verify db
+
+                        string jwt = httpContext.Request.Headers[_options.CurrentValue.JWTHeaderName];
                         var tokenHandler = new JwtSecurityTokenHandler();
-                        var keyValue = "akxhBSian218c9pJA98912n4010409AMKLUHqjn2njwaj";
+                        var keyValue = _options.CurrentValue.JWTTokenKey;
                         var key = Encoding.UTF8.GetBytes(keyValue);
                         tokenHandler.ValidateToken(jwt, new TokenValidationParameters
                         {
@@ -45,12 +57,13 @@ namespace TrialByFire.Tresearch.Middlewares
                         }, out SecurityToken validatedToken);
                         var jwtToken = (JwtSecurityToken)validatedToken;
                         //singleton
-                        IRoleIdentity roleIdentity = new RoleIdentity(true, jwtToken.Claims.First(x => x.Type == "username").Value,
-                             jwtToken.Claims.First(x => x.Type == "authorizationLevel").Value);
+                        IRoleIdentity roleIdentity = new RoleIdentity(true, jwtToken.Claims.First(x => x.Type
+                        == _options.CurrentValue.RoleIdentityIdentifier1).Value, jwtToken.Claims.First(x => x.Type ==
+                        _options.CurrentValue.RoleIdentityIdentifier2).Value);
                         IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
 
                         // possibly issue with this?
-                        httpContext.User = new ClaimsPrincipal(rolePrincipal);
+                        //httpContext.User = new ClaimsPrincipal(rolePrincipal);
                         Thread.CurrentPrincipal = rolePrincipal;
 
                         //a - object for all cross cutting concerns
@@ -67,7 +80,6 @@ namespace TrialByFire.Tresearch.Middlewares
 
                         //IServiceProvider serviceProvider = 
                         //httpContext.RequestServices.CreateScope(); // gives scope and access
-
                     }
                 }
             /*}

@@ -117,7 +117,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
                 linkCreated  = new RecoveryLink(account.Email, account.AuthorizationLevel, DateTime.Now, Guid.NewGuid());
                 result = await _sqlDAO.CreateRecoveryLinkAsync(linkCreated, cancellationToken);
-                
+
                 if (cancellationToken.IsCancellationRequested && result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
                 {
                     //Cancellation has been requested and changes have been made, need to roll back
@@ -134,7 +134,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 // No rollback necessary
                 throw;
-                
+
 
             }
             catch (Exception ex)
@@ -149,9 +149,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                
+
                 result = await _sqlDAO.EnableAccountAsync(email, authorizationLevel, cancellationToken);
-                
+
                 if(cancellationToken.IsCancellationRequested && result == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                 {
                     string rollbackResult = await _sqlDAO.DisableAccountAsync(email, authorizationLevel, cancellationToken);
@@ -174,7 +174,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
         public async Task<string> DisableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
-            
+
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();

@@ -13,6 +13,8 @@ using System.Security.Claims;
 using TrialByFire.Tresearch.Models.Implementations;
 using System.Security.Principal;
 using TrialByFire.Tresearch.Exceptions;
+using Microsoft.Extensions.Options;
+using TrialByFire.Tresearch.Models;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
@@ -22,14 +24,16 @@ namespace TrialByFire.Tresearch.Services.Implementations
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
+        private BuildSettingsOptions _options { get; }
         private IMessageBank _messageBank { get; }
         private string _payLoad { get; }
 
-        public AuthenticationService(ISqlDAO sqlDAO, ILogService logService,
-            IMessageBank messageBank)
+        public AuthenticationService(ISqlDAO sqlDAO, ILogService logService, 
+            IOptionsSnapshot<BuildSettingsOptions> options, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
+            _options = options.Value;
             _messageBank = messageBank;
             _payLoad = "";
         }
@@ -49,12 +53,64 @@ namespace TrialByFire.Tresearch.Services.Implementations
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            List<string> results = await _sqlDAO.AuthenticateAsync(otpClaim, cancellationToken).ConfigureAwait(false);
-            if (results[0].Equals(_messageBank.SuccessMessages["generic"]))
+            List<string> results = new List<string>();
+            try
             {
-                return CreateJwtToken(results[1]);
+                string jwtToken = await CreateJwtToken(otpClaim).ConfigureAwait(false);
+                int result = await _sqlDAO.AuthenticateAsync(otpClaim, jwtToken, cancellationToken).ConfigureAwait(false);
+                switch (result)
+                {
+                    case 0:
+                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.otpClaimNotFound).ConfigureAwait(false));
+                        break;
+                    case 1:
+                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.authenticationSuccess).ConfigureAwait(false));
+                        results.Add(jwtToken);
+                        break;
+                    case 2:
+                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.otpExpired)
+                            .ConfigureAwait(false));
+                        break;
+                    case 3:
+                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.badNameOrOTP)
+                            .ConfigureAwait(false));
+                        break;
+                    case 4:
+                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.tooManyFails)
+                            .ConfigureAwait(false));
+                        break;
+                    case 5:
+                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.duplicateOTPClaimData)
+                            .ConfigureAwait(false));
+                        break;
+                    case 6:
+                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.duplicateAccountData)
+                            .ConfigureAwait(false));
+                        break;
+                    case 7:
+                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.authenticationRollback)
+                            .ConfigureAwait(false));
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                };
+                return results;
             }
-            return results;
+            catch (OTPClaimCreationFailedException occfe)
+            {
+                results.Add(("400: Server: " + occfe.Message));
+                return results;
+            }
+            catch (InvalidOperationException ioe)
+            {
+                results.Add(await _messageBank.GetMessage(IMessageBank.Responses.notFoundOrEnabled).ConfigureAwait(false));
+                return results;
+            }
+            catch (Exception ex)
+            {
+                results.Add("500: Database: " + ex.Message);
+                return results;
+            }
         }
 
         // use microsoft built in jWT
@@ -71,50 +127,44 @@ namespace TrialByFire.Tresearch.Services.Implementations
         //
         // Returns:
         //     The result of the JWT creation process and the JWT token on success.
-        private List<string> CreateJwtToken(string payload)
+        private async Task<string> CreateJwtToken(IOTPClaim otpClaim, CancellationToken cancellation 
+            = default)
         {
-            List<string> results = new List<string>();
-
             // break payload into parts
             Dictionary<string, string> claimValuePairs = new Dictionary<string, string>();
-            string[] claimValue = payload.Split(",");
-            foreach (string cV in claimValue)
-            {
-                string[] pair = cV.Split(":");
-                claimValuePairs.Add(pair[0], pair[1]);
-            }
+            claimValuePairs.Add(_options.RoleIdentityIdentifier1, otpClaim.Username);
+            claimValuePairs.Add(_options.RoleIdentityIdentifier2, otpClaim.AuthorizationLevel);
 
             // create identity to place into JWT
             try
             {
-                IRoleIdentity roleIdentity = new RoleIdentity(true, claimValuePairs["username"], claimValuePairs["authorizationLevel"]);
+                IRoleIdentity roleIdentity = new RoleIdentity(true, claimValuePairs[_options.RoleIdentityIdentifier1], 
+                    claimValuePairs[_options.RoleIdentityIdentifier2]);
                 //create jwt and set values
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var keyValue = "akxhBSian218c9pJA98912n4010409AMKLUHqjn2njwaj";
+                var keyValue = _options.JWTTokenKey;
                 var key = Encoding.UTF8.GetBytes(keyValue);
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    Subject = new ClaimsIdentity(new[] { new Claim("username", claimValuePairs["username"]), 
-                        new Claim("authorizationLevel", claimValuePairs["authorizationLevel"]) }),
+                    Subject = new ClaimsIdentity(new[] { new Claim(_options.RoleIdentityIdentifier1, 
+                    claimValuePairs[_options.RoleIdentityIdentifier1]), 
+                        new Claim(_options.RoleIdentityIdentifier2, 
+                        claimValuePairs[_options.RoleIdentityIdentifier2]) }),
                     Expires = DateTime.UtcNow.AddDays(7),
                     IssuedAt = DateTime.UtcNow,
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
                 var token = tokenHandler.CreateToken(tokenDescriptor);
-                results.Add(_messageBank.SuccessMessages["generic"]);
-                results.Add(tokenHandler.WriteToken(token));
+                return tokenHandler.WriteToken(token);
             }
             catch (RoleIdentityCreationFailedException ricf)
             {
-                results.Add(ricf.Message);
-                return results;
+                return ricf.Message;
             }
             catch (ArgumentNullException ane)
             {
-                results.Add("Server: " + ane.Message);
-                return results;
+                return "401: Server: " + ane.Message;
             }
-            return results;
         }
     }
 }

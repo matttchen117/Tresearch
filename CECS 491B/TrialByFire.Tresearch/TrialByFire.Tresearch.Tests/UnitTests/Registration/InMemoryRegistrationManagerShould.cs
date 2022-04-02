@@ -15,7 +15,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
     public class InMemoryRegistrationManagerShould : TestBaseClass
     {
 
-        
+
         public InMemoryRegistrationManagerShould() : base(new string[] { })
         {
             TestBuilder.Services.AddScoped<IMailService, MailService>();
@@ -48,7 +48,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         [InlineData("", "")]
         public async Task ConfirmAccount(string guid, string statusCode)
         {
-         
+
             IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expected = statusCode;

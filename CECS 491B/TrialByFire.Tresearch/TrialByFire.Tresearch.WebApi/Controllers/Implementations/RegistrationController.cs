@@ -53,7 +53,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             }
         }
 
-        
+
         [HttpPost("confirm")]
         public async Task<IActionResult> ConfirmAccountAsync(string guid)
         {

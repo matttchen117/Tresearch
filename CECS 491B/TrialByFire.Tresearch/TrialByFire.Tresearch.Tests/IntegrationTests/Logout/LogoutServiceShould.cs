@@ -13,13 +13,12 @@ using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Services.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
+namespace TrialByFire.Tresearch.Tests.IntegrationTests.Logout
 {
     public class LogoutServiceShould : TestBaseClass
     {
         public LogoutServiceShould() : base(new string[] { })
         {
-            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
             TestServices.AddScoped<ILogoutService, LogoutService>();
             TestProvider = TestServices.BuildServiceProvider();
         }
