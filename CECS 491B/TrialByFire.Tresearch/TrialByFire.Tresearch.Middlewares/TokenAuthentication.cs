@@ -38,47 +38,49 @@ namespace TrialByFire.Tresearch.Middlewares
 
                 if(httpContext.Request.Headers.ContainsKey(_options.CurrentValue.JWTHeaderName))
                 {
-                    // if can modify permissions, always need to check db
-                    // for access, would need to verify db
-
-                    string jwt = httpContext.Request.Headers[_options.CurrentValue.JWTHeaderName];
-                    var tokenHandler = new JwtSecurityTokenHandler();
-                    var keyValue = _options.CurrentValue.JWTTokenKey;
-                    var key = Encoding.UTF8.GetBytes(keyValue);
-                    tokenHandler.ValidateToken(jwt, new TokenValidationParameters
+                    if(!httpContext.Request.Headers[_options.CurrentValue.JWTHeaderName].Equals("null"))
                     {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ClockSkew = TimeSpan.Zero
-                    }, out SecurityToken validatedToken);
-                    var jwtToken = (JwtSecurityToken)validatedToken;
-                    //singleton
-                    IRoleIdentity roleIdentity = new RoleIdentity(true, jwtToken.Claims.First(x => x.Type 
-                    == _options.CurrentValue.RoleIdentityIdentifier1).Value, jwtToken.Claims.First(x => x.Type == 
-                    _options.CurrentValue.RoleIdentityIdentifier2).Value);
-                    IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+                        // if can modify permissions, always need to check db
+                        // for access, would need to verify db
 
-                    // possibly issue with this?
-                    //httpContext.User = new ClaimsPrincipal(rolePrincipal);
-                    Thread.CurrentPrincipal = rolePrincipal;
+                        string jwt = httpContext.Request.Headers[_options.CurrentValue.JWTHeaderName];
+                        var tokenHandler = new JwtSecurityTokenHandler();
+                        var keyValue = _options.CurrentValue.JWTTokenKey;
+                        var key = Encoding.UTF8.GetBytes(keyValue);
+                        tokenHandler.ValidateToken(jwt, new TokenValidationParameters
+                        {
+                            ValidateIssuerSigningKey = true,
+                            IssuerSigningKey = new SymmetricSecurityKey(key),
+                            ValidateIssuer = false,
+                            ValidateAudience = false,
+                            ClockSkew = TimeSpan.Zero
+                        }, out SecurityToken validatedToken);
+                        var jwtToken = (JwtSecurityToken)validatedToken;
+                        //singleton
+                        IRoleIdentity roleIdentity = new RoleIdentity(true, jwtToken.Claims.First(x => x.Type
+                        == _options.CurrentValue.RoleIdentityIdentifier1).Value, jwtToken.Claims.First(x => x.Type ==
+                        _options.CurrentValue.RoleIdentityIdentifier2).Value);
+                        IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
 
-                    //a - object for all cross cutting concerns
-                    //b - set current thread to be the principal Thread.CurrentPrincipal, do this way
-                    // need to set user (ClaimPrincipal here too, put data from RolePrincipal into
-                    // new ClaimPrincipal object)
-                    // httpContext.User = ClaimPrincipal(RolePrincipal)
+                        // possibly issue with this?
+                        //httpContext.User = new ClaimsPrincipal(rolePrincipal);
+                        Thread.CurrentPrincipal = rolePrincipal;
 
-                    // Visual Studio Magazine
-                    // Can check archives for blog on how to do a
+                        //a - object for all cross cutting concerns
+                        //b - set current thread to be the principal Thread.CurrentPrincipal, do this way
+                        // need to set user (ClaimPrincipal here too, put data from RolePrincipal into
+                        // new ClaimPrincipal object)
+                        // httpContext.User = ClaimPrincipal(RolePrincipal)
 
-                    // Otherwise look at UseAuthentication module/source code
-                    // Refer to see what need to do to create correct dependencies
+                        // Visual Studio Magazine
+                        // Can check archives for blog on how to do a
 
-                    //IServiceProvider serviceProvider = 
-                    //httpContext.RequestServices.CreateScope(); // gives scope and access
+                        // Otherwise look at UseAuthentication module/source code
+                        // Refer to see what need to do to create correct dependencies
 
+                        //IServiceProvider serviceProvider = 
+                        //httpContext.RequestServices.CreateScope(); // gives scope and access
+                    }
                 }
             /*}
             catch (Exception ex)

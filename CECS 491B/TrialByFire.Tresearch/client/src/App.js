@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
 import ConfirmationSent from './Features/Registration/ConfirmationSent';
 import InactiveLink from './Features/Registration/InactiveLink';
-import LogoutForm from "./Features/Logout/LogoutForm";
-import LoginForm from "./Features/Login/Login";
+import Logout from "./Features/Logout/Logout";
+import Login from "./Features/Login/Login";
 import Authentication from "./Features/Login/Authentication";
 import Register from "./Features/Registration/Registration";
 import Home from "./Pages/Home/Home";
@@ -16,9 +16,9 @@ function App() {
       <Router>
         <header></header>
         <Routes>
-          <Route path="/Login/Login" element = {<LoginForm />}/>
+          <Route path="/Login/Login" element = {<Login />}/>
           <Route path="/Login/Authentication" element = {<Authentication />}/>
-          <Route path="/Logout/Logout" element = {<LogoutForm />}/>
+          <Route path="/Logout/Logout" element = {<Logout />}/>
           
           <Route path="/Registration/ConfirmationSent" element = {<ConfirmationSent />}/>
           <Route path="/Registration/InactiveLink" element = {<InactiveLink />}/>
