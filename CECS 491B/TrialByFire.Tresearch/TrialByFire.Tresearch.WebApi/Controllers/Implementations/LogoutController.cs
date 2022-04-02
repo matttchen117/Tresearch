@@ -57,7 +57,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             try
             {
                 result = await _logoutManager.LogoutAsync(_cancellationTokenSource.Token).ConfigureAwait(false);
-                if (result.Equals(_messageBank.GetMessage(IMessageBank.Responses.logoutSuccess))
+                if (result.Equals(_messageBank.GetMessage(IMessageBank.Responses.logoutSuccess)))
                 {
                     if(_options.Environment.Equals("Test"))
                     {

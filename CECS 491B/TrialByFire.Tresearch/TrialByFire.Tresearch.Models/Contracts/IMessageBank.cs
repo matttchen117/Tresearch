@@ -24,14 +24,17 @@ namespace TrialByFire.Tresearch.Models.Contracts
             tooManyFails,
             badNameOrOTP,
             duplicateAccountData,
+            authenticationRollback,
 
             storeOTPSuccess,
             otpClaimNotFound,
             duplicateOTPClaimData,
+            storeOTPRollback,
 
             logoutSuccess,
             unknownRole,
             logoutFail,
+            logoutRollback,
 
             badNameOrPass,
             badEmail,

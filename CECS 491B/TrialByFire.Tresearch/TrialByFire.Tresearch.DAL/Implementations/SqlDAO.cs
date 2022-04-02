@@ -25,28 +25,16 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             cancellationToken.ThrowIfCancellationRequested();
             using (var connection = new SqlConnection(_options.SqlConnectionString))
             {
-                using(SqlTransaction transaction = connection.BeginTransaction())
-                {
-                    try
-                    {
-                        await transaction.SaveAsync("LogoutSave").ConfigureAwait(false);
-                        //Perform sql statement
-                        var procedure = "[Logout]";
-                        var parameters = new DynamicParameters();
-                        parameters.Add("Username", account.Username);
-                        parameters.Add("AuthorizationLevel", account.AuthorizationLevel);
-                        parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                        var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
-                            commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
-                            .ConfigureAwait(false);
-                        await transaction.CommitAsync().ConfigureAwait(false);
-                        return parameters.Get<int>("Result");
-                    }catch(Exception ex)
-                    {
-                        await transaction.RollbackAsync().ConfigureAwait(false);
-                        throw;
-                    }
-                }
+                //Perform sql statement
+                var procedure = "[Logout]";
+                var parameters = new DynamicParameters();
+                parameters.Add("Username", account.Username);
+                parameters.Add("AuthorizationLevel", account.AuthorizationLevel);
+                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
+                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                    .ConfigureAwait(false);
+                return parameters.Get<int>("Result");
             }
         }
         public async Task<string> StoreLogAsync(ILog log, CancellationToken cancellationToken = default)

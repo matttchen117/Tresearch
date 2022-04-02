@@ -41,7 +41,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         //
         // Returns:
         //     The result of the operation.
-        public async Task<string> LogoutAsync(CancellationToken cancellationToken)
+        public async Task<string> LogoutAsync(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if(Thread.CurrentPrincipal != null)

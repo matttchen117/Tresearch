@@ -52,6 +52,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "400: Data: The OTP has expired. Please request a new one.";
                 case Responses.duplicateAccountData:
                     return "500: Database: Duplicate Account found.";
+                case Responses.authenticationRollback:
+                    return "400: Database: Authentication rollback occurred.";
 
                 case Responses.storeOTPSuccess:
                     return "200: Server: StoreOTP success.";
@@ -59,6 +61,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "500: Database: The OTP Claim was not found.";
                 case Responses.duplicateOTPClaimData:
                     return "500: Database: Duplicate OTP Claim found.";
+                case Responses.storeOTPRollback:
+                    return "400: Database: StoreOTP rollback occurred.";
 
                 case Responses.logoutSuccess:
                     return "200: Server: Logout success.";
@@ -66,6 +70,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "400: Server: Unknown role used.";
                 case Responses.logoutFail:
                     return "503: Server: Logout failed.";
+                case Responses.logoutRollback:
+                    return "400: Database: Logout rollback occurred.";
 
                 case Responses.storeLogFail:
                     return "503: Database: Failed to store the log.";

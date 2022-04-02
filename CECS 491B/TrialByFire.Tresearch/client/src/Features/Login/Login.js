@@ -32,7 +32,7 @@ const Login = () => {
         }
 
         if(!regexPassphrase.test(this.state.passphrase)){
-            this.setState({errorMessage: 'Your password can only contain: \nblank space\na-z\nA-Z\n.,@!'});
+            this.setState({errorMessage: 'Invalid passphrase'});
             return false;
         }
         return true; 
@@ -73,8 +73,8 @@ const Login = () => {
 
     const onSubmit = (event) => {
         event.preventDefault();
-        console.log(validateLoginForm())
-        if(validateLoginForm())
+        console.log(handleInput())
+        if(handleInput())
         {
             setError(false)
             {verified ? 

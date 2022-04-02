@@ -15,11 +15,11 @@ namespace TrialByFire.Tresearch.Middlewares
     public class TokenAuthentication
     {
         private RequestDelegate _next { get; }
-        private BuildSettingsOptions _options { get; }
-        public TokenAuthentication(RequestDelegate next, IOptionsSnapshot<BuildSettingsOptions> options)
+        private IOptionsMonitor<BuildSettingsOptions> _options { get; }
+        public TokenAuthentication(RequestDelegate next, IOptionsMonitor<BuildSettingsOptions> options)
         {
             _next = next;
-            _options = options.Value;
+            _options = options;
         }
 
         public async Task InvokeAsync(HttpContext httpContext)
@@ -36,14 +36,14 @@ namespace TrialByFire.Tresearch.Middlewares
                 // ALL hardcoding should be in config
                 // for custom headers, follow format X-{HeaderName}
 
-                if(httpContext.Request.Headers.ContainsKey(_options.JWTHeaderName))
+                if(httpContext.Request.Headers.ContainsKey(_options.CurrentValue.JWTHeaderName))
                 {
                     // if can modify permissions, always need to check db
                     // for access, would need to verify db
 
-                    string jwt = httpContext.Request.Headers[_options.JWTHeaderName];
+                    string jwt = httpContext.Request.Headers[_options.CurrentValue.JWTHeaderName];
                     var tokenHandler = new JwtSecurityTokenHandler();
-                    var keyValue = _options.JWTTokenKey;
+                    var keyValue = _options.CurrentValue.JWTTokenKey;
                     var key = Encoding.UTF8.GetBytes(keyValue);
                     tokenHandler.ValidateToken(jwt, new TokenValidationParameters
                     {
@@ -56,8 +56,8 @@ namespace TrialByFire.Tresearch.Middlewares
                     var jwtToken = (JwtSecurityToken)validatedToken;
                     //singleton
                     IRoleIdentity roleIdentity = new RoleIdentity(true, jwtToken.Claims.First(x => x.Type 
-                    == _options.RoleIdentityIdentifier1).Value, jwtToken.Claims.First(x => x.Type == 
-                    _options.RoleIdentityIdentifier2).Value);
+                    == _options.CurrentValue.RoleIdentityIdentifier1).Value, jwtToken.Claims.First(x => x.Type == 
+                    _options.CurrentValue.RoleIdentityIdentifier2).Value);
                     IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
 
                     // possibly issue with this?

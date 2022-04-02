@@ -37,7 +37,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         //
         // Returns:
         //     The result of the logout process.
-        public async Task<string> LogoutAsync(CancellationToken cancellationToken)
+        public async Task<string> LogoutAsync(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
@@ -68,6 +68,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
                             .ConfigureAwait(false);
                     case 2:
                         return await _messageBank.GetMessage(IMessageBank.Responses.duplicateAccountData)
+                            .ConfigureAwait(false);
+                    case 3:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.logoutRollback)
                             .ConfigureAwait(false);
                     default:
                         throw new NotImplementedException();

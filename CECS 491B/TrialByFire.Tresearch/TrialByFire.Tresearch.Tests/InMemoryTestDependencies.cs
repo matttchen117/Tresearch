@@ -17,7 +17,7 @@ namespace TrialByFire.Tresearch.Tests
     public class InMemoryTestDependencies
     {
         private BuildSettingsOptions _buildSettingsOptions { get; }
-        public IOptions<BuildSettingsOptions> BuildSettingsOptions { get; }
+        //public IOptionsSnapshot<BuildSettingsOptions> BuildSettingsOptions { get; }
         public ISqlDAO SqlDAO { get; }
         public ILogService LogService { get; }
         public IMessageBank MessageBank { get; }
@@ -28,13 +28,13 @@ namespace TrialByFire.Tresearch.Tests
 
         public InMemoryTestDependencies()
         {
-            _buildSettingsOptions = new BuildSettingsOptions()
+            /*_buildSettingsOptions = new BuildSettingsOptions()
             {
                 Environment = "Test",
                 SqlConnectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true",
                 SendGridAPIKey = ""
-            };
-            BuildSettingsOptions = Options.Create(_buildSettingsOptions) as IOptions<BuildSettingsOptions>;
+            };*/
+            //BuildSettingsOptions = Options.Create(_buildSettingsOptions) as IOptionsSnapshot<BuildSettingsOptions>;
             SqlDAO = new InMemorySqlDAO();
             LogService = new LogService(SqlDAO);
             MessageBank = new MessageBank();

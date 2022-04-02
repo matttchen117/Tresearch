@@ -56,6 +56,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
                         return await _messageBank.GetMessage(IMessageBank.Responses.otpClaimNotFound).ConfigureAwait(false);
                     case 4:
                         return await _messageBank.GetMessage(IMessageBank.Responses.duplicateOTPClaimData).ConfigureAwait(false);
+                    case 5:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.storeOTPRollback)
+                            .ConfigureAwait(false);
                     default:
                         throw new NotImplementedException();
                 };

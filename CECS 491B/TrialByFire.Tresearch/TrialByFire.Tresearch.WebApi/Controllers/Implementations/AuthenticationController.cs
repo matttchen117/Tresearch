@@ -30,7 +30,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             /*TimeSpan.FromSeconds(5)*/);
 
         public AuthenticationController(ISqlDAO sqlDAO, ILogService logService, 
-            IAuthenticationManager authenticationManager, IMessageBank messageBank, IOptions<BuildSettingsOptions> buildSettingsOptions)
+            IAuthenticationManager authenticationManager, IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> buildSettingsOptions)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
