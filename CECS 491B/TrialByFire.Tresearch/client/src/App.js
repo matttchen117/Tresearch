@@ -23,7 +23,8 @@ class App extends React.Component {
     super(props);
     this.state = {
       confirmationGuid: Confirm,
-      recoveryConfirm: RecoveryConfirm
+      recoveryConfirm: RecoveryConfirm,
+      nodeID: Tagger
     };
   }
 
@@ -47,7 +48,7 @@ class App extends React.Component {
             <Route path = "/Recover/Enable/:recoveryConfirm" element = {<RecoveryConfirm guid={this.state.recoveryConfirm}/>}/>
             <Route path = "/Recover/AccountEnabled" element = {<AccountEnabled/>} />
             <Route path = "/Admin/TagDashboard" element = {<TagDashboard/>} />
-            <Route path = "/Tagger" element = {<Tagger/>}/>
+            <Route path = "/Tagger/:nodeID" element = {<Tagger/>} exact/>
           </Routes>
         </Router>
       </div>

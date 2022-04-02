@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, {useState, useEffect } from "react";
 import Select from 'react-select';
+import { useParams} from "react-router-dom";
 
 import Tag from "../../UI/Tag/Tag";
 import "./Tagger.css";
@@ -14,10 +15,12 @@ function Tagger() {
   const nullSearch = null;  
 
   //Array of nodes this views context
-  const nodeData = [1,2];
+  const [nodeData, setNodeData] =  useState([]);
+
+  const {nodeID} = useParams();
 
   /**
-   * Fetches tag(s) that the current node has tagged
+   * Fetches tag(s) that the current node has tagged. Returns an 
    */
   const fetchNodeTags = () => {
     async function fetchData() {
@@ -26,8 +29,8 @@ function Tagger() {
         //Set tag array
         setTagData(request.data);
     }
-    fetchData();
-    return tagData;
+    //Run async fetch data function
+    fetchData();  
   }
 
   const fetchTagOptions = () => {
@@ -42,7 +45,6 @@ function Tagger() {
       setTagOptions(options);
     }
     fetchData();
-    return tagOptions;
   }
 
   const handleSelection = (e) =>{
@@ -69,16 +71,13 @@ function Tagger() {
         }))
   }
 
-  useEffect(() => {
+  const setNode = (
+    useEffect(() => {
+      GetNodeIDs();
       fetchNodeTags();
       fetchTagOptions();
-      //Refresh after every 3 seconds
-      const interval = setInterval(() => {
-        fetchNodeTags();                   //post data and get list of strings to make tags
-        fetchTagOptions();
-      }, 1000);
-      return () => clearInterval(interval);
-  }, [tagData], [tagOptions]) //tracks if state has been changed or not
+    }, [])
+  )
 
   const renderTags = (
     <div className="tagger-container">
@@ -96,9 +95,36 @@ function Tagger() {
       <Select options = {tagOptions} onChange = {handleSelection} value = {nullSearch}/>
     </div>
   )
+
+  const GetNodeIDs = () => {
+    var nodes = nodeID;
+    var tempNodes = [];
+    let count = nodeID.split('&').length-1;
+    if(count > 0){
+      //Multiple ids has been passed in
+      for(let i = 0; i <= count; i++){
+          var id = nodes.substring(nodeID.indexOf("=") + 1, nodes.indexOf("&"));
+          if(i == count){
+            //Last iteration does not have &
+             id = nodes.split('=')[1];
+          } else{
+            //Remove first iteration of nodeID
+            nodes = nodes.slice(nodes.indexOf('&')+1).trim();
+          }
+          tempNodes.push(id);
+      }
+    } else{
+    //Only one id has been passed in
+      var id = nodes.split('=')[1];
+      tempNodes.push(id); 
+    }
+    console.log('test');
+    setNodeData(tempNodes);
+  };
   
   return (
     <div className="tagger-wrapper">
+      {<setNode/>}
         <div className = "tagger-table-wrapper">
             {renderTags}
         </div>
