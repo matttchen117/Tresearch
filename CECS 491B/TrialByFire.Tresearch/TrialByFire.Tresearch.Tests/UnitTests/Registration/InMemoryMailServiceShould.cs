@@ -11,8 +11,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public InMemoryMailServiceShould() : base(new string[] { })
         {
 
-            TestBuilder.Services.AddScoped<IMailService, MailService>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<IMailService, MailService>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -21,7 +21,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public async Task SendEmail(string email, string url)
         {
             //Arrange
-            IMailService mailService = TestApp.Services.GetService<IMailService>();
+            IMailService mailService = TestProvider.GetService<IMailService>();
             
             //Act
             string result = await mailService.SendConfirmationAsync(email, url).ConfigureAwait(false);

@@ -19,11 +19,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
     {
         public RegistrationControllerShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<IMailService, MailService>();
-            TestBuilder.Services.AddScoped<IRegistrationService, RegistrationService>();
-            TestBuilder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
-            TestBuilder.Services.AddScoped<IRegistrationController, RegistrationController>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<IMailService, MailService>();
+            TestServices.AddScoped<IRegistrationService, RegistrationService>();
+            TestServices.AddScoped<IRegistrationManager, RegistrationManager>();
+            TestServices.AddScoped<IRegistrationController, RegistrationController>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -36,7 +36,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
             splitExpectation = statusCode.Split(":");
             ObjectResult expectedResult = new ObjectResult(splitExpectation[2])
             { StatusCode = Convert.ToInt32(splitExpectation[0]) };
-            IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
+            IRegistrationController registrationController = TestProvider.GetService<IRegistrationController>();
 
             //Act
             IActionResult results = await registrationController.RegisterAccountAsync(email, passphrase).ConfigureAwait(false); 
@@ -58,7 +58,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
             splitExpectation = statusCode.Split(":");
             ObjectResult expectedResult = new ObjectResult(splitExpectation[2])
             { StatusCode = Convert.ToInt32(splitExpectation[0]) };
-            IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
+            IRegistrationController registrationController = TestProvider.GetService<IRegistrationController>();
 
             //Act
             IActionResult results = await registrationController.ConfirmAccountAsync(guid).ConfigureAwait(false);

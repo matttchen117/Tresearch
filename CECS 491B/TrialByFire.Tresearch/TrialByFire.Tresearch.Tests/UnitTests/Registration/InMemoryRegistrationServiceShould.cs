@@ -14,9 +14,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
     {
         public InMemoryRegistrationServiceShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<IRegistrationService, RegistrationService>();
-            TestBuilder.Services.AddScoped<ISqlDAO, InMemorySqlDAO>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<IRegistrationService, RegistrationService>();
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
 
@@ -26,7 +26,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public async Task ConfirmTheAccount(string email, string authorizationLevel, string statusCode)
         {
             //Arrange
-            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
+            IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expected = statusCode;
 
@@ -44,7 +44,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         {
             //Arrange
             //Arrange
-            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
+            IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expected = statusCode;
 
@@ -62,7 +62,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public async Task CreateTheLink(string email,  string authorizationLevel, string statusCode)
         {
             //Arrange
-            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
+            IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expected = statusCode;
 

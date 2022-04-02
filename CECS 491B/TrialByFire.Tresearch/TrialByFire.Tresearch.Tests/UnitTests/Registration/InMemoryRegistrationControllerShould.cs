@@ -18,12 +18,12 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
     {
         public InMemoryRegistrationControllerShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<IMailService, MailService>();
-            TestBuilder.Services.AddScoped<ISqlDAO, SqlDAO>();
-            TestBuilder.Services.AddScoped<IRegistrationService, RegistrationService>();
-            TestBuilder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
-            TestBuilder.Services.AddScoped<IRegistrationController, RegistrationController>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<IMailService, MailService>();
+            TestServices.AddScoped<ISqlDAO, SqlDAO>();
+            TestServices.AddScoped<IRegistrationService, RegistrationService>();
+            TestServices.AddScoped<IRegistrationManager, RegistrationManager>();
+            TestServices.AddScoped<IRegistrationController, RegistrationController>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -32,7 +32,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public async Task RegisterTheUser(string email, string passphrase)
         {
             //Arrange
-            IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
+            IRegistrationController registrationController = TestProvider.GetService<IRegistrationController>();
             
             //Act
             IActionResult results = await registrationController.RegisterAccountAsync(email, passphrase).ConfigureAwait(false);
@@ -48,7 +48,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public async Task confirmAccount(string guid, string statusCode)
         {
             //Arrange
-            IRegistrationController registrationController = TestApp.Services.GetService<IRegistrationController>();
+            IRegistrationController registrationController = TestProvider.GetService<IRegistrationController>();
   
             //Act
             IActionResult results = await registrationController.ConfirmAccountAsync(guid);

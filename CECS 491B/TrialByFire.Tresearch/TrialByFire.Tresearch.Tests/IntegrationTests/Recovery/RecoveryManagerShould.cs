@@ -13,10 +13,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
     {
         public RecoveryManagerShould() : base(new string[]{ }) 
         {
-            TestBuilder.Services.AddScoped<IMailService, MailService>();
-            TestBuilder.Services.AddScoped<IRecoveryService, RecoveryService>();
-            TestBuilder.Services.AddScoped<IRecoveryManager, RecoveryManager>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<IMailService, MailService>();
+            TestServices.AddScoped<IRecoveryService, RecoveryService>();
+            TestServices.AddScoped<IRecoveryManager, RecoveryManager>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -24,7 +24,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         public async Task SendRecoveryEmailAsync(string username,string authorizationLevel, string baseUrl, string statusCode)
         {
             //Arrange
-            IRecoveryManager recoveryManager = TestApp.Services.GetService<IRecoveryManager>();
+            IRecoveryManager recoveryManager = TestProvider.GetService<IRecoveryManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expected = statusCode;
 
@@ -40,7 +40,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         public async Task EnableAccountAsync(string username, string authorizationLevel, string url, string statusCode)
         {
             //Arrange
-            IRecoveryManager recoveryManager = TestApp.Services.GetService<IRecoveryManager>();
+            IRecoveryManager recoveryManager = TestProvider.GetService<IRecoveryManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expected = statusCode;
 

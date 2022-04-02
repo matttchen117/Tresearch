@@ -14,8 +14,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         public RecoveryServiceShould() : base(new string[] { })
         {
             
-            TestBuilder.Services.AddScoped<IRecoveryService, RecoveryService>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<IRecoveryService, RecoveryService>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -25,7 +25,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         public async Task GetAccountAsync(string username, string statusCode, string authorizationLevel)
         {
             //Arrange
-            IRecoveryService recoveryService = TestApp.Services.GetService<IRecoveryService>();
+            IRecoveryService recoveryService = TestProvider.GetService<IRecoveryService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expectedStatusCode = statusCode;
             string expectedUsername = username;
@@ -48,7 +48,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         public async Task CreateALinkAsync(string username, string passphrase, string statusCode, string authorizationLevel, bool accountStatus, bool confirmed)
         {
             //Arrange
-            IRecoveryService recoveryService = TestApp.Services.GetService<IRecoveryService>();
+            IRecoveryService recoveryService = TestProvider.GetService<IRecoveryService>();
             IAccount account = new Account(username, username, passphrase, authorizationLevel, accountStatus, confirmed);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expectedAccount = username;
@@ -71,8 +71,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         public async Task RemoveALinkAsync(string username, string authorizationLevel, string statusCode, bool create)
         {
             //Arrange
-            IRecoveryService recoveryService = TestApp.Services.GetService<IRecoveryService>();
-            ISqlDAO sqlDAO = TestApp.Services.GetService<ISqlDAO>();
+            IRecoveryService recoveryService = TestProvider.GetService<IRecoveryService>();
+            ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             IRecoveryLink toRemove = new RecoveryLink(username, authorizationLevel, DateTime.Now, Guid.NewGuid());
             if(create)
@@ -92,11 +92,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         public async Task GetRecoveryLinkAsync(string username, string authorizationLevel, string statusCode, bool create)
         {
             //Arrange
-            IRecoveryService recoveryService = TestApp.Services.GetService<IRecoveryService>();
+            IRecoveryService recoveryService = TestProvider.GetService<IRecoveryService>();
             Guid toFindGuid = Guid.NewGuid();
             string toFindGuidString = toFindGuid.ToString();
             IRecoveryLink toFind = new RecoveryLink(username, authorizationLevel, DateTime.Now, toFindGuid);
-            ISqlDAO sqlDAO = TestApp.Services.GetService<ISqlDAO>();
+            ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
             if(create)
                 await sqlDAO.CreateRecoveryLinkAsync(toFind);
             string expectedStatusCode = statusCode;
@@ -117,7 +117,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         public async Task IncrementTotalLinksAsync(string username, string  authorizationLevel, string statusCode)
         {
             //Arrange
-            IRecoveryService recoveryService = TestApp.Services.GetService<IRecoveryService>();
+            IRecoveryService recoveryService = TestProvider.GetService<IRecoveryService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expected = statusCode;
 
@@ -135,7 +135,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         public async Task DecrementTotalLinksAsync(string username, string authorizationLevel, string statusCode)
         {
             //Arrange
-            IRecoveryService recoveryService = TestApp.Services.GetService<IRecoveryService>();
+            IRecoveryService recoveryService = TestProvider.GetService<IRecoveryService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expected = statusCode;
 
@@ -153,7 +153,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         public async Task GetTotalLinksAsync(string username, string authorizationLevel, int count)
         {
             //Arrange
-            IRecoveryService recoveryService = TestApp.Services.GetService<IRecoveryService>();
+            IRecoveryService recoveryService = TestProvider.GetService<IRecoveryService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             int expected = count;
 
@@ -171,7 +171,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         public async Task EnableAccountAsync(string email, string authorizationLevel, string statusCode)
         {
             //Arrange
-            IRecoveryService recoveryService = TestApp.Services.GetService<IRecoveryService>();
+            IRecoveryService recoveryService = TestProvider.GetService<IRecoveryService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expected = statusCode;
 
@@ -189,7 +189,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         public async Task DsiableAccountAsync(string email, string authorizationLevel, string statusCode)
         {
             //Arrange
-            IRecoveryService recoveryService = TestApp.Services.GetService<IRecoveryService>();
+            IRecoveryService recoveryService = TestProvider.GetService<IRecoveryService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expected = statusCode;
 

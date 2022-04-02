@@ -13,8 +13,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
     {
         public RegistrationServiceShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<IRegistrationService, RegistrationService>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<IRegistrationService, RegistrationService>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
 
@@ -27,7 +27,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 
             //Arrange
             IAccount account = new Account(email, email, passphrase, "user", true, false);
-            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
+            IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
             string expected = statusCode;
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
@@ -46,7 +46,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public async Task CreateTheLinkAsync(string email, string authorizationLevel, string statusCode)
         {
             //Arrange
-            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
+            IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
             //Act
@@ -63,7 +63,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public async Task ConfirmTheUserAsync(string email, string authenticationLevel, string statusCode)
         {
             //Arrange
-            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
+            IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expected = statusCode;
 
@@ -80,7 +80,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public async Task GetConfirmationLink(string guid, string statusCode)
         {
             //Arrange
-            IRegistrationService registrationService = TestApp.Services.GetService<IRegistrationService>();
+            IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expected = statusCode;
 

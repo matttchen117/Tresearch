@@ -14,11 +14,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
     {
         public RecoveryControllerShould() : base(new string[] { }) 
         {
-            TestBuilder.Services.AddScoped<IMailService, MailService>();
-            TestBuilder.Services.AddScoped<IRecoveryService, RecoveryService>();
-            TestBuilder.Services.AddScoped<IRecoveryManager, RecoveryManager>();
-            TestBuilder.Services.AddScoped<IRecoveryController, RecoveryController>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<IMailService, MailService>();
+            TestServices.AddScoped<IRecoveryService, RecoveryService>();
+            TestServices.AddScoped<IRecoveryManager, RecoveryManager>();
+            TestServices.AddScoped<IRecoveryController, RecoveryController>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
         [Theory]
         [InlineData("pammypoor+IntRecoveryController1@gmail.com", "user", "200: Server: success")]
@@ -29,7 +29,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
             splitExpectation = statusCode.Split(":");
             ObjectResult expectedResult = new ObjectResult(splitExpectation[2])
             { StatusCode = Convert.ToInt32(splitExpectation[0]) };
-            IRecoveryController recoveryController = TestApp.Services.GetService<IRecoveryController>();
+            IRecoveryController recoveryController = TestProvider.GetService<IRecoveryController>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
             //Act
@@ -50,7 +50,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
             splitExpectation = statusCode.Split(":");
             ObjectResult expectedResult = new ObjectResult(splitExpectation[2])
             { StatusCode = Convert.ToInt32(splitExpectation[0]) };
-            IRecoveryController recoveryController = TestApp.Services.GetService<IRecoveryController>();
+            IRecoveryController recoveryController = TestProvider.GetService<IRecoveryController>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
             //Act

@@ -9,8 +9,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
     {
         public TagServiceShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<ITagService, TagService>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<ITagService, TagService>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -18,7 +18,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         public async Task AddTagToNodeAsync(string tag, string statusCode, List<long> nodeIDs)
         {
             //Arrange
-            ITagService recoveryService = TestApp.Services.GetService<ITagService>();
+            ITagService recoveryService = TestProvider.GetService<ITagService>();
 
             //Act
             string result = await recoveryService.AddTagToNodesAsync(nodeIDs, tag).ConfigureAwait(false);
@@ -45,7 +45,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         public async Task RemoveTagFromNodeAsync(string tag, string statusCode, List<long> nodeIDs)
         {
             //Arrange
-            ITagService recoveryService = TestApp.Services.GetService<ITagService>();
+            ITagService recoveryService = TestProvider.GetService<ITagService>();
 
             //Act
             string result = await recoveryService.RemoveTagFromNodesAsync(nodeIDs, tag).ConfigureAwait(false);
@@ -72,7 +72,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         public async Task GetTagsFromNodesAsync(string statusCode, List<long> nodeIDs, List<string> tags)
         {
             //arrange
-            ITagService recoveryService = TestApp.Services.GetService<ITagService>();
+            ITagService recoveryService = TestProvider.GetService<ITagService>();
 
             //Act
             Tuple<List<string>, string> results = await recoveryService.GetNodeTagsAsync(nodeIDs).ConfigureAwait(false);
@@ -108,7 +108,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         public async Task CreateTagAsync(string tagName, string statusCode)
         {
             //Arrange
-            ITagService recoveryService = TestApp.Services.GetService<ITagService>();
+            ITagService recoveryService = TestProvider.GetService<ITagService>();
 
             //Act
             string result = await recoveryService.CreateTagAsync(tagName).ConfigureAwait(false);
@@ -124,7 +124,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         public async Task RemoveTagAsync(string tagName, string statusCode)
         {
             //Arrange
-            ITagService recoveryService = TestApp.Services.GetService<ITagService>();
+            ITagService recoveryService = TestProvider.GetService<ITagService>();
 
             //Act
             string result = await recoveryService.RemoveTagAsync(tagName).ConfigureAwait(false);
@@ -137,7 +137,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         public async Task GetTagsAsync()
         {
             //Arrange
-            ITagService recoveryService = TestApp.Services.GetService<ITagService>();
+            ITagService recoveryService = TestProvider.GetService<ITagService>();
             string statusCode = "200: Server: success";
 
             //Act

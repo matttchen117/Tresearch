@@ -14,8 +14,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
     {
         public MailServiceShould() :base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<IMailService, MailService>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<IMailService, MailService>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -23,7 +23,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public async Task SendEmail(string email, string url, string statusCode)
         {
             //Arrange
-            IMailService mailService = TestApp.Services.GetService<IMailService>();
+            IMailService mailService = TestProvider.GetService<IMailService>();
             string expected = statusCode;
             //Act
             string result = await mailService.SendConfirmationAsync(email, url).ConfigureAwait(false);

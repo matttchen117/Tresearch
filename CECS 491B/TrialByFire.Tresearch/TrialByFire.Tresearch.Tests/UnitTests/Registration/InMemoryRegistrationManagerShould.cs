@@ -18,11 +18,11 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
 
         public InMemoryRegistrationManagerShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<IMailService, MailService>();
-            TestBuilder.Services.AddScoped<ISqlDAO, InMemorySqlDAO>();
-            TestBuilder.Services.AddScoped<IRegistrationService, RegistrationService>();
-            TestBuilder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<IMailService, MailService>();
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestServices.AddScoped<IRegistrationService, RegistrationService>();
+            TestServices.AddScoped<IRegistrationManager, RegistrationManager>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -32,7 +32,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public async Task CreateTheUserAccount(string email, string passphrase, string authorizationLevel)
         {
             //Arrange
-            IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
+            IRegistrationManager registrationManager = TestProvider.GetService<IRegistrationManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string baseUrl = "https://trialbyfiretresearch.azurewebsites.net/Register/Confirm?guid=";
 
@@ -49,7 +49,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public async Task ConfirmAccount(string guid, string statusCode)
         {
 
-            IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
+            IRegistrationManager registrationManager = TestProvider.GetService<IRegistrationManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expected = statusCode;
 

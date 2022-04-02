@@ -15,10 +15,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
     {
         public RegistrationManagerShould() : base(new string[] { })
         {
-            TestBuilder.Services.AddScoped<IMailService, MailService>();
-            TestBuilder.Services.AddScoped<IRegistrationService, RegistrationService>();
-            TestBuilder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
-            TestApp = TestBuilder.Build();
+            TestServices.AddScoped<IMailService, MailService>();
+            TestServices.AddScoped<IRegistrationService, RegistrationService>();
+            TestServices.AddScoped<IRegistrationManager, RegistrationManager>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
         [Theory]
         [InlineData("trialbyfire.tresearch+IntRegMan1@gmail.com", "myPassword","user", "200: Server: success")]
@@ -27,7 +27,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         {
             //Arrange
             string baseUrl = "https://trialbyfiretresearch.azurewebsites.net/Register/Confirm?guid=";
-            IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
+            IRegistrationManager registrationManager = TestProvider.GetService<IRegistrationManager>();
             //Act
             string results = await registrationManager.CreateAndSendConfirmationAsync(email, passphrase, authorizationLevel, baseUrl).ConfigureAwait(false);
 
@@ -42,7 +42,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public async Task ConfirmTheUser(string username, string guid, string statusCode)
         {
             //Arrange
-            IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
+            IRegistrationManager registrationManager = TestProvider.GetService<IRegistrationManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expected = statusCode;
 
@@ -60,7 +60,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public void checkLinkInValidity(int minusHours)
         {
             //Arrange
-            IRegistrationManager registrationManager = TestApp.Services.GetService<IRegistrationManager>();
+            IRegistrationManager registrationManager = TestProvider.GetService<IRegistrationManager>();
             IConfirmationLink confirmationLink = new ConfirmationLink("test@gmail.com", "user", Guid.NewGuid(), DateTime.Now.AddHours(minusHours));
             bool expected;
             if (minusHours <= -24)
