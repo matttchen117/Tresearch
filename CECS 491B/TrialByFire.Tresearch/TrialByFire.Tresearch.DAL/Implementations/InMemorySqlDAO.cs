@@ -229,82 +229,184 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
 
 
-        public List<string> CreateAccount(IAccount account)
+        public async Task<string> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> results = new List<string>();
-            int numberOfConfirmationsInDatabase = InMemoryDatabase.Accounts.Count();
-            InMemoryDatabase.Accounts.Add(account);
-            int affectedRows = InMemoryDatabase.Accounts.Count() - numberOfConfirmationsInDatabase;
-
-            if (affectedRows == 1)
-                results.Add("Success - Account added to in memomry database");
-            else
-                results.Add("Failed - Could not add account to in memory database");
-
-            return results;
-
-        }
-
-        public IAccount GetUnconfirmedAccount(string email)
-        {
-            List<string> results = new List<string>();
-            for (int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
-                if (email.Equals(InMemoryDatabase.Accounts[i].Email))
-                    return InMemoryDatabase.Accounts[i];
-            return null;
-
-        }
-
-        public List<string> RemoveConfirmationLink(IConfirmationLink _confirmationLink)
-        {
-            List<string> results = new List<string>();
-            int numberOfConfirmationsInDatabase = InMemoryDatabase.ConfirmationLinks.Count();
-            InMemoryDatabase.ConfirmationLinks.Remove(_confirmationLink);
-            int affectedRows = InMemoryDatabase.ConfirmationLinks.Count() - numberOfConfirmationsInDatabase;
-            if (affectedRows == -1)
-                results.Add("Success - Confirmation link removed from in memory database");
-            else
-                results.Add("Failed - Confirmation link could not be removed from in memory database");
-            return results;
-        }
-
-        public List<string> ConfirmAccount(IAccount account)
-        {
-            List<string> results = new List<string>();
-            int indexOfAccount = InMemoryDatabase.Accounts.IndexOf(account);
-            if (indexOfAccount == -1)
-                results.Add("Failed - Account not found in database");
-            else
+            try
             {
-                InMemoryDatabase.Accounts[indexOfAccount].Confirmed = true;
-                results.Add("Success - Account confirmed in database");
+                cancellationToken.ThrowIfCancellationRequested();
+                if (InMemoryDatabase.Accounts.Contains(account))
+                    return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;
+
+                InMemoryDatabase.Accounts.Add(account);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    InMemoryDatabase.Accounts.Remove(account);
+                    throw new OperationCanceledException();
+                }
+                
+                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
             }
-            return results;
-        }
-        public List<string> CreateConfirmationLink(IConfirmationLink _confirmationlink)
-        {
-            List<string> results = new List<string>();
+            catch (OperationCanceledException)
+            {
+                // No rollback necessary
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return _messageBank.GetMessage(IMessageBank.Responses.accountCreateFail).Result;
+            }
 
-            int numberOfConfirmationsInDatabase = InMemoryDatabase.ConfirmationLinks.Count();
-            InMemoryDatabase.ConfirmationLinks.Add(_confirmationlink);
-            int affectedRows = InMemoryDatabase.ConfirmationLinks.Count() - numberOfConfirmationsInDatabase;
-
-            if (affectedRows == 1)
-                results.Add("Success - Confirmation link added to in memomry database");
-            else
-                results.Add("Failed - Could not add confirmation link to in memory database");
-
-            return results;
         }
 
-        public IConfirmationLink GetConfirmationLink(string url)
+        public async Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
-            string guidString = url.Substring(url.LastIndexOf('=') + 1);
-            Guid guid = new Guid(guidString);
-            for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count(); i++)
-                if (guid.Equals(InMemoryDatabase.ConfirmationLinks[i].UniqueIdentifier))
-                    return InMemoryDatabase.ConfirmationLinks[i];
-            return null;
+            IAccount nullAccount = null;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                for (int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
+                    if (email.Equals(InMemoryDatabase.Accounts[i].Email))
+                        return Tuple.Create(InMemoryDatabase.Accounts[i], _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
+                if (cancellationToken.IsCancellationRequested)
+                    throw new OperationCanceledException();
+                return Tuple.Create(nullAccount, _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result);
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return Tuple.Create(nullAccount, "500: Database: " + ex.Message);
+            }
+        }
+
+        public async Task<string> RemoveConfirmationLinkAsync(IConfirmationLink confirmationLink, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                InMemoryDatabase.ConfirmationLinks.Remove(confirmationLink);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    string rollbackResult = await CreateConfirmationLinkAsync(confirmationLink);
+                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                    else
+                        throw new OperationCanceledException();
+                }
+                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+
+        public async Task<string> UpdateAccountToUnconfirmedAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                for (int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
+                {
+                    if (email == InMemoryDatabase.Accounts[i].Email && authorizationLevel == InMemoryDatabase.Accounts[i].AuthorizationLevel)
+                    {
+                        InMemoryDatabase.Accounts[i].Confirmed = false;
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    }
+                }
+                return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+        public async Task<string> UpdateAccountToConfirmedAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                for(int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
+                {
+                    if (email == InMemoryDatabase.Accounts[i].Email && authorizationLevel == InMemoryDatabase.Accounts[i].AuthorizationLevel)
+                    {
+                        InMemoryDatabase.Accounts[i].Confirmed = true;
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    }
+                }
+                return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+        public async Task<string> CreateConfirmationLinkAsync(IConfirmationLink confirmationLink, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                InMemoryDatabase.ConfirmationLinks.Add(confirmationLink);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    string rollbackResult = await RemoveConfirmationLinkAsync(confirmationLink);
+                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                    else
+                        throw new OperationCanceledException();
+                }
+                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+
+        public async Task<Tuple<IConfirmationLink, string>> GetConfirmationLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            IConfirmationLink nullLink = null;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                string guidString = guid.Substring(guid.LastIndexOf('=') + 1);
+                Guid toFind = new Guid(guidString);
+                for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count(); i++)
+                    if (toFind.Equals(InMemoryDatabase.ConfirmationLinks[i].GUIDLink))
+                        return Tuple.Create(InMemoryDatabase.ConfirmationLinks[i], _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
+                if (cancellationToken.IsCancellationRequested)
+                    throw new OperationCanceledException();
+                return Tuple.Create(nullLink, _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkNotFound).Result);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(nullLink, "500: Database: " + ex.Message);
+            }
         }
 
         /*public List<IKPI> LoadKPI(DateTime now)
@@ -719,16 +821,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return viewList;
         }
 
-        public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(Guid guid, CancellationToken cancellationToken)
+        public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(string guid, CancellationToken cancellationToken)
         {
             IRecoveryLink nullLink = null;
             return Tuple.Create(nullLink, "200");
-        }
-
-        public async Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authenticationLevel, CancellationToken cancellationToken)
-        {
-            IAccount nullAccount = null;
-            return Tuple.Create(nullAccount, "500");
         }
 
         public async Task<Tuple<int, string>> GetTotalRecoveryLinksAsync(string email, string authorizationLevel, CancellationToken cancellationToken)
@@ -759,6 +855,51 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public async Task<string> CreateRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken))
         {
             return "500";
+        }
+
+        public async Task<string> IncrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "500";
+        }
+
+        public async Task<string> DecrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "500";
+        }
+
+        public async Task<int> GetRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return -1;
+        }
+
+        public async Task<string> AddTagToNodesAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
+
+        public async Task<string> RemoveTagFromNodeAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
+
+        public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Tuple.Create(new List<string>(), "200");
+        }
+
+        public async Task<string> CreateTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
+
+        public async Task<Tuple<List<string>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Tuple.Create(new List<string>(), "200");
+        }
+
+        public async Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
         }
     }
 }

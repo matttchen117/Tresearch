@@ -12,130 +12,156 @@ namespace TrialByFire.Tresearch.Services.Implementations
 {
     public class RegistrationService : IRegistrationService
     {
-        public ISqlDAO _sqlDAO { get; set; }
-        public ILogService _logService { get; set; }
+        private ISqlDAO _sqlDAO { get; set; }
+        private ILogService _logService { get; set; }
+        private IMessageBank _messageBank { get; set; }
 
         private int linkActivationLimit = 24;
 
-        public RegistrationService(ISqlDAO _sqlDAO, ILogService _logService)
+        public RegistrationService(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank)
         {
-            this._sqlDAO = _sqlDAO;
-            this._logService = _logService;
+            _sqlDAO = sqlDAO;
+            _logService = logService;
+            _messageBank = messageBank;
         }
 
 
-        public List<string> CreatePreConfirmedAccount(IAccount account)
+        public async Task<string> CreateAccountAsync(string email, string passphrase, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> results = new List<string>();
             try
             {
-                results.AddRange(_sqlDAO.CreateAccount(account));
+                cancellationToken.ThrowIfCancellationRequested();
+                IAccount account = new Account(email, email, passphrase, authorizationLevel, true, false);
+                string createResult = await _sqlDAO.CreateAccountAsync(account, cancellationToken).ConfigureAwait(false);
 
-                if (results.Last()[0] == 'S')
-                    results.Add("Success - Register Service created account");
-                else
-                    results.Add("Failed - Register service unable to create account");
-            }
-            catch (Exception ex)
-            {
-                results.Add("Failed - " + ex);
-            }
-            return results;
-        }
-
-        public List<string> CreateConfirmation(string email, string baseUrl)
-        {
-            Guid activationGuid;
-            List<string> results = new List<string>();
-            string linkUrl;
-            try
-            {
-                activationGuid = Guid.NewGuid();
-                linkUrl = $"{baseUrl}{activationGuid}";
-                results.Add(linkUrl);
-                IConfirmationLink _confirmationLink = new ConfirmationLink(email, activationGuid, DateTime.Now.ToUniversalTime());
-
-                if (_confirmationLink == null)
+                if(cancellationToken.IsCancellationRequested && createResult == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                 {
-                    results.Add("Failed - Account service could not create confirmation link");
-                    return results;
+                    //Perform Rollback
                 }
 
-
-                results.AddRange(_sqlDAO.CreateConfirmationLink(_confirmationLink));
-
-
-                if (results.Last()[0] == 'S')
-                    results.Add("Success - Account service created confirmation link");
-                else
-                    results.Add("Failed - Account service could not create confirmation link");
+                return createResult;
+            }
+            catch (OperationCanceledException)
+            {
+                //Nothing to rollback
+                throw;
             }
             catch (Exception ex)
             {
-                results.Add("Failed - Account service" + ex);
-
+                return "500: Server: " + ex.Message;
             }
-            return results;
         }
 
-        public List<string> ConfirmAccount(IAccount account)
+        public async Task<Tuple<IConfirmationLink, string>> CreateConfirmationAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> results = new List<string>();
+            IConfirmationLink nullLink = null;
             try
             {
-                results = _sqlDAO.ConfirmAccount(account);
-                if (results.Last()[0] == 'S')
-                    results.Add("Success - Account service confirmed account");
-                else
-                    results.Add("Failed - Account service could not confirm account");
-            }
-            catch
-            {
-                results.Add("Failed - Account service could not confirm account");
-            }
-            return results;
-        }
+                Guid guid = Guid.NewGuid();
+                IConfirmationLink confirmationLink = new ConfirmationLink(email, authorizationLevel, guid, DateTime.Now);
 
-        public IConfirmationLink GetConfirmationLink(string url)
-        {
-            IConfirmationLink _confirmationLink = _sqlDAO.GetConfirmationLink(url);
-            return _confirmationLink;
-        }
+                string result = await _sqlDAO.CreateConfirmationLinkAsync(confirmationLink, cancellationToken).ConfigureAwait(false);
 
-        public List<string> RemoveConfirmationLink(IConfirmationLink _confirmationLink)
-        {
-            List<string> results = new List<string>();
-            try
+                if (result != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                    return Tuple.Create(nullLink, result);
+
+                if(cancellationToken.IsCancellationRequested && result == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                {
+                    string rollbackResult = await _sqlDAO.RemoveConfirmationLinkAsync(confirmationLink);
+                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return Tuple.Create(nullLink, _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result);
+                    else
+                        throw new OperationCanceledException();
+                }
+                return Tuple.Create(confirmationLink, result);
+            }
+            catch (OperationCanceledException)
             {
-                results.AddRange(_sqlDAO.RemoveConfirmationLink(_confirmationLink));
-                if (results.Last()[0] == 'S')
-                    results.Add("Success - Registration service created confirmation link");
-                else
-                    results.Add("Failed - Registration service could not create confirmation link");
+                //Rollback taken care of
+                throw;
             }
             catch (Exception ex)
             {
-                results.Add("Failed - Account service " + ex);
+                return Tuple.Create(nullLink, "500: Server: " + ex.Message);
+
             }
-            return results;
         }
 
-        public IAccount GetUserFromConfirmationLink(IConfirmationLink link)
+        public async Task<string> ConfirmAccountAsync(string username, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
-            IAccount account = new Account();
-
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
+                string results = await _sqlDAO.UpdateAccountToConfirmedAsync(username, authorizationLevel, cancellationToken);
+                if(cancellationToken.IsCancellationRequested && results == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                {
+                    //Implement rollback
+                    string rollbackResults = await _sqlDAO.UpdateAccountToUnconfirmedAsync(username, authorizationLevel, cancellationToken).ConfigureAwait(false);
+                    if (rollbackResults != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                    else
+                        throw new OperationCanceledException();
+                }
+                return results;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary (or taken care of)
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return "500: Server: " + ex.Message;
+            }
+        }
 
-                account = _sqlDAO.GetUnconfirmedAccount(link.Username);
+        public async Task<Tuple<IConfirmationLink, string>> GetConfirmationLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            IConfirmationLink nullLink = null;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                Tuple<IConfirmationLink, string> confirmationLink = await _sqlDAO.GetConfirmationLinkAsync(guid).ConfigureAwait(false);
+                if (cancellationToken.IsCancellationRequested)
+                    throw new OperationCanceledException();
+                return confirmationLink;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return Tuple.Create(nullLink, "500: Server: " + ex.Message);
+            }
+        }
+
+        public async Task<string> RemoveConfirmationLinkAsync(IConfirmationLink confirmationLink, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                string result = await _sqlDAO.RemoveConfirmationLinkAsync(confirmationLink, cancellationToken).ConfigureAwait(false);
+                if(cancellationToken.IsCancellationRequested && result != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                {
+                    string rollbackResult = await _sqlDAO.CreateConfirmationLinkAsync(confirmationLink).ConfigureAwait(false);
+                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                    else
+                        throw new OperationCanceledException();
+                }
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
             }
             catch (Exception ex)
             {
-
+                return "500: Server: " + ex.Message;
             }
-            return account;
         }
-
-
     }
 }

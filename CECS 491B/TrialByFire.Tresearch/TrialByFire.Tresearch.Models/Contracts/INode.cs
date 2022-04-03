@@ -12,7 +12,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
 
         string summary { get; set; }
 
-        string mode { get; set; }
+        bool visibility { get; set; }
 
         string accountOwner { get; set; }
     }
