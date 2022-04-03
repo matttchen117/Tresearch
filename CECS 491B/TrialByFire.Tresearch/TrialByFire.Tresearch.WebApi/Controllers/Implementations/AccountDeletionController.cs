@@ -17,29 +17,25 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
     public class AccountDeletionController : Controller, IAccountDeletionController
     {
 
-
         private CancellationTokenSource CancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-
-        private BuildSettingsOptions BuildSettingsOptions { get; }
-        private ISqlDAO SqlDAO { get; }
-        private ILogService LogService { get; }
-
+        private BuildSettingsOptions _options { get; }
+        private ISqlDAO _sqlDAO { get; }
+        private ILogService _logService { get; }
         private IMessageBank _messageBank { get; }
-        private IAccountDeletionManager AccountDeletionManager { get; }
-
-        private BuildSettingsOptions _buildSettingsOptions { get; }
+        private IAccountDeletionManager _accountDeletionManager { get; }
 
 
 
 
 
-        public AccountDeletionController(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, IAccountDeletionManager accountDeletionManager, IOptionsSnapshot<BuildSettingsOptions>  buildSettingsOptions)
+
+        public AccountDeletionController(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, IAccountDeletionManager accountDeletionManager, IOptionsSnapshot<BuildSettingsOptions>  options)
         {
-            this.SqlDAO = sqlDAO;
-            this.LogService = logService;
-            this._messageBank = messageBank;
-            this.AccountDeletionManager = accountDeletionManager;
-            this.BuildSettingsOptions = buildSettingsOptions.Value;
+            _sqlDAO = sqlDAO;
+            _logService = logService;
+            _messageBank = messageBank;
+            _accountDeletionManager = accountDeletionManager;
+            _options = options.Value;
         }
 
         /// <summary>
@@ -52,38 +48,35 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         public async Task<IActionResult> DeleteAccountAsync()
         {
 
-            string[] split;
-            string result = "";
-
             try
             {
-                result = await AccountDeletionManager.DeleteAccountAsync(CancellationTokenSource.Token).ConfigureAwait(false);
+                string[] split;
+                string result = "";
 
-                if (result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic)))
+
+                result = await _accountDeletionManager.DeleteAccountAsync(CancellationTokenSource.Token).ConfigureAwait(false);
+
+                if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false)))
                 {
-                    if (_buildSettingsOptions.Environment.Equals("Test"))
+
+                    if (_options.Environment.Equals("Test"))
                     {
+
                         split = result.Split(": ");
                         return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                     }
 
+                    split = result.Split(": ");
+                    return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
+
                 }
 
                 split = result.Split(": ");
-                return new OkObjectResult(StatusCode(Convert.ToInt32(split[0]), split[2]));
-
-
-            }
-
-
-            //an exception is happening here
-            /*
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
 
             }
-            */
+
+
 
             catch (OperationCanceledException tce)
             {
@@ -93,8 +86,12 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             {
                 return StatusCode(400, ex.Message);
             }
-            split = result.Split(": ");
-            return StatusCode(Convert.ToInt32(split[0]), split[2]);
+
+
+
+
+
+
 
 
 

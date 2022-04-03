@@ -18,14 +18,14 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
+namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
 {
     public class AccountDeletionControllerShould : TestBaseClass
     {
 
         public AccountDeletionControllerShould() : base(new string[] { })
         {
-            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestServices.AddScoped<ISqlDAO, SqlDAO>();
             TestServices.AddScoped<IAccountDeletionService, AccountDeletionService>();
             TestServices.AddScoped<IAccountDeletionManager, AccountDeletionManager>();
             TestServices.AddScoped<IAccountDeletionController, AccountDeletionController>();
@@ -34,16 +34,16 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
 
 
         [Theory]
-        [InlineData("grizzly@gmail.com", "user", "200: Server: success")]
-        [InlineData("salewa@gmail.com", "admin", "200: Server: success")]
-        //need to fix up and test how i made the account not found error
-        //[InlineData("violetKeyCard@gmail.com", "admin", "Database: The account was not found.")]
+        [InlineData("grizzly@gmail.com", "user", "200: Server: Account Deletion Successful.")]
+        [InlineData("salewa@gmail.com", "admin", "200: Server: Account Deletion Successful.")]
 
+        [InlineData("violetKeyCard@gmail.com", "admin", "500: Database: The Account was not found.")]
 
         public async Task DeleteTheUserAsync(string currentIdentity, string currentRole, string expected)
         {
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
@@ -56,9 +56,15 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
 
 
             IAccountDeletionController accountDeletionController = TestProvider.GetService<IAccountDeletionController>();
-
             string[] expecteds = expected.Split(": ");
-            ObjectResult expectedResult = new ObjectResult(expecteds[2]) { StatusCode = Convert.ToInt32(expecteds[0]) };
+
+            string[] splitExpectation;
+            splitExpectation = expected.Split(":");
+            ObjectResult expectedResult = new ObjectResult(splitExpectation[2])
+            {
+                StatusCode = Convert.ToInt32(splitExpectation[0]),
+                Value = splitExpectation[2]
+            };
 
 
             // Act
@@ -67,7 +73,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
 
 
             // Assert
-            Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);
+            //Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);
             Assert.Equal(expectedResult.Value, objectResult.Value);
 
         }

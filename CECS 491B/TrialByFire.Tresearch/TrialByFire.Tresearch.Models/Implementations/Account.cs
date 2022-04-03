@@ -8,6 +8,7 @@ using TrialByFire.Tresearch.Models.Contracts;
 namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class Account : IAccount
+
     {
         public string? Email { get; set; }
 
@@ -22,6 +23,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public bool? Confirmed { get; set; }
 
         public string? Token { get; set; }
+
+        
 
         public Account(string email, string username, string passphrase, string authorizationLevel, bool accountStatus, bool confirmed)
         {
@@ -70,6 +73,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
             }
             return false;
         }
+
+
     }
 
 

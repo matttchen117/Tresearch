@@ -17,18 +17,17 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
+namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
 {
 
-    /*
+    
     public class AccountDeletionManagerShould : TestBaseClass
     {
 
 
-        
-
         public AccountDeletionManagerShould() : base(new string[] { })
         {
+            TestServices.AddScoped<ISqlDAO, SqlDAO>();
             TestServices.AddScoped<IAccountDeletionService, AccountDeletionService>();
             TestServices.AddScoped<IAccountDeletionManager, AccountDeletionManager>();
             TestProvider = TestServices.BuildServiceProvider();
@@ -38,7 +37,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
         [InlineData("trizip@gmail.com", "user", "200: Server: success")]
         [InlineData("switchblade@gmail.com", "admin", "200: Server: success")]
 
-        //[InlineData("greenKeyCard@gmail.com", "user", "Database: The account was not found.")]
+        [InlineData("greenKeyCard@gmail.com", "user", "500: Database: The Account was not found.")]
 
         
         public async Task DeleteTheUserAsync(string currentIdentity, string currentRole, string expected)
@@ -56,10 +55,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
             IAccountDeletionManager accountDeletionManager = TestProvider.GetService<IAccountDeletionManager>();
 
             // Act
-            List<string> results = await accountDeletionManager.DeleteAccountAsync(cancellationTokenSource).ConfigureAwait(false);
+            string results = await accountDeletionManager.DeleteAccountAsync(cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, results);
 
         }
 
@@ -76,5 +75,5 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
 
     }
 
-    */
+    
 }

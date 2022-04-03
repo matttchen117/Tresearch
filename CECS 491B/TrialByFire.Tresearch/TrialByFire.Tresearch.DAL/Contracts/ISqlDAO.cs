@@ -48,6 +48,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         // Delete account
         public Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken));
 
+
         // Get admins
         public Task<string> GetAmountOfAdminsAsync(CancellationToken cancellationToken = default(CancellationToken));
 

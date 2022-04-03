@@ -626,8 +626,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public async Task<string> GetAmountOfAdminsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             int affectedRows = 0;
-            //might not need to get authorization level here
-            //string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
             try
             {
 
@@ -698,7 +696,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         //could first look for it, might have to do it nested, select first and then check, if row back or not, if row back then delete, if not then cancel and 
         //dont waste resources going into delete
         //check for what their role is in beforehand, using isInRole method.
-        public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default)
+        public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
 
             int affectedRows;
@@ -706,7 +704,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             //same thing as getadmins
             if (Thread.CurrentPrincipal.Equals(null))
             {
-                return _messageBank.ErrorMessages["notAuthorized"];
+                return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
             }
 
             string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
@@ -720,20 +718,18 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    return _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result;
+                    return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
 
                 }
 
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
 
-
-
-
                     var parameters = new { Username = userName, AuthorizationLevel = userAuthLevel };
 
                     var procedure = "dbo.[deleteAccountStoredProcedure]";
-                    affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                     if (cancellationToken.IsCancellationRequested)
                     {
@@ -744,8 +740,20 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                     //RIGHT HERE CHECK IF CANCELLED, IF IT IS DO ROLLBACK
 
+                    //created if and else for affectedRows
+
+
+                    if(affectedRows >= 1)
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false);
+                    }
+
                 }
-                return await _messageBank.GetMessage(IMessageBank.Responses.deleteAccountFail).ConfigureAwait(false);
+                //return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false);
 
 
             }
@@ -753,11 +761,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
-            
-
-
-
-
+           
             catch (Exception ex)
             {
                 //might need to make specific exception

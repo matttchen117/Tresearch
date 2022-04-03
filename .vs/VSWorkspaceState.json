@@ -11,6 +11,6 @@
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests\\AccountDeletion"
   ],
-  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests\\AccountDeletion\\AccountDeletionControllerShould.cs",
+  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests\\AccountDeletion\\AccountDeletionManagerShould.cs",
   "PreviewInSolutionExplorer": false
 }

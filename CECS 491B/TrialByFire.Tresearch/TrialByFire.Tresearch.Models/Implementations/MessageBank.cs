@@ -134,12 +134,22 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "Fail - Daily Registration Not Inserted";
                 case Responses.dailyRegistrationNotExist:
                     return "Fail - Daily Registration to Update Does Not Exist";
+
+
+
+                case Responses.accountDeletionSuccess:
+                    return "200: Server: Account Deletion Successful.";
+                case Responses.getAdminsSuccess:
+                    return "200: Server: Get Admins Success.";
                 case Responses.lastAdminFail:
                     return "Fail - Cannot delete last admin in system";
-                case Responses.deleteAccountFail:
-                    return "Fail - Unable to delete account";
+                //this is when user clicks accountDeletion in twice before waiting for their first delete request to go thru
+                case Responses.accountAlreadyDeleted:
+                    return "Fail - Account is already deleted";
                 case Responses.accountDeleteFail:
-                    return "503: Database: Failed to delete account.";
+                    return "503: Database: Failed to delete account";
+
+
                 default:
                     return "error";
             }

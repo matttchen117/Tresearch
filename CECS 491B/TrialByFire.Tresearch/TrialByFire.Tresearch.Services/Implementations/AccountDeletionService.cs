@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
@@ -6,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
+using TrialByFire.Tresearch.Exceptions;
+using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Services.Contracts;
 
@@ -14,53 +17,57 @@ namespace TrialByFire.Tresearch.Services.Implementations
     public class AccountDeletionService : IAccountDeletionService
     {
 
-        private ISqlDAO SqlDAO { get; }
+        private ISqlDAO _sqlDAO { get; }
+        private ILogService _logService { get; }
+        private IMessageBank _messageBank { get; }
+        private BuildSettingsOptions _options { get; }
 
-        private ILogService LogService { get; }
 
 
-
-        private IMessageBank _messageBank;
-        
-        //cancellation token doesnt go into constructor, only in passed methods
-        //DI MESSAGEBANKN IN CONSTRUCTOR
-        public AccountDeletionService(ISqlDAO sqlDAO, ILogService logService)
+        public AccountDeletionService(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> options)
         {
-            this.SqlDAO = sqlDAO;
-            this.LogService = logService;
+            _sqlDAO = sqlDAO;
+            _logService = logService;
+            _messageBank = messageBank;
+            _options = options.Value;
 
         }
 
         //ANOTHER METHOD IN SERVICE, AND MANAGER SHOULD CALL GETADMINS METHOD, MANAGER CALLS SERVICE CALLS DAO, RETURN BACK OPPOSITE WAY
-        //1) CONFIGURE AWAIT(FALSE) FOR ALLASYHC METHOD CALLS, IF NOT THERE THE REQUEST MIGHT NOT START OFF IMMEDIATELY, 
-        //2) 
+
         public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            string admins;
-            string result;
+
+            Console.WriteLine(Thread.GetCurrentProcessorId);
+
+
+
+
+            string result = "";
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                result = await _sqlDAO.DeleteAccountAsync(cancellationToken).ConfigureAwait(false);
 
-                admins = await SqlDAO.GetAmountOfAdminsAsync(cancellationToken);
-
-                if (admins.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic)))
+                //added await to if statement
+                //instead of an else if here, i can just return result instead, make the manager figure out status codes for me
+                if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false)))
                 {
-                    result = await SqlDAO.DeleteAccountAsync(cancellationToken).ConfigureAwait(false);
-
-                    if (result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic)))
-                    {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.generic).ConfigureAwait(false);
-                    }
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false);
 
                 }
+                else if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).ConfigureAwait(false)))
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).ConfigureAwait(false);
+                } 
+
                 else
                 {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.lastAdminFail).ConfigureAwait(false);
+                    //doing account was not found here
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false);
+
+                    //return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).ConfigureAwait(false);
                 }
-
-
-                return await _messageBank.GetMessage(IMessageBank.Responses.deleteAccountFail).ConfigureAwait(false);
 
 
             }
@@ -69,17 +76,26 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
+            catch (AccountDeletionFailedException)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false); ;
+            }
 
+
+            
             catch (Exception ex)
             {
-                return await _messageBank.GetMessage(IMessageBank.Responses.deleteAccountFail).ConfigureAwait(false); ;
+                return _options.UncaughtExceptionMessage + ex.Message;
             }
+            
+
+            
 
         }
 
-        public async Task<string> GetAmountOfAdmins(CancellationToken cancellationToken = default)
+        public async Task<string> GetAmountOfAdminsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await SqlDAO.GetAmountOfAdminsAsync(cancellationToken).ConfigureAwait(false);
+            return await _sqlDAO.GetAmountOfAdminsAsync(cancellationToken).ConfigureAwait(false);
         }
 
 
