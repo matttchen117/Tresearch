@@ -19,7 +19,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public InMemoryRegistrationControllerShould() : base(new string[] { })
         {
             TestServices.AddScoped<IMailService, MailService>();
-            TestServices.AddScoped<ISqlDAO, SqlDAO>();
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
             TestServices.AddScoped<IRegistrationService, RegistrationService>();
             TestServices.AddScoped<IRegistrationManager, RegistrationManager>();
             TestServices.AddScoped<IRegistrationController, RegistrationController>();
