@@ -17,5 +17,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
         [HttpPost("register")]
         public Task<IActionResult> RegisterAccountAsync(string email, string passphrase);
         public Task<IActionResult> ConfirmAccountAsync(string guid);
+        public Task<IActionResult> ResendConfirmationLink(string guid);
     }
 }

@@ -19,7 +19,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public InMemoryRegistrationControllerShould() : base(new string[] { })
         {
             TestServices.AddScoped<IMailService, MailService>();
-            TestServices.AddScoped<ISqlDAO, SqlDAO>();
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
             TestServices.AddScoped<IRegistrationService, RegistrationService>();
             TestServices.AddScoped<IRegistrationManager, RegistrationManager>();
             TestServices.AddScoped<IRegistrationController, RegistrationController>();
@@ -27,11 +27,16 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         }
 
         [Theory]
-        [InlineData("pammypoor@gmail.com", "myValidPassphrase")]
-        [InlineData("pammypoor@gmail.com", "ApplePie!")]
-        public async Task RegisterTheUser(string email, string passphrase)
+        [InlineData("pammypoor+UnitConrReg1@gmail.com", "myValidPassphrase", "200: Server:  success")]     //Account doesn't exist
+        [InlineData("pammypoor+UnitConrReg2@gmail.com", "myPassphrase", "409: Server: Account  already exists")]
+        public async Task RegisterTheUser(string email, string passphrase, string statusCode)
         {
             //Arrange
+            string[] splitExpectation;
+            splitExpectation = statusCode.Split(":");
+            ObjectResult expectedResult = new ObjectResult(splitExpectation[2])
+            { StatusCode = Convert.ToInt32(splitExpectation[0]),
+              Value = splitExpectation[2]};
             IRegistrationController registrationController = TestProvider.GetService<IRegistrationController>();
             
             //Act
@@ -39,12 +44,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             var objectResult = results as ObjectResult;
 
             //Assert
-            Assert.Equal(200, objectResult.StatusCode);
+            Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);
         }
 
-        [Theory]
-        [InlineData("", "statusCode")]
-        [InlineData("", "")]
         public async Task confirmAccount(string guid, string statusCode)
         {
             //Arrange

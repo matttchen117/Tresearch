@@ -32,6 +32,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 cancellationToken.ThrowIfCancellationRequested();              
                 
                 string resultCreate = await _registrationService.CreateAccountAsync(email, passphrase, authorizationLevel, cancellationToken);
+
                 
                 //Check if request is cancelled and acccount was already created
                 if(cancellationToken.IsCancellationRequested && resultCreate == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
@@ -44,7 +45,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     return resultCreate;
 
                 Tuple<IConfirmationLink, string> confirmationLink = await _registrationService.CreateConfirmationAsync(email, authorizationLevel, cancellationToken).ConfigureAwait(false);
-               
+
+                
                 //Check if request is cancelled and confirmation link was already created
                 if(cancellationToken.IsCancellationRequested && confirmationLink.Item2 == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                 {
@@ -94,15 +96,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 //Check if confirmation link is valid
                 if (!IsConfirmationLinkInvalid(confirmationLink.Item1))
                 {
-                    // Remove confirmation link
-                    string removeOld = await _registrationService.RemoveConfirmationLinkAsync(confirmationLink.Item1, cancellationToken).ConfigureAwait(false);
-                    if (removeOld != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
-                        return _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkRemoveFail).Result;
-                    else
                         return _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkExpired).Result;
                 }
-
-                
 
                 IConfirmationLink linkInfo = confirmationLink.Item1;
                 string confirmResult = await _registrationService.ConfirmAccountAsync(linkInfo.Username, linkInfo.AuthorizationLevel, cancellationToken).ConfigureAwait(false);
@@ -127,6 +122,68 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     return _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkRemoveFail).Result;
                 else
                     return confirmResult;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Server: " + ex.Message;
+            }
+        }
+
+        public async Task<string> ResendConfirmation(string guid, string baseUrl, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                Tuple<IConfirmationLink, string> confirmationLink = await _registrationService.GetConfirmationLinkAsync(guid).ConfigureAwait(false);
+
+                if (confirmationLink.Item2 != await _messageBank.GetMessage(IMessageBank.Responses.generic))
+                    return confirmationLink.Item2;
+
+                // Remove confirmation link
+                string removeOld = await _registrationService.RemoveConfirmationLinkAsync(confirmationLink.Item1, cancellationToken).ConfigureAwait(false);
+
+                if (!removeOld.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
+                    return removeOld;
+
+                if (cancellationToken.IsCancellationRequested && removeOld.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
+                {
+                    string rollbackCreate = await _registrationService.CreateConfirmationAsync(confirmationLink.Item1);
+                    if (rollbackCreate.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
+                        throw new OperationCanceledException();
+                    else
+                        return await _messageBank.GetMessage(IMessageBank.Responses.generic);
+                }
+
+                Tuple<IConfirmationLink, string> newConfirmationLink = await _registrationService.CreateConfirmationAsync(confirmationLink.Item1.Username, confirmationLink.Item1.AuthorizationLevel, cancellationToken).ConfigureAwait(false);
+
+                if (!removeOld.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
+                    return newConfirmationLink.Item2;
+
+                if (cancellationToken.IsCancellationRequested && newConfirmationLink.Item2.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
+                {
+                    string rollbackCreate = await _registrationService.CreateConfirmationAsync(confirmationLink.Item1);
+                    if (!rollbackCreate.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
+                        return await _messageBank.GetMessage(IMessageBank.Responses.generic);
+                    string rollbackRemove = await _registrationService.RemoveConfirmationLinkAsync(newConfirmationLink.Item1);
+                    if (!rollbackCreate.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
+                        return await _messageBank.GetMessage(IMessageBank.Responses.generic);
+                    else
+                        throw new OperationCanceledException();
+                }
+
+                //Beyond point of no return cannot cancel
+                string linkUrl = $"{baseUrl}{newConfirmationLink.Item1.GUIDLink.ToString()}";
+                string mailResult = await _mailService.SendConfirmationAsync(confirmationLink.Item1.Username, linkUrl).ConfigureAwait(false);
+
+                return mailResult;
+
+
             }
             catch (OperationCanceledException)
             {

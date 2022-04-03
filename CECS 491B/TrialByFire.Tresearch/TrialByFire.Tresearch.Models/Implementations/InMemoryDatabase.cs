@@ -128,6 +128,18 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
             accounts.Add(new Account("altyn@gmail.com", "altyn@gmail.com", "asdfasdf", "user", true, true));
             accounts.Add(new Account("ryst@gmail.com", "ryst@gmail.com", "asdfasdf123", "admin", true, true));
+
+
+            //Accounts for Registration 
+            accounts.Remove(new Account("pammypoor+UnitConrReg1@gmail.com", "UnitSerReg@gmail.com", "myPassphrase", "user", true, false));
+            accounts.Add(new Account("pammypoor+UnitConrReg2@gmail.com", "UnitSerReg@gmail.com", "myPassphrase", "user", true, false));
+            
+            accounts.Add(new Account("pammypoor+UnitManReg2@gmail.com", "UnitSerReg@gmail.com", "myPassphrase", "user", true, false));
+
+            accounts.Add(new Account("pammypoor+UnitSerReg2@gmail.com", "UnitSerReg@gmail.com", "myPassphrase", "user", true, false));
+            accounts.Add(new Account("pammypoor+UnitSerReg3@gmail.com", "UnitSerReg@gmail.com", "myPassphrase", "user", true, false));
+            accounts.Add(new Account("pammypoor+UnitSerReg4@gmail.com", "UnitSerReg@gmail.com", "myPassphrase", "user", true, true));
+
             return accounts;
         }
 
@@ -568,6 +580,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<IConfirmationLink> InitializeConfirmationLinks()
         {
             List<IConfirmationLink> confirmationLinks = new List<IConfirmationLink>();
+
+            confirmationLinks.Add(new ConfirmationLink("pammypoor+UnitSerReg3@gmail.com", "user", Guid.NewGuid(), DateTime.Now));
             return confirmationLinks;
         }
 

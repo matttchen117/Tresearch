@@ -17,5 +17,6 @@ namespace TrialByFire.Tresearch.Managers.Contracts
         public Task<string> CreateAndSendConfirmationAsync(string email, string passphrases, string authorizationLevel, string baseUrl, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> ConfirmAccountAsync(string guid, CancellationToken cancellationToken = default(CancellationToken));
         public bool IsConfirmationLinkInvalid(IConfirmationLink confirmationLink);
+        public Task<string> ResendConfirmation(string guid, string baseUrl, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

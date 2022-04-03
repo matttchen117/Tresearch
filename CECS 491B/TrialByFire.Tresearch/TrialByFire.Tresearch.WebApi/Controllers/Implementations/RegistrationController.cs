@@ -74,5 +74,33 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpPost("resend")]
+        public async Task<IActionResult> ResendConfirmationLink(string guid)
+        {
+            try
+            {
+                string result = await _registrationManager.ResendConfirmation(guid, baseUrl).ConfigureAwait(false);
+                string[] split;
+                split = result.Split(":");
+                if (result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
+                {
+                    split = result.Split(": ");
+                    return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
+                }
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
+            }
+            catch(OperationCanceledException)
+            {
+                string result = await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                string[] split;
+                split = result.Split(":");
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }

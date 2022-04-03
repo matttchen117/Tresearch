@@ -25,13 +25,13 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _messageBank = messageBank;
         }
 
-
         public async Task<string> CreateAccountAsync(string email, string passphrase, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 IAccount account = new Account(email, email, passphrase, authorizationLevel, true, false);
+
                 string createResult = await _sqlDAO.CreateAccountAsync(account, cancellationToken).ConfigureAwait(false);
 
                 if(cancellationToken.IsCancellationRequested && createResult == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
@@ -83,6 +83,39 @@ namespace TrialByFire.Tresearch.Services.Implementations
             catch (Exception ex)
             {
                 return Tuple.Create(nullLink, "500: Server: " + ex.Message);
+
+            }
+        }
+
+        public async Task<string> CreateConfirmationAsync(IConfirmationLink link, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            IConfirmationLink nullLink = null;
+            try
+            {
+
+                string result = await _sqlDAO.CreateConfirmationLinkAsync(link, cancellationToken).ConfigureAwait(false);
+
+                if (result != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                    return result;
+
+                if (cancellationToken.IsCancellationRequested && result == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                {
+                    string rollbackResult = await _sqlDAO.RemoveConfirmationLinkAsync(link);
+                    if (rollbackResult != await _messageBank.GetMessage(IMessageBank.Responses.generic))
+                        return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
+                    else
+                        throw new OperationCanceledException();
+                }
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                //Rollback taken care of
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Server: " + ex.Message;
 
             }
         }

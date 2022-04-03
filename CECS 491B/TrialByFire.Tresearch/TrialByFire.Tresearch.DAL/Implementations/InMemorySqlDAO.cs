@@ -230,17 +230,19 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (InMemoryDatabase.Accounts.Contains(account))
-                    return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;
+
+                if(InMemoryDatabase.Accounts.Contains(account))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated);
 
                 InMemoryDatabase.Accounts.Add(account);
+
                 if (cancellationToken.IsCancellationRequested)
                 {
                     InMemoryDatabase.Accounts.Remove(account);
                     throw new OperationCanceledException();
                 }
                 
-                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                return await _messageBank.GetMessage(IMessageBank.Responses.generic);
             }
             catch (OperationCanceledException)
             {
@@ -358,12 +360,17 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                if (!InMemoryDatabase.Accounts.Contains(new Account(confirmationLink.Username, "doesnt matter", confirmationLink.AuthorizationLevel, true, false)))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound);
+                if (InMemoryDatabase.ConfirmationLinks.Contains(confirmationLink))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkExists);
+                
                 InMemoryDatabase.ConfirmationLinks.Add(confirmationLink);
                 if (cancellationToken.IsCancellationRequested)
                 {
                     string rollbackResult = await RemoveConfirmationLinkAsync(confirmationLink);
                     if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
-                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                        return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
                     else
                         throw new OperationCanceledException();
                 }

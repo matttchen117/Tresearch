@@ -1,40 +1,42 @@
 import React from "react";
-import axios from 'axios';
-
+import { useParams,} from "react-router-dom";
+import NavigationBar from "../../UI/Navigation/NavigationBar";
 import "./InactiveLink.css";
+import axios, {AxiosResponse, AxiosError} from 'axios';
 
-const InactiveLink = () => {
-    
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        var { username, password } = document.forms[0];
 
-        axios.post('https://localhost:44303/Registration/register?=', {username, password})
-        .then(res => {
-            
-         })
-    };
 
-    const renderBody = (
-        <div className="inactive-container">
-            <div class = "inactive-notif">
-                <hr></hr>
-                <h1>Uh Oh! Looks like your link expired.</h1>
-                <div className="email-button-container">
-                        <input type="submit" value="Resend Verification link "  onSubmit={handleSubmit}/>
-                    </div>
-            </div>
-        </div>
-    );
+class InactiveLink extends React.Component {
+     render() {
+        function GetGuid() {
+            const { confirmationGuid } = useParams();
+            console.log(confirmationGuid);
+            if(confirmationGuid != null){
+                axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/Registration/confirm?'+confirmationGuid)
+                .then(res => {
+                    window.location = '/Register/AccountConfirmed';
+                    return res;
+                })
+                .catch( err => {
+                    //window.location = '/Register/EULATerms';
+                    console.log(err);
+                    return err;
+                })
+            }
+            return null;
+        }
 
-    return (
-        <div className="component-container">
-            <div className="title-text">
-                <h1 className="inactive-title">Email confirmation link has expired</h1>
-            </div>
-            {renderBody}
-        </div>
-    );
+        const renderConfirm = (
+          <div className = "register-confirm-container">
+              <p><GetGuid/></p>
+          </div>
+        )
+      return (
+          <div className = "register-confirm-wrapper">
+            {renderConfirm}
+          </div>
+      );
+  }
 }
 
 export default InactiveLink;

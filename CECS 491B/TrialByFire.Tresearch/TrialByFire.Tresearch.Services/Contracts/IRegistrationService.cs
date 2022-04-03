@@ -17,5 +17,6 @@ namespace TrialByFire.Tresearch.Services.Contracts
         public Task<string> ConfirmAccountAsync(string username, string authenticationLevel, CancellationToken cancellationToken = default(CancellationToken));
         public Task<Tuple<IConfirmationLink, string>> GetConfirmationLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> RemoveConfirmationLinkAsync(IConfirmationLink _confirmationLink, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> CreateConfirmationAsync(IConfirmationLink link, CancellationToken cancellationToken = default(CancellationToken));
     }
 }
