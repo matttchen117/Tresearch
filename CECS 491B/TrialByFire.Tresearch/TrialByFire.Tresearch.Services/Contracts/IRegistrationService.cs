@@ -18,5 +18,7 @@ namespace TrialByFire.Tresearch.Services.Contracts
         public Task<Tuple<IConfirmationLink, string>> GetConfirmationLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> RemoveConfirmationLinkAsync(IConfirmationLink _confirmationLink, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> CreateConfirmationAsync(IConfirmationLink link, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> HashValueAsync(string value, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> CreateHashTableEntry(string email, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

@@ -29,9 +29,16 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         {
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();              
+                cancellationToken.ThrowIfCancellationRequested();
+
+                string resultHashed = await _registrationService.HashValueAsync(email, cancellationToken);
+
+                if (resultHashed == "")
+                    throw new Exception();
+
+                string resultHashTable = await _registrationService.CreateHashTableEntry(email, resultHashed, cancellationToken);
                 
-                string resultCreate = await _registrationService.CreateAccountAsync(email, passphrase, authorizationLevel, cancellationToken);
+                string resultCreate = await _registrationService.CreateAccountAsync(resultHashed, passphrase, authorizationLevel, cancellationToken);
 
                 
                 //Check if request is cancelled and acccount was already created

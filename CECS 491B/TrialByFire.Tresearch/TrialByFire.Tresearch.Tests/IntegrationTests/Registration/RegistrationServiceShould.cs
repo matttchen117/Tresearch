@@ -91,5 +91,21 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
             //Assert
             Assert.Equal(expected, result);
         }
+
+        [Theory]
+        [InlineData("pammypoor@gmail.com", "1D479F5F473B624F8DAE5A64BA677DAD94F0ED9C4B091D9B812B363B37BF070F")]
+        public async Task HashValue(string value, string expected)
+        {
+            //Arrange
+            IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+
+            //Act
+            string result = await registrationService.HashValueAsync(value, cancellationTokenSource.Token);
+
+            //Assert
+            Assert.Equal(expected, result);
+
+        }
     }
 }

@@ -904,5 +904,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             return "200";
         }
+
+        public async Task<string> CreateHashTableEntry(string email, string value, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
     }
 }
