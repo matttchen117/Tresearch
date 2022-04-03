@@ -18,7 +18,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         {
             //Arrange
             ISqlDAO _sqlDAO = new InMemorySqlDAO();
-            ILogService _logService = new LogService(_sqlDAO);
+            IMessageBank messageBank = new MessageBank();
+            ILogService _logService = new LogService(_sqlDAO, messageBank);
             IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
             IAccount account = new Account(email, username, passphrase, authenticationLevel, status, confirmed);
             _sqlDAO.CreateAccount(account);
@@ -37,7 +38,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         {
             //Arrange
             ISqlDAO _sqlDAO = new InMemorySqlDAO();
-            ILogService _logService = new LogService(_sqlDAO);
+            IMessageBank messageBank = new MessageBank();
+            ILogService _logService = new LogService(_sqlDAO, messageBank);
             IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
             IAccount account = new Account(email, username, passphrase, authenticationLevel, status, confirmed);
 
@@ -56,7 +58,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         {
             //Arrange
             ISqlDAO _sqlDAO = new InMemorySqlDAO();
-            ILogService _logService = new LogService(_sqlDAO);
+            IMessageBank messageBank = new MessageBank();
+            ILogService _logService = new LogService(_sqlDAO, messageBank);
             IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
             IAccount account = new Account(email, username, passphrase, authenticationLevel, status, confirmed);
 
@@ -74,7 +77,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         {
             //Arrange
             ISqlDAO _sqlDAO = new InMemorySqlDAO();
-            ILogService _logService = new LogService(_sqlDAO);
+            IMessageBank messageBank = new MessageBank();
+            ILogService _logService = new LogService(_sqlDAO, messageBank);
             IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
             IConfirmationLink _expected = new ConfirmationLink(username, Guid.NewGuid(), DateTime.Now.ToUniversalTime());
             _sqlDAO.CreateConfirmationLink(_expected);
@@ -95,7 +99,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public void RemoveConfirmationLink(string username)
         {
             ISqlDAO _sqlDAO = new InMemorySqlDAO();
-            ILogService _logService = new LogService(_sqlDAO);
+            IMessageBank messageBank = new MessageBank();
+            ILogService _logService = new LogService(_sqlDAO, messageBank);
             IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
             Guid guid = Guid.NewGuid();
             DateTime now = DateTime.Now.ToUniversalTime();
@@ -115,7 +120,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public void GetUserFromLink(string email, string passphrase)
         {
             ISqlDAO _sqlDAO = new InMemorySqlDAO();
-            ILogService _logService = new LogService(_sqlDAO);
+            IMessageBank messageBank = new MessageBank();
+            ILogService _logService = new LogService(_sqlDAO, messageBank);
             IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
             Guid guid = Guid.NewGuid();
             DateTime now = DateTime.Now.ToUniversalTime();

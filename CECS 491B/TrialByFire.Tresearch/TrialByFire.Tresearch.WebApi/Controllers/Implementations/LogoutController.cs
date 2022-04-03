@@ -23,10 +23,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         private ILogoutManager _logoutManager { get; }
 
         private BuildSettingsOptions _options { get; }
-
-        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
-            TimeSpan.FromSeconds(5));
-
         public LogoutController(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, 
             ILogoutManager logoutManager, IOptionsSnapshot<BuildSettingsOptions> options)
         {

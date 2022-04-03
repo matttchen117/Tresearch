@@ -8,10 +8,11 @@ namespace ArchiveProgram.Models.Contracts
 {
     public interface ILog
     {
-        public DateTime TimeStamp { get; }
+        public DateTime Timestamp { get; }
         public string Level { get; }
         public string Username { get; }
         public string Category { get; }
         public string Description { get; }
+        public string Hash { get; }
     }
 }

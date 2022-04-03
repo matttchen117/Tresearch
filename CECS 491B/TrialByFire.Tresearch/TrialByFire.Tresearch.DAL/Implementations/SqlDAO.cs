@@ -37,26 +37,25 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return parameters.Get<int>("Result");
             }
         }
-        public async Task<string> StoreLogAsync(ILog log, CancellationToken cancellationToken = default)
+        public async Task<int> StoreLogAsync(ILog log, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-
             using(var connection = new SqlConnection(_options.SqlConnectionString))
             {
-                var procedure = "[StoreLog]";                                                               
-                var value = new { Timestamp = log.Timestamp, Level = log.Level, Username = log.Username, 
-                Category = log.Category, Description = log.Description };   
-                int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                if (affectedRows != 1)
-                {
-                    affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    if (affectedRows != 1)
-                    {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.storeLogFail).ConfigureAwait(false);
-                    }
-                }
+                var procedure = "[StoreLog]";
+                var parameters = new DynamicParameters();
+                parameters.Add("Timestamp", log.Timestamp);
+                parameters.Add("Level", log.Level);
+                parameters.Add("Username", log.Username);
+                parameters.Add("Category", log.Category);
+                parameters.Add("Description", log.Description);
+                parameters.Add("Hash", log.Hash);
+                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
+                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                    .ConfigureAwait(false);
+                return parameters.Get<int>("Result");
             }
-            return await _messageBank.GetMessage(IMessageBank.Responses.generic).ConfigureAwait(false);
         }
 
 

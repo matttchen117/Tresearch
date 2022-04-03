@@ -87,7 +87,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             results.Add(r);
             //SendConfirmation(email);
 
-            _logService.CreateLog(DateTime.Now.ToUniversalTime(), "Info", email, "Business", results.Last());
+            _logService.StoreLogAsync(DateTime.Now.ToUniversalTime(), "Info", email, "Business", results.Last());
             return Ok(results.Last());
         }
 
@@ -120,9 +120,9 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             }
 
             if (!error)
-                _logService.CreateLog(DateTime.Now.ToUniversalTime(), "Info", email, "Business", results.Last());
+                _logService.StoreLogAsync(DateTime.Now.ToUniversalTime(), "Info", email, "Business", results.Last());
             else
-                _logService.CreateLog(DateTime.Now.ToUniversalTime(), "Info", email, "Error", results.Last());
+                _logService.StoreLogAsync(DateTime.Now.ToUniversalTime(), "Info", email, "Error", results.Last());
             return Ok(results.Last());
 
         }
@@ -150,9 +150,9 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 results.Add("Failed - Registration Controller " + ex);
             }
             if (!error)
-                _logService.CreateLog(DateTime.Now.ToUniversalTime(), "Info", results.First(), "Business", results.Last());
+                _logService.StoreLogAsync(DateTime.Now.ToUniversalTime(), "Info", results.First(), "Business", results.Last());
             else
-                _logService.CreateLog(DateTime.Now.ToUniversalTime(), "Info", results.First(), "Error", results.Last());
+                _logService.StoreLogAsync(DateTime.Now.ToUniversalTime(), "Info", results.First(), "Error", results.Last());
             return Ok(results.Last());
         }
     }

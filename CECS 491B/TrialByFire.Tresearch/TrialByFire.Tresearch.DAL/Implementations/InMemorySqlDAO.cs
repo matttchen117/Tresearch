@@ -59,10 +59,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             return 0;
         }
-        public async Task<string> StoreLogAsync(ILog log, CancellationToken cancellationToken = default)
+        public async Task<int> StoreLogAsync(ILog log, CancellationToken cancellationToken = default)
         {
             InMemoryDatabase.Logs.Add(log);
-            return await _messageBank.GetMessage(IMessageBank.Responses.generic).ConfigureAwait(false);
+            if(InMemoryDatabase.Logs.Contains(log))
+            {
+                return 1;
+            }
+            return 0;
         }
         public async Task<int> VerifyAccountAsync(IAccount account, 
             CancellationToken cancellationToken = default)

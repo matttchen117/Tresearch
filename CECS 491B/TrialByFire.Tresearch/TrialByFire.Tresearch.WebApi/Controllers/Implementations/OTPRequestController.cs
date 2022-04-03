@@ -20,11 +20,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
         private IOTPRequestManager _otpRequestManager { get; }
-
         private IMessageBank _messageBank { get; }
-
-        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
-            TimeSpan.FromSeconds(5));
 
         public OTPRequestController(ISqlDAO sqlDAO, ILogService logService, 
             IOTPRequestManager otpRequestManager, IMessageBank messageBank)
@@ -58,8 +54,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             try
             {
                 string[] split;
-                string result = await _otpRequestManager.RequestOTPAsync(username, passphrase, authorizationLevel,
-                    _cancellationTokenSource.Token).ConfigureAwait(false);
+                string result = await _otpRequestManager.RequestOTPAsync(username, passphrase, 
+                    authorizationLevel).ConfigureAwait(false);
                 if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.storeOTPSuccess)
                     .ConfigureAwait(false)))
                 {

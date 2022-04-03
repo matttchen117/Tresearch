@@ -26,9 +26,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         private BuildSettingsOptions _buildSettingsOptions { get; }
 
-        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
-            /*TimeSpan.FromSeconds(5)*/);
-
         public AuthenticationController(ISqlDAO sqlDAO, ILogService logService, 
             IAuthenticationManager authenticationManager, IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> buildSettingsOptions)
         {
@@ -76,7 +73,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             string[] split;
             List<string> results = await _authenticationManager.AuthenticateAsync(username, otp, authorizationLevel, 
-                DateTime.Now.ToUniversalTime(), _cancellationTokenSource.Token).ConfigureAwait(false);
+                DateTime.Now.ToUniversalTime()).ConfigureAwait(false);
             string result = results[0];
             if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.authenticationSuccess).
                     ConfigureAwait(false)))
@@ -107,7 +104,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             try
             {
                 List<string> results = await _authenticationManager.AuthenticateAsync(username, 
-                    otp, authorizationLevel, now, _cancellationTokenSource.Token).ConfigureAwait(false);
+                    otp, authorizationLevel, now).ConfigureAwait(false);
                 result = results[0];
                 if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.authenticationSuccess).
                     ConfigureAwait(false)))

@@ -29,10 +29,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public InMemoryRegistrationManagerShould()
         {
             _sqlDAO = new InMemorySqlDAO();
-            _logService = new LogService(_sqlDAO);
-            _registrationService = new RegistrationService(_sqlDAO, _logService);
-
             _messageBank = new MessageBank();
+            _logService = new LogService(_sqlDAO, _messageBank);
+            _registrationService = new RegistrationService(_sqlDAO, _logService);
             _mailService = new MailService(_messageBank);
             _validationService = new ValidationService(_messageBank);
             _registrationManager = new RegistrationManager(_sqlDAO, _logService, _registrationService, _mailService, _validationService, _messageBank);
