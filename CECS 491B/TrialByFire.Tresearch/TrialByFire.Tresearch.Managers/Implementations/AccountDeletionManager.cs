@@ -63,9 +63,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 {
                     return await _accountDeletionService.DeleteAccountAsync(cancellationToken).ConfigureAwait(false);
                 }
-
-
-
             }
 
             catch (OperationCanceledException)

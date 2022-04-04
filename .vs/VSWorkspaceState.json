@@ -3,14 +3,15 @@
     "",
     "\\CECS 491B",
     "\\CECS 491B\\TrialByFire.Tresearch",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\Implementations",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\Implementations",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests\\AccountDeletion"
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests\\AccountDeletion",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\Controllers",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\Controllers\\Implementations"
   ],
-  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests\\AccountDeletion\\AccountDeletionManagerShould.cs",
+  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\Controllers\\Implementations\\AccountDeletionController.cs",
   "PreviewInSolutionExplorer": false
 }

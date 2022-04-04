@@ -22,7 +22,6 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
     public class AccountDeletionServiceShould : TestBaseClass
     {
 
-        
         public AccountDeletionServiceShould() : base(new string[] { })
         {
             TestServices.AddScoped<ISqlDAO, SqlDAO>();
@@ -32,8 +31,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
         }
 
         [Theory]
-        [InlineData("altyn@gmail.com", "user", "success")]
-        [InlineData("ryst@gmail.com", "admin", "success")]
+        [InlineData("altyn@gmail.com", "user", "200: Server: Account Deletion Successful.")]
+        [InlineData("ryst@gmail.com", "admin", "200: Server: Account Deletion Successful.")]
+        
         [InlineData("redKeyCard@gmail.com", "admin", "500: Database: The Account was not found.")]
 
         public async Task DeleteTheUserAsync(string currentIdentity, string currentRole, string expected)
@@ -42,7 +42,6 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
-            //CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
             IAccountDeletionService accountDeletionService = TestProvider.GetService<IAccountDeletionService>();

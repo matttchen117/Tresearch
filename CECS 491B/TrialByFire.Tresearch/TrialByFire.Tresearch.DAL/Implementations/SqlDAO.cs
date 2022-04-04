@@ -652,13 +652,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var procedure = "dbo.[GetAmountOfAdmins]";
                     affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
-                    //modifying database, have cancellationToken before and after
-                    //check after query, if cancellation was requested dont throw, you need to rollback instead of returning error
-
-
+                    //changed up logic for affectedRows, if there is more than 1 row
+                    //then this should be valid.
                     if (affectedRows > 1)
                     {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.generic).ConfigureAwait(false);
+                        return await _messageBank.GetMessage(IMessageBank.Responses.getAdminsSuccess).ConfigureAwait(false);
                     }
                     else
                     {
@@ -723,6 +721,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 }
 
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
+
                 {
 
                     var parameters = new { Username = userName, AuthorizationLevel = userAuthLevel };
@@ -742,11 +741,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                     //created if and else for affectedRows
 
-
-                    if(affectedRows >= 1)
+                    //error checking
+                    if(affectedRows == 0)
                     {
                         return await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false);
                     }
+
                     else
                     {
                         return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false);

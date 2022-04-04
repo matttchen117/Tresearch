@@ -34,23 +34,23 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
         }
 
         [Theory]
-        [InlineData("trizip@gmail.com", "user", "200: Server: success")]
-        [InlineData("switchblade@gmail.com", "admin", "200: Server: success")]
+        [InlineData("trizip@gmail.com", "user", "200: Server: Account Deletion Successful.")]
+        [InlineData("switchblade@gmail.com", "admin", "200: Server: Account Deletion Successful.")]
 
         [InlineData("greenKeyCard@gmail.com", "user", "500: Database: The Account was not found.")]
 
         
         public async Task DeleteTheUserAsync(string currentIdentity, string currentRole, string expected)
         {
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             if (!currentIdentity.Equals("guest"))
             {
                 Thread.CurrentPrincipal = rolePrincipal;
-
             }
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
 
             IAccountDeletionManager accountDeletionManager = TestProvider.GetService<IAccountDeletionManager>();
 
@@ -64,10 +64,12 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
 
 
 
+        /*
         public async Task DeleteTheUserAsyncWithin5Seconds(string currentIdentity, string currentRole, string expected)
         {
 
         }
+        */
 
         
 

@@ -42,12 +42,13 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
         public async Task DeleteTheUserAsync(string currentIdentity, string currentRole, string expected)
         {
 
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            
+            //CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
+
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-
             if (!currentIdentity.Equals("guest"))
             {
                 Thread.CurrentPrincipal = rolePrincipal;
@@ -58,6 +59,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
             IAccountDeletionController accountDeletionController = TestProvider.GetService<IAccountDeletionController>();
             string[] expecteds = expected.Split(": ");
 
+            ObjectResult expectedResult = new ObjectResult(expecteds[2]) { StatusCode = Convert.ToInt32(expecteds[0]) };
+
+
+            /*
             string[] splitExpectation;
             splitExpectation = expected.Split(":");
             ObjectResult expectedResult = new ObjectResult(splitExpectation[2])
@@ -65,6 +70,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
                 StatusCode = Convert.ToInt32(splitExpectation[0]),
                 Value = splitExpectation[2]
             };
+            */
 
 
             // Act
@@ -73,7 +79,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
 
 
             // Assert
-            //Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);
+            Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);
             Assert.Equal(expectedResult.Value, objectResult.Value);
 
         }
