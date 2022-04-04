@@ -1565,5 +1565,100 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 }
             }
         }
+
+        public async Task<string> CreateNodeAsync(INode node, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var procedure = "[CreateNode]";
+                    var values = new
+                    {
+                        nodeID = node.nodeID,
+                        parentNodeId = node.parentNodeID,
+                        nodeTitle = node.nodeTitle,
+                        summary = node.summary,
+                        mode = node.mode,
+                        accountOwner = node.accountOwner
+                    };
+                    var affectedRows = await connection.QueryAsync<int>(new CommandDefinition(procedure, values, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        string rollbackResult = "Delete Node";
+                        //to do
+                        //if(rollback != "200"
+                        //return 503
+                        //else
+                        //return 500
+                        return "500";
+                    }
+
+                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                }
+            }
+            catch(OperationCanceledException)
+            {
+                return _messageBank.ErrorMessages["cancellationRequested"];
+            }
+            catch(Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+
+        public async Task<Tuple<INode, string>> GetNodeAsync(long nID, CancellationToken cancellationToken = default)
+        {
+            INode? nullNode = null;
+            try
+            {
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var procedure = "dbo.[GetNode]";
+                    var parameters = new
+                    {
+                        nodeID = nID
+                    };
+                    var Nodes = await connection.QueryAsync<Node>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    if(Nodes.Count() == 0)
+                    {
+                        return Tuple.Create(nullNode, _messageBank.ErrorMessages["nodeNotFound"]);
+                    }
+
+                    INode node = Nodes.First();
+
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return Tuple.Create(nullNode, _messageBank.ErrorMessages["cancellationRequested"]);
+                    }
+                    else
+                    {
+                        return Tuple.Create(nullNode, _messageBank.SuccessMessages["generic"]);
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return Tuple.Create(nullNode, _messageBank.ErrorMessages["cancellationRequested"]);
+            }
+            catch(Exception ex)
+            {
+                return Tuple.Create(nullNode, "500: Database: " + ex.Message);
+            }
+        }
+
+        /*public async Task<string> UpdateNode(INode node)
+        {
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
+            {
+                var procedure = "[CreateNode]";
+                var values = new
+                {
+
+                }
+            }
+        }*/
     }
 }

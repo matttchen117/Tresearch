@@ -34,6 +34,7 @@ builder.Services.AddScoped<IAuthenticationManager, AuthenticationManager>();
 builder.Services.AddScoped<IOTPRequestManager, OTPRequestManager>();
 builder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
 builder.Services.AddScoped<ILogoutManager, LogoutManager>();
+builder.Services.AddScoped<IUADManager, UADManager>();  
 // Unnecessary, only here temporarily for successful build
 
 builder.Services.AddControllers();

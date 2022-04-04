@@ -32,6 +32,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
             {
                 case Responses.generic:
                     return "200: Server: success";
+                case Responses.createNodeSuccess:
+                    return "200: Server: Create Node Success";
                 case Responses.storeLogFail:
                     return "503: Database: Failed to store the log.";
                 case Responses.badNameOrPass:
@@ -63,6 +65,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.notFoundOrAuthorized:
                     return "404: Database: Account not found or not authorized to perform the " +
                 "operation.";
+                case Responses.nodeNotFound:
+                    return "404: Database: The node was not found.";
                 case Responses.recoveryLinkNotFound:
                     return "404: Database: The recovery link was not found";
                 case Responses.cancellationRequested:
@@ -87,6 +91,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "503: Server: Logout failed.";
                 case Responses.rollbackFailed:
                     return "504: Server rollback failed";
+                case Responses.createNodeFail:
+                    return "503: Database: Failed to create node.";
+                case Responses.nodeAlreadyExists:
+                    return "409: Database: Node Already Exists";
                 case Responses.createdNodesExists:
                     return "Fail - Created Nodes Already Exists";
                 case Responses.createdNodeNotExist:
@@ -139,6 +147,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("notFoundOrEnabled", "404: Database: The account was not found or it has been disabled.");
             errorMessages.Add("notFoundOrAuthorized", "404: Database: Account not found or not authorized to perform the " +
                 "operation.");
+            errorMessages.Add("nodeNotFound", "404: Database: The node was not found.");
             errorMessages.Add("recoveryLinkNotFound", "404: Database: The recovery link was not found");
             // 408 Errors - Server side timeout
             errorMessages.Add("cancellationRequested", "408: Server: Cancellation token requested cancellation.");
@@ -151,6 +160,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("accountEnableFail", "503: Database: Failed to enable the account.");
             errorMessages.Add("recoveryLinkRemoveFail", "503: Database: Failed to remove recovery link.");
             errorMessages.Add("recoveryLinkCreateFail", "504: Database: Failed to create recovery link.");
+            errorMessages.Add("createNodeFail", "503: Database: Failed to create node.");
             errorMessages.Add("otpFail", "503: Database: Failed to create OTP.");
             errorMessages.Add("databaseFail", "503: Database: The database is down. Please try again later.");
             errorMessages.Add("logoutFail", "503: Server: Logout failed.");

@@ -820,5 +820,73 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             return "500";
         }
+
+        public async Task<string> CreateNodeAsync(INode node, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                bool nodeExists = false;
+                foreach(var n in InMemoryDatabase.Nodes)
+                {
+                    if(node.nodeID == n.nodeID)
+                    {
+                        nodeExists = true;
+                    }
+                }
+                if (nodeExists)
+                {
+                    return _messageBank.GetMessage(IMessageBank.Responses.nodeAlreadyExists).Result;
+                }
+
+                InMemoryDatabase.Nodes.Add(node);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    InMemoryDatabase.Nodes.Remove(node);
+                    throw new OperationCanceledException();
+                }
+
+                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return _messageBank.GetMessage(IMessageBank.Responses.createNodeFail).Result;
+            }
+        }
+
+        public async Task<Tuple<INode, string>> GetNodeAsync(long nID, CancellationToken cancellationToken = default)
+        {
+            INode nullNode = null;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                Node node;
+                foreach(Node n in InMemoryDatabase.Nodes){
+                    if (nID.Equals(n.nodeID))
+                    {
+                        INode temp;
+                        temp = n;
+                        return Tuple.Create(temp, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
+                    }
+                }
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException();
+                }
+                return Tuple.Create(nullNode, _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).Result);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return Tuple.Create(nullNode, "500: Database: " + ex.Message);
+            }
+        }
     }
 }

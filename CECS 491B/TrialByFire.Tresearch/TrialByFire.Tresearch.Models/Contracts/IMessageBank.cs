@@ -27,6 +27,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             accountNotFound,
             notFoundOrEnabled,
             notFoundOrAuthorized,
+            nodeNotFound,
             recoveryLinkNotFound,
             cancellationRequested,
             cookieFail,
@@ -39,6 +40,8 @@ namespace TrialByFire.Tresearch.Models.Contracts
             databaseFail,
             logoutFail,
             rollbackFailed,
+            createNodeFail,
+            nodeAlreadyExists,
             createdNodesExists,
             createdNodeNotExist,
             createdNodeNotInserted,
@@ -52,6 +55,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             dailyRegistrationNotInserted,
             dailyRegistrationNotExist,
             storeLogFail,
+            createNodeSuccess,
         }
         public Task<string> GetMessage(Responses response);
     }
