@@ -142,10 +142,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.getAdminsSuccess:
                     return "200: Server: Get Admins Success.";
                 case Responses.lastAdminFail:
-                    return "Fail - Cannot delete last admin in system";
+                    return "503: Database: Cannot delete last admin in system";
                 //this is when user clicks accountDeletion in twice before waiting for their first delete request to go thru
                 case Responses.accountAlreadyDeleted:
-                    return "Fail - Account is already deleted";
+                    return "503: Database: Account is already deleted";
                 case Responses.accountDeleteFail:
                     return "503: Database: Failed to delete account";
 

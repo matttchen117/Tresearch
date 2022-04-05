@@ -42,6 +42,12 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
                 cancellationToken.ThrowIfCancellationRequested();
 
+                //checking if account is even there in the first place, if they are a guest then their username would be null.
+                if (Thread.CurrentPrincipal.Identity.Name.Equals(null))
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).ConfigureAwait(false);
+                }
+
                 string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
                 string admins = "";
 
@@ -56,7 +62,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                         return await _accountDeletionService.DeleteAccountAsync(cancellationToken).ConfigureAwait(false);
                     }
 
-                    return await _messageBank.GetMessage(IMessageBank.Responses.lastAdminFail).ConfigureAwait(false);
+
+                    return await _messageBank.GetMessage(IMessageBank.Responses.getAdminsSuccess).ConfigureAwait(false);
 
                 }
                 else

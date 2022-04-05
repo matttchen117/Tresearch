@@ -49,7 +49,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            
+            //CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
 
 
             IAccountDeletionManager accountDeletionManager = TestProvider.GetService<IAccountDeletionManager>();

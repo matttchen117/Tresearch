@@ -216,6 +216,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+
+
+
         /// <summary>
         ///     RemoveRecoveryLinkAsync()
         ///         Removes recovery link from database.
@@ -651,9 +654,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                     var procedure = "dbo.[GetAmountOfAdmins]";
                     affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-
+                    
+                    Console.WriteLine(affectedRows);
                     //changed up logic for affectedRows, if there is more than 1 row
                     //then this should be valid.
+                    
                     if (affectedRows > 1)
                     {
                         return await _messageBank.GetMessage(IMessageBank.Responses.getAdminsSuccess).ConfigureAwait(false);

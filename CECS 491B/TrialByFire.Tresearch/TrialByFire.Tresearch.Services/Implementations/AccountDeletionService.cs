@@ -38,10 +38,6 @@ namespace TrialByFire.Tresearch.Services.Implementations
         public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
 
-            Console.WriteLine(Thread.GetCurrentProcessorId);
-
-
-
 
             string result = "";
             try
@@ -97,6 +93,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
         {
             return await _sqlDAO.GetAmountOfAdminsAsync(cancellationToken).ConfigureAwait(false);
         }
+
+
+
 
 
     }
