@@ -64,7 +64,7 @@ class RegistrationForm extends React.Component  {
 
     hashInput = (value) => {
         var pbkdf2 = require('pbkdf2');      
-        const pbkdfKey = pbkdf2.pbkdf2Sync(value, '',  10000,  64, 'sha512');
+        const pbkdfKey = pbkdf2.pbkdf2Sync(value, '',  10000,  32, 'sha512');
         return pbkdfKey.toString('hex').toUpperCase();
     }
 
@@ -76,7 +76,7 @@ class RegistrationForm extends React.Component  {
 
         if(this.handleInput()){
             this.setState({errorMessage: ''})
-            axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/Registration/register?email=' + this.state.email.toLowerCase() + '&passphrase=' + this.hashInput(this.state.passphrase.toLowerCase()))
+            axios.post('https://localhost:7010/Registration/register?email=' + this.state.email.toLowerCase() + '&passphrase=' + this.hashInput(this.state.passphrase.toLowerCase()))
             .then(res => {
                 window.location = '/Register/ConfirmationSent';
             })
@@ -86,6 +86,7 @@ class RegistrationForm extends React.Component  {
                         break;
                     default: this.setState({errorMessage: 'Unable to create account'});
                 }
+                console.log(err.errorMessage);
             })
         }
     }

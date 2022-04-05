@@ -75,6 +75,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             dailyLoginsExists,
             dailyLoginNotInserted,
             dailyLoginNotExist,
+            tagRetrievalFail,
             topSearchExists,
             topSearchNotInserted,
             topSearchNotExist,
@@ -83,6 +84,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             dailyRegistrationNotExist,
             storeLogFail,
             nodeTagNodeDoesNotExist,
+            nodeNotFound,
             tagAlreadyExist,
             tagDoesNotExist,
         }

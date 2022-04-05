@@ -1623,7 +1623,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 switch (ex.Number)
                 {
-                    default: return "500: Database: " + ex.Message;
+                    default: return "500: Database:" + ex.Number;
                 }
             }
             catch (OperationCanceledException)
@@ -1640,6 +1640,57 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             List<string> tags = new List<string>();
+            List<string> invalid = new List<string>();
+            invalid.Add("-1 invalid");
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    await connection.OpenAsync();
+                    foreach (var nodeId in nodeIDs)
+                    {
+                        var procedure = "dbo.[GetNodeTags]";
+                        var value = new
+                        {
+                            NodeID = nodeId
+                        };
+                        List<string> results = new List<string>(await connection.QueryAsync<string>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+
+                        if (results.Contains("-1 invalid"))
+                            return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound));
+
+                        if (nodeId == nodeIDs.First())
+                        {
+                            tags = results;
+                        }
+                        tags = tags.Intersect(results).ToList();
+                    }
+
+                    return Tuple.Create(tags, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
+                }
+            }
+            catch (SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    default: return Tuple.Create(tags, "500: Database: " + ex.Message);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback handled
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(tags, "500: Database: " + ex.Message);
+            }
+        }
+
+        public async Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            List<string> tags = new List<string>();
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -1649,13 +1700,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     foreach (var nodeId in nodeIDs)
                     {
 
-                        var procedure = "dbo.[GetNodeTags]";
+                        var procedure = "dbo.[GetNodeTagsDesc]";
                         var value = new
                         {
                             NodeID = nodeId
                         };
                         List<string> results = new List<string>(await connection.QueryAsync<string>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
-                        if(nodeId == nodeIDs.First())
+                        if (nodeId == nodeIDs.First())
                         {
                             tags = results;
                         }
@@ -1815,6 +1866,75 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             catch (Exception ex)
             {
                 return Tuple.Create(tags, "500: Database: " + ex.Message);
+            }
+        }
+
+        public async Task<Tuple<List<string>, string>> GetTagsDescAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            List<string> tags = null;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    await connection.OpenAsync();
+                    var procedure = "dbo.[GetTagsDesc]";
+                    var value = new { };
+                    List<string> results = new List<string>(await connection.QueryAsync<string>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+
+
+                    return Tuple.Create(results, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
+                }
+            }
+            catch (SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    default: return Tuple.Create(tags, "500: Database: " + ex.Message);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback handled
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(tags, _options.UncaughtExceptionMessage + ex.Message);
+            }
+        }
+
+        public async Task<Tuple<bool, string>> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    foreach (var nodeId in nodeIDs)
+                    {
+                        var procedure = "dbo.[IsAuthorizedNodeChanges]";
+                        var value = new
+                        {
+                            NodeID = nodeId,
+                            Username = account.Username,
+                            AuthorizationLevel = account.AuthorizationLevel
+                        };
+                        var isAuthorized = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                        if (isAuthorized == 0)
+                            return Tuple.Create(false, await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized));
+                    }
+                    return Tuple.Create(true, await _messageBank.GetMessage(IMessageBank.Responses.generic));
+                }
+            } 
+            catch(OperationCanceledException)
+            {
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return Tuple.Create(false, _options.UncaughtExceptionMessage + ex.Message);
             }
         }
     }

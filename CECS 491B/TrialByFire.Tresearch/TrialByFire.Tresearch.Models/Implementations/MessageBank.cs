@@ -35,6 +35,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
                 case Responses.verifySuccess:
                     return "200: Server: Account Verification success.";
+                case Responses.nodeTagNodeDoesNotExist:
+                    return "204: No nodes passed in.";
                 case Responses.notEnabled:
                     return "401: Database: Account disabled. Perform account recovery or contact system admin.";
                 case Responses.notConfirmed:
@@ -102,6 +104,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 "operation.";
                 case Responses.tagDoesNotExist:
                     return "404: Database: Tag not found.";
+                case Responses.nodeNotFound:
+                    return "404: Database: Node not found.";
                 case Responses.recoveryLinkNotFound:
                     return "404: Database: The recovery link was not found";
                 case Responses.cancellationRequested:
@@ -118,6 +122,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "410: Server: The recovery link has expired.";
                 case Responses.confirmationLinkExpired:
                     return "410: Server: The confirmation link has expired.";
+                case Responses.tagRetrievalFail:
+                    return "502: Server: Unable to get tag data.";
                 case Responses.cookieFail:
                     return "503: Server: Authentication Cookie creation failed.";
                 case Responses.sendEmailFail:

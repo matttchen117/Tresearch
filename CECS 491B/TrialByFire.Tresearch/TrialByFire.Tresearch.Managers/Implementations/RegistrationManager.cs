@@ -14,6 +14,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         public IRegistrationService _registrationService { get; set; }
         public IValidationService _validationService { get; set; }
         public IMessageBank _messageBank { get; set; }
+        
         private int linkActivationLimit = 24;
         public RegistrationManager(ISqlDAO sqlDAO, ILogService logService, IRegistrationService accountService, IMailService mailService, IValidationService validationService, IMessageBank messageBank)
         {

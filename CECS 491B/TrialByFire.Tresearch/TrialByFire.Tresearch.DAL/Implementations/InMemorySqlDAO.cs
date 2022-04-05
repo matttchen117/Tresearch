@@ -131,6 +131,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+        public async Task<Tuple<bool, string>> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Tuple.Create(false, "");
+        }
         public async Task<int> StoreOTPAsync(IAccount account, IOTPClaim otpClaim, 
             CancellationToken cancellationToken = default)
         {
@@ -900,6 +904,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return Tuple.Create(new List<string>(), "200");
         }
 
+        public async Task<Tuple<List<string>, string>> GetTagsDescAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Tuple.Create(new List<string>(), "200");
+        }
+
         public async Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             return "200";
@@ -908,6 +917,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public async Task<string> CreateHashTableEntry(string email, string value, CancellationToken cancellationToken = default(CancellationToken))
         {
             return "200";
+        }
+
+        public async Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Tuple.Create(new List<string>(), "200");
         }
     }
 }
