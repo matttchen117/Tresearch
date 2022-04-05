@@ -735,7 +735,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var value = new
                     {
                         Username = account.Username,
-                        Email = account.Email,
                         Passphrase = account.Passphrase,
                         AuthorizationLevel = account.AuthorizationLevel,
                         AccountStatus = account.AccountStatus,

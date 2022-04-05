@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS Nodes
 DROP TABLE IF EXISTS OTPClaims
 DROP TABLE IF EXISTS Accounts
 DROP TABLE IF EXISTS Logs
+DROP TABLE IF EXISTS UserHashTable
 DROP PROCEDURE IF EXISTS GetLogs
 DROP PROCEDURE IF EXISTS DeleteLogs
 DROP PROCEDURE IF EXISTS VerifyAccount
@@ -20,21 +21,26 @@ DROP PROCEDURE IF EXISTS StoreOTP
 DROP PROCEDURE IF EXISTS Logout
 DROP PROCEDURE IF EXISTS StoreLog
  
+CREATE TABLE UserHashTable( -- only for logging/usage analysis
+    UserID VARCHAR(100) NULL,
+    UserHash VARCHAR(128)
+    CONSTRAINT userhashtable_pk PRIMARY KEY(UserHash)
+);
+
 CREATE TABLE Accounts(
-    Username VARCHAR(50),
-    Email VARCHAR(50),
-    Passphrase VARCHAR(100),
+    Username VARCHAR(128), --username should be email
+    Passphrase VARCHAR(128),
     AuthorizationLevel VARCHAR(40),
     AccountStatus BIT,
     Confirmed BIT,
 	Token VARCHAR(64) NULL,
-    CONSTRAINT user_account_pk PRIMARY KEY(Username, AuthorizationLevel)
+    CONSTRAINT user_account_pk PRIMARY KEY(Username, AuthorizationLevel),
 );
 
 
 CREATE TABLE OTPClaims(
-	Username VARCHAR(50),
-	OTP VARCHAR(10),
+	Username VARCHAR(128),
+	OTP VARCHAR(128),
 	AuthorizationLevel VARCHAR(40),
 	TimeCreated DATETIME,
 	FailCount INT,
@@ -46,7 +52,7 @@ CREATE TABLE OTPClaims(
 
 CREATE TABLE Nodes(
 
-	Username VARCHAR(50),
+	Username VARCHAR(128),
 	AuthorizationLevel VARCHAR(40),
 
 	NodeID BIGINT PRIMARY KEY,
@@ -79,7 +85,7 @@ CREATE TABLE NodeTags(
 
 
 CREATE TABLE UserRatings(
-	Username VARCHAR(50),
+	Username VARCHAR(128),
 	AuthorizationLevel VARCHAR(40),
 
 
@@ -140,69 +146,6 @@ CREATE TABLE Logs(
 	Description TEXT,
 	Hash VARCHAR(64)
 );
-
---for otp tests
-INSERT INTO Accounts (Username, Email, Passphrase, AuthorizationLevel, AccountStatus, Confirmed) VALUES
-('drakat7@gmail.com', 'drakat7@gmail.com', 'abcDEF123', 'user', 1, 1),
-('drakat7@gmail.com', 'drakat7@gmail.com', 'abcDEF123', 'admin', 1, 1),
-('aarry@gmail.com', 'aarry@gmail.com', 'abcDEF123', 'user', 1, 1),
-('barry@gmail.com', 'barry@gmail.com', 'abcDEF123', 'admin', 1, 1),
-('carry@gmail.com', 'carry@gmail.com', 'abcDEF123', 'user', 1, 1),
-('darry@gmail.com', 'darry@gmail.com', 'abcDEF123', 'user', 0, 1),
-('earry@gmail.com', 'earry@gmail.com', 'abcDEF123', 'user', 0, 0),
-('farry@gmail.com', 'farry@gmail.com', 'abcDEF123', 'user', 1, 1);
---for authentication tests
-INSERT INTO Accounts (Username, Email, Passphrase, AuthorizationLevel, AccountStatus, Confirmed) VALUES
-('garry@gmail.com', 'garry@gmail.com', 'abcDEF123', 'user', 1, 1),
-('harry@gmail.com', 'harry@gmail.com', 'abcDEF123', 'admin', 1, 1),
-('iarry@gmail.com', 'iarry@gmail.com', 'abcDEF123', 'admin', 1, 1),
-('sarry@gmail.com', 'sarry@gmail.com', 'abcDEF123', 'admin', 1, 1),
-('jarry@gmail.com', 'jarry@gmail.com', 'abcDEF123', 'admin', 1, 1),
-('karry@gmail.com', 'karry@gmail.com', 'abcDEF123', 'user', 1, 1),
-('larry@gmail.com', 'larry@gmail.com', 'abcDEF123', 'user', 0, 1),
-('marry@gmail.com', 'marry@gmail.com', 'abcDEF123', 'user', 0, 0),
-('narry@gmail.com', 'narry@gmail.com', 'abcDEF123', 'user', 1, 1),
-('oarry@gmail.com', 'oarry@gmail.com', 'abcDEF123', 'user', 1, 1),
-('parry@gmail.com', 'parry@gmail.com', 'abcDEF123', 'user', 1, 1),
-('rarry@gmail.com', 'rarry@gmail.com', 'abcDEF123', 'user', 1, 1),
---api test
-('qarry@gmail.com', 'qarry@gmail.com', 'abcDEF123', 'user', 1, 1);
-
---for otp tests
-INSERT INTO OTPClaims (Username, OTP, AuthorizationLevel, TimeCreated, FailCount) VALUES
-('drakat7@gmail.com', 'ABCdef123', 'user', '2022-03-04T05:06:00', 0),
-('drakat7@gmail.com', 'ABCdef123', 'admin', '2022-03-04T05:06:00', 0),
-('aarry@gmail.com', 'ABCdef123', 'user', '2022-03-04T05:06:00', 0),
-('barry@gmail.com', 'ABCdef123', 'admin', '2022-03-04T05:06:00', 0),
-('carry@gmail.com', 'ABCdef123', 'user', '2022-03-04T05:06:00', 0),
-('darry@gmail.com', 'ABCdef123', 'user', '2022-03-04T05:06:00', 0),
-('earry@gmail.com', 'ABCdef123', 'user', '2022-03-04T05:06:00', 0),
-('farry@gmail.com', 'ABCdef123', 'user', '2022-03-04T05:06:00', 4);
---for authentication tests
-INSERT INTO OTPClaims (Username, OTP, AuthorizationLevel, TimeCreated, FailCount) VALUES
-('garry@gmail.com', 'ABCdef123', 'user', '2022-03-04T05:06:00', 0),
-('harry@gmail.com', 'ABCdef123', 'admin', '2022-03-04T05:06:00', 0),
-('iarry@gmail.com', 'ABCdef123', 'admin', '2022-03-04T05:06:00', 0),
-('sarry@gmail.com', 'ABCdef123', 'admin', '2022-03-04T05:06:00', 0),
-('jarry@gmail.com', 'ABCdef123', 'admin', '2022-03-04T05:06:00', 0),
-('karry@gmail.com', 'ABCdef123', 'user', '2022-03-04T05:06:00', 0),
-('larry@gmail.com', 'ABCdef123', 'user', '2022-03-04T05:06:00', 0),
-('marry@gmail.com', 'ABCdef123', 'user', '2022-03-04T05:06:00', 0),
-('narry@gmail.com', 'ABCdef123', 'user', '2022-03-04T05:06:00', 4),
-('oarry@gmail.com', 'ABCdef123', 'user', '2022-03-04T05:06:00', 4),
-('parry@gmail.com', 'ABCdef123', 'user', '2022-03-04T05:06:00', 4),
-('rarry@gmail.com', 'ABCdef123', 'user', '2022-03-04T05:06:00', 4),
---api test
-('qarry@gmail.com', 'ABCdef123', 'user', '2022-03-06T18:43:00', 0);
-
-INSERT INTO Logs (Timestamp, Level, Username, Category, Description) VALUES
-('2022-02-06T18:43:00', 'Server', 'drakat7@gmail.com', 'Info', 'This is a test.'),
-('2022-02-07T18:43:00', 'Server', 'drakat7@gmail.com', 'Info', 'This is a test.'),
-('2022-02-08T18:43:00', 'Server', 'drakat7@gmail.com', 'Info', 'This is a test.'),
-('2022-02-09T18:43:00', 'Server', 'drakat7@gmail.com', 'Info', 'This is a test.'),
-('2022-02-10T18:43:00', 'Server', 'drakat7@gmail.com', 'Info', 'This is a test.'),
-('2022-02-11T18:43:00', 'Server', 'drakat7@gmail.com', 'Info', 'This is a test.');
-
 
 SET ANSI_NULLS ON
 GO
@@ -295,7 +238,7 @@ GO
 -- =============================================
 CREATE PROCEDURE VerifyAccount 
 	-- Add the parameters for the stored procedure here
-	@Username VARCHAR(50),
+	@Username VARCHAR(128),
     @AuthorizationLevel VARCHAR(40),
 	@Result int OUTPUT
 AS
@@ -352,8 +295,8 @@ GO
 -- =============================================
 CREATE PROCEDURE Authenticate 
 	-- Add the parameters for the stored procedure here
-	@Username VARCHAR(50),
-    @OTP VARCHAR(10),
+	@Username VARCHAR(128),
+    @OTP VARCHAR(128),
     @AuthorizationLevel VARCHAR(40),
 	@TimeCreated DateTime,
 	@Token VARCHAR(64) NULL,
@@ -463,10 +406,10 @@ GO
 -- =============================================
 CREATE PROCEDURE StoreOTP 
 	-- Add the parameters for the stored procedure here
-	@Username VARCHAR(50),
+	@Username VARCHAR(128),
 	@AuthorizationLevel VARCHAR(40),
-	@Passphrase VARCHAR(100),
-	@OTP VARCHAR(10),
+	@Passphrase VARCHAR(128),
+	@OTP VARCHAR(128),
 	@TimeCreated DateTime,
 	@Result int OUTPUT
 AS
@@ -545,7 +488,7 @@ GO
 -- =============================================
 CREATE PROCEDURE Logout 
 	-- Add the parameters for the stored procedure here
-	@Username VARCHAR(50),
+	@Username VARCHAR(128),
 	@AuthorizationLevel VARCHAR(40),
 	@Result int OUTPUT
 AS
@@ -610,7 +553,7 @@ CREATE PROCEDURE StoreLog
 	-- Add the parameters for the stored procedure here
 	@Timestamp DATETIME,
 	@Level VARCHAR(30),
-	@Username VARCHAR(50),
+	@Username VARCHAR(128),
 	@Category VARCHAR(30),
 	@Description TEXT,
 	@Hash VARCHAR(64),
