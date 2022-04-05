@@ -52,7 +52,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 					ex = "Error";
 				}
 			}
-			Assert.Equal(expected, ex);*/
+			Assert.Equal(expected, ex);
 		}
 	}
 }

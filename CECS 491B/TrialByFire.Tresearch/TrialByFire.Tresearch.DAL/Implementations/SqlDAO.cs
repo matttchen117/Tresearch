@@ -1798,7 +1798,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         parentNodeId = node.parentNodeID,
                         nodeTitle = node.nodeTitle,
                         summary = node.summary,
-                        mode = node.mode,
+                        visibility = node.visibility,
                         accountOwner = node.accountOwner
                     };
                     var affectedRows = await connection.QueryAsync<int>(new CommandDefinition(procedure, values, cancellationToken: cancellationToken)).ConfigureAwait(false);

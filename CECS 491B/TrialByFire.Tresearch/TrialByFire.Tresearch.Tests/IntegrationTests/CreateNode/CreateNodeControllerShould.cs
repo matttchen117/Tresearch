@@ -32,9 +32,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
         }
 
         [Theory]
-        [InlineData("jessie@gmail.com", 69420, 69419, "Cooking", "Concepts of Preparing Food", "Public", "jessie@gmail.com", "jessie@gmail.com", "guest", "200: Server: success")]
-        [InlineData("larry@gmail.com", 100000, 100001, "Title 1", "Summary 1", "Private", "larry@gmail.com", "larry@gmail.com", "guest", "409: Database: Node Already Exists")]
-        public async Task CreateTheNode(string username, long nodeID, long parentID, string nodeTitle, string summary, string mode,
+        [InlineData("jessie@gmail.com", 69420, 69419, "Cooking", "Concepts of Preparing Food", true, "jessie@gmail.com", "jessie@gmail.com", "guest", "200: Server: success")]
+        [InlineData("larry@gmail.com", 100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com", "larry@gmail.com", "guest", "409: Database: Node Already Exists")]
+        public async Task CreateTheNode(string username, long nodeID, long parentID, string nodeTitle, string summary, bool visibility,
             string accountOwner, string currentIdentity, string currentRole, string expected)
         {
             //Arrange
@@ -50,7 +50,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
             {
                 StatusCode = Convert.ToInt32(expects[0])
             };
-            Node node = new Node(nodeID, parentID, nodeTitle, summary, mode, accountOwner);
+            Node node = new Node(nodeID, parentID, nodeTitle, summary, visibility, accountOwner);
 
             //Act
             IActionResult result = await createNodeController.CreateNodeAsync(username, node).ConfigureAwait(false);

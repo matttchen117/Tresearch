@@ -134,6 +134,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<INode> InitializeNodes()
         {
             List<INode> nodes = new List<INode>();
+            nodes.Add(new Node(69420, 69419, "Cooking", "Concepts of Preparing Food", true, "jessie@gmail.com"));
             nodes.Add(new Node(100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com"));
             nodes.Add(new Node(100001, 100002, "Title 2", "Summary 2", false, "larry@gmail.com"));
             nodes.Add(new Node(100002, 100003, "Title 3", "Summary 3", false, "larry@gmail.com"));

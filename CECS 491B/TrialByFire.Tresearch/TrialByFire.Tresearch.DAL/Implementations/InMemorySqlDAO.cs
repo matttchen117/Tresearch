@@ -863,6 +863,41 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return "500";
         }
 
+        public async Task<int> GetRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return -1;
+        }
+
+        public async Task<string> AddTagToNodesAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
+
+        public async Task<string> RemoveTagFromNodeAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
+
+        public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Tuple.Create(new List<string>(), "200");
+        }
+
+        public async Task<string> CreateTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
+
+        public async Task<Tuple<List<string>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Tuple.Create(new List<string>(), "200");
+        }
+
+        public async Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
+
         public async Task<string> CreateNodeAsync(INode node, CancellationToken cancellationToken = default)
         {
             try

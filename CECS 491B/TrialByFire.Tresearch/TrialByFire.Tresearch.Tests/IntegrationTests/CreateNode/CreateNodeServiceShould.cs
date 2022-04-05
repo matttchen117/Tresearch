@@ -27,9 +27,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
         }
 
         [Theory]
-        [InlineData("jessie@gmail.com", 69420, 69419, "Cooking", "Concepts of Preparing Food", "Public", "jessie@gmail.com", "200: Server: success")]
-        [InlineData("larry@gmail.com", 100000, 100001, "Title 1", "Summary 1", "Private", "larry@gmail.com", "409: Database: Node Already Exists")]
-        public async Task CreateTheNode(string username, long nodeID, long parentID, string nodeTitle, string summary, string mode,
+        [InlineData("jessie@gmail.com", 69420, 69419, "Cooking", "Concepts of Preparing Food", true, "jessie@gmail.com", "200: Server: success")]
+        [InlineData("larry@gmail.com", 100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com", "409: Database: Node Already Exists")]
+        public async Task CreateTheNode(string username, long nodeID, long parentID, string nodeTitle, string summary, bool mode,
             string accountOwner, string expected)
         {
             //Arrange
