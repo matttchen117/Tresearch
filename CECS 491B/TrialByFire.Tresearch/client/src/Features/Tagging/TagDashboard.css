@@ -1,0 +1,101 @@
+.tag-dashboard-wrapper{
+    position: relative;
+}
+
+.tag-dashboard-table-container{
+    margin-right: auto;
+    margin-left: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 50%;
+}
+
+.tag-dashboard-table {
+    border: 1px  solid #f3f3f3;
+    border-collapse: collapse;
+    font-size: 1em;
+    margin: 25px;
+    min-width: 400px;
+    width: 100%;
+}
+
+.row-tag-table{
+    line-height: 20px;
+    display: inline-block;
+}
+
+.tag-dashboard-table span{
+    
+    color: gray;
+    float: left;
+}
+
+.tag-dashboard-table table{
+    overflow: auto;
+    height: 100px;
+}
+
+
+.tag-dashboard-table thead{
+    background-color: #788770;
+    color: #ffffff;
+    display: block;
+    
+}
+
+.tag-dashboard-table tbody{
+    display: block;
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.tag-dashboard-table th {
+    font-size: 20px;
+    padding: 10px 10px;
+    width: 100%;
+}
+.tag-dashboard-table tr {
+    display: flex;
+    cursor: pointer;
+    width: 100%;
+
+}
+.tag-dashboard-table td{
+
+    text-align: left;
+    padding: 5px 5px;
+    float: right;
+}
+
+.tag-dashboard-table tbody tr:nth-of-type(even){
+    background-color: #f3f3f3;
+}
+
+.tag-dashboard-create-form {
+    display: inline-block;
+   
+}
+
+.tag-dashboard-create-input-container {
+    display: block; 
+    float: left;
+}
+
+.tag-dashboard-create-input-container input{
+    background-color: #f2f2f2;
+    border: 0;
+    box-sizing: border-box;
+    outline: 0;
+    padding: 15px 15px 15px 15px;
+    
+    
+}
+
+.tag-dashboard-create-button {
+    
+    display: block;
+    float: right;
+
+}

@@ -24,7 +24,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
         [InlineData(2021, 12, 12, "Error")]
         public async Task LoadKPIs(int year, int month, int day, string expected)
         {
-            // Arrange
+            /*// Arrange
             IUADService uadService = new UADService(SqlDAO, LogService);
             IAuthenticationService authenticationService = new AuthenticationService(SqlDAO, LogService, MessageBank);
             IAuthorizationService authorizationService = new AuthorizationService(SqlDAO, LogService);
@@ -44,7 +44,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
                     ex = "Error";
                 }
             }
-            Assert.Equal(expected, ex);
+            Assert.Equal(expected, ex);*/
         }
 
 

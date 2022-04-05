@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -16,10 +17,16 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
 {
-    public class InMemoryOTPRequestManagerShould : InMemoryTestDependencies
+    public class InMemoryOTPRequestManagerShould : TestBaseClass
     {
-        public InMemoryOTPRequestManagerShould() : base()
+        public InMemoryOTPRequestManagerShould() : base(new string[] { })
         {
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestServices.AddScoped<IMailService, MailService>();
+            TestServices.AddScoped<IOTPRequestService, OTPRequestService>();
+            TestServices.AddScoped<IAccountVerificationService, AccountVerificationService>();
+            TestServices.AddScoped<IOTPRequestManager, OTPRequestManager>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
@@ -31,12 +38,11 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             "Passphrase. Please try again.")]
         [InlineData("aarry@gmail.com", "abcdEF123", "user", "guest", "guest", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "guest", "guest", "404: Database: The account was not found or " +
-            "it has been disabled.")]
+        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "guest", "guest", "500: Database: The Account was not found.")]
         [InlineData("barry@gmail.com", "abcDEF123", "admin", "billy@yahoo.com", "admin", "403: Server: Active session found. " +
             "Please logout and try again.")]
-        [InlineData("darry@gmail.com", "abcDEF123", "user", "guest", "guest", "404: Database: The account was not found or it " +
-            "has been disabled.")]
+        [InlineData("darry@gmail.com", "abcDEF123", "user", "guest", "guest", "401: Database: Account disabled. " +
+            "Perform account recovery or contact system admin.")]
         [InlineData("earry@gmail.com", "abcDEF123", "user", "guest", "guest", "401: Database: Please confirm your " +
             "account before attempting to login.")]
         public async Task RequestTheOTPAsync(string username, string passphrase, string authorizationLevel, string currentIdentity, string currentRole, string expected)
@@ -48,10 +54,42 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }
-            IMailService mailService = new MailService(MessageBank);
-            IOTPRequestService otpRequestService = new OTPRequestService(SqlDAO, LogService, MessageBank);
-            IOTPRequestManager otpRequestManager = new OTPRequestManager(SqlDAO, LogService, ValidationService,
-                AuthenticationService, otpRequestService, MessageBank, mailService);
+            IOTPRequestManager otpRequestManager = TestProvider.GetService<IOTPRequestManager>();
+
+            // Act
+            string result = await otpRequestManager.RequestOTPAsync(username, passphrase, 
+                authorizationLevel).ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal(expected, result);
+        }
+
+        [Theory]
+        [InlineData("drakat7@gmail.com", "abcDEF123", "user", "guest", "guest", "503: Server: Email failed to send.")]
+        [InlineData("drakat7@gmail.com", "abcDEF123", "admin", "guest", "guest", "503: Server: Email failed to send.")]
+        [InlineData("aarry@gmail.com", "#$%", "user", "guest", "guest", "400: Data: Invalid Username or " +
+            "Passphrase. Please try again.")]
+        [InlineData("aarry@gmail.com", "abcdef#$%", "user", "guest", "guest", "400: Data: Invalid Username or " +
+            "Passphrase. Please try again.")]
+        [InlineData("aarry@gmail.com", "abcdEF123", "user", "guest", "guest", "400: Data: Invalid Username or " +
+            "Passphrase. Please try again.")]
+        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "guest", "guest", "500: Database: The Account was not found.")]
+        [InlineData("barry@gmail.com", "abcDEF123", "admin", "billy@yahoo.com", "admin", "403: Server: Active session found. " +
+            "Please logout and try again.")]
+        [InlineData("darry@gmail.com", "abcDEF123", "user", "guest", "guest", "401: Database: Account disabled. " +
+            "Perform account recovery or contact system admin.")]
+        [InlineData("earry@gmail.com", "abcDEF123", "user", "guest", "guest", "401: Database: Please confirm your " +
+            "account before attempting to login.")]
+        public async Task RequestTheOTPAsyncWithin5Seconds(string username, string passphrase, string authorizationLevel, string currentIdentity, string currentRole, string expected)
+        {
+            // Arrange
+            IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
+            IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+            if (!currentIdentity.Equals("guest"))
+            {
+                Thread.CurrentPrincipal = rolePrincipal;
+            }
+            IOTPRequestManager otpRequestManager = TestProvider.GetService<IOTPRequestManager>();
             CancellationTokenSource cancellationTokenSource =
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));
 

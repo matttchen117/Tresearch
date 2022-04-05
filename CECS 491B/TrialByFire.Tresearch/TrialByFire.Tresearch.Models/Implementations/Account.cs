@@ -13,13 +13,15 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public string? Username { get; set; }
 
-        public string? Passphrase { get; set; }
+        public string? Passphrase { get; }
 
         public string? AuthorizationLevel { get; set; }
 
         public bool? AccountStatus { get; set; }
 
         public bool? Confirmed { get; set; }
+
+        public string? Token { get; set; }
 
         public Account(string email, string username, string passphrase, string authorizationLevel, bool accountStatus, bool confirmed)
         {

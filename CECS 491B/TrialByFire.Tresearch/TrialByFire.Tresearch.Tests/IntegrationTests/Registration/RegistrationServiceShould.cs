@@ -5,99 +5,91 @@ using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Services.Implementations;
 using TrialByFire.Tresearch.Models.Implementations;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 {
-    public class RegistrationServiceShould : IntegrationTestDependencies
+    public class RegistrationServiceShould : TestBaseClass
     {
-
-        public IRegistrationService _registrationService { get; set; }
-
-        public RegistrationServiceShould() : base()
+        public RegistrationServiceShould() : base(new string[] { })
         {
-            _registrationService = new RegistrationService(SqlDAO, LogService);
+            TestServices.AddScoped<IRegistrationService, RegistrationService>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
 
         [Theory]
-        [InlineData("wonderbread@gmail.com", "myRegisterPassword")]
-        [InlineData("orowheat@hotmail.com", "unFortunateName")]
-        public void RegisterTheUser(string email, string passphrase)
+        [InlineData("IntegrationRegistrationService1@gmail.com", "myRegisterPassword", "user", "200: Server: success")]
+        [InlineData("IntegrationRegistrationService2@gmail.com", "unFortunateName", "user", "200: Server: success")]
+        [InlineData("IntegrationRegistrationService3@gmail.com", "unFortunateName", "user", "409: Server: Account  already exists")]
+        public async Task CreateTheAccountAsync(string email, string passphrase, string authorizationLevel, string statusCode)
         {
-            //Arrange 
+
+            //Arrange
             IAccount account = new Account(email, email, passphrase, "user", true, false);
+            IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
+            string expected = statusCode;
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
             //Act
-            List<string> results = _registrationService.CreatePreConfirmedAccount(account);
+            string results = await registrationService.CreateAccountAsync(email, passphrase, authorizationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
-            Assert.Equal('S', results.Last()[0]);
+            Assert.Equal(expected, results);
         }
 
 
         [Theory]
-        [InlineData("wheatIsGreat@gmail.com", "wheatIsGreat@gmail.com", "myPassword", "user", true, false, "www.Tresearch.systems/Registration/confirm?=")]
-        [InlineData("whitebread@hotmail.com", "whitebread@hotmail.com", "servicePassword", "user", true, false, "www.Tresearch.systems/Registration/confirm?=")]
-        public void CreateTheLink(string email, string username, string passphrase, string authenticationLevel, bool status, bool confirmed, string baseUrl)
+        [InlineData("IntegrationRegistrationService4@gmail.com", "user", "200: Server: success")]
+        [InlineData("IntegrationRegistrationService5@gmail.com", "user", "409: Database: The confirmation link already exists.")]
+        [InlineData("IntegrationRegistrationService99@gmail.com", "user", "404: Database: The account was not found.")]
+        public async Task CreateTheLinkAsync(string email, string authorizationLevel, string statusCode)
         {
             //Arrange
-            IAccount _account = new Account(email, username, passphrase, authenticationLevel, status, confirmed);
+            IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
             //Act
-            List<string> results = _registrationService.CreateConfirmation(email, baseUrl);
+            Tuple<IConfirmationLink, string> results = await registrationService.CreateConfirmationAsync(email, authorizationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
-            Assert.Equal('S', results.Last()[0]);        // GUID contains 36 characters
+            Assert.Equal(statusCode, results.Item2);        // GUID contains 36 characters
         }
 
         [Theory]
-        [InlineData("confirmMe@gmail.com", "myPassword", "User", true, false)]
-        [InlineData("confirmMe2@gmail.com", "myPassword", "User", true, false)]
-        public void ConfirmTheUser(string email, string passphrase, string authenticationLevel, bool status, bool confirmed)
+        [InlineData("IntegrationRegistrationService6@gmail.com", "user", "200: Server: success")]
+        [InlineData("IntegrationRegistrationService7@gmail.com", "user", "200: Server: success")]
+        [InlineData("IntegrationRegistrationService99@gmail.com", "user", "404: Database: The account was not found.")]
+        public async Task ConfirmTheUserAsync(string email, string authenticationLevel, string statusCode)
         {
             //Arrange
-            SqlDAO.CreateConfirmationLink(new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now));
+            IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            string expected = statusCode;
 
-            IAccount _account = new Account(email, email, passphrase, authenticationLevel, status, confirmed);
-            SqlDAO.CreateAccount(_account);
             //Act
-            List<string> results = _registrationService.ConfirmAccount(_account);
+            string result = await registrationService.ConfirmAccountAsync(email, authenticationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
-            Assert.Equal('S', results.Last()[0]);
+            Assert.Equal(expected, result);
         }
 
         [Theory]
-        [InlineData("getMyLink@gmail.com")]
-        [InlineData("getMyLink2@gmail.com")]
-        public void GetConfirmationLink(string email)
+        [InlineData("7eeb0847-f9f7-4ff4-b7e1-de4a4160c965", "200: Server: success")]
+        [InlineData("7eeb0847-f9f7-4ff4-b7e1-ab4a4160c965", "404: Database: The confirmation link was not found.")]
+        public async Task GetConfirmationLink(string guid, string statusCode)
         {
             //Arrange
-            Guid myguid = Guid.NewGuid();
-            string guid = myguid.ToString();
-            SqlDAO.CreateConfirmationLink(new ConfirmationLink(email, myguid, DateTime.Now));
+            IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            string expected = statusCode;
 
             //Act
-            IConfirmationLink link = _registrationService.GetConfirmationLink(guid);
+            Tuple<IConfirmationLink, string> link = await registrationService.GetConfirmationLinkAsync(guid, cancellationTokenSource.Token);
+            string result = link.Item2;
 
             //Assert
-            Assert.Equal(email, link.Username);
-        }
-
-        [Theory]
-        [InlineData("removeMe@gmail.com")]
-        [InlineData("removeMe2@gmail.com")]
-        public void RemoveConfirmationLink(string email)
-        {
-            //Arrange
-            IConfirmationLink link = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now);
-            SqlDAO.CreateConfirmationLink(link);
-
-            //Act
-            List<string> results = _registrationService.RemoveConfirmationLink(link);
-
-            //Assert
-            Assert.Equal('S', results.Last()[0]);
+            Assert.Equal(expected, result);
         }
     }
 }

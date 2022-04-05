@@ -22,16 +22,17 @@ namespace TrialByFire.Tresearch.Managers.Implementations
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
-        private IValidationService _validationService { get; }
+        private IAccountVerificationService _accountVerificationService { get; }
         private IAuthenticationService _authenticationService { get; }
         private IMessageBank _messageBank { get; }
 
-        public AuthenticationManager(ISqlDAO sqlDAO, ILogService logService, IValidationService validationService, 
+        public AuthenticationManager(ISqlDAO sqlDAO, ILogService logService, 
+            IAccountVerificationService accountVerificationService, 
             IAuthenticationService authenticationService, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
-            _validationService = validationService;
+            _accountVerificationService = accountVerificationService;
             _authenticationService = authenticationService;
             _messageBank = messageBank;
         }
@@ -59,21 +60,23 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             {
                 if (Thread.CurrentPrincipal == null)
                 {
-                    // Basic input validation will be done at client side
- /*                   Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-                    keyValuePairs.Add("username", username);
-                    keyValuePairs.Add("otp", otp);
-                    string result = _validationService.ValidateInput(keyValuePairs);
-                    if(result.Equals(_messageBank.SuccessMessages["generic"]))
-                    {*/
+                    IAccount account = new Account(username, authorizationLevel);
                     IOTPClaim resultClaim = new OTPClaim(username, otp, authorizationLevel, now);
-                    results = await _authenticationService.AuthenticateAsync(resultClaim, cancellationToken).ConfigureAwait(false);
+                    string result = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken)
+                        .ConfigureAwait(false);
+                    if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses
+                        .verifySuccess).ConfigureAwait(false)))
+                    {
+                        results = await _authenticationService.AuthenticateAsync(resultClaim, cancellationToken).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        results.Add(result);
+                    }
                     return results;
-                    /*}
-                    results.Add(result);
-                    return results;*/
                 }
-                results.Add(_messageBank.ErrorMessages["alreadyAuthenticated"]);
+                results.Add(await _messageBank.GetMessage(IMessageBank.Responses.alreadyAuthenticated)
+                    .ConfigureAwait(false));
             }catch(OTPClaimCreationFailedException occfe)
             {
                 results.Add(occfe.Message);

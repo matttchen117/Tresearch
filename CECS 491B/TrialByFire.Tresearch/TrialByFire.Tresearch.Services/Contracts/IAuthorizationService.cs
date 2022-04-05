@@ -10,7 +10,7 @@ namespace TrialByFire.Tresearch.Services.Contracts
 {
     public interface IAuthorizationService
     {
-        Task<string> VerifyAuthorizedAsync(string requiredAuthLevel, 
-            CancellationToken cancellationToken = default);
+        Task<bool> VerifyAuthorizedAsync(string requiredAuthLevel,
+            string identity, CancellationToken cancellationToken = default);
     }
 }
