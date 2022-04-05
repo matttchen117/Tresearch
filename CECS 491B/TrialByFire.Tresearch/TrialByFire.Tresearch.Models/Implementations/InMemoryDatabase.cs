@@ -158,6 +158,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodes.Add(new Node(200003, 200004, "Title 4", "Summary 4", true, "billy@yahoo.com"));
             nodes.Add(new Node(200004, 200004, "Title 5", "Summary 5", true, "billy@yahoo.com"));
 
+            nodes.Add(new Node(67890, 67890, "Underwater Basket Weaving", "Hardest class offered at CSULB", true, "82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b"));
+            nodes.Add(new Node(67891, 67891, "Subject1", "This is a easy subject", true, "82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b"));
+            nodes.Add(new Node(67892, 67891, "Subject2", "Somewhat hard subject", true, "82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b"));
+            nodes.Add(new Node(67893, 67891, "Subject3", "This is a hard subject", true, "82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b"));
+
             return nodes;
         }
 

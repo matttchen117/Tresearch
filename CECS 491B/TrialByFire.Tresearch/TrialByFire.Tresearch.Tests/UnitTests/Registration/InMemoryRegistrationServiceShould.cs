@@ -24,7 +24,6 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         public async Task CreateTheUser(string email,  string passphrase, string authorizationLevel, string statusCode)
         {
             //Arrange
-            //Arrange
             IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expected = statusCode;
