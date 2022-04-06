@@ -12,8 +12,9 @@ namespace TrialByFire.Tresearch.DAL.Contracts
     {
         public Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> CreateHashTableEntry(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default);
         public Task<int> LogoutAsync(IAccount account, CancellationToken cancellationToken = default);
-        public Task<string> StoreLogAsync(ILog log, CancellationToken cancellationToken = default);
+        public Task<int> StoreLogAsync(ILog log, string destination, CancellationToken cancellationToken = default);
         public Task<string> EnableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> DisableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
         public Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken= default(CancellationToken));
@@ -60,7 +61,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         /*
             Ian's Methods
          */
-        
+
         /*
         public string CreateNode();
 

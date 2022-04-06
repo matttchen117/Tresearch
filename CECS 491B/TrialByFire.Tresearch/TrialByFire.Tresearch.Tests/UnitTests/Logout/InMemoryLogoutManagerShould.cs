@@ -17,9 +17,9 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
 {
-    public class LogoutManagerShould : TestBaseClass
+    public class InMemoryLogoutManagerShould : TestBaseClass
     {
-        public LogoutManagerShould() : base(new string[] { })
+        public InMemoryLogoutManagerShould() : base(new string[] { })
         {
             TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
             TestServices.AddScoped<ILogoutService, LogoutService>();

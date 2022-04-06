@@ -36,6 +36,10 @@ namespace TrialByFire.Tresearch.Models.Contracts
             logoutFail,
             logoutRollback,
 
+            logSuccess,
+            logFail,
+            logRollback,
+
             badNameOrPass,
             badEmail,
             notAuthenticated,

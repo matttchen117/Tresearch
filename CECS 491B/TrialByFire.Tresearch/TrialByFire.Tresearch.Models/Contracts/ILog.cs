@@ -10,8 +10,24 @@ namespace TrialByFire.Tresearch.Models.Contracts
     {
         public DateTime Timestamp { get; }
         public string Level { get; }
-        public string Username { get; }
+        public enum Levels
+        {
+            Info,
+            Debug,
+            Warning,
+            Error,
+        }
+        public string UserHash { get; }
         public string Category { get; }
+        public enum Categories
+        {
+            View,
+            Business,
+            Server,
+            Data,
+            Datastore,
+        }
         public string Description { get; }
+        public string Hash { get; }
     }
 }

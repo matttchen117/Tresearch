@@ -66,6 +66,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.storeOTPRollback:
                     return "400: Database: StoreOTP rollback occurred.";
 
+
                 case Responses.logoutSuccess:
                     return "200: Server: Logout success.";
                 case Responses.unknownRole:
@@ -74,6 +75,13 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "503: Server: Logout failed.";
                 case Responses.logoutRollback:
                     return "400: Database: Logout rollback occurred.";
+
+                case Responses.logSuccess:
+                    return "200: Server: Log success.";
+                case Responses.logFail:
+                    return "503: Server: Log failed.";
+                case Responses.logRollback:
+                    return "400: Database: Log rollback occurred.";
 
                 case Responses.storeLogFail:
                     return "503: Database: Failed to store the log.";

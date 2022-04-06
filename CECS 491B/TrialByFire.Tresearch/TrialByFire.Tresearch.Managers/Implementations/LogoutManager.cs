@@ -24,6 +24,9 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private ILogoutService _logoutService { get; }
         private BuildSettingsOptions _options { get; }
 
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
+            TimeSpan.FromSeconds(5));
+
         public LogoutManager(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, 
             ILogoutService logoutService, IOptionsSnapshot<BuildSettingsOptions> options)
         {
@@ -48,7 +51,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             {
                 try
                 {
-                    return await _logoutService.LogoutAsync(cancellationToken).ConfigureAwait(false);
+                    return await _logoutService.LogoutAsync(_cancellationTokenSource.Token)
+                        .ConfigureAwait(false);
                 }catch (Exception ex)
                 {
                     return _options.UncaughtExceptionMessage + ex.Message;

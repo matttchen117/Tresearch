@@ -30,7 +30,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
         /// <summary>
         ///     CreateAccountAsync(email, passphrase, authorizationlevel)
-        ///         
+        ///
         /// </summary>
         /// <param name="email"></param>
         /// <param name="passphrase"></param>
@@ -42,15 +42,13 @@ namespace TrialByFire.Tresearch.Services.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-
-                IAccount account = new Account(email, email, passphrase, authorizationLevel, true, false);
-
+                IAccount account = new Account(email, passphrase, authorizationLevel, true, false);
                 string createResult = await _sqlDAO.CreateAccountAsync(account, cancellationToken).ConfigureAwait(false);
 
                 if(cancellationToken.IsCancellationRequested && createResult == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                 {
                     //Perform Rollback
-                   
+
                 }
 
                 return createResult;

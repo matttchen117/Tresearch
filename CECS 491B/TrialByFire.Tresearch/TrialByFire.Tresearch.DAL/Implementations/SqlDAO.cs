@@ -20,7 +20,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = messageBank;
             _options = options.Value;
         }
-
         public async Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -90,6 +89,24 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return _options.UncaughtExceptionMessage + ex.Message;
             }
         }
+        
+        public async Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
+            {
+                //Perform sql statement
+                var procedure = "dbo.[GetUserHash]";
+                var parameters = new DynamicParameters();
+                parameters.Add("Username", account.Username);
+                parameters.Add("AuthorizationLevel", account.AuthorizationLevel);
+                parameters.Add("Result", dbType: DbType.AnsiString, size: 128, direction: ParameterDirection.Output);
+                var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
+                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                    .ConfigureAwait(false);
+                return parameters.Get<string>("Result");
+            }
+        }
         public async Task<int> LogoutAsync(IAccount account, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -107,26 +124,26 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return parameters.Get<int>("Result");
             }
         }
-        public async Task<string> StoreLogAsync(ILog log, CancellationToken cancellationToken = default)
+        public async Task<int> StoreLogAsync(ILog log, string destination, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-
             using(var connection = new SqlConnection(_options.SqlConnectionString))
             {
                 var procedure = "[StoreLog]";
-                var value = new { Timestamp = log.Timestamp, Level = log.Level, Username = log.Username,
-                Category = log.Category, Description = log.Description };
-                int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                if (affectedRows != 1)
-                {
-                    affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    if (affectedRows != 1)
-                    {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.storeLogFail).ConfigureAwait(false);
-                    }
-                }
+                var parameters = new DynamicParameters();
+                parameters.Add("Timestamp", log.Timestamp);
+                parameters.Add("Level", log.Level);
+                parameters.Add("@UserHash", log.UserHash);
+                parameters.Add("Category", log.Category);
+                parameters.Add("Description", log.Description);
+                parameters.Add("Hash", log.Hash);
+                parameters.Add("Destination", destination);
+                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
+                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                    .ConfigureAwait(false);
+                return parameters.Get<int>("Result");
             }
-            return await _messageBank.GetMessage(IMessageBank.Responses.generic).ConfigureAwait(false);
         }
 
 
@@ -142,7 +159,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                using (var connection = new SqlConnection(_options.SqlConnectionString)) 
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     //Perform sql statement
                     var procedure = "dbo.[DisableAccount]";                                                                 // Name of store procedure
@@ -806,7 +823,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var value = new
                     {
                         Username = account.Username,
-                        Email = account.Email,
                         Passphrase = account.Passphrase,
                         AuthorizationLevel = account.AuthorizationLevel,
                         AccountStatus = account.AccountStatus,
@@ -1964,7 +1980,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     }
                     return Tuple.Create(true, await _messageBank.GetMessage(IMessageBank.Responses.generic));
                 }
-            } 
+            }
             catch(OperationCanceledException)
             {
                 throw;
