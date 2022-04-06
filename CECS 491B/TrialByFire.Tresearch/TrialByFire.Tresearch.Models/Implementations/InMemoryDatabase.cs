@@ -11,6 +11,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
     {
         public IList<IOTPClaim> OTPClaims { get; set; }
         public IList<IAccount> Accounts { get; set; }
+        public IList<IConfirmationLink> ConfirmationLinks { get; set; }
+        public IList<Tuple<IConfirmationLink, int>> ConfirmationLinksCreated { get; set; }
+        public IList<IRecoveryLink> RecoveryLinks { get; set; }
+        public IList<Tuple<IConfirmationLink, int>> RecoveryLinksCreated { get; set; }
         public IList<INode> Nodes { get; set; }
         public IList<ITag> Tags { get; set; }
         public IList<INodeTag> NodeTags { get; set; }
@@ -21,10 +25,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public IList<IDailyLogin> DailyLogins { get; set; }
         public IList<ITopSearch> TopSearches { get; set; }
         public IList<INodesCreated> NodesCreated { get; set; }
-
         public IList<IDailyRegistration> DailyRegistrations { get; set; }
-
-        public IList<IConfirmationLink> ConfirmationLinks { get; set; }
         public IList<IView> Views { get; set; }
 
         public IList<ILog> Logs { get; set; }
@@ -44,11 +45,20 @@ namespace TrialByFire.Tresearch.Models.Implementations
             ConfirmationLinks = InitializeConfirmationLinks();
             Views = InitializeViews();
             Logs = InitializeLogs();
+            RecoveryLinks = InitializeRecoveryLinks();
         }
 
         /*
             In memory database initialization methods
          */
+
+        private List<IRecoveryLink> InitializeRecoveryLinks()
+        {
+            List<IRecoveryLink> recoveryLinks = new List<IRecoveryLink>();
+            recoveryLinks.Add(new RecoveryLink("pammypoor+recoverService1", "user", DateTime.Now.AddDays(-2), Guid.NewGuid()));
+
+            return recoveryLinks;
+        }
 
         private List<IOTPClaim> InitializeOTPClaims()
         {
@@ -124,17 +134,18 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<INode> InitializeNodes()
         {
             List<INode> nodes = new List<INode>();
-            nodes.Add(new Node(100000, 100001, "Title 1", "Summary 1", "Private", "larry@gmail.com"));
-            nodes.Add(new Node(100001, 100002, "Title 2", "Summary 2", "Private", "larry@gmail.com"));
-            nodes.Add(new Node(100002, 100003, "Title 3", "Summary 3", "Private", "larry@gmail.com"));
-            nodes.Add(new Node(100003, 100004, "Title 4", "Summary 4", "Public", "larry@gmail.com"));
-            nodes.Add(new Node(100004, 100004, "Title 5", "Summary 5", "Public", "larry@gmail.com"));
+            nodes.Add(new Node(69420, 69419, "Cooking", "Concepts of Preparing Food", true, "jessie@gmail.com"));
+            nodes.Add(new Node(100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com"));
+            nodes.Add(new Node(100001, 100002, "Title 2", "Summary 2", false, "larry@gmail.com"));
+            nodes.Add(new Node(100002, 100003, "Title 3", "Summary 3", false, "larry@gmail.com"));
+            nodes.Add(new Node(100003, 100004, "Title 4", "Summary 4", true, "larry@gmail.com"));
+            nodes.Add(new Node(100004, 100004, "Title 5", "Summary 5", true, "larry@gmail.com"));
 
-            nodes.Add(new Node(200000, 200001, "Title 1", "Summary 1", "Private", "billy@yahoo.com"));
-            nodes.Add(new Node(200001, 200002, "Title 2", "Summary 2", "Private", "billy@yahoo.com"));
-            nodes.Add(new Node(200002, 200003, "Title 3", "Summary 3", "Private", "billy@yahoo.com"));
-            nodes.Add(new Node(200003, 200004, "Title 4", "Summary 4", "Public", "billy@yahoo.com"));
-            nodes.Add(new Node(200004, 200004, "Title 5", "Summary 5", "Public", "billy@yahoo.com"));
+            nodes.Add(new Node(200000, 200001, "Title 1", "Summary 1", false, "billy@yahoo.com"));
+            nodes.Add(new Node(200001, 200002, "Title 2", "Summary 2", false, "billy@yahoo.com"));
+            nodes.Add(new Node(200002, 200003, "Title 3", "Summary 3", false, "billy@yahoo.com"));
+            nodes.Add(new Node(200003, 200004, "Title 4", "Summary 4", true, "billy@yahoo.com"));
+            nodes.Add(new Node(200004, 200004, "Title 5", "Summary 5", true, "billy@yahoo.com"));
 
             return nodes;
         }

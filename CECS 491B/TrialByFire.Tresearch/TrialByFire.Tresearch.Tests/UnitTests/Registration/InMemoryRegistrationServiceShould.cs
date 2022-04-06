@@ -5,128 +5,70 @@ using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Services.Implementations;
 using TrialByFire.Tresearch.Models.Implementations;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
 {
-    public class InMemoryRegistrationServiceShould
+    public class InMemoryRegistrationServiceShould : TestBaseClass
     {
+        public InMemoryRegistrationServiceShould() : base(new string[] { })
+        {
+            TestServices.AddScoped<IRegistrationService, RegistrationService>();
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestProvider = TestServices.BuildServiceProvider();
+        }
+
+
         [Theory]
-        [InlineData("pammypoor@gmail.com", "pammypoor@gmail.com", "myPassphrase", "U", true, false)]
-        [InlineData("ValasquezJerry@gmail.com", "ValasquezJerry@gmail.com", "oooooPPPPPP", "U", true, false)]
-        public void ConfirmTheAccount(string email, string username, string passphrase, string authenticationLevel, bool status, bool confirmed)
+        [InlineData("", "user", "")]
+        [InlineData("", "user", "")]
+        public async Task ConfirmTheAccount(string email, string authorizationLevel, string statusCode)
         {
             //Arrange
-            ISqlDAO _sqlDAO = new InMemorySqlDAO();
-            ILogService _logService = new LogService(_sqlDAO);
-            IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
-            IAccount account = new Account(email, username, passphrase, authenticationLevel, status, confirmed);
-            _sqlDAO.CreateAccount(account);
+            IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            string expected = statusCode;
 
             //Act
-            List<string> results = _registrationService.ConfirmAccount(account);
+            string result = await registrationService.ConfirmAccountAsync(email, authorizationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
-            Assert.Equal('S', results.Last()[0]);
+            Assert.Equal(expected, result);
         }
 
         [Theory]
-        [InlineData("pammypoor@gmail.com", "pammypoor@gmail.com", "superSecretPassphrase", "U", true, false)]
-        [InlineData("JEdgarHoover@usa.gov", "JEdgarHoover@usa.gov", "helloHello123", "U", true, false)]
-        public void CreateTheUser(string email, string username, string passphrase, string authenticationLevel, bool status, bool confirmed)
+        [InlineData("", "", "", "user", "")]
+        [InlineData("", "", "", "user", "")]
+        public async Task CreateTheUser(string email, string username, string passphrase, string authorizationLevel, string statusCode)
         {
             //Arrange
-            ISqlDAO _sqlDAO = new InMemorySqlDAO();
-            ILogService _logService = new LogService(_sqlDAO);
-            IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
-            IAccount account = new Account(email, username, passphrase, authenticationLevel, status, confirmed);
+            //Arrange
+            IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            string expected = statusCode;
 
             //Act
-            List<string> results = _registrationService.CreatePreConfirmedAccount(account);
+            string results = await registrationService.CreateAccountAsync(email, passphrase, authorizationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
-            Assert.Equal('S', results.Last()[0]);
+            Assert.Equal(expected, results);
         }
 
 
         [Theory]
-        [InlineData("pammypoor@gmail.com", "pammypoor@gmail.com", "myPassphrase", "U", true, false, "www.Tresearch.systems/")]
-        [InlineData("h.poor@cox.net", "h.poor@cox.net", "password123", "U", true, false, "www.Tresearch.systems/")]
-        public void CreateTheLink(string email, string username, string passphrase, string authenticationLevel, bool status, bool confirmed, string baseUrl)
+        [InlineData("", "", "")]
+        [InlineData("", "", "")]
+        public async Task CreateTheLink(string email,  string authorizationLevel, string statusCode)
         {
             //Arrange
-            ISqlDAO _sqlDAO = new InMemorySqlDAO();
-            ILogService _logService = new LogService(_sqlDAO);
-            IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
-            IAccount account = new Account(email, username, passphrase, authenticationLevel, status, confirmed);
+            IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            string expected = statusCode;
 
             //Act
-            List<string> results = _registrationService.CreateConfirmation(email, baseUrl);
-
-            //Assert
-            Assert.Equal('S', results.Last()[0]);
-        }
-
-        [Theory]
-        [InlineData("wilburt@gmail.com", "www.Tresearch.systems/")]
-        [InlineData("maxwell123@hotmails=.com", "www.Tresearch.systems/")]
-        public void GetTheLink(string username, string url)
-        {
-            //Arrange
-            ISqlDAO _sqlDAO = new InMemorySqlDAO();
-            ILogService _logService = new LogService(_sqlDAO);
-            IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
-            IConfirmationLink _expected = new ConfirmationLink(username, Guid.NewGuid(), DateTime.Now.ToUniversalTime());
-            _sqlDAO.CreateConfirmationLink(_expected);
-
-            string linkUrl = linkUrl = $"{url}/Account/Verify?t={_expected.UniqueIdentifier}";
-
-            //Act
-            IConfirmationLink _confirmationLink = _registrationService.GetConfirmationLink(linkUrl);
-
-            //Assert
-            Assert.Equal(_expected, _confirmationLink);
-        }
-
-        [Theory]
-        [InlineData("HunterS@gmail.com")]
-        [InlineData("pammypoor@gmail.com")]
-        [InlineData("Fez@hotmail.com")]
-        public void RemoveConfirmationLink(string username)
-        {
-            ISqlDAO _sqlDAO = new InMemorySqlDAO();
-            ILogService _logService = new LogService(_sqlDAO);
-            IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
-            Guid guid = Guid.NewGuid();
-            DateTime now = DateTime.Now.ToUniversalTime();
-            IConfirmationLink link = new ConfirmationLink(username, guid, now);
-            _sqlDAO.CreateConfirmationLink(link);
-
-            //Act
-            List<string> results = _registrationService.RemoveConfirmationLink(link);
-
-            //Assert
-            Assert.Equal('S', results.Last()[0]);
-        }
-
-        [Theory]
-        [InlineData("pammypoor@gmail.com", "superSecret")]
-        [InlineData("tstingtesting@hotmail.com", "bonjourApple")]
-        public void GetUserFromLink(string email, string passphrase)
-        {
-            ISqlDAO _sqlDAO = new InMemorySqlDAO();
-            ILogService _logService = new LogService(_sqlDAO);
-            IRegistrationService _registrationService = new RegistrationService(_sqlDAO, _logService);
-            Guid guid = Guid.NewGuid();
-            DateTime now = DateTime.Now.ToUniversalTime();
-            IAccount expected = new Account(email, email, passphrase, "User", true, false);
-            IConfirmationLink link = new ConfirmationLink(email, guid, now);
-
-            _sqlDAO.CreateAccount(expected);
-            _sqlDAO.CreateConfirmationLink(link);
-
-            //Act
-            IAccount result = _registrationService.GetUserFromConfirmationLink(link);
+            Tuple<IConfirmationLink, string> results = await registrationService.CreateConfirmationAsync(email, authorizationLevel);
+            string result = results.Item2;
 
             //Assert
             Assert.Equal(expected, result);

@@ -68,19 +68,28 @@ namespace TrialByFire.Tresearch.Services.Implementations
                         results.Add(jwtToken);
                         break;
                     case 2:
-                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.otpExpired).ConfigureAwait(false));
+                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.otpExpired)
+                            .ConfigureAwait(false));
                         break;
                     case 3:
-                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.badNameOrOTP).ConfigureAwait(false));
+                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.badNameOrOTP)
+                            .ConfigureAwait(false));
                         break;
                     case 4:
-                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.tooManyFails).ConfigureAwait(false));
+                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.tooManyFails)
+                            .ConfigureAwait(false));
                         break;
                     case 5:
-                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.duplicateOTPClaimData).ConfigureAwait(false));
+                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.duplicateOTPClaimData)
+                            .ConfigureAwait(false));
                         break;
                     case 6:
-                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.duplicateAccountData).ConfigureAwait(false));
+                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.duplicateAccountData)
+                            .ConfigureAwait(false));
+                        break;
+                    case 7:
+                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.authenticationRollback)
+                            .ConfigureAwait(false));
                         break;
                     default:
                         throw new NotImplementedException();

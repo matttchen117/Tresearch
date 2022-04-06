@@ -10,6 +10,10 @@ namespace TrialByFire.Tresearch.Models.Contracts
     {
         public IList<IOTPClaim> OTPClaims { get; set; }
         public IList<IAccount> Accounts { get; set; }
+        public IList<IConfirmationLink> ConfirmationLinks { get; set; }
+        public IList<Tuple<IConfirmationLink, int>> ConfirmationLinksCreated { get; set; }
+        public IList<IRecoveryLink> RecoveryLinks { get; set; }
+        public IList<Tuple<IConfirmationLink, int>> RecoveryLinksCreated { get; set; }
         public IList<INode> Nodes { get; set; }
         public IList<ITag> Tags { get; set; }
         public IList<INodeTag> NodeTags { get; set; }
@@ -20,7 +24,6 @@ namespace TrialByFire.Tresearch.Models.Contracts
         public IList<IDailyLogin> DailyLogins { get; set; }
         public IList<ITopSearch> TopSearches { get; set; }
         public IList<INodesCreated> NodesCreated { get; set; }
-        public IList<IConfirmationLink> ConfirmationLinks { get; set; }
 
     }
 }

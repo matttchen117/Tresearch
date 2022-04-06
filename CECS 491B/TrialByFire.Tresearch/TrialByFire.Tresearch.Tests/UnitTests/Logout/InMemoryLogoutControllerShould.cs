@@ -33,13 +33,13 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
 
         [Theory]
         [InlineData("guest", "guest", "401: Server: No active session found. Please login and try again.")]
-        [InlineData("aarry@gmail.com", "user", "200: Server: success")]
-        public async Task LogTheUserOut(string currentIdentity, string currentRole, string expected)
+        [InlineData("aarry@gmail.com", "user", "200: Server: Logout success.")]
+        public async Task LogTheUserOutAsync(string currentIdentity, string currentRole, string expected)
         {
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            if(!currentIdentity.Equals("guest"))
+            if (!currentIdentity.Equals("guest"))
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }

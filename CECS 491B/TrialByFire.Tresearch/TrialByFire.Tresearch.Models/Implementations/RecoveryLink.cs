@@ -4,15 +4,13 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class RecoveryLink : IRecoveryLink
     {
-        public string? Username { get; set; }
+        public string Username { get; set; }
 
-        public Guid? GUIDLink { get; set; }
+        public string AuthorizationLevel { get; set; }
+        public DateTime TimeCreated { get; set; }
+        public Guid GUIDLink { get; set; }
 
-        public DateTime? TimeCreated { get; set; }
-
-        public string? AuthorizationLevel { get; set; }
-
-        public RecoveryLink(string username, Guid uniqueIdentifier, DateTime datetime, string authorizationLevel)
+        public RecoveryLink(string username, string authorizationLevel, DateTime datetime, Guid uniqueIdentifier)
         {
             Username = username;
             GUIDLink = uniqueIdentifier;
@@ -22,8 +20,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public bool isValid()
         {
-            DateTime now = System.DateTime.Now.ToUniversalTime();
-            return (TimeCreated > now.AddHours(-24) && TimeCreated <=now);
+            DateTime now = System.DateTime.Now;
+            return (TimeCreated <=now.AddMinutes(1) && TimeCreated > now.AddDays(-1));
         }
     }
 }

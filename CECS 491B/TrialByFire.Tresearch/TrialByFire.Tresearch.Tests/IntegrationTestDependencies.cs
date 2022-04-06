@@ -17,7 +17,7 @@ namespace TrialByFire.Tresearch.Tests
     public class IntegrationTestDependencies
     {
         private BuildSettingsOptions _buildSettingsOptions { get; }
-        public IOptions<BuildSettingsOptions> BuildSettingsOptions { get; }
+        //public IOptionsSnapshot<BuildSettingsOptions> BuildSettingsOptions { get; }
         public ISqlDAO SqlDAO { get; }
         public ILogService LogService { get; }
         public IMessageBank MessageBank { get; }
@@ -25,6 +25,7 @@ namespace TrialByFire.Tresearch.Tests
         public IAuthorizationService AuthorizationService { get; }
         public IValidationService ValidationService { get; }
 
+        private string _connectionString = "Data Source=tresearchstudentserver.database.windows.net;Initial Catalog=tresearchStudentServer;User ID=tresearchadmin;Password=CECS491B!;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
         private string _connectionString = "Data Source=tresearchstudentserver.database.windows.net;Initial Catalog=tresearchStudentServer;User ID=tresearchadmin;Password=CECS491B!;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
 ;
@@ -32,14 +33,13 @@ namespace TrialByFire.Tresearch.Tests
 
         public IntegrationTestDependencies()
         {
-            _buildSettingsOptions = new BuildSettingsOptions()
+            /*_buildSettingsOptions = new BuildSettingsOptions()
             {
                 Environment = "Test",
-                SqlConnectionString = "Data Source=tresearchstudentserver.database.windows.net;Initial Catalog=tresearchStudentServer;User ID=tresearchadmin;Password=CECS491B!;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
-,
+                SqlConnectionString = "Data Source=tresearchstudentserver.database.windows.net;Initial Catalog=tresearchStudentServer;User ID=tresearchadmin;Password=CECS491B!;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False",
                 SendGridAPIKey = ""
-            };
-            BuildSettingsOptions = Options.Create(_buildSettingsOptions) as IOptions<BuildSettingsOptions>;
+            };*/
+            //BuildSettingsOptions = Options.Create(_buildSettingsOptions) as IOptionsSnapshot<BuildSettingsOptions>;
             MessageBank = new MessageBank();
             //SqlDAO = new SqlDAO(MessageBank, BuildSettingsOptions);
             LogService = new LogService(SqlDAO);
