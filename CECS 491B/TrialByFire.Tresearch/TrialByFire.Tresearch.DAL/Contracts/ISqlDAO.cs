@@ -10,7 +10,8 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 {
     public interface ISqlDAO
     {
-        public Task<string> CreateHashTableEntry(string email, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> CreateHashTableEntry(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
         public Task<int> LogoutAsync(IAccount account, CancellationToken cancellationToken = default);
         public Task<string> StoreLogAsync(ILog log, CancellationToken cancellationToken = default);
         public Task<string> EnableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));

@@ -1,5 +1,7 @@
-﻿using TrialByFire.Tresearch.Services.Contracts;
+﻿using Microsoft.Extensions.Options;
+using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.DAL.Contracts;
+using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using System.Security.Cryptography;
@@ -11,17 +13,19 @@ namespace TrialByFire.Tresearch.Services.Implementations
     /// </summary>
     public class RegistrationService : IRegistrationService
     {
+        private BuildSettingsOptions _options { get; }
         private ISqlDAO _sqlDAO { get; set; }
         private ILogService _logService { get; set; }
         private IMessageBank _messageBank { get; set; }
 
         private int linkActivationLimit = 24;
 
-        public RegistrationService(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank)
+        public RegistrationService(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, IOptions<BuildSettingsOptions> options)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
             _messageBank = messageBank;
+            _options = options.Value;
         }
 
         /// <summary>
@@ -228,16 +232,12 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        public async Task<string> CreateHashTableEntry(string email, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> CreateHashTableEntry(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                string result = await _sqlDAO.CreateHashTableEntry(email, hashedEmail, cancellationToken).ConfigureAwait(false);
-                if (cancellationToken.IsCancellationRequested && result != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
-                {
-                    
-                }
+                string result = await _sqlDAO.CreateHashTableEntry(email, authorizationLevel, hashedEmail, cancellationToken).ConfigureAwait(false);
                 return result;
             }
             catch (OperationCanceledException)

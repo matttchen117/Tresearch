@@ -24,7 +24,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         private ILogService _logService { get; }
         private IRegistrationManager _registrationManager { get; }
         private IMessageBank _messageBank { get; }
-        private string baseUrl = "https://trialbyfiretresearch.azurewebsites.net/Register/Confirm/guid=";
+        
 
         /// <summary>
         ///     Class constructor
@@ -54,7 +54,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
-                string result = await _registrationManager.CreateAndSendConfirmationAsync(email, passphrase, "user", baseUrl).ConfigureAwait(false);
+                string result = await _registrationManager.CreateAndSendConfirmationAsync(email, passphrase, "user").ConfigureAwait(false);
                 string[] split;
                 split = result.Split(":");
                 if(result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
@@ -108,7 +108,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
-                string result = await _registrationManager.ResendConfirmation(guid, baseUrl).ConfigureAwait(false);
+                string result = await _registrationManager.ResendConfirmation(guid).ConfigureAwait(false);
                 string[] split;
                 split = result.Split(":");
                 if (result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))

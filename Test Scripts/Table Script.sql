@@ -1,6 +1,5 @@
 DROP TABLE IF EXISTS EmailRecoveryLinks
 DROP TABLE IF EXISTS EmailRecoveryLinksCreated
-DROP TABLE IF EXISTS EmailConfirmationLinksCreated
 DROP TABLE IF EXISTS EmailConfirmationLinks
 DROP TABLE IF EXISTS TreeHistories
 DROP TABLE IF EXISTS DailyRegistrations
@@ -52,23 +51,24 @@ DROP PROCEDURE IF EXISTS UnconfirmAccount
 
 CREATE TABLE UserHashTable(
 	UserID VARCHAR(100),
+	UserRole VARCHAR(40),
 	UserHash VARCHAR(128),
 	CONSTRAINT user_hashtable_pk PRIMARY KEY(UserHash)
 );
  
 CREATE TABLE Accounts(
-    Username VARCHAR(128),
+    Username VARCHAR(100),
     Passphrase VARCHAR(128),
     AuthorizationLevel VARCHAR(40),
     AccountStatus BIT,
     Confirmed BIT,
 	Token VARCHAR(64) NULL,
 	CONSTRAINT user_account_pk PRIMARY KEY(Username, AuthorizationLevel),
-	CONSTRAINT user_account_hash_fk  FOREIGN KEY(Username) REFERENCES UserHashTable(UserHash)
+	CONSTRAINT user_account_hash_fk  FOREIGN KEY(Username, AuthorizationLevel) REFERENCES UserHashTable(UserID, UserRole)
 );
 
 CREATE TABLE OTPClaims(
-	Username VARCHAR(128),
+	Username VARCHAR(100),
 	OTP VARCHAR(100),
 	AuthorizationLevel VARCHAR(40),
 	TimeCreated DATETIME,
@@ -79,14 +79,13 @@ CREATE TABLE OTPClaims(
 );
 
 CREATE TABLE Nodes(
-	Username VARCHAR(128),
-	AuthorizationLevel VARCHAR(40),
+	UserHash VARCHAR(128),
 	NodeID BIGINT PRIMARY KEY,
 	NodeParentID BIGINT,
 	NodeTitle VARCHAR(100),
 	Summary VARCHAR(750),
 	Visibility BIT,
-	CONSTRAINT node_owner_fk FOREIGN KEY(Username, AuthorizationLevel) REFERENCES Accounts(Username, AuthorizationLevel)
+	CONSTRAINT node_owner_fk FOREIGN KEY(UserHash) REFERENCES UserHashTable(UserHash)
 );
 
 CREATE TABLE Tags(
@@ -103,13 +102,12 @@ CREATE TABLE NodeTags(
 );
 
 CREATE TABLE UserRatings(
-	Username VARCHAR(128),
-	AuthorizationLevel VARCHAR(40),
-	NodeID BIGINT FOREIGN KEY REFERENCES Nodes(NodeID),
+	UserHash VARCHAR(128)
+	NodeID BIGINT,
 	Rating INT,
-	CONSTRAINT user_ratings_fk FOREIGN KEY(Username, AuthorizationLevel) 
-		REFERENCES Accounts(Username, AuthorizationLevel),
-	CONSTRAINT user_ratings_pk PRIMARY KEY(Username, NodeID)
+	CONSTRAINT user_ratings_fk FOREIGN KEY (UserHash) REFERENCES UserHashTable(UserHash),
+	CONSTRAINT user_ratings_node_fk FOREIGN KEY (NodeID) REFERENCES Nodes(NodeID),
+	CONSTRAINT user_ratings_pk PRIMARY KEY(UserHash, NodeID)
 );
 
 --shouldn’t you combine both EditDate and EditTime into one attribute so the datatype can be DateTime
@@ -148,27 +146,19 @@ CREATE TABLE NodesCreated(
 );
 
 CREATE TABLE EmailConfirmationLinks(
-	Username VARCHAR(128),
+	Username VARCHAR(100),
 	AuthorizationLevel VARCHAR(40),
 	GuidLink UNIQUEIDENTIFIER PRIMARY KEY,
 	TimeCreated DateTime,
-	CONSTRAINT confirmation_links_fk FOREIGN KEY(Username, AuthorizationLevel) REFERENCES Accounts(Username, AuthorizationLevel),
+	CONSTRAINT confirmation_links_fk FOREIGN KEY(Username, AuthorizationLevel) REFERENCES Accounts(Username, AuthorizationLevel)
 );
 
 CREATE TABLE EmailRecoveryLinks(
-	Username VARCHAR(128),
+	Username VARCHAR(100),
 	AuthorizationLevel VARCHAR(40),
 	GuidLink UNIQUEIDENTIFIER PRIMARY KEY,
 	TimeCreated DateTime,
 	CONSTRAINT recovery_links_fk FOREIGN KEY(Username, AuthorizationLevel) REFERENCES Accounts(Username, AuthorizationLevel),
-);
-
-CREATE TABLE EmailConfirmationLinksCreated(
-	Username VARCHAR(128),
-	AuthorizationLevel VARCHAR(40),
-	LinkCount int,
-	CONSTRAINT confirmation_count_pk PRIMARY KEY(Username, AuthorizationLevel),
-	CONSTRAINT confirmation_count_links_fk FOREIGN KEY(Username, AuthorizationLevel) REFERENCES Accounts(Username, AuthorizationLevel)
 );
 
 CREATE TABLE EmailRecoveryLinksCreated(
@@ -182,9 +172,10 @@ CREATE TABLE EmailRecoveryLinksCreated(
 CREATE TABLE Logs(
 	Timestamp DATETIME,
 	Level VARCHAR(30),
-	Username VARCHAR(128),
+	UserHash VARCHAR(128),
 	Category VARCHAR(30),
-	Description TEXT
+	Description TEXT,
+	CONSTRAINT logs_fk FOREIGN KEY (UserHash) REFERENCES UserHashTable(UserHash)
 );
 
 SET ANSI_NULLS ON
@@ -292,7 +283,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[CreateAccount]    
 (
-	@Username VARCHAR(128),
+	@Username VARCHAR(100),
 	@Passphrase VARCHAR(128),
 	@AuthorizationLevel VARCHAR(40),
 	@AccountStatus bit,
@@ -315,7 +306,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[CreateConfirmationLink]    
 (
-	@Username VARCHAR(128),
+	@Username VARCHAR(100),
 	@AuthorizationLevel VARCHAR(40),
 	@GUIDLink UNIQUEIDENTIFIER,
 	@TimeCreated DATETIME
@@ -335,7 +326,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[CreateNode]
 (
-    @Username VARCHAR(128),
+    @Username VARCHAR(100),
     @AuthorizationLevel VARCHAR(40),
     @NodeID BIGINT,
     @NodeParentID BIGINT,
@@ -359,8 +350,8 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[CreateUserHash]    
 (
-	
 	@UserID VARCHAR(100),
+	@UserRole VARCHAR(40),
 	@UserHash VARCHAR(128)
 )
 as
@@ -368,16 +359,17 @@ begin
 	IF EXISTS( SELECT * FROM UserHashTable with (updlock, serializable) WHERE UserHash = @UserHash)
 		BEGIN
 			UPDATE UserHashTable SET UserID = @UserID WHERE UserHash = @UserHash;
+			UPDATE UserHashTable SET UserRole = @UserRole WHERE UserHash = @UserHash;
 		END
 	ELSE
 		BEGIN
-			INSERT INTO UserHashTable(UserID, UserHash) VALUES(@UserID, @UserHash);
+			INSERT INTO UserHashTable(UserID, UserRole, UserHash) VALUES(@UserID, @UserRole, @UserHash);
 		END
 end
 
 -- =============================================
 -- Author:		Pammy Poor
--- Description:	Creates a user id 
+-- Description:	Creates a recovery link
 -- =============================================
 SET ANSI_NULLS ON
 GO
@@ -385,7 +377,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE procedure [dbo].[CreateRecoveryLink]
 (
-	@Username VARCHAR(128),
+	@Username VARCHAR(100),
 	@GUIDLink UNIQUEIDENTIFIER,
 	@TimeCreated DATETIME,
 	@AuthorizationLevel VARCHAR(40)
@@ -407,10 +399,11 @@ GO
 CREATE PROCEDURE [dbo].[CreateTag]    
 (
 	@TagName VARCHAR(100)
+	@TagCount BIGINT 
 )
 as
 begin
-	INSERT Tags(TagName) VALUES (@TagName)
+	INSERT Tags(TagName, TagCount) VALUES (@TagName, @TagCount)
 end
 
 -- =============================================
@@ -422,7 +415,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE procedure [dbo].[DecrementRecoveryLinksCreated]
-	@Username VARCHAR(128),
+	@Username VARCHAR(100),
 	@AuthorizationLevel VARCHAR(40)
 
 as
@@ -455,7 +448,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[DeleteAccountStoredProcedure]
-@Username VARCHAR(128), @AuthorizationLevel VARCHAR(40)
+@Username VARCHAR(100), @AuthorizationLevel VARCHAR(40)
 AS 
 BEGIN 
 	DELETE FROM NodeTags WHERE NodeTags.NodeID IN 
@@ -489,7 +482,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE procedure [dbo].[DisableAccount]
 (
-	@Username Varchar(128),
+	@Username Varchar(100),
 	@AuthorizationLevel VARCHAR(40)
 )
 AS
@@ -507,7 +500,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE procedure [dbo].[EnableAccount] 
 (
-	@Username VARCHAR(128), 
+	@Username VARCHAR(100), 
 	@AuthorizationLevel VARCHAR(40)
 )
 AS
@@ -523,7 +516,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE procedure [dbo].[GetAccount] @Username VARCHAR(128), @AuthorizationLevel VARCHAR(40)
+CREATE procedure [dbo].[GetAccount] @Username VARCHAR(100), @AuthorizationLevel VARCHAR(40)
 as
 BEGIN
 SELECT * FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel
@@ -596,7 +589,14 @@ CREATE PROCEDURE [dbo].[GetNodeTagsDesc]
 )
 as
 begin
-	SELECT TagName FROM NodeTags where Nodeid = @NodeID ORDER BY TagName DESC;
+	IF NOT EXISTS(SELECT * FROM Nodes where Nodeid = @NodeID)
+		BEGIN
+			SELECT '-1 invalid'
+		END
+	ELSE
+		BEGIN
+			SELECT TagName FROM NodeTags where Nodeid = @NodeID ORDER BY TagName DESC
+		END
 end
 
 -- =============================================
@@ -725,12 +725,11 @@ GO
 CREATE PROCEDURE [dbo].[IsAuthorizedNodeChanges]
 (
 	@NodeID BIGINT,
-	@Username VARCHAR(128),
-	@AuthorizationLevel VARCHAR(40)
+	@UserHash VARCHAR(128)
 )
 AS
 BEGIN
-	  SELECT CASE WHEN EXISTS ( SELECT * FROM Nodes WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel AND NodeID = @NodeID)
+	  SELECT CASE WHEN EXISTS ( SELECT * FROM Nodes WHERE UserHash = @UserHash AND NodeID = @NodeID)
 	  THEN CAST(1 AS BIT)
 	  ELSE CAST(0 AS BIT)
 END
@@ -803,7 +802,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[UnconfirmAccount]    
 (
-	@Username VARCHAR(128),
+	@Username VARCHAR(100),
 	@AuthorizationLevel VARCHAR(40)
 )
 as

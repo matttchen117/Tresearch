@@ -1,5 +1,7 @@
-﻿using TrialByFire.Tresearch.DAL.Contracts;
+﻿using Microsoft.Extensions.Options;
+using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
+using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
@@ -8,72 +10,81 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 {
     public class RegistrationManager : IRegistrationManager
     {
-        public ISqlDAO _sqlDAO { get; set; }
-        public ILogService _logService { get; set; }
-        public IMailService _mailService { get; set; }
-        public IRegistrationService _registrationService { get; set; }
-        public IValidationService _validationService { get; set; }
-        public IMessageBank _messageBank { get; set; }
-        
-        private int linkActivationLimit = 24;
-        public RegistrationManager(ISqlDAO sqlDAO, ILogService logService, IRegistrationService accountService, IMailService mailService, IValidationService validationService, IMessageBank messageBank)
+        private BuildSettingsOptions _options { get; }
+        private ISqlDAO _sqlDAO { get; set; }
+        private ILogService _logService { get; set; }
+        private IMailService _mailService { get; set; }
+        private IRegistrationService _registrationService { get; set; }
+        private IMessageBank _messageBank { get; set; }
+
+        private string baseUrl = "https://trialbyfiretresearch.azurewebsites.net/Register/Confirm/guid=";
+        public RegistrationManager(ISqlDAO sqlDAO, ILogService logService, IRegistrationService accountService, IMailService mailService, IMessageBank messageBank, IOptions<BuildSettingsOptions> options)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
             _mailService = mailService;
             _registrationService = accountService;
-            _validationService = validationService;
             _messageBank = messageBank;
+            _options = options.Value;
         }
 
-        public async Task<string> CreateAndSendConfirmationAsync(string email, string passphrase, string authorizationLevel, string baseUrl, CancellationToken cancellationToken = default(CancellationToken))
+        /// <summary>
+        ///     CreateAndSendConfirmationAsync(string email, string passphrase, string authorizationLevel)
+        /// </summary>
+        /// <param name="email">Email of user's new account. Must not be hashed</param>
+        /// <param name="passphrase">Passphrase is already hashed from client</param>
+        /// <param name="authorizationLevel">Authorization Level of user</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>String result</returns>
+        public async Task<string> CreateAndSendConfirmationAsync(string email, string passphrase, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                string resultHashed = await _registrationService.HashValueAsync(email, cancellationToken);
-
-                if (resultHashed == "")
-                    throw new Exception();
-
-                string resultHashTable = await _registrationService.CreateHashTableEntry(email, resultHashed, cancellationToken);
-                
-                string resultCreate = await _registrationService.CreateAccountAsync(resultHashed, passphrase, authorizationLevel, cancellationToken);
-
-                
-                //Check if request is cancelled and acccount was already created
-                if(cancellationToken.IsCancellationRequested && resultCreate == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                //Check if user has a token already. User should not be logged in
+                if (Thread.CurrentPrincipal == null)
                 {
-                    //Perform account removal
+                    //Hash email Uusing pbkdf2
+                    string resultHashEmail = await _registrationService.HashValueAsync(email+authorizationLevel, cancellationToken);
+
+                    //Create a UserID, UserRole and UserHash in UserHashTable
+                    string resultInsertUserHashTable = await _registrationService.CreateHashTableEntry(email, authorizationLevel, resultHashEmail, cancellationToken);
+
+                    //Check if HashTable was succesfully added
+                    if (!resultInsertUserHashTable.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
+                        return resultInsertUserHashTable;
+
+                    //Create an account in Account Tables
+                    string resultCreateAccount = await _registrationService.CreateAccountAsync(resultHashEmail, passphrase, authorizationLevel, cancellationToken);
+
+                    //Check if account  was created
+                    if (resultCreateAccount != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return resultCreateAccount;
+
+                    //Create Account Confirmation Link
+                    Tuple<IConfirmationLink, string> confirmationLinkResult = await _registrationService.CreateConfirmationAsync(email, authorizationLevel, cancellationToken).ConfigureAwait(false);
+                    
+                    //Check if confirmation link was successfully created
+                    if(!confirmationLinkResult.Item2.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
+                        return confirmationLinkResult.Item2;
+
+                    IConfirmationLink confirmationLink = confirmationLinkResult.Item1;
+                    
+                    //Send confirmation link to user
+                    string linkUrl = $"{baseUrl}{confirmationLink.GUIDLink.ToString()}";
+                    string mailResult = await _mailService.SendConfirmationAsync(email, linkUrl).ConfigureAwait(false);
+
+                    return mailResult;
+
                 }
+                else
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.alreadyAuthenticated);
+                }    
 
-                //Check if account  was created
-                if (resultCreate != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
-                    return resultCreate;
-
-                Tuple<IConfirmationLink, string> confirmationLink = await _registrationService.CreateConfirmationAsync(email, authorizationLevel, cancellationToken).ConfigureAwait(false);
 
                 
-                //Check if request is cancelled and confirmation link was already created
-                if(cancellationToken.IsCancellationRequested && confirmationLink.Item2 == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
-                {
-                    //Perform account removal
-                    string rollbackResult = await _registrationService.RemoveConfirmationLinkAsync(confirmationLink.Item1, cancellationToken).ConfigureAwait(false);
-                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
-                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
-                    else
-                        throw new OperationCanceledException();
-                }
-
-                if (confirmationLink.Item2 != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
-                    return confirmationLink.Item2;
-
-                //Beyond point of no return cannot cancel
-                string linkUrl = $"{baseUrl}{confirmationLink.Item1.GUIDLink.ToString()}";
-                string mailResult = await _mailService.SendConfirmationAsync(email, linkUrl).ConfigureAwait(false);
-
-                return mailResult;
             }
             catch (OperationCanceledException)
             {
@@ -142,7 +153,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             }
         }
 
-        public async Task<string> ResendConfirmation(string guid, string baseUrl, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> ResendConfirmation(string guid, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {

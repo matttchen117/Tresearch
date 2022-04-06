@@ -21,7 +21,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _options = options.Value;
         }
 
-        public async Task<string> CreateHashTableEntry(string email, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -29,15 +29,17 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     //Perform sql statement
-                    var procedure = "dbo.[CreateHash]";                                                                 // Name of store procedure
-                    var value = new { Email = email, HashedValue = hashedEmail };   //Columns to check in database
+                    var procedure = "dbo.[RemoveHashIdentity]";                                                                 // Name of store procedure
+                    var value = new { UserHash = hashedEmail };                                                                 // Parameters of stored procedure
                     int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
-                    //Check if cancellation is requested
+                    //Check if cancellation is requested ... remove user identity from hash table
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        //Cancellation has been requested, undo everything
-                        
+                        string rollbackResult = await CreateHashTableEntry(email, authorizationLevel, hashedEmail);
+                        if (rollbackResult.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
+                            throw new OperationCanceledException();
+                        return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
                     }
 
                     return await _messageBank.GetMessage(IMessageBank.Responses.generic);
@@ -50,7 +52,42 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return "500: Database: " + ex.Message;
+                return _options.UncaughtExceptionMessage + ex.Message;
+            }
+        }
+
+        public async Task<string> CreateHashTableEntry(string email,string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Perform sql statement
+                    var procedure = "dbo.[CreateHash]";                                                                 // Name of store procedure
+                    var value = new { UserID = email, UserRole = authorizationLevel, UserHash = hashedEmail };          // Parameters of stored procedure
+                    int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    //Check if cancellation is requested ... remove user identity from hash table
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        string rollbackResult = await RemoveUserIdentityFromHashTable(email, authorizationLevel, hashedEmail);
+                        if (rollbackResult.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
+                            throw new OperationCanceledException();
+                        return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
+                    }
+
+                    return await _messageBank.GetMessage(IMessageBank.Responses.generic);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Cancellation requested, nothing to rollback
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return _options.UncaughtExceptionMessage + ex.Message;
             }
         }
         public async Task<int> LogoutAsync(IAccount account, CancellationToken cancellationToken = default)

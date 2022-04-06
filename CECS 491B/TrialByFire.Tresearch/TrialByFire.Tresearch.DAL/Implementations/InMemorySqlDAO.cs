@@ -914,7 +914,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return "200";
         }
 
-        public async Task<string> CreateHashTableEntry(string email, string value, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
+        public async Task<string> CreateHashTableEntry(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
         {
             return "200";
         }

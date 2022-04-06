@@ -34,7 +34,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             string baseUrl = "https://trialbyfiretresearch.azurewebsites.net/Register/Confirm?guid=";
 
             //Act
-            string result = await registrationManager.CreateAndSendConfirmationAsync(email, passphrase, authorizationLevel, baseUrl, cancellationTokenSource.Token);
+            string result = await registrationManager.CreateAndSendConfirmationAsync(email, passphrase, authorizationLevel, cancellationTokenSource.Token);
 
             //Assert
             Assert.Equal(statusCode, result);
