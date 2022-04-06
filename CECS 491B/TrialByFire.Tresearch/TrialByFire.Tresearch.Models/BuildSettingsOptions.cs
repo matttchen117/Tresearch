@@ -12,5 +12,7 @@
         public string User { get; set; } = String.Empty;
         public string Admin { get; set; } = String.Empty;
         public string UncaughtExceptionMessage { get; set; } = String.Empty;
+        public string AnalyticTable { get; set; } = String.Empty;
+        public string ArchiveTable { get; set; } = String.Empty;
     }
 }

@@ -45,7 +45,7 @@ if (System.IO.Directory.Exists(targetFolder))
         _cancellationTokenSource.Token.ThrowIfCancellationRequested();
         using (var connection = new SqlConnection(settings.SqlConnectionString))
         {
-            var procedure = "[GetLogs]";
+            var procedure = "[GetArchiveableLogs]";
             var values = new { Timestamp = dateTime };
             var results = connection.Query<Log>(procedure, values, commandType: CommandType.StoredProcedure).ToList();
             List<string> stringList = results.Select(i => i.ToString()).ToList();
@@ -57,7 +57,7 @@ if (System.IO.Directory.Exists(targetFolder))
             File.WriteAllLines(filePath, stringList);
             StringBuilder stringBuilder = new StringBuilder();
             sevenZipCompressor.CompressFiles(Path.Combine(targetFolder, stringBuilder.AppendFormat("{0}{1}", dateTime, "_Archive.7z").ToString()), filePath);
-            procedure = "DeleteLogs";
+            procedure = "DeleteArchiveableLogs";
             var rowsAffected = connection.Execute(procedure, values, commandType: CommandType.StoredProcedure);
         }
         // Compress the directory and save the file in a yyyyMMdd_project-files.7z format (eg. 20141024_project-files.7z
@@ -88,6 +88,7 @@ if (System.IO.Directory.Exists(targetFolder))
             parameters.Add("Category", log.Category);
             parameters.Add("Description", log.Description);
             parameters.Add("Hash", log.Hash);
+            parameters.Add("Destination", "ArchiveLogs");
             parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
             var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
                 commandType: CommandType.StoredProcedure, cancellationToken: _cancellationTokenSource.Token))

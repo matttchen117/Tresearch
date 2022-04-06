@@ -13,13 +13,12 @@ using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Services.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.UnitTests.Logging
+namespace TrialByFire.Tresearch.Tests.IntegrationTests.Logging
 {
-    public class InMemoryLogServiceShould : TestBaseClass
+    public class LogServiceShould : TestBaseClass
     {
-        public InMemoryLogServiceShould() : base(new string[] { })
+        public LogServiceShould() : base(new string[] { })
         {
-            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
             TestServices.AddScoped<ILogService, LogService>();
             TestProvider = TestServices.BuildServiceProvider();
         }
@@ -36,7 +35,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logging
 
 
             // Act
-            ILog log = await logService.CreateLogAsync(timestamp, level, username, authorizationLevel,
+            ILog log = await logService.CreateLogAsync(timestamp, level, username, authorizationLevel, 
                 category, description).ConfigureAwait(false);
 
             // Assert
@@ -72,8 +71,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logging
             "AnalyticLogs", "200: Server: Log success.")]
         [InlineData(2022, 4, 2, 5, 0, 0, "Info", "drakat7@gmail.com", "admin", "Server", "Log success.",
             "AnalyticLogs", "200: Server: Log success.")]
-        public async Task StoreTheLogAsync(int year, int month, int day, int hour, int minute,
-            int second, string level, string username, string authorizationLevel, string category,
+        public async Task StoreTheLogAsync(int year, int month, int day, int hour, int minute, 
+            int second, string level, string username, string authorizationLevel, string category, 
             string description, string destination, string expected)
         {
             // Arrange
@@ -111,7 +110,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logging
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             // Act
-            string result = await logService.StoreLogAsync(log, destination,
+            string result = await logService.StoreLogAsync(log, destination, 
                 cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert

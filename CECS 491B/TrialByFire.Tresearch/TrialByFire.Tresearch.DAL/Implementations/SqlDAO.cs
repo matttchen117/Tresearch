@@ -20,6 +20,24 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = messageBank;
             _options = options.Value;
         }
+
+        public async Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
+            {
+                //Perform sql statement
+                var procedure = "dbo.[GetUserHash]";
+                var parameters = new DynamicParameters();
+                parameters.Add("Username", account.Username);
+                parameters.Add("AuthorizationLevel", account.AuthorizationLevel);
+                parameters.Add("Result", dbType: DbType.AnsiString, size: 128, direction: ParameterDirection.Output);
+                var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
+                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                    .ConfigureAwait(false);
+                return parameters.Get<string>("Result");
+            }
+        }
         public async Task<int> LogoutAsync(IAccount account, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -37,7 +55,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return parameters.Get<int>("Result");
             }
         }
-        public async Task<int> StoreLogAsync(ILog log, CancellationToken cancellationToken = default)
+        public async Task<int> StoreLogAsync(ILog log, string destination, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             using(var connection = new SqlConnection(_options.SqlConnectionString))
@@ -46,10 +64,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 var parameters = new DynamicParameters();
                 parameters.Add("Timestamp", log.Timestamp);
                 parameters.Add("Level", log.Level);
-                parameters.Add("Username", log.Username);
+                parameters.Add("@UserHash", log.UserHash);
                 parameters.Add("Category", log.Category);
                 parameters.Add("Description", log.Description);
                 parameters.Add("Hash", log.Hash);
+                parameters.Add("Destination", destination);
                 parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
                     commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))

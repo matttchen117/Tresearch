@@ -17,7 +17,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             Warning,
             Error,
         }
-        public string Username { get; }
+        public string UserHash { get; }
         public string Category { get; }
         public enum Categories
         {

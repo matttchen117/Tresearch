@@ -19,31 +19,17 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             InMemoryDatabase = new InMemoryDatabase();
             _messageBank = new MessageBank();
         }
-
-       /* public List<IKPI> LoadKPI(DateTime now)
+        public async Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            foreach(UserHashObject u in InMemoryDatabase.UserHashTable)
+            {
+                if(u.UserID.Equals(account.Username) && u.UserRole.Equals(account.AuthorizationLevel))
+                {
+                    return u.UserHash;
+                }
+            }
+            return null;
         }
-
-        INodesCreated ISqlDAO.GetNodesCreated(DateTime nodeCreationDate)
-        {
-            throw new NotImplementedException();
-        }
-
-        IDailyLogin ISqlDAO.GetDailyLogin(DateTime nodeCreationDate)
-        {
-            throw new NotImplementedException();
-        }
-
-        ITopSearch ISqlDAO.GetTopSearch(DateTime nodeCreationDate)
-        {
-            throw new NotImplementedException();
-        }
-
-        IDailyRegistration ISqlDAO.GetDailyRegistration(DateTime nodeCreationDate)
-        {
-            throw new NotImplementedException();
-        }*/
 
         public async Task<int> LogoutAsync(IAccount account, CancellationToken cancellationToken = default)
         {
@@ -59,13 +45,27 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             return 0;
         }
-        public async Task<int> StoreLogAsync(ILog log, CancellationToken cancellationToken = default)
+        public async Task<int> StoreLogAsync(ILog log, string destination, CancellationToken cancellationToken = default)
         {
-            InMemoryDatabase.Logs.Add(log);
-            if(InMemoryDatabase.Logs.Contains(log))
+            switch(destination)
             {
-                return 1;
-            }
+                case "AnalyticLogs":
+                    InMemoryDatabase.AnalyticLogs.Add(log);
+                    if (InMemoryDatabase.AnalyticLogs.Contains(log))
+                    {
+                        return 1;
+                    }
+                    break;
+                case "ArchiveLogs":
+                    InMemoryDatabase.ArchiveLogs.Add(log);
+                    if (InMemoryDatabase.ArchiveLogs.Contains(log))
+                    {
+                        return 1;
+                    }
+                    break;
+                default:
+                    return 0;
+            };
             return 0;
         }
         public async Task<int> VerifyAccountAsync(IAccount account, 
