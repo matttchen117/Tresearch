@@ -62,16 +62,6 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
             ObjectResult expectedResult = new ObjectResult(expecteds[2]) { StatusCode = Convert.ToInt32(expecteds[0]) };
 
 
-            /*
-            string[] splitExpectation;
-            splitExpectation = expected.Split(":");
-            ObjectResult expectedResult = new ObjectResult(splitExpectation[2])
-            {
-                StatusCode = Convert.ToInt32(splitExpectation[0]),
-                Value = splitExpectation[2]
-            };
-            */
-
 
             // Act
             IActionResult result = await accountDeletionController.DeleteAccountAsync().ConfigureAwait(false);

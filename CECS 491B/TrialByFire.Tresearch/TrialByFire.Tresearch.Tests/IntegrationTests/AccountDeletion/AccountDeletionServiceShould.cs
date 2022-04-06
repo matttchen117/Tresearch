@@ -34,7 +34,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
         [InlineData("altyn@gmail.com", "user", "200: Server: Account Deletion Successful.")]
         [InlineData("ryst@gmail.com", "admin", "200: Server: Account Deletion Successful.")]
         
-        [InlineData("redKeyCard@gmail.com", "admin", "500: Database: The Account was not found.")]
+        [InlineData("redKeyCard@gmail.com", "admin", "200: Server: Account Deletion Successful.")]
 
         public async Task DeleteTheUserAsync(string currentIdentity, string currentRole, string expected)
         {

@@ -71,7 +71,8 @@ namespace TrialByFire.Tresearch.Models.Contracts
             accountDeletionSuccess,
             lastAdminFail,
             accountAlreadyDeleted,
-            accountDeleteFail
+            accountDeleteFail,
+            verificationFailure
         }
         public Task<string> GetMessage(Responses response);
     }

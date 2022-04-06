@@ -27,7 +27,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
 
 
-
+    
 
         public AccountDeletionController(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, IAccountDeletionManager accountDeletionManager, IOptionsSnapshot<BuildSettingsOptions>  options)
         {

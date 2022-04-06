@@ -148,6 +148,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "503: Database: Account is already deleted";
                 case Responses.accountDeleteFail:
                     return "503: Database: Failed to delete account";
+                case Responses.verificationFailure:
+                    return "401: Server: Failure to authenticate and verify user for deletion.";
+
 
 
                 default:
