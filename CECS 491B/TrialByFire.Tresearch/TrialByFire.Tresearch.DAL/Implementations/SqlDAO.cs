@@ -35,13 +35,25 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Check if cancellation is requested ... remove user identity from hash table
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        string rollbackResult = await CreateHashTableEntry(email, authorizationLevel, hashedEmail);
+                        string rollbackResult = await CreateUserHashAsync(email, authorizationLevel, hashedEmail);
                         if (rollbackResult.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
                             throw new OperationCanceledException();
                         return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
                     }
 
                     return await _messageBank.GetMessage(IMessageBank.Responses.generic);
+                }
+            }
+            catch (SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    case 2627:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated);
+                    case 547:   //Adding recovery link violates foreign key constraint (AKA NO ACCOUNT)
+                        return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+                    default:
+                        return "500: Database: " + ex.Message;
                 }
             }
             catch (OperationCanceledException)
@@ -55,7 +67,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> CreateHashTableEntry(string email,string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> CreateUserHashAsync(string email,string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -63,7 +75,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     //Perform sql statement
-                    var procedure = "dbo.[CreateHash]";                                                                 // Name of store procedure
+                    var procedure = "dbo.[CreateUserHash]";                                                                 // Name of store procedure
                     var value = new { UserID = email, UserRole = authorizationLevel, UserHash = hashedEmail };          // Parameters of stored procedure
                     int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
@@ -79,6 +91,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     return await _messageBank.GetMessage(IMessageBank.Responses.generic);
                 }
             }
+
             catch (OperationCanceledException)
             {
                 // Cancellation requested, nothing to rollback

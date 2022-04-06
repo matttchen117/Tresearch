@@ -14,7 +14,8 @@ DROP TABLE IF EXISTS Nodes
 DROP TABLE IF EXISTS OTPClaims
 DROP TABLE IF EXISTS Accounts
 DROP TABLE IF EXISTS UserHashTable
-DROP TABLE IF EXISTS Logs
+DROP TABLE IF EXISTS AnalyticLogs
+DROP TABLE IF EXISTS ArchiveLogs
 
 DROP PROCEDURE IF EXISTS GetLogs
 DROP PROCEDURE IF EXISTS DeleteLogs
@@ -48,15 +49,23 @@ DROP PROCEDURE IF EXISTS RemoveRecoveryLink
 DROP PROCEDURE IF EXISTS RemoveTag
 DROP PROCEDURE IF EXISTS RemoveTagFromNode
 DROP PROCEDURE IF EXISTS UnconfirmAccount
+DROP PROCEDURE IF EXISTS Authenticate
+DROP PROCEDURE IF EXISTS VerifyAccount
+DROP PROCEDURE IF EXISTS StoreOTP
+DROP PROCEDURE IF EXISTS GetArchiveableLogs
+DROP PROCEDURE IF EXISTS DeleteArchiveableLogs
+DROP PROCEDURE IF EXISTS Logout
+DROP PROCEDURE IF EXISTS StoreLog
 
-CREATE TABLE UserHashTable(
+CREATE TABLE [dbo].UserHashTable(
 	UserID VARCHAR(100),
 	UserRole VARCHAR(40),
 	UserHash VARCHAR(128),
+	CONSTRAINT user_hashtable_unique UNIQUE (UserID, UserRole),
 	CONSTRAINT user_hashtable_pk PRIMARY KEY(UserHash)
 );
  
-CREATE TABLE Accounts(
+CREATE TABLE [dbo].Accounts(
     Username VARCHAR(100),
     Passphrase VARCHAR(128),
     AuthorizationLevel VARCHAR(40),
@@ -67,7 +76,7 @@ CREATE TABLE Accounts(
 	CONSTRAINT user_account_hash_fk  FOREIGN KEY(Username, AuthorizationLevel) REFERENCES UserHashTable(UserID, UserRole)
 );
 
-CREATE TABLE OTPClaims(
+CREATE TABLE [dbo].OTPClaims(
 	Username VARCHAR(100),
 	OTP VARCHAR(100),
 	AuthorizationLevel VARCHAR(40),
@@ -78,7 +87,7 @@ CREATE TABLE OTPClaims(
 	CONSTRAINT otp_claims_pk PRIMARY KEY(Username, AuthorizationLevel)
 );
 
-CREATE TABLE Nodes(
+CREATE TABLE [dbo].Nodes(
 	UserHash VARCHAR(128),
 	NodeID BIGINT PRIMARY KEY,
 	NodeParentID BIGINT,
@@ -88,12 +97,12 @@ CREATE TABLE Nodes(
 	CONSTRAINT node_owner_fk FOREIGN KEY(UserHash) REFERENCES UserHashTable(UserHash)
 );
 
-CREATE TABLE Tags(
+CREATE TABLE [dbo].Tags(
 	TagName VARCHAR(100) PRIMARY KEY,
 	TagCount BIGINT
 );
 
-CREATE TABLE NodeTags(
+CREATE TABLE [dbo].NodeTags(
     TagName VARCHAR(100),
     NodeID BIGINT,
 	CONSTRAINT tag_name_fk FOREIGN KEY (TagName) REFERENCES Tags(TagName),
@@ -101,8 +110,8 @@ CREATE TABLE NodeTags(
 	CONSTRAINT node_id_fk FOREIGN KEY (NodeID) REFERENCES Nodes(NodeID)
 );
 
-CREATE TABLE UserRatings(
-	UserHash VARCHAR(128)
+CREATE TABLE [dbo].UserRatings(
+	UserHash VARCHAR(128),
 	NodeID BIGINT,
 	Rating INT,
 	CONSTRAINT user_ratings_fk FOREIGN KEY (UserHash) REFERENCES UserHashTable(UserHash),
@@ -111,45 +120,46 @@ CREATE TABLE UserRatings(
 );
 
 --shouldn’t you combine both EditDate and EditTime into one attribute so the datatype can be DateTime
-CREATE TABLE TreeHistories(
+CREATE TABLE [dbo].TreeHistories(
 	EditDate DATE,
 	EditTime TIME,
 );
 
-CREATE TABLE ViewsWebPages(
+CREATE TABLE [dbo].ViewsWebPages(
 	ViewName VARCHAR(100),
 	Visits INT,
 	AverageDuration FLOAT
 );
 
 -- Keep number of registrations on a given date
-CREATE TABLE DailyRegistrations(
+CREATE TABLE [dbo].DailyRegistrations(
 	RegistrationDate DATE PRIMARY KEY,
 	RegistrationCount INT
 );
 
 -- Keep all of the logins for a given date
-CREATE TABLE DailyLogins(
+CREATE TABLE [dbo].DailyLogins(
 	LoginDate DATE PRIMARY KEY,
 	LoginCount INT
 );
 
-CREATE TABLE TopSearches(
+CREATE TABLE [dbo].TopSearches(
 	TopSearchDate DATE PRIMARY KEY,
 	SearchString VARCHAR(100),
 	SearchCount INT
 );
 
-CREATE TABLE NodesCreated(
+CREATE TABLE [dbo].NodesCreated(
 	NodeCreationDate DATE PRIMARY KEY,
 	NodeCreationTime INT,
 );
 
-CREATE TABLE EmailConfirmationLinks(
+CREATE TABLE [dbo].EmailConfirmationLinks(
 	Username VARCHAR(100),
 	AuthorizationLevel VARCHAR(40),
 	GuidLink UNIQUEIDENTIFIER PRIMARY KEY,
 	TimeCreated DateTime,
+	CONSTRAINT confirmation_unique UNIQUE (Username, AuthorizationLevel),
 	CONSTRAINT confirmation_links_fk FOREIGN KEY(Username, AuthorizationLevel) REFERENCES Accounts(Username, AuthorizationLevel)
 );
 
@@ -161,21 +171,31 @@ CREATE TABLE EmailRecoveryLinks(
 	CONSTRAINT recovery_links_fk FOREIGN KEY(Username, AuthorizationLevel) REFERENCES Accounts(Username, AuthorizationLevel),
 );
 
-CREATE TABLE EmailRecoveryLinksCreated(
-	Username VARCHAR(128),
+CREATE TABLE [dbo].EmailRecoveryLinksCreated(
+	Username VARCHAR(100),
 	AuthorizationLevel VARCHAR(40),
 	LinkCount int,
 	CONSTRAINT recovery_count_pk PRIMARY KEY(Username, AuthorizationLevel),
 	CONSTRAINT recovery_count_fk FOREIGN KEY(Username, AuthorizationLevel) REFERENCES Accounts(Username, AuthorizationLevel)
 );
 
-CREATE TABLE Logs(
+
+CREATE TABLE [dbo].AnalyticLogs(
 	Timestamp DATETIME,
 	Level VARCHAR(30),
 	UserHash VARCHAR(128),
 	Category VARCHAR(30),
 	Description TEXT,
-	CONSTRAINT logs_fk FOREIGN KEY (UserHash) REFERENCES UserHashTable(UserHash)
+	Hash VARCHAR(64)
+);
+
+CREATE TABLE [dbo].ArchiveLogs(
+	Timestamp DATETIME,
+	Level VARCHAR(30),
+	UserHash VARCHAR(128),
+	Category VARCHAR(30),
+	Description TEXT,
+	Hash VARCHAR(64)
 );
 
 SET ANSI_NULLS ON
@@ -187,7 +207,7 @@ GO
 -- Create date: 3/19/22
 -- Description:	Grabs all logs older than the specified DateTime
 -- =============================================
-CREATE PROCEDURE GetLogs 
+CREATE PROCEDURE GetArchiveableLogs 
 	-- Add the parameters for the stored procedure here
 	@Timestamp DateTime = NULL
 AS
@@ -198,7 +218,7 @@ BEGIN
 
     -- Insert statements for procedure here
 	SELECT *
-	FROM Logs
+	FROM ArchiveLogs
 	WHERE Timestamp <= @Timestamp
 
 	RETURN;
@@ -214,21 +234,428 @@ GO
 -- Create date: 3/19/2022
 -- Description:	Deletes all logs older than the given DateTime
 -- =============================================
-CREATE PROCEDURE DeleteLogs 
+CREATE PROCEDURE DeleteArchiveableLogs 
 	-- Add the parameters for the stored procedure here
-	@Timestamp DateTime = NULL
+	@Timestamp DateTime = NULL,
+	@Result int OUTPUT
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
+	DECLARE @TranCounter int;
+	SET @TranCounter = @@TRANCOUNT;
+	IF @TranCounter > 0
+		SAVE TRANSACTION ProcedureSave
+	ELSE
+		BEGIN TRAN
+			BEGIN TRY;
+				-- Insert statements for procedure here
 
-    -- Insert statements for procedure here
-	DELETE
-	FROM Logs
-	WHERE Timestamp <= @Timestamp
+				-- 1 = success, 2 = Rollback occurred
+				DELETE
+				FROM ArchiveLogs
+				WHERE Timestamp <= @Timestamp
 
-	RETURN;
+				SET @Result = 1
+
+				COMMIT TRANSACTION
+			END TRY
+			BEGIN CATCH
+			IF @TranCounter = 0
+				BEGIN
+					SET @Result = 2
+					ROLLBACK TRANSACTION
+				END
+			ELSE
+				IF XACT_STATE() <> -1
+					BEGIN
+						SET @Result = 2
+						ROLLBACK TRANSACTION ProcedureSave
+					END
+			END CATCH
+	RETURN @Result;
+END
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Matthew Chen
+-- Create date: 3/27/2022
+-- Description:	Verify that the account is confirmed and enabled
+-- =============================================
+CREATE PROCEDURE VerifyAccount 
+	-- Add the parameters for the stored procedure here
+	@Username VARCHAR(128),
+    @AuthorizationLevel VARCHAR(40),
+	@Result int OUTPUT
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+	DECLARE @TranCounter int;
+	SET @TranCounter = @@TRANCOUNT;
+	IF @TranCounter > 0
+		SAVE TRANSACTION ProcedureSave
+	ELSE
+		BEGIN TRAN
+			BEGIN TRY;
+				-- Insert statements for procedure here 
+
+				-- 0 = No Account found, 1 = Success, 2 = Not Confirmed, 3 = Not Enabled, 4 = Rollback occurred
+				SET @Result = (SELECT COALESCE(
+					(SELECT CASE 
+						WHEN Confirmed = 1 AND AccountStatus = 1 THEN 1
+						WHEN Confirmed = 0 AND AccountStatus = 0 THEN 2
+						WHEN Confirmed = 1 AND AccountStatus = 0 THEN 3
+					END AS Verified
+					FROM Accounts
+					WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel), 0)
+				)
+				COMMIT TRANSACTION
+			END TRY
+			BEGIN CATCH
+			IF @TranCounter = 0
+				BEGIN
+					SET @Result = 4
+					ROLLBACK TRANSACTION
+				END
+			ELSE
+				IF XACT_STATE() <> -1
+					BEGIN
+						SET @Result = 4
+						ROLLBACK TRANSACTION ProcedureSave
+					END
+			END CATCH
+	RETURN @Result;
+END
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Matthew Chen
+-- Create date: 3/27/2022
+-- Description:	Authenticates the user
+-- =============================================
+CREATE PROCEDURE Authenticate 
+	-- Add the parameters for the stored procedure here
+	@Username VARCHAR(128),
+    @OTP VARCHAR(128),
+    @AuthorizationLevel VARCHAR(40),
+	@TimeCreated DateTime,
+	@Token VARCHAR(64) NULL,
+	@Result int OUTPUT
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+	DECLARE @FailCount int;
+	DECLARE @RowCount int;
+	DECLARE @TranCounter int;
+	SET @TranCounter = @@TRANCOUNT;
+	IF @TranCounter > 0
+		SAVE TRANSACTION ProcedureSave
+	ELSE
+		BEGIN TRAN
+			BEGIN TRY;
+				-- Insert statements for procedure here
+
+				-- 0 = No OTP Claim found, 1 = Success, 2 = Expired OTP, 3 = Bad OTP, 4 = Too many fails, 5 = Duplicate OTP Claims found, 6 = Duplicate Accounts found
+				-- 7 = Rollback occurred
+				SET @Result = (
+					SELECT COALESCE(
+						(SELECT CASE 
+							WHEN CAST(OTP as BINARY) = CAST(@OTP as BINARY) AND TimeCreated <= @TimeCreated AND DATEADD(minute, 2, TimeCreated) >= @TimeCreated THEN 1
+							WHEN CAST(OTP as BINARY) = CAST(@OTP as BINARY) THEN 2
+							ELSE 3
+						END AS Result
+						FROM OTPClaims
+						WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel), 0
+					)
+				)
+
+				IF(@Result = 1)
+					BEGIN
+						UPDATE Accounts 
+						SET Token = @Token 
+						WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel
+
+						SELECT @RowCount = @@ROWCOUNT
+
+						IF(@RowCount != 1)
+							SET @Result = @RowCount
+					END
+
+				IF(@Result = 3)
+					BEGIN
+						UPDATE OTPClaims 
+						SET FailCount = FailCount+1 
+						WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel
+
+						SELECT @RowCount = @@ROWCOUNT
+
+						SET @FailCount = (
+							SELECT COALESCE(
+							(SELECT FailCount
+							FROM OTPClaims
+							WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel), 0)
+						)
+
+						IF(@RowCount = 1)
+							BEGIN
+								IF(@FailCount >= 5)
+									BEGIN
+										SET @Result = 4
+										UPDATE Accounts
+										SET AccountStatus = 0
+										WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel
+
+										SET @RowCount = @@ROWCOUNT
+
+										IF(@RowCount != 1)
+											SET @Result = 6
+									END
+							END
+						ELSE
+							SET @Result = 5
+					END
+					COMMIT TRANSACTION
+			END TRY
+			BEGIN CATCH
+			IF @TranCounter = 0
+				BEGIN
+					SET @Result = 7
+					ROLLBACK TRANSACTION
+				END
+			ELSE
+				IF XACT_STATE() <> -1
+					BEGIN
+						SET @Result = 7
+						ROLLBACK TRANSACTION ProcedureSave
+					END
+			END CATCH
+	RETURN @Result;
+END
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Matthew Chen
+-- Create date: 3/27/2022
+-- Description:	Stores the otp for the User
+-- =============================================
+CREATE PROCEDURE StoreOTP 
+	-- Add the parameters for the stored procedure here
+	@Username VARCHAR(128),
+	@AuthorizationLevel VARCHAR(40),
+	@Passphrase VARCHAR(128),
+	@OTP VARCHAR(128),
+	@TimeCreated DateTime,
+	@Result int OUTPUT
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+	DECLARE @RowCount int;
+	DECLARE @TranCounter int;
+	SET @TranCounter = @@TRANCOUNT;
+	IF @TranCounter > 0
+		SAVE TRANSACTION ProcedureSave
+	ELSE
+		BEGIN TRAN
+			BEGIN TRY;
+				-- Insert statements for procedure here
+
+				-- 0 = No Account Found, 1 = Success, 2 = Bad Passphrase, 3 = No OTP Claim found, 4 = Duplicate OTP Claims found, 5 = Rollback occurred
+
+				SET @Result = (SELECT COALESCE(
+					(SELECT CASE 
+							WHEN CAST(Passphrase as BINARY) = CAST(@Passphrase as BINARY) THEN 1
+							ELSE 2
+						END AS Result
+						FROM Accounts
+						WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel), 0
+					)
+				)
+
+				IF(@Result = 1)
+					BEGIN
+						UPDATE OTPClaims
+						SET OTP = @OTP, TimeCreated = @TimeCreated, 
+							FailCount = CASE 
+											WHEN TimeCreated >= DATEADD(day, 1, @TimeCreated) THEN 0
+											ELSE FailCount
+										END
+						WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel
+
+						SELECT @RowCount = @@ROWCOUNT
+			
+						IF(@RowCount = 1)
+							SET @Result = 1
+						ELSE IF (@RowCount = 0)
+							SET @Result = 3
+						ELSE
+							SET @Result = 4
+					END
+				COMMIT TRANSACTION
+			END TRY
+			BEGIN CATCH
+			IF @TranCounter = 0
+				BEGIN
+					SET @Result = 5
+					ROLLBACK TRANSACTION
+				END
+			ELSE
+				IF XACT_STATE() <> -1
+					BEGIN
+						SET @Result = 5
+						ROLLBACK TRANSACTION ProcedureSave
+					END
+			END CATCH
+	RETURN @Result;
+END
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Matthew Chen
+-- Create date: 3/29/2022
+-- Description:	Stores the otp for the User
+-- =============================================
+CREATE PROCEDURE Logout 
+	-- Add the parameters for the stored procedure here
+	@Username VARCHAR(128),
+	@AuthorizationLevel VARCHAR(40),
+	@Result int OUTPUT
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+	DECLARE @RowCount int;
+	DECLARE @TranCounter int;
+	SET @TranCounter = @@TRANCOUNT;
+	IF @TranCounter > 0
+		SAVE TRANSACTION ProcedureSave
+	ELSE
+		BEGIN TRAN
+			BEGIN TRY;
+				-- Insert statements for procedure here
+
+				-- 0 = No Account Found, 1 = Success, 2 = Duplicate account found, 3 = Rollback occurred
+
+				UPDATE Accounts
+				SET Token = null
+				WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel 
+
+				SELECT @RowCount = @@ROWCOUNT
+
+				IF(@RowCount = 0)
+					SET @Result = 0
+				ELSE IF(@RowCount = 1)
+					SET @Result = 1
+				ELSE
+					SET @Result = 2
+
+				COMMIT TRANSACTION
+			END TRY
+		BEGIN CATCH
+			IF @TranCounter = 0
+				BEGIN
+					SET @Result = 3
+					ROLLBACK TRANSACTION
+				END
+			ELSE
+				IF XACT_STATE() <> -1
+					BEGIN
+						SET @Result = 3
+						ROLLBACK TRANSACTION ProcedureSave
+					END
+		END CATCH
+	RETURN @Result;
+END
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Matthew Chen
+-- Create date: 3/29/2022
+-- Description:	Stores the otp for the User
+-- =============================================
+CREATE PROCEDURE StoreLog 
+	-- Add the parameters for the stored procedure here
+	@Timestamp DATETIME,
+	@Level VARCHAR(30),
+	@UserHash VARCHAR(128),
+	@Category VARCHAR(30),
+	@Description TEXT,
+	@Hash VARCHAR(64),
+	@Destination VARCHAR(40),
+	@Result int OUTPUT
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+	DECLARE @RowCount int;
+	DECLARE @TranCounter int;
+	SET @TranCounter = @@TRANCOUNT;
+	IF @TranCounter > 0
+		SAVE TRANSACTION ProcedureSave
+	ELSE
+		BEGIN TRAN
+			BEGIN TRY;
+				-- Insert statements for procedure here
+
+				-- 0 = Fail, 1 = success, 2 = Rollback occurred
+				IF @Destination = 'Analytic'
+					INSERT INTO AnalyticLogs(Timestamp, Level, UserHash, Category, Description, Hash) VALUES
+					(@Timestamp, @Level, @UserHash, @Category, @Description, @Hash);
+				ELSE IF @Destination = 'Archive'
+					INSERT INTO ArchiveLogs(Timestamp, Level, UserHash, Category, Description, Hash) VALUES
+					(@Timestamp, @Level, @UserHash, @Category, @Description, @Hash);			
+
+				SELECT @RowCount = @@ROWCOUNT
+
+				IF(@RowCount = 1)
+					SET @Result = 1
+				ELSE
+					SET @Result = 0
+
+				COMMIT TRANSACTION
+			END TRY
+		BEGIN CATCH
+			IF @TranCounter = 0
+				BEGIN
+					SET @Result = 2
+					ROLLBACK TRANSACTION
+				END
+			ELSE
+				IF XACT_STATE() <> -1
+					BEGIN
+						SET @Result = 2
+						ROLLBACK TRANSACTION ProcedureSave
+					END
+		END CATCH
+	RETURN @Result;
 END
 GO
 
@@ -252,6 +679,7 @@ begin
 		INSERT INTO NodeTags(Nodeid, TagName) VALUES(@NodeID, @TagName);
 	END
 end
+
 
 
 -- =============================================
@@ -326,8 +754,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[CreateNode]
 (
-    @Username VARCHAR(100),
-    @AuthorizationLevel VARCHAR(40),
+    @UserHash VARCHAR(128),
     @NodeID BIGINT,
     @NodeParentID BIGINT,
     @NodeTitle VARCHAR(100),
@@ -336,8 +763,8 @@ CREATE PROCEDURE [dbo].[CreateNode]
 )
 as
 begin
-    INSERT INTO Nodes(Username, AuthorizationLevel, NodeID, NodeParentID, NodeTitle, Summary, Visibility)
-         VALUES(@Username, @AuthorizationLevel, @NodeID, @NodeParentID, @NodeTitle, @Summary, @Visibility);
+    INSERT INTO Nodes(UserHash, NodeID, NodeParentID, NodeTitle, Summary, Visibility)
+         VALUES(@UserHash, @NodeID, @NodeParentID, @NodeTitle, @Summary, @Visibility);
 end
 
 -- =============================================
@@ -398,7 +825,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[CreateTag]    
 (
-	@TagName VARCHAR(100)
+	@TagName VARCHAR(100),
 	@TagCount BIGINT 
 )
 as
@@ -451,25 +878,30 @@ CREATE PROCEDURE [dbo].[DeleteAccountStoredProcedure]
 @Username VARCHAR(100), @AuthorizationLevel VARCHAR(40)
 AS 
 BEGIN 
-	DELETE FROM NodeTags WHERE NodeTags.NodeID IN 
+	/**DELETE FROM NodeTags WHERE NodeTags.NodeID IN 
     (SELECT NodeTags.NodeID
     FROM Nodes  
     INNER JOIN NodeTags ON NodeTags.NodeID = Nodes.NodeID
-    WHERE Nodes.Username = @Username AND Nodes.AuthorizationLevel = @AuthorizationLevel);
+    WHERE Nodes.Username = @Username AND Nodes.AuthorizationLevel = @AuthorizationLevel);*/
 
+	/*
     DELETE FROM UserRatings 
-    WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
+    WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;*/
 
     DELETE FROM EmailConfirmationLinks     WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
     DELETE FROM EmailRecoveryLinks     WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
-    DELETE FROM EmailConfirmationLinksCreated     WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
     DELETE FROM EmailRecoveryLinksCreated     WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
 
-    DELETE FROM Nodes WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
+	UPDATE Nodes set Visibility = 0 WHERE UserHash = (SELECT UserHash FROM UserHashTable WHERE UserID = @Username and UserRole = @AuthorizationLevel);
+    
+	--DELETE FROM Nodes WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
 
     DELETE FROM OTPClaims WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
 
     DELETE FROM Accounts WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
+
+	UPDATE UserHashTable SET UserID = NULL, UserRole = NULL WHERE UserID = @Username and UserRole = @AuthorizationLevel;
+
 END
 
 -- =============================================
@@ -732,6 +1164,7 @@ BEGIN
 	  SELECT CASE WHEN EXISTS ( SELECT * FROM Nodes WHERE UserHash = @UserHash AND NodeID = @NodeID)
 	  THEN CAST(1 AS BIT)
 	  ELSE CAST(0 AS BIT)
+END
 END
 
 -- =============================================

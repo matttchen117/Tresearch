@@ -18,6 +18,7 @@ import RecoverySent from "./Features/Recover/RecoverySent";
 import TagDashboard from "./Features/Tagging/TagDashboard";
 import Tagger from "./Features/Tagging/Tagger";
 import InactiveLink from "./Features/Registration/InactiveLink";
+import Portal from "./Pages/Portal/Portal";
 
 class App extends React.Component {
   constructor(props){
@@ -37,6 +38,7 @@ class App extends React.Component {
           <header></header>
           <Routes>
             <Route path="/" element = {<Home />}/>
+            <Route path = "/Portal" element ={<Portal />}/>
             <Route path="/Register/ConfirmationSent" element = {<ConfirmationSent />}/>
             <Route path="/Register/EULATerms" element = {<EULATerms/>} />
             <Route path ="/Register/Confirm/:confirmationGuid" element = {<Confirm guid={this.state.confirmationGuid}/>}/>

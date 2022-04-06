@@ -235,7 +235,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                string result = await _sqlDAO.CreateHashTableEntry(email, authorizationLevel, hashedEmail, cancellationToken).ConfigureAwait(false);
+                string result = await _sqlDAO.CreateUserHashAsync(email, authorizationLevel, hashedEmail, cancellationToken).ConfigureAwait(false);
                 return result;
             }
             catch (OperationCanceledException)
