@@ -12,18 +12,10 @@ namespace TrialByFire.Tresearch.Services.Contracts
 {
     public interface IRegistrationService
     {
-        public ISqlDAO _sqlDAO { get; set; }
-        public ILogService _logService { get; set; }
-
-        public List<string> CreatePreConfirmedAccount(IAccount account);
-
-        public List<string> CreateConfirmation(string email, string baseUrl);
-
-        public List<string> ConfirmAccount(IAccount account);
-
-        public IConfirmationLink GetConfirmationLink(string url);
-
-        public List<string> RemoveConfirmationLink(IConfirmationLink _confirmationLink);
-        public IAccount GetUserFromConfirmationLink(IConfirmationLink link);
+        public Task<string> CreateAccountAsync(string email, string passphrase, string authorizationlevel, CancellationToken cancellation = default(CancellationToken));
+        public Task<Tuple<IConfirmationLink, string>> CreateConfirmationAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> ConfirmAccountAsync(string username, string authenticationLevel, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<IConfirmationLink, string>> GetConfirmationLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> RemoveConfirmationLinkAsync(IConfirmationLink _confirmationLink, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

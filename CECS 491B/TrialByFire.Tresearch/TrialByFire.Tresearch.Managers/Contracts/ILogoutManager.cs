@@ -8,6 +8,6 @@ namespace TrialByFire.Tresearch.Managers.Contracts
 {
     public interface ILogoutManager
     {
-        public Task<string> LogoutAsync(CancellationToken cancellationToken);
+        public Task<string> LogoutAsync(CancellationToken cancellationToken = default);
     }
 }

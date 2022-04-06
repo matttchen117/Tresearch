@@ -52,6 +52,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "400: Data: The OTP has expired. Please request a new one.";
                 case Responses.duplicateAccountData:
                     return "500: Database: Duplicate Account found.";
+                case Responses.authenticationRollback:
+                    return "400: Database: Authentication rollback occurred.";
 
                 case Responses.storeOTPSuccess:
                     return "200: Server: StoreOTP success.";
@@ -59,6 +61,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "500: Database: The OTP Claim was not found.";
                 case Responses.duplicateOTPClaimData:
                     return "500: Database: Duplicate OTP Claim found.";
+                case Responses.storeOTPRollback:
+                    return "400: Database: StoreOTP rollback occurred.";
 
                 case Responses.logoutSuccess:
                     return "200: Server: Logout success.";
@@ -66,7 +70,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "400: Server: Unknown role used.";
                 case Responses.logoutFail:
                     return "503: Server: Logout failed.";
+                case Responses.logoutRollback:
+                    return "400: Database: Logout rollback occurred.";
 
+                case Responses.createNodeSuccess:
+                    return "200: Server: Create Node Success";
                 case Responses.storeLogFail:
                     return "503: Database: Failed to store the log.";
                 case Responses.badNameOrPass:
@@ -81,27 +89,57 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "403: Database: You are not authorized to perform this operation.";
                 case Responses.alreadyEnabled:
                     return "403: Server: Account is already enabled.";
+                case Responses.accountAlreadyConfirmed:
+                    return "403: Server: Account is already confirmed";
+                case Responses.accountAlreadyUnconfirmed:
+                    return "403: Server: Account is already unconfirmed";
                 case Responses.recoveryLinkLimitReached:
                     return "403: Server: Account has reached limit of five attempts this month";
                 case Responses.notFoundOrEnabled:
                     return "404: Database: The account was not found or it has been disabled.";
+                case Responses.confirmationLinkNotFound:
+                    return "404: Database: The confirmation link was not found.";
                 case Responses.notFoundOrAuthorized:
                     return "404: Database: Account not found or not authorized to perform the " +
                 "operation.";
+                case Responses.nodeNotFound:
+                    return "404: Database: The node was not found.";
+                case Responses.tagDoesNotExist:
+                    return "404: Database: Tag not found.";
                 case Responses.recoveryLinkNotFound:
                     return "404: Database: The recovery link was not found";
                 case Responses.cancellationRequested:
                     return "408: Server: Cancellation token requested cancellation.";
+                case Responses.accountAlreadyCreated:
+                    return "409: Server: Account  already exists";
+                case Responses.recoveryLinkExists:
+                    return "409: Database: The recovery link arealdy exists.";
+                case Responses.confirmationLinkExists:
+                    return "409: Database: The confirmation link already exists.";
+                case Responses.tagAlreadyExist:
+                    return "409: Database: The tag already exists.";
+                case Responses.recoveryLinkExpired:
+                    return "410: Server: The recovery link has expired.";
+                case Responses.confirmationLinkExpired:
+                    return "410: Server: The confirmation link has expired.";
                 case Responses.cookieFail:
                     return "503: Server: Authentication Cookie creation failed.";
                 case Responses.sendEmailFail:
                     return "503: Server: Email failed to send.";
+                case Responses.accountConfirmedFail:
+                    return "503: Database: Failed to confirm the account";
+                case Responses.accountUnconfirmedFail:
+                    return "503: Database: Failed to unconfirm the account";
                 case Responses.accountDisableFail:
                     return "503: Database: Failed to disable the account.";
                 case Responses.accountEnableFail:
                     return "503: Database: Failed to enable the account.";
                 case Responses.recoveryLinkRemoveFail:
                     return "503: Database: Failed to remove recovery link.";
+                case Responses.confirmationLinkRemoveFail:
+                    return "503: Database: Failed to remove confirmation link.";
+                case Responses.confirmationLinkCreateFail:
+                    return "504: Database: Failed to create confirmation linik.";
                 case Responses.recoveryLinkCreateFail:
                     return "504: Database: Failed to create recovery link.";
                 case Responses.otpFail:
@@ -110,6 +148,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "503: Database: The database is down. Please try again later.";
                 case Responses.rollbackFailed:
                     return "504: Server rollback failed";
+                case Responses.createNodeFail:
+                    return "503: Database: Failed to create node.";
+                case Responses.nodeAlreadyExists:
+                    return "409: Database: Node Already Exists";
                 case Responses.createdNodesExists:
                     return "Fail - Created Nodes Already Exists";
                 case Responses.createdNodeNotExist:
@@ -181,24 +223,26 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("notFoundOrEnabled", "404: Database: The account was not found or it has been disabled.");
             errorMessages.Add("notFoundOrAuthorized", "404: Database: Account not found or not authorized to perform the " +
                 "operation.");
+            errorMessages.Add("nodeNotFound", "404: Database: The node was not found.");
             errorMessages.Add("recoveryLinkNotFound", "404: Database: The recovery link was not found");
             // 408 Errors - Server side timeout
             errorMessages.Add("cancellationRequested", "408: Server: Cancellation token requested cancellation.");
-            
+
 
             //503 Errors - Service Unavailable (Server unable to handle request)
             errorMessages.Add("cookieFail", "503: Server: Authentication Cookie creation failed.");
-            errorMessages.Add("sendEmailFail", "503: Server: Email failed to send.");            
+            errorMessages.Add("sendEmailFail", "503: Server: Email failed to send.");
             errorMessages.Add("accountDisableFail", "503: Database: Failed to disable the account.");
             errorMessages.Add("accountEnableFail", "503: Database: Failed to enable the account.");
             errorMessages.Add("recoveryLinkRemoveFail", "503: Database: Failed to remove recovery link.");
             errorMessages.Add("recoveryLinkCreateFail", "504: Database: Failed to create recovery link.");
+            errorMessages.Add("createNodeFail", "503: Database: Failed to create node.");
             errorMessages.Add("otpFail", "503: Database: Failed to create OTP.");
             errorMessages.Add("databaseFail", "503: Database: The database is down. Please try again later.");
             errorMessages.Add("logoutFail", "503: Server: Logout failed.");
             errorMessages.Add("rollbackFailed", "504: Server rollback failed");
-            
-    
+
+
 
 
             errorMessages.Add("createdNodesExists", "Fail - Created Nodes Already Exists");

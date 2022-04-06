@@ -10,49 +10,32 @@ using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
 {
-
-    public class InMemoryRegistrationControllerShould
+    public class InMemoryRegistrationControllerShould : TestBaseClass
     {
-        ISqlDAO _sqlDAO { get; set; }
-        ILogService _logService { get; set; }
-
-        IRegistrationService _registrationService { get; set; }
-
-        IMailService _mailService { get; set; }
-
-        IValidationService _validationService { get; set; }
-
-        IMessageBank _messageBank { get; set; }
-
-        IRegistrationManager _registrationManager { get; set; }
-
-        IRegistrationController _registrationController { get; set; }
-
-        public InMemoryRegistrationControllerShould()
+        public InMemoryRegistrationControllerShould() : base(new string[] { })
         {
-            _sqlDAO = new InMemorySqlDAO();
-            _logService = new LogService(_sqlDAO);
-            _registrationService = new RegistrationService(_sqlDAO, _logService);
-
-            _messageBank = new MessageBank();
-            _mailService = new MailService(_messageBank);
-            _validationService = new ValidationService(_messageBank);
-            _registrationManager = new RegistrationManager(_sqlDAO, _logService, _registrationService, _mailService, _validationService, _messageBank);
-            _registrationController = new RegistrationController(_sqlDAO, _logService, _registrationService, _mailService, _messageBank, _validationService, _registrationManager);
+            TestServices.AddScoped<IMailService, MailService>();
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestServices.AddScoped<IRegistrationService, RegistrationService>();
+            TestServices.AddScoped<IRegistrationManager, RegistrationManager>();
+            TestServices.AddScoped<IRegistrationController, RegistrationController>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
         [InlineData("pammypoor@gmail.com", "myValidPassphrase")]
         [InlineData("pammypoor@gmail.com", "ApplePie!")]
-        public void RegisterTheUser(string email, string passphrase)
+        public async Task RegisterTheUser(string email, string passphrase)
         {
             //Arrange
-            IAccount account = new Account(email, email, passphrase, "User", true, false);
+            IRegistrationController registrationController = TestProvider.GetService<IRegistrationController>();
+            
             //Act
-            IActionResult results = _registrationController.RegisterAccount(email, passphrase);
+            IActionResult results = await registrationController.RegisterAccountAsync(email, passphrase).ConfigureAwait(false);
             var objectResult = results as ObjectResult;
 
             //Assert
@@ -60,40 +43,19 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         }
 
         [Theory]
-        [InlineData("pammypoor+INcontrollerSendConfirmation1@gmail.com")]
-        [InlineData("pammypoor+INcontrollerSendConfirmation2@gmail.com")]
-        public void SendConfirmation(string email)
+        [InlineData("", "statusCode")]
+        [InlineData("", "")]
+        public async Task confirmAccount(string guid, string statusCode)
         {
             //Arrange
-            IAccount account = new Account(email, "temporaryPassword");
-
+            IRegistrationController registrationController = TestProvider.GetService<IRegistrationController>();
+  
             //Act
-            IActionResult results = _registrationController.SendConfirmation(email);
+            IActionResult results = await registrationController.ConfirmAccountAsync(guid);
             var objectResult = results as ObjectResult;
 
             //Assert
-            Assert.Equal(200, objectResult.StatusCode);
-        }
-
-
-        [Theory]
-        [InlineData("pammypoor+INcontrollerConfirm1@gmail.com", "myControllerPass", "www.tresearch.systems/Registration/verify?=", "2022-03-06 21:32:59.910")]
-        [InlineData("pammypoor+INcontrollerConfirm2@gmail.com", "myControllerPassword", "www.tresearch.systems/Registration/verify?=", "2022-03-06 21:32:59.910")]
-        public void confirmAccount(string email, string passphrase, string url, string date)
-        {
-            //Arrange
-            IAccount _account = new Account(email, email, passphrase, "User", true, false);
-            IConfirmationLink _confirmationLink = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Parse(date));
-
-            _sqlDAO.CreateAccount(_account);
-            _sqlDAO.CreateConfirmationLink(_confirmationLink);
-
-            //Act
-            IActionResult results = _registrationController.ConfirmAccount(url + _confirmationLink.UniqueIdentifier);
-            var objectResult = results as ObjectResult;
-
-            //Assert
-            Assert.Equal(200, objectResult.StatusCode);
+            Assert.Equal(statusCode, objectResult.Value);
         }
     }
 }

@@ -17,9 +17,9 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
 {
-    public class InMemoryLogoutManagerShould : TestBaseClass
+    public class LogoutManagerShould : TestBaseClass
     {
-        public InMemoryLogoutManagerShould() : base(new string[] { })
+        public LogoutManagerShould() : base(new string[] { })
         {
             TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
             TestServices.AddScoped<ILogoutService, LogoutService>();
@@ -29,13 +29,34 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logout
 
         [Theory]
         [InlineData("guest", "guest", "401: Server: No active session found. Please login and try again.")]
-        [InlineData("aarry@gmail.com", "user", "200: Server: success")]
-        public async Task LogTheUserOut(string currentIdentity, string currentRole, string expected)
+        [InlineData("aarry@gmail.com", "user", "200: Server: Logout success.")]
+        public async Task LogTheUserOutAsync(string currentIdentity, string currentRole, string expected)
         {
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            if(!currentIdentity.Equals("guest"))
+            if (!currentIdentity.Equals("guest"))
+            {
+                Thread.CurrentPrincipal = rolePrincipal;
+            }
+            ILogoutManager logoutManager = TestProvider.GetService<ILogoutManager>();
+
+            // Act
+            string result = await logoutManager.LogoutAsync().ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal(expected, result);
+        }
+
+        [Theory]
+        [InlineData("guest", "guest", "401: Server: No active session found. Please login and try again.")]
+        [InlineData("aarry@gmail.com", "user", "200: Server: Logout success.")]
+        public async Task LogTheUserOutAsyncWithin5Seconds(string currentIdentity, string currentRole, string expected)
+        {
+            // Arrange
+            IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
+            IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+            if (!currentIdentity.Equals("guest"))
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }

@@ -25,16 +25,21 @@ builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 builder.Services.AddScoped<IMailService, MailService>();
 builder.Services.AddScoped<IOTPRequestService, OTPRequestService>();
+builder.Services.AddScoped<IRecoveryService, RecoveryService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 builder.Services.AddScoped<IUADService, UADService>();
 builder.Services.AddScoped<IValidationService, ValidationService>();
 builder.Services.AddScoped<ILogoutService, LogoutService>();
+builder.Services.AddScoped<ITagService, TagService>();
 // Managers
 builder.Services.AddScoped<IAccountDeletionManager, AccountDeletionManager>();
 builder.Services.AddScoped<IAuthenticationManager, AuthenticationManager>();
 builder.Services.AddScoped<IOTPRequestManager, OTPRequestManager>();
+builder.Services.AddScoped<IRecoveryManager, RecoveryManager>();
 builder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
 builder.Services.AddScoped<ILogoutManager, LogoutManager>();
+builder.Services.AddScoped<ITagManager, TagManager>();
+builder.Services.AddScoped<IUADManager, UADManager>();  
 // Unnecessary, only here temporarily for successful build
 
 builder.Services.AddControllers();
@@ -53,8 +58,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       builder =>
                       {
-                          builder.WithOrigins("http://localhost:3000",
-                                              "https://localhost:3000")
+                          builder.WithOrigins("https://trialbyfiretresearch.azurewebsites.net",
+                                                "http://localhost:3000",
+                                                "https://localhost:3000")
                                               //.WithHeaders("TresearchAuthenticationCookie")
                                               .AllowAnyHeader()
                                               .AllowAnyMethod()

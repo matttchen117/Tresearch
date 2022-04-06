@@ -1,9 +1,8 @@
 .form-recover-wrapper {
     position: relative;
-    max-width: 350px;
+    max-width: 650px;
     margin: 0 auto 100px;
     text-align:center;
-    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.25);
     padding: 30px;
     border-radius: 5px;
     --form-container-bkg-color: white;
@@ -11,10 +10,22 @@
     background-color: var(--form-container-bkg-color);
 }
 
+.error-recover{
+    color: red;
+}
+
 .recover-title {
-    font-size: 45px;
+    font-size: 30px;
     font-weight: 500;
     color: #788770;
+    text-align: center;
+}
+
+.recover-text {
+    font-size: 15px;
+    color: #788770;
+    text-align: center;
+    
 }
 
 .form-recover-wrapper input[type='text'] {

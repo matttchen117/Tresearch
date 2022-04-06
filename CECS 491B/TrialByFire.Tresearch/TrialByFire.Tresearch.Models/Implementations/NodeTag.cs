@@ -5,13 +5,13 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class NodeTag : INodeTag
     {
-        public long nodeID { get; set; }
-        public string tagName { get; set; }
+        public long NodeID { get; set; }
+        public string TagName { get; set; }
 
         public NodeTag(long nodeID, string tagName)
         {
-            this.nodeID = nodeID;
-            this.tagName = tagName;
+            this.NodeID = nodeID;
+            this.TagName = tagName;
         }
     }
 }

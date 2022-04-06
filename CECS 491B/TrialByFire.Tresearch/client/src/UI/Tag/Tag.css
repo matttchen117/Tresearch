@@ -1,5 +1,4 @@
 .tag {
-    display: inline-block;
     position: relative;
     padding: 0 3px 0 10px;
     margin: 0 10px 10px 0;
@@ -11,7 +10,6 @@
     border-style: solid;
     border-color: #788770;
     text-decoration: none;
-    display: inline-block;
     float: left;
 }
 
