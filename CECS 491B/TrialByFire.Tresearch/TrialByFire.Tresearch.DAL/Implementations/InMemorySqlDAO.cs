@@ -230,17 +230,20 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         }
 
+        public async Task<string> CreateOTPAsync(string username, string authorizationLevel, int failCount, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
 
 
-
-        public async Task<string> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Tuple<int, string>> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 if(InMemoryDatabase.Accounts.Contains(account))
-                    return await _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated);
+                    return Tuple.Create(InMemoryDatabase.Accounts.Count-1, await _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated));
 
                 InMemoryDatabase.Accounts.Add(account);
 
@@ -250,7 +253,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     throw new OperationCanceledException();
                 }
                 
-                return await _messageBank.GetMessage(IMessageBank.Responses.generic);
+                return Tuple.Create(-1,await _messageBank.GetMessage(IMessageBank.Responses.generic));
             }
             catch (OperationCanceledException)
             {
@@ -259,7 +262,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch(Exception ex)
             {
-                return _messageBank.GetMessage(IMessageBank.Responses.accountCreateFail).Result;
+                return Tuple.Create(-1,_messageBank.GetMessage(IMessageBank.Responses.accountCreateFail).Result);
             }
 
         }
@@ -922,7 +925,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             return "200";
         }
-        public async Task<string> CreateUserHashAsync(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> CreateUserHashAsync(int ID, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
         {
             return "200";
         }

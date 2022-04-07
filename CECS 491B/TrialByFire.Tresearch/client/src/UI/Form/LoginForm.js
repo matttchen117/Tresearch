@@ -96,7 +96,7 @@ class LoginForm extends React.Component  {
                         console.log(response.data);
                         console.log(response.headers['authorization']);
                         localStorage.setItem('authorization', response.headers['authorization']);
-                        //navigate('/Login/Authentication');
+                        window.location = '/Register/ConfirmationSent';
                 }).catch(err => {
                         console.log(err.data);
                     })

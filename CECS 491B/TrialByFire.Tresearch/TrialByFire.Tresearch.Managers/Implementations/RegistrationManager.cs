@@ -48,19 +48,30 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     //Hash email Uusing pbkdf2
                     string resultHashEmail = await _registrationService.HashValueAsync(email+authorizationLevel, cancellationToken);
 
+                   
+
+                   
+                    
+
+                    //Create an account in Account Tables
+                    Tuple<int, string> resultCreateAccount = await _registrationService.CreateAccountAsync(email, passphrase, authorizationLevel, cancellationToken);
+
+                    return resultCreateAccount.Item1.ToString();
+
                     //Create a UserID, UserRole and UserHash in UserHashTable
-                    string resultInsertUserHashTable = await _registrationService.CreateHashTableEntry(email, authorizationLevel, resultHashEmail, cancellationToken);
+                    string resultInsertUserHashTable = await _registrationService.CreateHashTableEntry(resultCreateAccount.Item1, resultHashEmail, cancellationToken);
 
                     //Check if HashTable was succesfully added
                     if (!resultInsertUserHashTable.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
                         return resultInsertUserHashTable;
 
-                    //Create an account in Account Tables
-                    string resultCreateAccount = await _registrationService.CreateAccountAsync(resultHashEmail, passphrase, authorizationLevel, cancellationToken);
 
                     //Check if account  was created
-                    if (resultCreateAccount != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
-                        return resultCreateAccount;
+                    if (resultCreateAccount.Item2 != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return resultCreateAccount.Item2;
+
+                    //Create OTP 
+                    string resultCreateOTP = await _registrationService.CreateOTPAsync(email, authorizationLevel, cancellationToken);
 
                     //Create Account Confirmation Link
                     Tuple<IConfirmationLink, string> confirmationLinkResult = await _registrationService.CreateConfirmationAsync(email, authorizationLevel, cancellationToken).ConfigureAwait(false);

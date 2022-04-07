@@ -12,8 +12,9 @@ DROP TABLE IF EXISTS NodeTags
 DROP TABLE IF EXISTS Tags
 DROP TABLE IF EXISTS Nodes
 DROP TABLE IF EXISTS OTPClaims
-DROP TABLE IF EXISTS Accounts
+
 DROP TABLE IF EXISTS UserHashTable
+DROP TABLE IF EXISTS Accounts
 DROP TABLE IF EXISTS AnalyticLogs
 DROP TABLE IF EXISTS ArchiveLogs
 
@@ -24,6 +25,7 @@ DROP PROCEDURE IF EXISTS ConfirmAccount
 DROP PROCEDURE IF EXISTS CreateAccount
 DROP PROCEDURE IF EXISTS CreateConfirmationLink	
 DROP PROCEDURE IF EXISTS CreateNode
+DROP PROCEDURE IF EXISTS CreateOTP
 DROP PROCEDURE IF EXISTS CreateRecoveryLink
 DROP PROCEDURE IF EXISTS CreateTag
 DROP PROCEDURE IF EXISTS CreateUserHash
@@ -57,25 +59,25 @@ DROP PROCEDURE IF EXISTS DeleteArchiveableLogs
 DROP PROCEDURE IF EXISTS Logout
 DROP PROCEDURE IF EXISTS StoreLog
 
-CREATE TABLE [dbo].UserHashTable(
-	UserID VARCHAR(100),
-	UserRole VARCHAR(40),
-	UserHash VARCHAR(128),
-	CONSTRAINT user_hashtable_unique UNIQUE (UserID, UserRole),
-	CONSTRAINT user_hashtable_pk PRIMARY KEY(UserHash)
-);
- 
 CREATE TABLE [dbo].Accounts(
+	UserID INT IDENTITY(1,1),
     Username VARCHAR(100),
     Passphrase VARCHAR(128),
     AuthorizationLevel VARCHAR(40),
     AccountStatus BIT,
     Confirmed BIT,
-	Token VARCHAR(64) NULL,
-	CONSTRAINT user_account_pk PRIMARY KEY(Username, AuthorizationLevel),
-	CONSTRAINT user_account_hash_fk  FOREIGN KEY(Username, AuthorizationLevel) REFERENCES UserHashTable(UserID, UserRole)
+    Token VARCHAR(64) NULL,
+	CONSTRAINT user_accounts_ck UNIQUE (UserID),
+    CONSTRAINT user_account_pk PRIMARY KEY(Username, AuthorizationLevel)
 );
 
+CREATE TABLE [dbo].UserHashTable(
+	UserID INT,
+	UserHash VARCHAR(128),
+	CONSTRAINT user_hashtable_fk FOREIGN KEY (UserID) REFERENCES Accounts(UserID),
+	CONSTRAINT user_hashtable_pk PRIMARY KEY(UserHash)
+);
+ 
 CREATE TABLE [dbo].OTPClaims(
 	Username VARCHAR(100),
 	OTP VARCHAR(100),
@@ -717,11 +719,12 @@ CREATE PROCEDURE [dbo].[CreateAccount]
 	@AccountStatus bit,
 	@Confirmed bit
 )
-as
-begin
+AS
+BEGIN
 	INSERT INTO Accounts(Username, Passphrase, AuthorizationLevel, AccountStatus, Confirmed)
 		 VALUES(@Username, @Passphrase, @AuthorizationLevel, @AccountStatus, @Confirmed);
-end
+	SELECT UserID FROM Accounts WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
+END
 
 
 -- =============================================
@@ -768,6 +771,26 @@ begin
 end
 
 -- =============================================
+--Author:        Pammy Poor
+-- Description:    Create OTP
+-- =============================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[CreateOTP]
+(
+    @Username VARCHAR(100),
+	@AuthorizationLvel VARCHAR(40),
+	@FailCount INT
+)
+as
+begin
+    INSERT INTO OTPClaims(Username, AuthorizationLevel, FailCount)
+         VALUES(@Username, @AuthorizationLvel, @FailCount);
+end
+
+-- =============================================
 -- Author:		Pammy Poor
 -- Description:	Creates a user id 
 -- =============================================
@@ -777,8 +800,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[CreateUserHash]    
 (
-	@UserID VARCHAR(100),
-	@UserRole VARCHAR(40),
+	@UserID INT,
 	@UserHash VARCHAR(128)
 )
 as
@@ -786,11 +808,10 @@ begin
 	IF EXISTS( SELECT * FROM UserHashTable with (updlock, serializable) WHERE UserHash = @UserHash)
 		BEGIN
 			UPDATE UserHashTable SET UserID = @UserID WHERE UserHash = @UserHash;
-			UPDATE UserHashTable SET UserRole = @UserRole WHERE UserHash = @UserHash;
 		END
 	ELSE
 		BEGIN
-			INSERT INTO UserHashTable(UserID, UserRole, UserHash) VALUES(@UserID, @UserRole, @UserHash);
+			INSERT INTO UserHashTable(UserID, UserHash) VALUES(@UserID, @UserHash);
 		END
 end
 
@@ -892,15 +913,15 @@ BEGIN
     DELETE FROM EmailRecoveryLinks     WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
     DELETE FROM EmailRecoveryLinksCreated     WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
 
-	UPDATE Nodes set Visibility = 0 WHERE UserHash = (SELECT UserHash FROM UserHashTable WHERE UserID = @Username and UserRole = @AuthorizationLevel);
     
 	--DELETE FROM Nodes WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
 
     DELETE FROM OTPClaims WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
 
+
     DELETE FROM Accounts WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
 
-	UPDATE UserHashTable SET UserID = NULL, UserRole = NULL WHERE UserID = @Username and UserRole = @AuthorizationLevel;
+	
 
 END
 

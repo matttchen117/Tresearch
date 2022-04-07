@@ -1,4 +1,7 @@
------ Tagging Service
+-
+
+
+---- Tagging Service
 
 DELETE NodeTags where NodeID = 67892
 DELETE NodeTags where NodeID = 67891
@@ -84,23 +87,21 @@ INSERT Nodes(Username, AuthorizationLevel, NodeID, NodeParentID, NodeTitle, Summ
 			'Subject 1',
 			'easy starter subject',
 			1)
-INSERT Nodes(Username, AuthorizationLevel, NodeID, NodeParentID, NodeTitle, Summary, Visibility)
+INSERT Nodes(UserHash, NodeID, NodeParentID, NodeTitle, Summary, Visibility)
 	VALUES('82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b',
-			'user',
 			67892,
 			67890,
 			'Subject 2',
 			'not so easy starter subject',
 			1)
-INSERT Nodes(Username, AuthorizationLevel, NodeID, NodeParentID, NodeTitle, Summary, Visibility)
+INSERT Nodes(UserHash, NodeID, NodeParentID, NodeTitle, Summary, Visibility)
 	VALUES('82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b',
-			'user',
 			67893,
 			67893,
 			'Above water weaving',
 			'hardest class at csulb',
 			1)
-INSERT Nodes(Username, AuthorizationLevel, NodeID, NodeParentID, NodeTitle, Summary, Visibility)
+INSERT Nodes(UserHash, NodeID, NodeParentID, NodeTitle, Summary, Visibility)
 	VALUES('82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b',
 			'user',
 			67894,
@@ -108,9 +109,8 @@ INSERT Nodes(Username, AuthorizationLevel, NodeID, NodeParentID, NodeTitle, Summ
 			'Subject 1',
 			'easy starter subject',
 			1)
-INSERT Nodes(Username, AuthorizationLevel, NodeID, NodeParentID, NodeTitle, Summary, Visibility)
+INSERT Nodes(UserHash, NodeID, NodeParentID, NodeTitle, Summary, Visibility)
 	VALUES('82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b',
-			'user',
 			67895,
 			67894,
 			'Subject 2',

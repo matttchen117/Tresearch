@@ -1,20 +1,19 @@
  
  
  -- SQLDAO SHOULD SCRIPTS
-  DELETE Accounts WHERE Username = 'sqlDAORegTest1@gmail.com'
-  DELETE Accounts WHERE Username = 'sqlDAORegTest2@gmail.com'
+  
 
   DELETE UserHashTable WHERE UserID = 'pammypoor+daoReg1@gmail.com'
   DELETE UserHashTable WHERE UserID = 'pammypoor+daoReg2@gmail.com'
   DELETE UserHashTable WHERE UserID = 'sqlDAORegTest1@gmail.com'
   DELETE UserHashTable WHERE UserID = 'sqlDAORegTest2@gmail.com'
 
-  INSERT INTO UserHashTable (UserID, UserRole, UserHash) VALUES ('pammypoor+daoReg2@gmail.com', 'user', 'db4c939b4b5feab3194957cdce046084d2c6fec58b3474db02c2b175b715db1ce6536f133b9ffb961b9d8251bf82084ca5fadb5d1daa4cb792860a394aa38e15')
-  INSERT INTO UserHashTable (UserID, UserRole, UserHash) VALUES ('sqlDAORegTest1@gmail.com', 'user', 'f544d6b677f201b7c153bbd7f8406e56f60cec499febed0a8d3faff778cd37c775bcd93b5dd1a7dc2fe20aa552af05bd0fc81a5d4aac0de5226442a11a8a2b23');
-  INSERT INTO UserHashTable (UserID, UserRole, UserHash) VALUES ('sqlDAORegTest2@gmail.com', 'user', 'fc687b50f993dfde3236ffdeebbb0dfc67f5f3fe27376b82ade28a5a7db1593191f48ea13be9d97dbf3d4a70f1cb1664c50c75ea3fff77cfc76741e019077b5a');
+  DELETE Accounts WHERE Username = 'sqlDAORegTest1@gmail.com'
+  DELETE Accounts WHERE Username = 'sqlDAORegTest2@gmail.com'
 
-  Insert INTO Accounts (Username, AuthorizationLevel, Passphrase, AccountStatus, Confirmed) VALUES ('sqlDAORegTest2@gmail.com', 'user', '1e5645a39fd80695b37f8fd4cf96bef2632e0d0aaf78ca13c42066196a2838535414e82ffa24adf950683d528deed5757675870b7d4708a2f814ea9000237de8', 1, 0);
+  INSERT INTO Accounts (Username, Passphrase, AuthorizationLevel, AccountStatus, Confirmed) VALUES ('sqlDAORegTest2@gmail.com', '1e5645a39fd80695b37f8fd4cf96bef2632e0d0aaf78ca13c42066196a2838535414e82ffa24adf950683d528deed5757675870b7d4708a2f814ea9000237de8', 'user', 1, 1);
 
+  
  --Recovery Service Should scripts
 
   DELETE EmailConfirmationLinks WHERE Username = 'IntegrationRegistrationService1@gmail.com';

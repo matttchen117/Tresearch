@@ -23,10 +23,11 @@ function EULATerms() {
                 </p>
                 <h3>Intellectual Property Rights</h3>
                 <p>Trial by Fire retains ownership of the Tresearch rights, title, and service including all Intellectual Property Rights associated with the service and content. User created
-                    content will remain the intellectual property of Trial By Fire.</p>
+                    content through nodes and other features will remain the intellectual property of Trial By Fire. Perseonable identifiable data such as the user's email and passphrase is not owned by Trial By Fire and will 
+                    be deleted upon termination of this license.</p>
                 <h3>Termination</h3>
                 <p>We reserve the right to terminate this license with or without prior notice. Failing to comply with our terms and conditions will result in a termination of this license.
-                   Once terminated, user information will be deleted. 
+                   Once terminated, user personal identifiable data will be deleted. 
                 </p>
             </div>
         </div>

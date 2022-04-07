@@ -35,10 +35,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Check if cancellation is requested ... remove user identity from hash table
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        string rollbackResult = await CreateUserHashAsync(email, authorizationLevel, hashedEmail);
-                        if (rollbackResult.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
-                            throw new OperationCanceledException();
-                        return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
+                        
                     }
 
                     return await _messageBank.GetMessage(IMessageBank.Responses.generic);
@@ -67,7 +64,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> CreateUserHashAsync(string email,string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> CreateUserHashAsync(int id, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -76,16 +73,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //Perform sql statement
                     var procedure = "dbo.[CreateUserHash]";                                                                 // Name of store procedure
-                    var value = new { UserID = email, UserRole = authorizationLevel, UserHash = hashedEmail };          // Parameters of stored procedure
+                    var value = new { UserID = id, UserHash = hashedEmail };          // Parameters of stored procedure
                     int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                     //Check if cancellation is requested ... remove user identity from hash table
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        string rollbackResult = await RemoveUserIdentityFromHashTable(email, authorizationLevel, hashedEmail);
-                        if (rollbackResult.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
-                            throw new OperationCanceledException();
-                        return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
+                        
                     }
 
                     return await _messageBank.GetMessage(IMessageBank.Responses.generic);
@@ -822,7 +816,50 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> CreateOTPAsync(string username, string authorizationLevel, int failCount, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    await connection.OpenAsync();
+
+                    //Perform Sql Statement
+                    var procedure = "dbo.[CreateOTP]";
+                    var value = new
+                    {
+                        Username = username, 
+                        AuthorizationLevel = authorizationLevel,
+                        FailCount = failCount
+                    };
+                    var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    
+                    if (affectedRows == 1)
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    else
+                        return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;    //CHECK IF THIS IS ACCOUNT ALREADY EXISTS
+                }
+            }
+            catch (SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    case 2627: return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;
+                    default: return "500: Database: " + ex.Message;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback handled
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500 : Database: " + ex;
+            }
+        }
+        public async Task<Tuple<int, string>> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -841,19 +878,20 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         AccountStatus = account.AccountStatus,
                         Confirmed = account.Confirmed
                     };
-                    var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    if (affectedRows == 1)
-                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
-                    else
-                        return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;    //CHECK IF THIS IS ACCOUNT ALREADY EXISTS
+
+                    var userID = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    return Tuple.Create(userID, await _messageBank.GetMessage(IMessageBank.Responses.generic));
                 }
             }
             catch(SqlException ex)
             {
                 switch (ex.Number)
                 {
-                    case 2627: return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;
-                    default: return "500: Database: " + ex.Message;
+                    case 2627:
+                        return Tuple.Create(-1, await _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated));
+                    default: 
+                        return Tuple.Create(-1,  _options.UncaughtExceptionMessage + ex.Message);
                 }
             }
             catch(OperationCanceledException)
@@ -863,7 +901,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return "500 : Database: " + ex;
+                return Tuple.Create(-1, _options.UncaughtExceptionMessage + ex.Message);
             }
         }
         public string DeleteAccount()

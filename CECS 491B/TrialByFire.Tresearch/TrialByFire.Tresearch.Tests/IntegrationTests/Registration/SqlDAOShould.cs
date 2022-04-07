@@ -16,16 +16,16 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         }
 
         [Theory]
-        [InlineData("pammypoor+daoReg1@gmail.com", "user", "0c73979d72f9243294fe095e09cae5eb4c9eca10a4f35c648c5301433341358b5c8e3b595af32f3a08e94ece868401d5d26b99c0681810c4d89fd51a95314953",  "200: Server: success")]    // Hash doesn't exist
-        [InlineData("pammypoor+daoReg2@gmail.com", "user", "db4c939b4b5feab3194957cdce046084d2c6fec58b3474db02c2b175b715db1ce6536f133b9ffb961b9d8251bf82084ca5fadb5d1daa4cb792860a394aa38e15", "200: Server: success")]     // Hash already exists, Account was previously deleted
-        public async Task CreateUserHashAsync(string email, string authorizationLevel, string hashedEmail, string status)
+        [InlineData(1, "0c73979d72f9243294fe095e09cae5eb4c9eca10a4f35c648c5301433341358b5c8e3b595af32f3a08e94ece868401d5d26b99c0681810c4d89fd51a95314953",  "200: Server: success")]            // Hash doesn't exist
+        [InlineData(2, "db4c939b4b5feab3194957cdce046084d2c6fec58b3474db02c2b175b715db1ce6536f133b9ffb961b9d8251bf82084ca5fadb5d1daa4cb792860a394aa38e15", "200: Server: success")]     // Hash already exists, Account was previously deleted
+        public async Task CreateUserHashAsync(int id, string hashedEmail, string status)
         {
             //Arrange
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
             //Act
-            string result = await sqlDAO.CreateUserHashAsync(email, authorizationLevel, hashedEmail, cancellationTokenSource.Token);
+            string result = await sqlDAO.CreateUserHashAsync(id, hashedEmail, cancellationTokenSource.Token);
 
             //Assert
             Assert.Equal(status, result);
@@ -40,10 +40,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
             //Act
-            string result = await sqlDAO.CreateAccountAsync(account, cancellationTokenSource.Token);
+            Tuple<int, string> result = await sqlDAO.CreateAccountAsync(account, cancellationTokenSource.Token);
 
             //Assert
-            Assert.Equal(expected, result);
+            Assert.Equal(expected, result.Item2);
         }
 
         public static IEnumerable<object[]> AccountInfo()

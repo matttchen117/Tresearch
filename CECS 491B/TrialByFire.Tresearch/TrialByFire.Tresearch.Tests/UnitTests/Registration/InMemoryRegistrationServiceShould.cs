@@ -29,10 +29,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             string expected = statusCode;
 
             //Act
-            string results = await registrationService.CreateAccountAsync(email, passphrase, authorizationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
+            Tuple<int, string> results = await registrationService.CreateAccountAsync(email, passphrase, authorizationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
-            Assert.Equal(expected, results);
+            Assert.Equal(expected, results.Item2);
         }
 
         [Theory]

@@ -11,7 +11,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
     public interface ISqlDAO
     {
         public Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
-        public Task<string> CreateUserHashAsync(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> CreateUserHashAsync(int ID, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default);
         public Task<int> LogoutAsync(IAccount account, CancellationToken cancellationToken = default);
         public Task<int> StoreLogAsync(ILog log, string destination, CancellationToken cancellationToken = default);
@@ -24,7 +24,8 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public Task<int> GetRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> RemoveRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> CreateRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken));
-        public Task<string> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> CreateOTPAsync(string username, string authorizationLevel, int failCount, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<int, string>> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> CreateConfirmationLinkAsync(IConfirmationLink _confirmationlink, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> UpdateAccountToUnconfirmedAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> UpdateAccountToConfirmedAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
