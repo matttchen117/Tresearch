@@ -20,37 +20,20 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
     public class AuthenticationController : Controller, IAuthenticationController
     {
         private ISqlDAO _sqlDAO { get; }
-        private ILogService _logService { get; }
+        private ILogManager _logManager { get; }
         private IAuthenticationManager _authenticationManager { get; }
         private IMessageBank _messageBank { get; }
 
         private BuildSettingsOptions _buildSettingsOptions { get; }
 
-        public AuthenticationController(ISqlDAO sqlDAO, ILogService logService, 
+        public AuthenticationController(ISqlDAO sqlDAO, ILogManager logManager, 
             IAuthenticationManager authenticationManager, IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> buildSettingsOptions)
         {
             _sqlDAO = sqlDAO;
-            _logService = logService;
+            _logManager = logManager;
             _authenticationManager = authenticationManager;
             _messageBank = messageBank;
             _buildSettingsOptions = buildSettingsOptions.Value;
-        }
-
-        [HttpPost]
-        [Route("test")]
-        public string Test(string username, string otp, string authorizationLevel)
-        {
-            IRoleIdentity roleIdentity = new RoleIdentity(true, username, authorizationLevel);
-            IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            Response.HttpContext.User = new ClaimsPrincipal(rolePrincipal);
-            return HttpContext.User.Identity.Name;
-        }
-
-        [HttpPost]
-        [Route("test2")]
-        public string Test()
-        {
-            return HttpContext.User.IsInRole("user").ToString();
         }
 
         //
@@ -85,13 +68,13 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 }
                 HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "Authorization");
                 HttpContext.Response.Headers.Add("Authorization", results[1]);
-                //_logService.CreateLog(DateTime.Now.ToUniversalTime(), "Server", username, "Info", "Authentication Succeeded");
+                _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), "Server", username, authorizationLevel, "Info", "Authentication Succeeded");
                 split = result.Split(": ");
                 return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
             }
             // {category}: {error message}
-            //_logService.CreateLog(DateTime.Now.ToUniversalTime(), "Error", username, error[1], error[2]);
             split = result.Split(": ");
+            _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), "Error", username, authorizationLevel, split[1], split[2]);
             return StatusCode(Convert.ToInt32(split[0]), split[2]);
         }
 

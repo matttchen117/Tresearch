@@ -28,11 +28,10 @@ namespace TrialByFire.Tresearch.Services.Implementations
         private IMessageBank _messageBank { get; }
         private string _payLoad { get; }
 
-        public AuthenticationService(ISqlDAO sqlDAO, ILogService logService, 
+        public AuthenticationService(ISqlDAO sqlDAO, 
             IOptionsSnapshot<BuildSettingsOptions> options, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
-            _logService = logService;
             _options = options.Value;
             _messageBank = messageBank;
             _payLoad = "";
