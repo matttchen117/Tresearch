@@ -181,6 +181,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+
             string accountName = Thread.CurrentPrincipal.Identity.Name;
             string accountRole = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
             IAccount account = new Account(accountName, accountRole);
@@ -200,7 +201,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     {
                         if (InMemoryDatabase.Nodes[j].accountOwner.Equals(accountName))
                         {
-                            if (InMemoryDatabase.NodeTags[j].nodeID.Equals(InMemoryDatabase.Nodes[j].nodeID))
+                            if (InMemoryDatabase.NodeTags[j].NodeID.Equals(InMemoryDatabase.Nodes[j].nodeID))
                             {
                                 InMemoryDatabase.NodeTags.RemoveAt(j);
                             }

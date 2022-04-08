@@ -38,6 +38,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
 
         public async Task DeleteTheUserAsync(string currentIdentity, string currentRole, string expected)
         {
+
+            
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);

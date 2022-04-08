@@ -17,17 +17,14 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
     public class AccountDeletionController : Controller, IAccountDeletionController
     {
 
-        private CancellationTokenSource CancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        //private CancellationTokenSource CancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
+        private CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
         private BuildSettingsOptions _options { get; }
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
         private IMessageBank _messageBank { get; }
         private IAccountDeletionManager _accountDeletionManager { get; }
-
-
-
-
-    
 
         public AccountDeletionController(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, IAccountDeletionManager accountDeletionManager, IOptionsSnapshot<BuildSettingsOptions>  options)
         {

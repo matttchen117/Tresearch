@@ -91,7 +91,8 @@ namespace TrialByFire.Tresearch.Models.Contracts
             lastAdminFail,
             accountAlreadyDeleted,
             accountDeleteFail,
-            verificationFailure
+            verificationFailure,
+
             nodeTagNodeDoesNotExist,
             tagAlreadyExist,
             tagDoesNotExist,

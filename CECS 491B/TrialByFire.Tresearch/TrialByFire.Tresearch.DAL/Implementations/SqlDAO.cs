@@ -887,7 +887,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                     var parameters = new { Username = userName, AuthorizationLevel = userAuthLevel };
 
-                    var procedure = "dbo.[deleteAccountStoredProcedure]";
+                    var procedure = "dbo.[DeleteAccountStoredProcedure]";
 
                     affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 

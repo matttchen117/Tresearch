@@ -15,7 +15,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
     /// </summary>
     [ApiController]
     [EnableCors]
-    [Route("[controler]")]
+    [Route("[controller]")]
     public class CreateNodeController : Controller, ICreateNodeController
     {
         private ISqlDAO _sqlDAO { get; }
@@ -38,7 +38,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _createNodeManager = createNodeManager;
             _messageBank = messageBank;
         }
-
+        
         /// <summary>
         /// Entry point for node creation requests that forwards the given input to the CreateNodeManager for the opration to be performed.
         /// </summary>

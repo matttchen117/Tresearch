@@ -4,8 +4,6 @@ import './App.css';
 
 import ConfirmationSent from './Features/Registration/ConfirmationSent';
 import InactiveLink from './Features/Registration/InactiveLink';
-import Logout from "./Features/Logout/Logout";
-import Login from "./Features/Login/Login";
 import Authentication from "./Features/Login/Authentication";
 import Register from "./Features/Registration/Registration";
 import Home from "./Pages/Home/Home";
@@ -18,6 +16,9 @@ import AccountEnabled from "./Features/Recover/AccountEnabled";
 import RecoverySent from "./Features/Recover/RecoverySent";
 import TagDashboard from "./Features/Tagging/TagDashboard";
 import Tagger from "./Features/Tagging/Tagger";
+import LoginForm from "./UI/Form/LoginForm";
+import LogoutForm from "./UI/Form/LogoutForm";
+import Settings from "./Pages/Settings/Settings";
 
 class App extends React.Component {
   constructor(props){
@@ -50,6 +51,8 @@ class App extends React.Component {
             <Route path = "/Recover/AccountEnabled" element = {<AccountEnabled/>} />
             <Route path = "/Admin/TagDashboard" element = {<TagDashboard/>} />
             <Route path = "/Tagger/:nodeID" element = {<Tagger/>} exact/>
+            <Route path="/Settings" element = {<Settings />}/>
+
           </Routes>
         </Router>
       </div>

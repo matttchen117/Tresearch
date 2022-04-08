@@ -46,10 +46,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
 
 
-                if (Thread.CurrentPrincipal.Identity.Name.Equals(null))
-                {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).ConfigureAwait(false);
-                }
 
                 string userName = Thread.CurrentPrincipal.Identity.Name;
                 string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
