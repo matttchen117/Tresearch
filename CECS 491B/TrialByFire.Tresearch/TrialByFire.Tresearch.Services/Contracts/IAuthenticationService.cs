@@ -12,5 +12,6 @@ namespace TrialByFire.Tresearch.Services.Contracts
     public interface IAuthenticationService
     {
         Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim, CancellationToken cancellationToken = default);
+        Task<List<string>> RefreshSessionAsync(IRefreshSessionInput refreshSessionInput, CancellationToken cancellationToken = default);
     }
 }

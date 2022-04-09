@@ -84,7 +84,7 @@ class LoginForm extends React.Component  {
 
     onSubmitHandler = (e) => {
         e.preventDefault();
-        axios.defaults.headers.common['Authorization'] = localStorage.getItem('authorization');
+        axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
         // pbkdf2 uses callbacks not promises, need to wrap in a promise object
 
         if(this.handleInput()){
@@ -95,7 +95,7 @@ class LoginForm extends React.Component  {
                 .then(response => {
                         console.log(response.data);
                         console.log(response.headers['authorization']);
-                        localStorage.setItem('authorization', response.headers['authorization']);
+                        sessionStorage.setItem('authorization', response.headers['authorization']);
                         //navigate('/Login/Authentication');
                 }).catch(err => {
                         console.log(err.data);

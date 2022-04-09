@@ -37,11 +37,12 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logging
             // Arrange
             DateTime timestamp = new DateTime(year, month, day, hour, minute, second).ToUniversalTime();
             ILogManager logManager = TestProvider.GetService<ILogManager>();
-
+            Enum.TryParse(level, out ILogManager.Levels enumLevel);
+            Enum.TryParse(category, out ILogManager.Categories enumCategory);
 
             // Act
-            string result = await logManager.StoreAnalyticLogAsync(timestamp, level, username,
-                authorizationLevel, category, description).ConfigureAwait(false);
+            string result = await logManager.StoreAnalyticLogAsync(timestamp, enumLevel, username,
+                authorizationLevel, enumCategory, description).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, result);
@@ -57,12 +58,14 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logging
             // Arrange
             DateTime timestamp = new DateTime(year, month, day, hour, minute, second).ToUniversalTime();
             ILogManager logManager = TestProvider.GetService<ILogManager>();
+            Enum.TryParse(level, out ILogManager.Levels enumLevel);
+            Enum.TryParse(category, out ILogManager.Categories enumCategory);
             CancellationTokenSource cancellationTokenSource =
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             // Act
-            string result = await logManager.StoreAnalyticLogAsync(timestamp, level, username,
-                authorizationLevel, category, description, cancellationTokenSource.Token)
+            string result = await logManager.StoreAnalyticLogAsync(timestamp, enumLevel, username,
+                authorizationLevel, enumCategory, description, cancellationTokenSource.Token)
                 .ConfigureAwait(false);
 
             // Assert
@@ -79,11 +82,13 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logging
             // Arrange
             DateTime timestamp = new DateTime(year, month, day, hour, minute, second).ToUniversalTime();
             ILogManager logManager = TestProvider.GetService<ILogManager>();
+            Enum.TryParse(level, out ILogManager.Levels enumLevel);
+            Enum.TryParse(category, out ILogManager.Categories enumCategory);
 
 
             // Act
-            string result = await logManager.StoreArchiveLogAsync(timestamp, level, username,
-                authorizationLevel, category, description).ConfigureAwait(false);
+            string result = await logManager.StoreArchiveLogAsync(timestamp, enumLevel, username,
+                authorizationLevel, enumCategory, description).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, result);
@@ -99,12 +104,14 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Logging
             // Arrange
             DateTime timestamp = new DateTime(year, month, day, hour, minute, second).ToUniversalTime();
             ILogManager logManager = TestProvider.GetService<ILogManager>();
+            Enum.TryParse(level, out ILogManager.Levels enumLevel);
+            Enum.TryParse(category, out ILogManager.Categories enumCategory);
             CancellationTokenSource cancellationTokenSource =
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             // Act
-            string result = await logManager.StoreArchiveLogAsync(timestamp, level, username,
-                authorizationLevel, category, description, cancellationTokenSource.Token)
+            string result = await logManager.StoreArchiveLogAsync(timestamp, enumLevel, username,
+                authorizationLevel, enumCategory, description, cancellationTokenSource.Token)
                 .ConfigureAwait(false);
 
             // Assert

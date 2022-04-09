@@ -32,6 +32,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
             {
                 case Responses.generic:
                     return "200: Server: success";
+                case Responses.unhandledException:
+                    return "600: Server: Unhandled Exception: ";
 
                 case Responses.verifySuccess:
                     return "200: Server: Account Verification success.";
@@ -80,6 +82,16 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "503: Server: Log failed.";
                 case Responses.logRollback:
                     return "400: Database: Log rollback occurred.";
+
+                case Responses.jwtValidationSuccess:
+                    return "200: Server: JWT Validation Success.";
+                case Responses.jwtValidationFail:
+                    return "400: Data: JWT Validation Failed: ";
+
+                case Responses.refreshSessionSuccess:
+                    return "200: Server: Refresh Session Success.";
+                case Responses.refreshSessionFail:
+                    return "400: Data: Refresh Session Failed: ";
 
                 case Responses.storeLogFail:
                     return "503: Database: Failed to store the log.";

@@ -14,5 +14,7 @@
         public string UncaughtExceptionMessage { get; set; } = String.Empty;
         public string AnalyticTable { get; set; } = String.Empty;
         public string ArchiveTable { get; set; } = String.Empty;
+        public string JwtIssuer { get; set; } = String.Empty;
+        public string JwtHashAlgorithm { get; set; } = String.Empty;
     }
 }

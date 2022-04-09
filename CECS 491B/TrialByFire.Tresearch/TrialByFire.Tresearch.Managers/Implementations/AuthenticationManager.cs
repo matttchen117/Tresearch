@@ -64,7 +64,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 if (Thread.CurrentPrincipal == null)
                 {
                     IAccount account = new Account(username, authorizationLevel);
-                    IOTPClaim resultClaim = new OTPClaim(username, otp, authorizationLevel, now);
+                    OTPClaim resultClaim = new OTPClaim(username, otp, authorizationLevel, now);
                     string result = await _accountVerificationService.VerifyAccountAsync(account, 
                         _cancellationTokenSource.Token)
                         .ConfigureAwait(false);
@@ -87,6 +87,13 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 results.Add(occfe.Message);
             }
             return results;
+        }
+
+        public async Task<List<string>> RefreshSessionAsync(CancellationToken cancellationToken = default)
+        {
+            Account account = new Account(Thread.CurrentPrincipal.Identity.Name, (Thread.CurrentPrincipal.Identity as IRoleIdentity).AuthorizationLevel);
+            return await _authenticationService.RefreshSessionAsync(account, _cancellationTokenSource.Token)
+                .ConfigureAwait(false);
         }
     }
 }

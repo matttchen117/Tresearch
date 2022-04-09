@@ -9,12 +9,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class Account : IAccount
     {
-        public string? Username { get; set; }
-        public string? Email { get; set; }
+        public string Username { get; set; }
 
         public string? Passphrase { get; }
 
-        public string? AuthorizationLevel { get; set; }
+        public string AuthorizationLevel { get; set; }
 
         public bool? AccountStatus { get; set; }
 
@@ -48,10 +47,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
         {
             Username = username;
             AuthorizationLevel = authorizationLevel;
-        }
-
-        public Account()
-        {
         }
 
         public override bool Equals(object? obj)

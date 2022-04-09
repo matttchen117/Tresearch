@@ -13,6 +13,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
         public enum Responses
         {
             generic,
+            unhandledException,
 
             verifySuccess,
             notEnabled,
@@ -39,6 +40,12 @@ namespace TrialByFire.Tresearch.Models.Contracts
             logSuccess,
             logFail,
             logRollback,
+
+            jwtValidationSuccess,
+            jwtValidationFail,
+
+            refreshSessionSuccess,
+            refreshSessionFail,
 
             badNameOrPass,
             badEmail,

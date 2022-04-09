@@ -21,6 +21,26 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _options = options.Value;
         }
 
+        public async Task<int> RefreshSessionAsync(IRefreshSessionInput refreshSessionInput,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
+            {
+                //Perform sql statement
+                var procedure = "dbo.[RefreshSession]";
+                var parameters = new DynamicParameters();
+                parameters.Add("Username", refreshSessionInput.Username);
+                parameters.Add("AuthorizationLevel", refreshSessionInput.AuthorizationLevel);
+                parameters.Add("Token", refreshSessionInput.Token);
+                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
+                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                    .ConfigureAwait(false);
+                return parameters.Get<int>("Result");
+            }
+        }
+
         public async Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -64,7 +84,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 var parameters = new DynamicParameters();
                 parameters.Add("Timestamp", log.Timestamp);
                 parameters.Add("Level", log.Level);
-                parameters.Add("@UserHash", log.UserHash);
+                parameters.Add("Username", log.UserHash);
                 parameters.Add("Category", log.Category);
                 parameters.Add("Description", log.Description);
                 parameters.Add("Hash", log.Hash);

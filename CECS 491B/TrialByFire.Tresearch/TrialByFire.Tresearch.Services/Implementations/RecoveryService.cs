@@ -115,7 +115,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                linkCreated  = new RecoveryLink(account.Email, account.AuthorizationLevel, DateTime.Now, Guid.NewGuid());
+                linkCreated  = new RecoveryLink(account.Username, account.AuthorizationLevel, DateTime.Now, Guid.NewGuid());
                 result = await _sqlDAO.CreateRecoveryLinkAsync(linkCreated, cancellationToken);
 
                 if (cancellationToken.IsCancellationRequested && result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))

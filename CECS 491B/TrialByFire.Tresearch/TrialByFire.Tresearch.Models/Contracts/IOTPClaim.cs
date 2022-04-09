@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Models.Contracts
 {
-    public interface IOTPClaim
+    public interface IOTPClaim : ICreateJwtInput
     {
-        string Username { get; }
+        string Username { get; set; }
 
-        string AuthorizationLevel { get; }
+        string AuthorizationLevel { get; set; }
         string OTP { get; }
         DateTime TimeCreated { get; }
 

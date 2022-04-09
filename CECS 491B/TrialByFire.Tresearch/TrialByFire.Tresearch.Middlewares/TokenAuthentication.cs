@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TrialByFire.Tresearch.Models;
+using TrialByFire.Tresearch.Managers.Contracts;
 
 namespace TrialByFire.Tresearch.Middlewares
 {
@@ -22,11 +23,10 @@ namespace TrialByFire.Tresearch.Middlewares
             _options = options;
         }
 
-        public async Task InvokeAsync(HttpContext httpContext)
+        public async Task Invoke(HttpContext httpContext, ILogManager logManager, IMessageBank messageBank)
         {
-            /*try
-            {*/
-
+            try
+            {
                 // This should check if httpContext.User is not null
                 // The Thread.CurrentPrincipal could be running on a different thread from the logout
 
@@ -40,32 +40,31 @@ namespace TrialByFire.Tresearch.Middlewares
                 {
                     if(!httpContext.Request.Headers[_options.CurrentValue.JWTHeaderName].Equals("null"))
                     {
-                        // if can modify permissions, always need to check db
-                        // for access, would need to verify db
+                    // if can modify permissions, always need to check db
+                    // for access, would need to verify db
+                            string jwt = httpContext.Request.Headers[_options.CurrentValue.JWTHeaderName];
+                            var tokenHandler = new JwtSecurityTokenHandler();
+                            var keyValue = _options.CurrentValue.JWTTokenKey;
+                            var key = Encoding.UTF8.GetBytes(keyValue);
+                            tokenHandler.ValidateToken(jwt, new TokenValidationParameters
+                            {
+                                ValidateIssuerSigningKey = true,
+                                IssuerSigningKey = new SymmetricSecurityKey(key),
+                                ValidateIssuer = true,
+                                ValidIssuer = _options.CurrentValue.JwtIssuer,
+                                ValidAlgorithms = new[] { _options.CurrentValue.JwtHashAlgorithm },
+                                ClockSkew = TimeSpan.Zero
+                            }, out SecurityToken validatedToken);
+                            var jwtToken = (JwtSecurityToken)validatedToken;
+                            //singleton
+                            IRoleIdentity roleIdentity = new RoleIdentity(true, jwtToken.Claims.First(x => x.Type
+                            == _options.CurrentValue.RoleIdentityIdentifier1).Value, jwtToken.Claims.First(x => x.Type ==
+                            _options.CurrentValue.RoleIdentityIdentifier2).Value);
+                            IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
 
-                        string jwt = httpContext.Request.Headers[_options.CurrentValue.JWTHeaderName];
-                        var tokenHandler = new JwtSecurityTokenHandler();
-                        var keyValue = _options.CurrentValue.JWTTokenKey;
-                        var key = Encoding.UTF8.GetBytes(keyValue);
-                        tokenHandler.ValidateToken(jwt, new TokenValidationParameters
-                        {
-                            ValidateIssuerSigningKey = true,
-                            IssuerSigningKey = new SymmetricSecurityKey(key),
-                            ValidateIssuer = false,
-                            ValidateAudience = false,
-                            ClockSkew = TimeSpan.Zero
-                        }, out SecurityToken validatedToken);
-                        var jwtToken = (JwtSecurityToken)validatedToken;
-                        //singleton
-                        IRoleIdentity roleIdentity = new RoleIdentity(true, jwtToken.Claims.First(x => x.Type
-                        == _options.CurrentValue.RoleIdentityIdentifier1).Value, jwtToken.Claims.First(x => x.Type ==
-                        _options.CurrentValue.RoleIdentityIdentifier2).Value);
-                        IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-
-                        // possibly issue with this?
-                        //httpContext.User = new ClaimsPrincipal(rolePrincipal);
-                        Thread.CurrentPrincipal = rolePrincipal;
-
+                            // possibly issue with this?
+                            //httpContext.User = new ClaimsPrincipal(rolePrincipal);
+                            Thread.CurrentPrincipal = rolePrincipal;
                         //a - object for all cross cutting concerns
                         //b - set current thread to be the principal Thread.CurrentPrincipal, do this way
                         // need to set user (ClaimPrincipal here too, put data from RolePrincipal into
@@ -82,13 +81,17 @@ namespace TrialByFire.Tresearch.Middlewares
                         //httpContext.RequestServices.CreateScope(); // gives scope and access
                     }
                 }
-            /*}
+            }
             catch (Exception ex)
             {
+                logManager.StoreArchiveLogAsync(DateTime.UtcNow, level: ILogManager.Levels.Error,
+                    "unknown", "unknown", category: ILogManager.Categories.Server, 
+                    await messageBank.GetMessage(IMessageBank.Responses.jwtValidationFail)
+                    .ConfigureAwait(false) + ex.Message);
+            }finally
+            {
                 await _next(httpContext);
-            }*/
-
-            await _next(httpContext);
+            }
         }
     }
 }

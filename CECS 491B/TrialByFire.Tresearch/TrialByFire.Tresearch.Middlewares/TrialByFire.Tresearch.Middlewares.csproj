@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TrialByFire.Tresearch.Managers\TrialByFire.Tresearch.Managers.csproj" />
     <ProjectReference Include="..\TrialByFire.Tresearch.Models\TrialByFire.Tresearch.Models.csproj" />
   </ItemGroup>
 

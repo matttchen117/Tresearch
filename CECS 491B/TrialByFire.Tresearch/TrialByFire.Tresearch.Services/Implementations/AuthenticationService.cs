@@ -126,13 +126,13 @@ namespace TrialByFire.Tresearch.Services.Implementations
         //
         // Returns:
         //     The result of the JWT creation process and the JWT token on success.
-        private async Task<string> CreateJwtToken(IOTPClaim otpClaim, CancellationToken cancellation 
+        private async Task<string> CreateJwtToken(ICreateJwtInput jwtInput, CancellationToken cancellation 
             = default)
         {
             // break payload into parts
             Dictionary<string, string> claimValuePairs = new Dictionary<string, string>();
-            claimValuePairs.Add(_options.RoleIdentityIdentifier1, otpClaim.Username);
-            claimValuePairs.Add(_options.RoleIdentityIdentifier2, otpClaim.AuthorizationLevel);
+            claimValuePairs.Add(_options.RoleIdentityIdentifier1, jwtInput.Username);
+            claimValuePairs.Add(_options.RoleIdentityIdentifier2, jwtInput.AuthorizationLevel);
 
             // create identity to place into JWT
             try
@@ -149,8 +149,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     claimValuePairs[_options.RoleIdentityIdentifier1]), 
                         new Claim(_options.RoleIdentityIdentifier2, 
                         claimValuePairs[_options.RoleIdentityIdentifier2]) }),
-                    Expires = DateTime.UtcNow.AddDays(7),
+                    Expires = DateTime.UtcNow.AddMinutes(30),
                     IssuedAt = DateTime.UtcNow,
+                    Issuer = _options.JwtIssuer,
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
                 var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -164,6 +165,34 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 return "401: Server: " + ane.Message;
             }
+        }
+
+        public async Task<List<string>> RefreshSessionAsync(IRefreshSessionInput refreshSessionInput, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            List<string> results = new List<string>();
+            try
+            {
+                string jwt = await CreateJwtToken(refreshSessionInput, cancellationToken).ConfigureAwait(false);
+                int result = await _sqlDAO.RefreshSessionAsync(refreshSessionInput, cancellationToken).ConfigureAwait(false);
+                switch(result)
+                {
+                    case 0:
+                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.refreshSessionFail).ConfigureAwait(false));
+                        break;
+                    case 1:
+                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.refreshSessionSuccess).ConfigureAwait(false));
+                        results.Add(jwt);
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            catch(Exception ex)
+            {
+                results.Add(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
+            }
+            return results;
         }
     }
 }

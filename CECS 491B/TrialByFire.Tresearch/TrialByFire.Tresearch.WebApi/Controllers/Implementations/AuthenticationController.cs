@@ -52,7 +52,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         //     The result of the operation with any status codes if applicable.
         [HttpPost]
         [Route("authenticate")]
-        public async Task<IActionResult> AuthenticateAsync(string username, string otp, string authorizationLevel)
+        public async Task<IActionResult> AuthenticateAsync(string username, string otp, 
+            string authorizationLevel, CancellationToken cancellationToken = default)
         {
             string[] split;
             List<string> results = await _authenticationManager.AuthenticateAsync(username, otp, authorizationLevel, 
@@ -68,19 +69,29 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 }
                 HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "Authorization");
                 HttpContext.Response.Headers.Add("Authorization", results[1]);
-                _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), "Server", username, authorizationLevel, "Info", "Authentication Succeeded");
+                _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info, username, 
+                    authorizationLevel, category: ILogManager.Categories.Server, "Authentication Succeeded");
                 split = result.Split(": ");
                 return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
             }
             // {category}: {error message}
             split = result.Split(": ");
-            _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), "Error", username, authorizationLevel, split[1], split[2]);
+            if(Enum.TryParse(split[1], out ILogManager.Categories category))
+            {
+                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error, username, authorizationLevel,
+                category, split[2]);
+            }
+            else
+            {
+                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error, username, authorizationLevel,
+                category: ILogManager.Categories.Server, split[2] + ": Bad category passed back.");
+            }
             return StatusCode(Convert.ToInt32(split[0]), split[2]);
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> AuthenticateAsync(string username, string otp, 
-            string authorizationLevel, DateTime now)
+            string authorizationLevel, DateTime now, CancellationToken cancellationToken = default)
         {
             string[] split;
             string result = "";
@@ -119,25 +130,37 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             return StatusCode(Convert.ToInt32(split[0]), split[2]);
         }
 
-        //
-        // Summary:
-        //     Generates the CookieOptions for the Cookie to be created for the User.
-        //
-        // Returns:
-        //     The created CookieOptions.
-        [ApiExplorerSettings(IgnoreApi = true)]
-        private CookieOptions CreateCookieOptions()
+        [HttpPost]
+        [Route("refreshSession")]
+        public async Task<IActionResult> RefreshSessionAsync(CancellationToken cancellationToken = default)
         {
-            CookieOptions cookieOptions = new CookieOptions();
-            cookieOptions.IsEssential = true;
-            cookieOptions.Expires = DateTime.Now.ToUniversalTime().AddDays(5);
-            //cookieOptions.Path = "/";
-            cookieOptions.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
-            cookieOptions.Secure = true;
-            return cookieOptions;
-            //Return CookieOptions, set actual Cookie in the caller code
-            // For Readability
+            List<string> results = await _authenticationManager.RefreshSessionAsync().ConfigureAwait(false);
+            string[] split;
+            string result = results[0];
+            if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.refreshSessionSuccess).
+                    ConfigureAwait(false)))
+            {
+                HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "Authorization");
+                HttpContext.Response.Headers.Add("Authorization", results[1]);
+                _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
+                    Thread.CurrentPrincipal.Identity.Name,
+                    (Thread.CurrentPrincipal.Identity as IRoleIdentity).AuthorizationLevel, category: ILogManager.Categories.Server, "Authentication Succeeded");
+                split = result.Split(": ");
+                return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
+            }
+            // {category}: {error message}
+            split = result.Split(": ");
+            if (Enum.TryParse(split[1], out ILogManager.Categories category))
+            {
+                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error, Thread.CurrentPrincipal.Identity.Name,
+                    (Thread.CurrentPrincipal.Identity as IRoleIdentity).AuthorizationLevel, category, split[2]);
+            }
+            else
+            {
+                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error, Thread.CurrentPrincipal.Identity.Name,
+                    (Thread.CurrentPrincipal.Identity as IRoleIdentity).AuthorizationLevel, category: ILogManager.Categories.Server, split[2] + ": Bad category passed back.");
+            }
+            return StatusCode(Convert.ToInt32(split[0]), split[2]);
         }
-
     }
 }

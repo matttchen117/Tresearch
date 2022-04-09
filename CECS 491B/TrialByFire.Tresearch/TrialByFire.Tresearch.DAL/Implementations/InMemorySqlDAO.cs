@@ -19,6 +19,22 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             InMemoryDatabase = new InMemoryDatabase();
             _messageBank = new MessageBank();
         }
+
+        public async Task<int> RefreshSessionAsync(IRefreshSessionInput refreshSessionInput, 
+            CancellationToken cancellationToken = default)
+        {
+            foreach(Account a in InMemoryDatabase.Accounts)
+            {
+                if(a.Username.Equals(refreshSessionInput.Username) && 
+                    a.AuthorizationLevel.Equals(refreshSessionInput.AuthorizationLevel))
+                {
+                    a.Token = refreshSessionInput.Token;
+                    return 1;
+                }
+            }
+            return 0;
+        }
+
         public async Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default)
         {
             foreach(UserHashObject u in InMemoryDatabase.UserHashTable)
@@ -265,7 +281,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 for (int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
-                    if (email.Equals(InMemoryDatabase.Accounts[i].Email))
+                    if (email.Equals(InMemoryDatabase.Accounts[i].Username))
                         return Tuple.Create(InMemoryDatabase.Accounts[i], _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
                 if (cancellationToken.IsCancellationRequested)
                     throw new OperationCanceledException();
@@ -315,7 +331,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 for (int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
                 {
-                    if (email == InMemoryDatabase.Accounts[i].Email && authorizationLevel == InMemoryDatabase.Accounts[i].AuthorizationLevel)
+                    if (email == InMemoryDatabase.Accounts[i].Username && authorizationLevel == InMemoryDatabase.Accounts[i].AuthorizationLevel)
                     {
                         InMemoryDatabase.Accounts[i].Confirmed = false;
                         return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
@@ -339,7 +355,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 for(int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
                 {
-                    if (email == InMemoryDatabase.Accounts[i].Email && authorizationLevel == InMemoryDatabase.Accounts[i].AuthorizationLevel)
+                    if (email == InMemoryDatabase.Accounts[i].Username && authorizationLevel == InMemoryDatabase.Accounts[i].AuthorizationLevel)
                     {
                         InMemoryDatabase.Accounts[i].Confirmed = true;
                         return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;

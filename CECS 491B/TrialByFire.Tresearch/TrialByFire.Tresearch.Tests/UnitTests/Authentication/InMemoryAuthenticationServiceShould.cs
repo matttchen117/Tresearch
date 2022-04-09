@@ -36,7 +36,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             int minute, int second, string expected)
         {
             // Arrange
-            IOTPClaim otpClaim = new OTPClaim(username, otp, authorizationLevel, new DateTime(year, month, day, hour, minute, second));
+            OTPClaim otpClaim = new OTPClaim(username, otp, authorizationLevel, new DateTime(year, month, day, hour, minute, second));
             IAuthenticationService authenticationService = TestProvider.GetService<IAuthenticationService>();
 
             // Act
@@ -63,7 +63,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             int minute, int second, string expected)
         {
             // Arrange
-            IOTPClaim otpClaim = new OTPClaim(username, otp, authorizationLevel, new DateTime(year, month, day, hour, minute, second));
+            OTPClaim otpClaim = new OTPClaim(username, otp, authorizationLevel, new DateTime(year, month, day, hour, minute, second));
             IAuthenticationService authenticationService = TestProvider.GetService<IAuthenticationService>();
             CancellationTokenSource cancellationTokenSource =
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));

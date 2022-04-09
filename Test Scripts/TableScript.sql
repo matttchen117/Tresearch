@@ -12,8 +12,8 @@ DROP TABLE IF EXISTS NodeTags
 DROP TABLE IF EXISTS Tags
 DROP TABLE IF EXISTS Nodes
 DROP TABLE IF EXISTS OTPClaims
-DROP TABLE IF EXISTS Accounts
 DROP TABLE IF EXISTS UserHashTable
+DROP TABLE IF EXISTS Accounts
 DROP TABLE IF EXISTS AnalyticLogs
 DROP TABLE IF EXISTS ArchiveLogs
 
@@ -58,23 +58,23 @@ DROP PROCEDURE IF EXISTS Logout
 DROP PROCEDURE IF EXISTS StoreLog
 DROP PROCEDURE IF EXISTS GetUserHash
 
-CREATE TABLE UserHashTable(
-	UserID VARCHAR(100) NULL,
-	UserRole VARCHAR(40) NULL,
-	UserHash VARCHAR(128),
-	CONSTRAINT userhashtable_ck_01 UNIQUE (UserID, UserRole),
-	CONSTRAINT user_hashtable_pk PRIMARY KEY(UserHash)
-);
- 
-CREATE TABLE Accounts(
+CREATE TABLE [dbo].Accounts(
+	UserID INT IDENTITY(1,1),
     Username VARCHAR(100),
     Passphrase VARCHAR(128),
     AuthorizationLevel VARCHAR(40),
     AccountStatus BIT,
     Confirmed BIT,
-	Token VARCHAR(64) NULL,
-	CONSTRAINT user_account_pk PRIMARY KEY(Username, AuthorizationLevel),
-	CONSTRAINT user_account_hash_fk  FOREIGN KEY(Username, AuthorizationLevel) REFERENCES UserHashTable(UserID, UserRole)
+    Token VARCHAR(64) NULL,
+	CONSTRAINT user_accounts_ck UNIQUE (UserID),
+    CONSTRAINT user_account_pk PRIMARY KEY(Username, AuthorizationLevel)
+);
+
+CREATE TABLE [dbo].UserHashTable(
+	UserID INT,
+	UserHash VARCHAR(128),
+	CONSTRAINT user_hashtable_fk FOREIGN KEY (UserID) REFERENCES Accounts(UserID),
+	CONSTRAINT user_hashtable_pk PRIMARY KEY(UserHash)
 );
 
 CREATE TABLE OTPClaims(
@@ -119,6 +119,12 @@ CREATE TABLE NodeTags(
 	CONSTRAINT user_ratings_node_fk FOREIGN KEY (NodeID) REFERENCES Nodes(NodeID),
 	CONSTRAINT user_ratings_pk PRIMARY KEY(UserHash, NodeID)
 );*/
+
+CREATE TYPE dbo.SearchTagList AS TABLE
+(
+	Tag VARCHAR(100)
+);
+GO
 
 --shouldn’t you combine both EditDate and EditTime into one attribute so the datatype can be DateTime
 CREATE TABLE TreeHistories(
@@ -186,6 +192,7 @@ CREATE TABLE AnalyticLogs(
 	Category VARCHAR(30),
 	Description TEXT,
 	Hash VARCHAR(64)
+	CONSTRAINT analytic_logs_fk_01 FOREIGN KEY (UserHash) REFERENCES UserHashTable(UserHash)
 );
 
 CREATE TABLE ArchiveLogs(
@@ -195,6 +202,7 @@ CREATE TABLE ArchiveLogs(
 	Category VARCHAR(30),
 	Description TEXT,
 	Hash VARCHAR(64)
+	CONSTRAINT archive_logs_fk_01 FOREIGN KEY (UserHash) REFERENCES UserHashTable(UserHash)
 );
 
 SET ANSI_NULLS ON
@@ -630,7 +638,13 @@ BEGIN
 					(@Timestamp, @Level, @UserHash, @Category, @Description, @Hash);
 				ELSE IF @Destination = 'ArchiveLogs'
 					INSERT INTO ArchiveLogs(Timestamp, Level, UserHash, Category, Description, Hash) VALUES
-					(@Timestamp, @Level, @UserHash, @Category, @Description, @Hash);			
+					(@Timestamp, @Level, @UserHash, @Category, @Description, @Hash);
+				
+				-- need to include schema for the table
+				--@sql = 'INSERT INTO dbo.'+@DESTINATION+''
+
+				-- if error, return line that caused error
+				-- it is fine as is though, so decide what to settle on
 
 				SELECT @RowCount = @@ROWCOUNT
 
@@ -644,6 +658,55 @@ BEGIN
 		BEGIN CATCH
 			IF @TranCounter = 0
 				BEGIN
+					-- output could be a table
+					SET @Result = 2
+					ROLLBACK TRANSACTION
+				END
+			ELSE
+				IF XACT_STATE() <> -1
+					BEGIN
+						SET @Result = 2
+						ROLLBACK TRANSACTION ProcedureSave
+					END
+		END CATCH
+	RETURN @Result;
+END
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Matthew Chen
+-- Create date: 3/29/2022
+-- Description:	Stores the otp for the User
+-- =============================================
+CREATE PROCEDURE Search 
+	-- Add the parameters for the stored procedure here
+	@TagList AS dbo.SearchTagList READONLY,
+	@Result int OUTPUT
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+	DECLARE @RowCount int;
+	DECLARE @TranCounter int;
+	SET @TranCounter = @@TRANCOUNT;
+	IF @TranCounter > 0
+		SAVE TRANSACTION ProcedureSave
+	ELSE
+		BEGIN TRAN
+			BEGIN TRY;
+				
+
+				COMMIT TRANSACTION
+			END TRY
+		BEGIN CATCH
+			IF @TranCounter = 0
+				BEGIN
+					-- output could be a table
 					SET @Result = 2
 					ROLLBACK TRANSACTION
 				END
@@ -690,6 +753,65 @@ BEGIN
 		RETURN 0;
 	END CATCH
 	RETURN 0;
+END
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Matthew Chen
+-- Create date: 4/9/2022
+-- Description:	Stores the otp for the User
+-- =============================================
+CREATE PROCEDURE RefreshSession 
+	-- Add the parameters for the stored procedure here
+	@Username VARCHAR(100),
+	@AuthorizationLevel VARCHAR(40),
+	@Token VARCHAR(128),
+	@Result int OUTPUT
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+
+	-- 0 = Fail, 1 = Success, 2 = Rollback
+	SET NOCOUNT ON;
+	DECLARE @RowCount int;
+	DECLARE @TranCounter int;
+	SET @TranCounter = @@TRANCOUNT;
+	IF @TranCounter > 0
+		SAVE TRANSACTION ProcedureSave
+	ELSE
+		BEGIN TRAN
+			BEGIN TRY;
+				UPDATE Accounts SET Token = @Token WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel;
+
+				SELECT @RowCount = @@ROWCOUNT
+
+				IF(@RowCount = 0)
+					SET @Result = 0
+				ELSE
+					SET @Result = 1
+
+				COMMIT TRANSACTION
+			END TRY
+		BEGIN CATCH
+			IF @TranCounter = 0
+				BEGIN
+					-- output could be a table
+					SET @Result = 2
+					ROLLBACK TRANSACTION
+				END
+			ELSE
+				IF XACT_STATE() <> -1
+					BEGIN
+						SET @Result = 2
+						ROLLBACK TRANSACTION ProcedureSave
+					END
+		END CATCH
+	RETURN @Result;
 END
 GO
 
