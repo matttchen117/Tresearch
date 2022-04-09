@@ -33,10 +33,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.generic:
                     return "200: Server: success";
 
+                case Responses.databaseConnectionFail:
+                    return "503: Database: unable to connect to database.";
+
                 case Responses.verifySuccess:
                     return "200: Server: Account Verification success.";
-                case Responses.nodeTagNodeDoesNotExist:
-                    return "204: No nodes passed in.";
                 case Responses.notEnabled:
                     return "401: Database: Account disabled. Perform account recovery or contact system admin.";
                 case Responses.notConfirmed:
@@ -83,6 +84,27 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.logRollback:
                     return "400: Database: Log rollback occurred.";
 
+                case Responses.tagAddSuccess:
+                    return "200: Server: Tag added to node(s).";
+                case Responses.tagRemoveSuccess:
+                    return "200: Server: Tag removed from node(s).";
+                case Responses.tagCreateSuccess:
+                    return "200: Server: Tag created in tag bank.";
+                case Responses.tagDeleteSuccess:
+                    return "200: Server: Tag removed from tag bank.";
+                case Responses.tagGetSuccess:
+                    return "200: Server: Tag(s) retrieved.";
+                case Responses.tagNotFound:
+                    return "404: Database: Tag not found.";
+                case Responses.tagDuplicate:
+                    return "409: Database: The tag already exists.";
+                case Responses.tagRetrievalFail:
+                    return "502: Server: Unable to get tag data.";
+
+
+                case Responses.nodeNotFound:
+                    return "404: Database: Node not found.";
+
                 case Responses.storeLogFail:
                     return "503: Database: Failed to store the log.";
                 case Responses.badNameOrPass:
@@ -110,10 +132,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.notFoundOrAuthorized:
                     return "404: Database: Account not found or not authorized to perform the " +
                 "operation.";
-                case Responses.tagDoesNotExist:
-                    return "404: Database: Tag not found.";
-                case Responses.nodeNotFound:
-                    return "404: Database: Node not found.";
+                
+                
                 case Responses.recoveryLinkNotFound:
                     return "404: Database: The recovery link was not found";
                 case Responses.cancellationRequested:
@@ -124,14 +144,12 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "409: Database: The recovery link arealdy exists.";
                 case Responses.confirmationLinkExists:
                     return "409: Database: The confirmation link already exists.";
-                case Responses.tagAlreadyExist:
-                    return "409: Database: The tag already exists.";
+                
                 case Responses.recoveryLinkExpired:
                     return "410: Server: The recovery link has expired.";
                 case Responses.confirmationLinkExpired:
                     return "410: Server: The confirmation link has expired.";
-                case Responses.tagRetrievalFail:
-                    return "502: Server: Unable to get tag data.";
+                
                 case Responses.cookieFail:
                     return "503: Server: Authentication Cookie creation failed.";
                 case Responses.sendEmailFail:

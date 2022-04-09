@@ -6,7 +6,16 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 {
-    internal class TagManagerShould
+    public class TagManagerShould: TestBaseClass, IDisposable
     {
+        public TagManagerShould() : base(new string[] { })
+        {
+
+        }
+
+        public void Dispose()
+        {
+
+        }
     }
 }

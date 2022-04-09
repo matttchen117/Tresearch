@@ -679,8 +679,10 @@ begin
 	IF NOT EXISTS(SELECT * FROM NodeTags WHERE NodeID = @NodeID AND TagName = @TagName)
 	BEGIN
 		INSERT INTO NodeTags(Nodeid, TagName) VALUES(@NodeID, @TagName);
+		UPDATE Tags SET TagCount = TagCount + 1 WHERE TagName= @TagName
 	END
 end
+
 
 
 
@@ -781,13 +783,13 @@ GO
 CREATE PROCEDURE [dbo].[CreateOTP]
 (
     @Username VARCHAR(100),
-	@AuthorizationLvel VARCHAR(40),
+	@AuthorizationLevel VARCHAR(40),
 	@FailCount INT
 )
 as
 begin
     INSERT INTO OTPClaims(Username, AuthorizationLevel, FailCount)
-         VALUES(@Username, @AuthorizationLvel, @FailCount);
+         VALUES(@Username, @AuthorizationLevel, @FailCount);
 end
 
 -- =============================================
@@ -899,29 +901,13 @@ CREATE PROCEDURE [dbo].[DeleteAccountStoredProcedure]
 @Username VARCHAR(100), @AuthorizationLevel VARCHAR(40)
 AS 
 BEGIN 
-	/**DELETE FROM NodeTags WHERE NodeTags.NodeID IN 
-    (SELECT NodeTags.NodeID
-    FROM Nodes  
-    INNER JOIN NodeTags ON NodeTags.NodeID = Nodes.NodeID
-    WHERE Nodes.Username = @Username AND Nodes.AuthorizationLevel = @AuthorizationLevel);*/
-
-	/*
-    DELETE FROM UserRatings 
-    WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;*/
 
     DELETE FROM EmailConfirmationLinks     WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
     DELETE FROM EmailRecoveryLinks     WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
     DELETE FROM EmailRecoveryLinksCreated     WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
-
-    
-	--DELETE FROM Nodes WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
-
     DELETE FROM OTPClaims WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
-
-
+	UPDATE UserHashTable SET UserID = NULL WHERE UserID = (SELECT UserID FROM Accounts Where Username = @Username and AuthorizationLevel = @AuthorizationLevel);
     DELETE FROM Accounts WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
-
-	
 
 END
 
@@ -1222,11 +1208,12 @@ as
 begin
 	IF EXISTS(SELECT * FROM Tags WHERE TagName = @TagName)
 		BEGIN
+			DECLARE @TagCount BIGINT = (SELECT TagCount FROM Tags WHERE TagName = @TagName)
 			DELETE NodeTags WHERE TagName = @TagName
 			DELETE Tags WHERE TagName = @TagName
+			SELECT @TagCount
 		END
-	
-end
+END
 
 -- =============================================
 -- Author:		Pammy Poor
@@ -1244,6 +1231,7 @@ CREATE PROCEDURE [dbo].[RemoveTagFromNode]
 as
 begin
 	DELETE FROM NodeTags where NodeID = @NodeID AND TagName = @TagName;
+	UPDATE Tags SET TagCount = TagCount - 1 WHERE TagName= @TagName
 end
 
 -- =============================================

@@ -37,55 +37,31 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
         /// <summary>
         ///     AddTagToNodeAsync(nodeIDs, tagName)
-        ///         Adds a tag to node. Node must be owned by user and 
+        ///         Adds a tag to node.  
         /// </summary>
-        /// <param name="nodeIDs"></param>
-        /// <param name="tagName"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="nodeIDs">List of nodes' ids to add tag</param>
+        /// <param name="tagName">String tag to add to nodes</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status code</returns>
         public async Task<string> AddTagToNodesAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                string role = "";
-                if (Thread.CurrentPrincipal.IsInRole(_options.User))
-                    role = _options.User;
-                else if (Thread.CurrentPrincipal.IsInRole(_options.Admin))
-                    role = _options.Admin;
-                else
-                    return await _messageBank.GetMessage(IMessageBank.Responses.unknownRole).ConfigureAwait(false);
-
-                IAccount account = new Account(Thread.CurrentPrincipal.Identity.Name, role);
-
-                Tuple<bool, string> isAuthorized = await OwnsNode(nodeIDs, account, cancellationToken);
-
-                if (!isAuthorized.Item1)
-                    return isAuthorized.Item2;
-
+                //Check if list contains more than one node
                 if (nodeIDs.Count > 0)
                 {
-                    string result = await _sqlDAO.AddTagToNodesAsync(nodeIDs, tagName, cancellationToken);
-
-                    if(cancellationToken.IsCancellationRequested && result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
-                    {
-                        //Perform Rollback
-                        string resultRollback = await _sqlDAO.RemoveTagFromNodeAsync(nodeIDs, tagName, cancellationToken);
-                        if (resultRollback.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
-                            throw new OperationCanceledException();
-                        else
-                            return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
-                    }
-                    
+                    string result = await _sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationToken);
                     return result;
                 }
                 else
-                    return _messageBank.GetMessage(IMessageBank.Responses.nodeTagNodeDoesNotExist).Result;
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound);
             }
             catch (OperationCanceledException)
             {
-                throw;
+                //rollback not necessary
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
             }
             catch(Exception ex)
             {
@@ -93,47 +69,35 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
+        /// <summary>
+        ///     RemoveTagFromNodesAsync(nodeIDs, tagName)
+        ///         Removes tag from nodes passed in. Checks if list has at least one node.
+        /// </summary>
+        /// <param name="nodeIDs">List of nodes</param>
+        /// <param name="tagName">String tag name</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status</returns>
         public async Task<string> RemoveTagFromNodesAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
+                
                 cancellationToken.ThrowIfCancellationRequested();
 
-                string role = "";
-                if (Thread.CurrentPrincipal.IsInRole(_options.User))
-                    role = _options.User;
-                else if (Thread.CurrentPrincipal.IsInRole(_options.Admin))
-                    role = _options.Admin;
-                else
-                    return await _messageBank.GetMessage(IMessageBank.Responses.unknownRole).ConfigureAwait(false);
-
-                IAccount account = new Account(Thread.CurrentPrincipal.Identity.Name, role);
-
-                Tuple<bool, string> isAuthorized = await OwnsNode(nodeIDs, account, cancellationToken);
-
-                if (!isAuthorized.Item1)
-                    return isAuthorized.Item2;
-
+                //Check if list contains at least one node
                 if (nodeIDs.Count > 0)
                 {
-                    string result = await _sqlDAO.RemoveTagFromNodeAsync(nodeIDs, tagName, cancellationToken);
-                    if (cancellationToken.IsCancellationRequested && result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
-                    {
-                        //Perform Rollback
-                        string resultRollback = await _sqlDAO.AddTagToNodesAsync(nodeIDs, tagName, cancellationToken);
-                        if (resultRollback.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
-                            throw new OperationCanceledException();
-                        else
-                            return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
-                    }
+                    //Remove tag from node(s)
+                    string result = await _sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationToken);
                     return result;
                 }
                 else
-                    return _messageBank.GetMessage(IMessageBank.Responses.nodeTagNodeDoesNotExist).Result;
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound);
             }
             catch (OperationCanceledException)
             {
-                throw;
+                //rollback not necessary
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
             }
             catch (Exception ex)
             {
@@ -148,21 +112,6 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                string role = "";
-                if (Thread.CurrentPrincipal.IsInRole(_options.User))
-                    role = _options.User;
-                else if (Thread.CurrentPrincipal.IsInRole(_options.Admin))
-                    role = _options.Admin;
-                else
-                    return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.unknownRole).ConfigureAwait(false));
-
-                IAccount account = new Account(Thread.CurrentPrincipal.Identity.Name, role);
-
-                Tuple<bool, string> isAuthorized = await OwnsNode(nodeIDs, account, cancellationToken);
-
-                if (!isAuthorized.Item1)
-                    return Tuple.Create(new List<string>(), isAuthorized.Item2);
-
                 if (nodeIDs.Count > 0)
                 {
                     Tuple<List<string>, string> result = await _sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationToken);
@@ -171,7 +120,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     return result;
                 }
                 else
-                    return Tuple.Create(tags, _messageBank.GetMessage(IMessageBank.Responses.nodeTagNodeDoesNotExist).Result);
+                    return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound));
             }
             catch (OperationCanceledException)
             {
@@ -185,7 +134,6 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
         public async Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> tags = new List<string>();
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -197,38 +145,31 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     return result;
                 }
                 else
-                    return Tuple.Create(tags, _messageBank.GetMessage(IMessageBank.Responses.nodeTagNodeDoesNotExist).Result);
+                    return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound));
             }
             catch (OperationCanceledException)
             {
-                throw;
+                return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
             }
             catch (Exception ex)
             {
-                return Tuple.Create(tags, _options.UncaughtExceptionMessage + ex.Message);
+                return Tuple.Create(new List<string>(), _options.UncaughtExceptionMessage + ex.Message);
             }
         }
 
-        public async Task<string> CreateTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> CreateTagAsync(string tagName, int count, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
+                //Check if cancellation token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
-                string result = await _sqlDAO.CreateTagAsync(tagName, cancellationToken);
-                if (cancellationToken.IsCancellationRequested && result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
-                {
-                    //Perform Rollback
-                    string resultRollback = await _sqlDAO.RemoveTagAsync(tagName, cancellationToken);
-                    if (resultRollback.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
-                        throw new OperationCanceledException();
-                    else
-                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
-                }
+                //Create tag in bank
+                string result = await _sqlDAO.CreateTagAsync(tagName, count, cancellationToken);
                 return result;
             }
             catch (OperationCanceledException)
             {
-                throw;
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
             }
             catch (Exception ex)
             {
@@ -236,24 +177,21 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        public async Task<Tuple<List<string>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> tags = null;
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                Tuple<List<string>, string> result = await _sqlDAO.GetTagsAsync(cancellationToken);
-                if (cancellationToken.IsCancellationRequested)
-                    throw new OperationCanceledException();
+                Tuple<List<ITag>, string> result = await _sqlDAO.GetTagsAsync(cancellationToken);
                 return result;
             }
             catch (OperationCanceledException)
             {
-                throw;
+                return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
             }
             catch (Exception ex)
             {
-                return Tuple.Create(tags, _options.UncaughtExceptionMessage + ex.Message);
+                return Tuple.Create(new List<ITag>(), _options.UncaughtExceptionMessage + ex.Message);
             }
         }
 
@@ -283,11 +221,11 @@ namespace TrialByFire.Tresearch.Services.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                string result = await _sqlDAO.RemoveTagAsync(tagName, cancellationToken);
+                string result = await _sqlDAO.DeleteTagAsync(tagName, cancellationToken);
                 if (cancellationToken.IsCancellationRequested && result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
                 {
                     //Perform Rollback
-                    string resultRollback = await _sqlDAO.CreateTagAsync(tagName, cancellationToken);
+                    string resultRollback = await _sqlDAO.CreateTagAsync(tagName, 0, cancellationToken);
                     if (resultRollback.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
                         throw new OperationCanceledException();
                     else
@@ -302,26 +240,6 @@ namespace TrialByFire.Tresearch.Services.Implementations
             catch (Exception ex)
             {
                 return _options.UncaughtExceptionMessage + ex.Message;
-            }
-        }
-
-        public async Task<Tuple<bool, string>> OwnsNode(List<long> nodeID, IAccount account, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            try
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                Tuple<bool, string> result = await _sqlDAO.IsAuthorizedToMakeNodeChangesAsync(nodeID, account, cancellationToken);
-                if (cancellationToken.IsCancellationRequested)
-                    throw new OperationCanceledException();
-                return result;
-            } 
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                return Tuple.Create(false, _options.UncaughtExceptionMessage + ex.Message);
             }
         }
     }

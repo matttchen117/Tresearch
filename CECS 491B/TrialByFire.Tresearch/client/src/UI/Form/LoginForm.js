@@ -90,19 +90,19 @@ class LoginForm extends React.Component  {
         if(this.handleInput()){
             this.setState({errorMessage: ''})
             {this.state.verified ? 
-                axios.post('https://localhost:7010/Authentication/authenticate?username=' + this.state.username.toLowerCase() + 
+                axios.post('https://trialbyfiretresearch.azurewebsites.net/Authentication/authenticate?username=' + this.state.username.toLowerCase() + 
                 '&otp=' + this.state.otp + '&authorizationLevel=user')
                 .then(response => {
                         console.log(response.data);
                         console.log(response.headers['authorization']);
                         localStorage.setItem('authorization', response.headers['authorization']);
-                        window.location = '/Register/ConfirmationSent';
+                        window.location = '/Portal';
                 }).catch(err => {
                         console.log(err.data);
                     })
                 :
-                axios.post('https://localhost:7010/OTPRequest/requestotp?username=' + this.state.username.toLowerCase() + 
-                '&passphrase=' + this.state.passphrase + '&authorizationLevel=user')
+                axios.post('https://trialbyfiretresearch.azurewebsites.net/OTPRequest/requestotp?username=' + this.state.username.toLowerCase() + 
+                '&passphrase=' + this.hashInput(this.state.passphrase) + '&authorizationLevel=user')
                 .then(response => {
                         console.log(response.data);
                         console.log(response.headers['authorization']);

@@ -135,9 +135,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<Tuple<bool, string>> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return Tuple.Create(false, "");
+            return "";
         }
         public async Task<int> StoreOTPAsync(IAccount account, IOTPClaim otpClaim, 
             CancellationToken cancellationToken = default)
@@ -886,12 +886,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return -1;
         }
 
-        public async Task<string> AddTagToNodesAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> AddTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             return "200";
         }
 
-        public async Task<string> RemoveTagFromNodeAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> RemoveTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             return "200";
         }
@@ -901,14 +901,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return Tuple.Create(new List<string>(), "200");
         }
 
-        public async Task<string> CreateTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> CreateTagAsync(string tagName, int count,CancellationToken cancellationToken = default(CancellationToken))
         {
             return "200";
         }
 
-        public async Task<Tuple<List<string>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            return Tuple.Create(new List<string>(), "200");
+            return Tuple.Create(new List<ITag>(), "200");
         }
 
         public async Task<Tuple<List<string>, string>> GetTagsDescAsync(CancellationToken cancellationToken = default(CancellationToken))
@@ -916,7 +916,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return Tuple.Create(new List<string>(), "200");
         }
 
-        public async Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> DeleteTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             return "200";
         }

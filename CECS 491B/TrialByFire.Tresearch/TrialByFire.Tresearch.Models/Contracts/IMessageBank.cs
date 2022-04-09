@@ -14,6 +14,8 @@ namespace TrialByFire.Tresearch.Models.Contracts
         {
             generic,
 
+            databaseConnectionFail,
+
             verifySuccess,
             notEnabled,
             notConfirmed,
@@ -39,6 +41,17 @@ namespace TrialByFire.Tresearch.Models.Contracts
             logSuccess,
             logFail,
             logRollback,
+
+            tagAddSuccess,
+            tagRemoveSuccess,
+            tagCreateSuccess,
+            tagDeleteSuccess,
+            tagGetSuccess,
+            tagRetrievalFail,
+            tagDuplicate,
+            tagNotFound,
+
+            nodeNotFound,
 
             badNameOrPass,
             badEmail,
@@ -79,18 +92,16 @@ namespace TrialByFire.Tresearch.Models.Contracts
             dailyLoginsExists,
             dailyLoginNotInserted,
             dailyLoginNotExist,
-            tagRetrievalFail,
+            
             topSearchExists,
             topSearchNotInserted,
             topSearchNotExist,
             dailyRegistrationExists,
             dailyRegistrationNotInserted,
             dailyRegistrationNotExist,
-            storeLogFail,
-            nodeTagNodeDoesNotExist,
-            nodeNotFound,
-            tagAlreadyExist,
-            tagDoesNotExist,
+            storeLogFail
+            
+            
         }
         public Task<string> GetMessage(Responses response);
     }

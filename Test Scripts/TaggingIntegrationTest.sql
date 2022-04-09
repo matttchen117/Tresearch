@@ -1,5 +1,16 @@
--
+SELECT * FROM Accounts
+SELECT * FROM UserHashTable
 
+-- TAGGING SQLDAO SHOULD 
+	-- Set up Should only need to run once
+		Insert Accounts(Username, Passphrase, AuthorizationLevel, AccountStatus, Confirmed) VALUES
+			('tresearchTagServiceSQLDAOshould1@tresearch.system', '2d1e06f30c62efb95c118ac7adf4f0922d8d47ef1a4b26a51646de990b074cb019761095d391b2f5a33b864ab984f868180d317f1c7aac94b0cc099134a1219a', 'user', 1, 1),
+			('tresearchTagServiceSQLDAOshould2@tresearch.system', '30472ac011fe1a7c0ec6ba98686f0fd21a8e2a8d72c074b2e4d60bdf2555bd82e4ad866adef6a2ee4b5a6dc3b2d4fadfae1128e4e658dc2901d83fd5571b436c', 'user', 1, 1),
+			('tresearchTagServiceSQLDAOshould3@tresearch.system', 'cb118e46dbebd6b9033c9fd02376dc7cb715f81ea33010612594e3c8989ef2fd42ef59c64e7205659d2a7a48021f4246fcfd920fa93f9bc32f342088c42d3e3f', 'user', 1, 1),
+			('tresearchTagServiceSQLDAOshould4@tresearch.system', '975902fe26a1040fc52bc423c5af22d4d3f9ad2334b5ca447b9d3f32241e9135d069a3ba4e408b8d786688767d15b485d61083cfbc0d46a2714ae3aaec8b713c', 'user', 1, 1),
+			('tresearchTagServiceSQLDAOshould5@tresearch.system', '31d07c99fc9d467df04ce0fd0066211d541acb94924363a53924a5bb99468848cd2ff811de7cd0fe115962a5b81e49fa57dbd0659f9197cdb002f5bff5e940dc', 'user', 1, 1),
+
+			
 
 ---- Tagging Service
 
@@ -32,6 +43,13 @@ DELETE Accounts WHERE Username = '922af9995cba547f23f3cd24d5fb8f901d24e656ff0726
 DELETE Accounts WHERE Username = '3abc1413abbe2d2b92ecebb8a18dbd093e87e7c3fb80d266df3bb7639b127da39bd2cf4ff15b8a0f27a30aed08e229b41f21a20d63db7dcc9f14398c6f0a734a'
 DELETE Accounts WHERE Username = '501887a12f175f45dc7c80e21f5ffc1f8ab46e8004e755595d3d0e08c851dacab130573f4f531353eefcd7ed3314bd0aded194c3934387db986e8c80ea7fb356'
 
+DELETE UserHashTable WHERE UserID = 135
+DELETE UserHashTable WHERE UserID = 136
+DELETE UserHashTable WHERE UserID = 137
+DELETE UserHashTable WHERE UserID = 138
+DELETE UserHashTable WHERE UserID = 139
+
+
 DELETE UserHashTable WHERE UserID = 'tagService1@gmail.com'
 DELETE UserHashTable WHERE UserID = 'tagService2@gmail.com'
 DELETE UserHashTable WHERE UserID = 'tagService3@gmail.com'
@@ -42,8 +60,6 @@ DELETE UserHashTable WHERE UserID = 'tagService7@gmail.com'
 DELETE UserHashTable WHERE UserID = 'tagService8@gmail.com'
 DELETE UserHashTable WHERE UserID = 'tagService9@gmail.com'
 DELETE UserHashTable WHERE UserID = 'tagService10@gmail.com'
-
-
 
 Insert UserHashTable(UserID, UserHash) 
 	Values('tagService1@gmail.com', '82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b'),

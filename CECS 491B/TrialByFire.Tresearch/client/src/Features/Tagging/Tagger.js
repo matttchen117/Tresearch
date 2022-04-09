@@ -15,9 +15,7 @@ function Tagger() {
   const nullSearch = null;  
 
   //Array of nodes this views context
-  const nodeData = [1,2]
-
-  const {nodeID} = useParams();
+  const nodeData = [1 , 2];
 
   /**
    * Fetches tag(s) that the current node has tagged. Returns an 
@@ -71,7 +69,7 @@ function Tagger() {
         }))
   }
 
-  const setNode = (
+  const SetNode = (
     useEffect(() => {
       fetchNodeTags();
       fetchTagOptions();
@@ -97,7 +95,7 @@ function Tagger() {
   
   return (
     <div className="tagger-wrapper">
-      {<setNode/>}
+        {<SetNode/>}
         <div className = "tagger-table-wrapper">
             {renderTags}
         </div>

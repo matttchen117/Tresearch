@@ -17,15 +17,15 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         // User tree data updated within 5 seconds, as per BRD
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         private ISqlDAO _sqlDAO { get; set; }
-        private ILogService _logService { get; set; }
+        private ILogManager _logManager { get; set; }
         private IMessageBank _messageBank { get; set; }
         private ITagManager _tagManager { get; set; }
         private BuildSettingsOptions _options { get; }
 
-        public TagController(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, ITagManager tagManager, IOptionsSnapshot<BuildSettingsOptions> options)
+        public TagController(ISqlDAO sqlDAO, ILogManager logManager, IMessageBank messageBank, ITagManager tagManager, IOptionsSnapshot<BuildSettingsOptions> options)
         {
             _sqlDAO = sqlDAO;
-            _logService = logService;
+            _logManager = logManager;
             _messageBank = messageBank;
             _tagManager = tagManager;
             _options = options.Value;
@@ -37,22 +37,33 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         /// <returns>Status code and List of tags</returns>
         [HttpGet]
         [Route("taglist")]
-       public async Task<IActionResult> GetTagsAsync()
+        public async Task<IActionResult> GetTagsAsync()
         {
-            try
+            if (Thread.CurrentPrincipal != null)
             {
-                Tuple<List<string>, string> result = await _tagManager.GetTagsAsync("asc", _cancellationTokenSource.Token);
+                Tuple<List<ITag>, string> result = await _tagManager.GetTagsAsync("asc", _cancellationTokenSource.Token);
                 string[] split;
                 split = result.Item2.Split(":");
+
+                string role = "";
+                if (Thread.CurrentPrincipal.IsInRole(_options.User))
+                    role = _options.User;
+                else if (Thread.CurrentPrincipal.IsInRole(_options.Admin))
+                    role = _options.Admin;
+
+                if (result.Item2.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
+                    _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), "Server", Thread.CurrentPrincipal.Identity.Name, role, "Info", "Get Tags Succeeded");
+                else
+                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), "Error", Thread.CurrentPrincipal.Identity.Name, role, split[1], split[2]);
                 return StatusCode(Convert.ToInt32(split[0]), result.Item1);
             }
-            catch (OperationCanceledException)
+            else
             {
-                return StatusCode(408, "Request time out");
-            }
-            catch(Exception ex)
-            {
-                return StatusCode(500, ex.Message);
+                string errorResult = await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated);
+                string[] errorSplit;
+                errorSplit = errorResult.Split(":");
+                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), "Error", "unknown", "unknown", errorSplit[0], errorSplit[2]);
+                return StatusCode(Convert.ToInt32(errorSplit[0]), errorSplit[2]);
             }
         }
 
@@ -61,7 +72,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
-                Tuple<List<string>, string> result = await _tagManager.GetPossibleTagsAsync(nodeIDs, _cancellationTokenSource.Token);
+                Tuple<List<ITag>, string> result = await _tagManager.GetPossibleTagsAsync(nodeIDs, _cancellationTokenSource.Token);
                 string[] split;
                 split = result.Item2.Split(":");
                 return StatusCode(Convert.ToInt32(split[0]), result.Item1);
@@ -167,10 +178,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 string[] split;
                 split = result.Split(":");
                 return StatusCode(Convert.ToInt32(split[0]), split[2]);
-            }
-            catch (OperationCanceledException)
-            {
-                return StatusCode(408, "Request time out");
             }
             catch (Exception ex)
             {

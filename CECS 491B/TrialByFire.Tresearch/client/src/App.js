@@ -19,6 +19,7 @@ import TagDashboard from "./Features/Tagging/TagDashboard";
 import Tagger from "./Features/Tagging/Tagger";
 import InactiveLink from "./Features/Registration/InactiveLink";
 import Portal from "./Pages/Portal/Portal";
+import AdminPortal from "./Pages/AdminPortal/AdminPortal";
 
 class App extends React.Component {
   constructor(props){
@@ -53,6 +54,7 @@ class App extends React.Component {
             <Route path = "/Recover/Enable/:recoveryConfirm" element = {<RecoveryConfirm guid={this.state.recoveryConfirm}/>}/>
             <Route path = "/Recover/AccountEnabled" element = {<AccountEnabled/>} />
             <Route path = "/Admin/TagDashboard" element = {<TagDashboard/>} />
+            <Route path = "/Admin/Dashboard" element = {<AdminPortal/>} />
             <Route path = "/Tagger" element = {<Tagger/>} exact/>
           </Routes>
         </Router>

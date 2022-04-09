@@ -20,7 +20,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await sqlDAO.AddTagToNodesAsync(nodeIDs, tagName, cancellationTokenSource.Token);
+            string result = await sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
 
             //Arrange
             Assert.Equal(expected, result);

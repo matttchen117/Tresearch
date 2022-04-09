@@ -57,17 +57,19 @@ class RegistrationForm extends React.Component  {
         this.setState({ passphrase: updatedpassphrase});
     }
 
+    hashInput = (value) => {
+        var pbkdf2 = require('pbkdf2');      
+        const pbkdfKey = pbkdf2.pbkdf2Sync(value, '',  10000,  64, 'sha512');
+        return pbkdfKey.toString('hex').toUpperCase();
+    }
+
+
     inputCheckboxHandler = (e) => {
         let updatedAgreement = !this.state.agreement;
         this.setState({agreement: updatedAgreement});
     }
 
-    hashInput = (value) => {
-        var pbkdf2 = require('pbkdf2');      
-        const pbkdfKey = pbkdf2.pbkdf2Sync(value, '',  10000,  32, 'sha512');
-        return pbkdfKey.toString('hex').toUpperCase();
-    }
-
+    
 
     onSubmitHandler = (e) => {
         e.preventDefault();
@@ -76,7 +78,7 @@ class RegistrationForm extends React.Component  {
 
         if(this.handleInput()){
             this.setState({errorMessage: ''})
-            axios.post('https://localhost:7010/Registration/register?email=' + this.state.email.toLowerCase() + '&passphrase=' + this.hashInput(this.state.passphrase.toLowerCase()))
+            axios.post('https://localhost:7010/Registration/register?email=' + this.state.email.toLowerCase() + '&passphrase=' + this.hashInput(this.state.passphrase))
             .then(res => {
                 window.location = '/Register/ConfirmationSent';
             })

@@ -1,80 +1,266 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using TrialByFire.Tresearch.DAL.Contracts;
+using TrialByFire.Tresearch.Models;
+using TrialByFire.Tresearch.Models.Contracts;
+using System.Data.SqlClient;
+using System.Text.RegularExpressions;
 using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 {
-    public class SqlDAOShould : TestBaseClass
+    public class SqlDAOShould : TestBaseClass, IDisposable
     {
         public SqlDAOShould() : base(new string[] { })
         {
             TestProvider = TestServices.BuildServiceProvider();
+
+            IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
+            BuildSettingsOptions optionsValue = options.Value;
+
+            string script = File.ReadAllText("../../../IntegrationTests/Tag/DAOIntegrationSetup.sql");
+            
+            IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
+            {
+                connection.Open();
+                foreach (string command in commands)
+                    if (!string.IsNullOrWhiteSpace(command.Trim()))
+                        using (var com = new SqlCommand(command, connection))
+                            com.ExecuteNonQuery();
+            }
         }
 
-        public async Task AddTagToNodes(List<long> nodeIDs, string tagName)
+        public void Dispose()
         {
+            IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
+            BuildSettingsOptions optionsValue = options.Value;
 
+            string script = File.ReadAllText("../../../IntegrationTests/Tag/DAOIntegrationCleanup.sql");
+
+            IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
+            {
+                connection.Open();
+                foreach (string command in commands)
+                    if (!string.IsNullOrWhiteSpace(command.Trim()))
+                        using (var com = new SqlCommand(command, connection))
+                        {
+                            com.ExecuteNonQuery();
+                        }
+
+            }
         }
 
-        public static IEnumerable<object[]> AddNodeTagData()
+        [Theory]
+        [MemberData(nameof(AddTagData))]
+        public async Task AddTagAsync(List<long> nodeIDs, string tagName, string expected)
         {
-            //User owns all tags, nodes already have tag
-            var userCase0 = "82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b";
-            var roleCase0 = "user";
-            var tagNameCase0 = "music";
-            var nodeListCase0 = new List<long> { 67890, 67891, 67892 };
-            var resultCase0 = "200: Server: success";
+            //Arrange
+            ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
-            //User owns all tags, nodes do not contain these tags already
-            var userCase1 = "82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b";
-            var roleCase1 = "user";
-            var tagNameCase1 = "art";
-            var nodeListCase1 = new List<long> { 67890, 67891, 67892 };
-            var resultCase1 = "200: Server: success";
+            //Act
+            string result = await sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
 
-            // User owns tag, node doesn't already contain tag
-            var userCase2 = "82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b";
-            var roleCase2 = "user";
-            var tagNameCase2 = "cooking";
-            var nodeListCase2 = new List<long> { 67890 };
-            var resultCase2 = "200: Server: success";
+            //Assert
+            Assert.Equal(expected, result);
+        }
 
-            //No node is passed in
-            var userCase3 = "82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b";
-            var roleCase3 = "user";
-            var tagNameCase3 = "baking";
+        [Theory]
+        //Success: Tag Added to database
+        [InlineData("Tresearch SqlDAO test tag1", 0, "200: Server: Tag created in tag bank.")]
+        //Fail: Tag already exists in database
+        [InlineData("Tresearch SqlDAO This Tag Exists Already", 0, "409: Database: The tag already exists.")]
+        public async Task CreateTagAsync(string tagName, int count, string expected)
+        {
+            //Arrange
+            ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
+            //Act
+            string result = await sqlDAO.CreateTagAsync(tagName, count, cancellationTokenSource.Token);
+
+            //Arrange
+            Assert.Equal(expected, result);
+        }
+
+        [Theory]
+        //Success: Tag removed from database
+        [InlineData("Tresearch SqlDAO Delete Me Tag", "200: Server: Tag removed from tag bank.")]
+        //Success: Tag was not in database
+        [InlineData("Tresearch This Tag Doesnt exist", "200: Server: Tag removed from tag bank.")]
+        //Success: Tag removed from database (there were nodes that has this tagged)
+        public async Task DeleteTagAsync(string tagName, string expected)
+        {
+            //Arrange
+            ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
+            //Act
+            string result = await sqlDAO.DeleteTagAsync(tagName, cancellationTokenSource.Token);
+
+            //Arrange
+            Assert.Equal(expected, result);
+        }
+
+        public async Task GetNodeTagsAsync(List<long> nodeIDs, string expected, List<string> expectedTags)
+        {
+            //Arrange
+            ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
+            //Act
+            Tuple<List<string>, string> myResult = await sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationTokenSource.Token);
+            string result = myResult.Item2;
+            List<string> resultTags = myResult.Item1;
+
+
+            //Arrange
+            Assert.Equal(expected, result);
+            Assert.Equal(expectedTags, resultTags);
+        }
+
+        [Fact]
+        public async Task GetTagsAsync()
+        {
+            //Arrange
+            string expected = "200: Server: Tag(s) retrieved.";
+            ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
+            //Act
+            Tuple<List<ITag>, string> resultTags = await sqlDAO.GetTagsAsync(cancellationTokenSource.Token);
+            string result = resultTags.Item2;
+
+            //Arrange
+            Assert.Equal(expected, result);
+        }
+
+        [Theory]
+        [MemberData(nameof(RemoveTagData))]
+        public async Task RemoveTagAsync(List<long> nodeIDs, string tagName, string expected)
+        {
+            //Arrange
+            ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
+            //Act
+            string result = await sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
+
+            //Arrange
+            Assert.Equal(expected, result);
+        }
+
+
+        public static IEnumerable<object[]> AddTagData()
+        {
+            //nodes already have tag
+            var tagNameCase0 = "Tresearch SqlDAO Add Tag1";
+            var nodeListCase0 = new List<long> { 2022030533, 2022030534, 2022030535 };
+            var resultCase0 = "200: Server: Tag added to node(s).";
+
+            //nodes do not contain these tags already
+            var tagNameCase1 = "Tresearch SqlDAO Add Tag2";
+            var nodeListCase1 = new List<long> { 2022030533, 2022030534, 2022030535 };
+            var resultCase1 = "200: Server: Tag added to node(s).";
+
+            // node doesn't already contain tag
+            var tagNameCase2 = "Tresearch SqlDAO Add Tag3";
+            var nodeListCase2 = new List<long> { 2022030533 };
+            var resultCase2 = "200: Server: Tag added to node(s).";
+
+            //Node already has tag
+            var tagNameCase3 = "Tresearch SqlDAO Add Tag4";
             var nodeListCase3 = new List<long> { };
-            var resultCase3 = "204: No nodes passed in.";
+            var resultCase3 = "200: Server: Tag added to node(s).";
 
-            //User does not own node and is trying to make changes
-            var userCase4 = "92336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b";
-            var roleCase4 = "user";
-            var tagNameCase4 = "art";
-            var nodeListCase4 = new List<long> { 67890 };
-            var resultCase4 = "403: Database: You are not authorized to perform this operation.";
-
-            //User does not own all nodes and is trying to make changes (they only own first 2)
-            var userCase5 = "82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b";
-            var roleCase5 = "user";
-            var tagNameCase5 = "baking";
-            var nodeListCase5 = new List<long> { 67890, 67891, 67897 };     //user does not own 67897
-            var resultCase5 = "403: Database: You are not authorized to perform this operation.";
-
-            //Users role is not valid
-            var userCase6 = "82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b";
-            var roleCase6 = "role";         // This role is invalid
-            var tagNameCase6 = "baking";
-            var nodeListCase6 = new List<long> { 67890 };
-            var resultCase6 = "400: Server: Unknown role used.";
+            //Tag doesn't exist
+            var tagNameCase4 = "Tresearch SqlDAO Add Tag5";
+            var nodeListCase4 = new List<long> { 2022030533 };
+            var resultCase4 = "404: Database: Tag not found.";
 
             return new[]
             {
-                new object[] { userCase0, roleCase0, tagNameCase0, resultCase0, nodeListCase0 },
-                new object[] { userCase1, roleCase1, tagNameCase1, resultCase1, nodeListCase1 },
-                new object[] { userCase2, roleCase2, tagNameCase2, resultCase2, nodeListCase2 },
-                new object[] { userCase3, roleCase3, tagNameCase3, resultCase3, nodeListCase3 },
-                new object[] { userCase4, roleCase4, tagNameCase4, resultCase4, nodeListCase4 },
-                new object[] { userCase5, roleCase5, tagNameCase5, resultCase5, nodeListCase5 },
-                new object[] { userCase6, roleCase6, tagNameCase6, resultCase6, nodeListCase6 }
+                new object[] { nodeListCase0, tagNameCase0, resultCase0 },
+                new object[] { nodeListCase1, tagNameCase1, resultCase1 },
+                new object[] { nodeListCase2, tagNameCase2, resultCase2 },
+                new object[] { nodeListCase3, tagNameCase3, resultCase3 },
+                new object[] { nodeListCase4, tagNameCase4, resultCase4 }
+            };
+        }
+
+        public static IEnumerable<object[]> RemoveTagData()
+        {
+            //nodes already have tag
+            var tagNameCase0 = "Tresearch SqlDAO Delete Tag1";
+            var nodeListCase0 = new List<long> { 2022030536, 2022030537, 2022030538 };
+            var resultCase0 = "200: Server: Tag removed from node(s).";
+
+            //nodes do not contain these tags already
+            var tagNameCase1 = "Tresearch SqlDAO Delete Tag2";
+            var nodeListCase1 = new List<long> { 2022030536, 2022030537, 2022030538 };
+            var resultCase1 = "200: Server: Tag removed from node(s).";
+
+            // node doesn't already contain tag
+            var tagNameCase2 = "Tresearch SqlDAO Delete Tag3";
+            var nodeListCase2 = new List<long> { 2022030536 };
+            var resultCase2 = "200: Server: Tag removed from node(s).";
+
+            //Node already has tag
+            var tagNameCase3 = "Tresearch SqlDAO Delete Tag4";
+            var nodeListCase3 = new List<long> { };
+            var resultCase3 = "200: Server: Tag removed from node(s).";
+
+            return new[]
+            {
+                new object[] { nodeListCase0, tagNameCase0, resultCase0 },
+                new object[] { nodeListCase1, tagNameCase1, resultCase1 },
+                new object[] { nodeListCase2, tagNameCase2, resultCase2 },
+                new object[] { nodeListCase3, tagNameCase3, resultCase3 }
+            };
+        }
+
+        public static IEnumerable<object[]> GetNodeTagData()
+        {
+            /**Nodes contain shared tags
+             *      
+             */
+            var nodeListCase0 = new List<long> { 2022030539, 2022030540, 2022030541 };
+            string expectedCase0 = "200: Server: Tag(s) retrieved.";
+            var expectedTags0 = new List<string> { "Tresearch SqlDAO Get Tag1", "Tresearch SqlDAO Get Tag2" };
+
+            /**Nodes contain no shared tags
+             * 
+             */
+            var nodeListCase1 = new List<long> { 2022030539, 2022030540, 2022030541, 2022030542 };
+            string expectedCase1 = "200: Server: Tag(s) retrieved.";
+            var expectedTags1 = new List<string> { };
+
+            //Node has tags
+            var nodeListCase2 = new List<long> { 2022030539 };
+            string expectedCase2 = "200: Server: Tag(s) retrieved.";
+            var expectedTags2 = new List<string> { "Tresearch SqlDAO Get Tag1", "Tresearch SqlDAO Get Tag2", "Tresearch SqlDAO Get Tag3" };
+
+            //Node contains no tags
+            var nodeListCase3 = new List<long> { 2022030543 };
+            string expectedCase3 = "200: Server: Tag(s) retrieved.";
+            var expectedTags3 = new List<string> { };
+
+            //No nodes passed in
+            var nodeListCase4 = new List<long> {  };
+            string expectedCase4 = "200: Server: Tag(s) retrieved.";
+            var expectedTags4 = new List<string> { };
+
+            return new[]
+            {
+                new object[] { nodeListCase0, expectedCase0, expectedTags0 },
+                new object[] { nodeListCase1, expectedCase1, expectedTags1},
+                new object[] { nodeListCase2, expectedCase2, expectedTags2 },
+                new object[] { nodeListCase3, expectedCase3, expectedTags3 },
+                new object[] { nodeListCase4, expectedCase4, expectedTags4 }
             };
         }
     }
