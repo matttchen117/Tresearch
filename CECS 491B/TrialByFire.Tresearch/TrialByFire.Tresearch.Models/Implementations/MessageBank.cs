@@ -34,7 +34,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "200: Server: success";
 
                 case Responses.databaseConnectionFail:
-                    return "503: Database: unable to connect to database.";
+                    return "503: Database: Unable to connect to database.";
 
                 case Responses.verifySuccess:
                     return "200: Server: Account Verification success.";
