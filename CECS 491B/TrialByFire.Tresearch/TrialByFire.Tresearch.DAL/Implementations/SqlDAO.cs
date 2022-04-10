@@ -907,8 +907,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return Tuple.Create(-1, _options.UncaughtExceptionMessage + ex.Message);
             }
         }
-        public string DeleteAccount()
-        {
+
 
 
         /// <summary>

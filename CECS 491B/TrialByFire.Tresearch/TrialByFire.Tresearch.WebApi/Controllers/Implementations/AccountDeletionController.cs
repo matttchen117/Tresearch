@@ -14,22 +14,23 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
     [ApiController]
     [EnableCors]
     [Route("[Controller]")]
-    public class AccountDeletionController : Controller, IAccountDeletionController
+    public class AccountDeletionController : ControllerBase, IAccountDeletionController
     {
 
-        //private CancellationTokenSource CancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
-        private CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
+        private CancellationTokenSource CancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         private BuildSettingsOptions _options { get; }
         private ISqlDAO _sqlDAO { get; }
+        private ILogManager _logManager { get; }
         private ILogService _logService { get; }
         private IMessageBank _messageBank { get; }
         private IAccountDeletionManager _accountDeletionManager { get; }
 
-        public AccountDeletionController(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, IAccountDeletionManager accountDeletionManager, IOptionsSnapshot<BuildSettingsOptions>  options)
+        public AccountDeletionController(ISqlDAO sqlDAO, ILogService logService, ILogManager logManager, IMessageBank messageBank, IAccountDeletionManager accountDeletionManager, IOptionsSnapshot<BuildSettingsOptions>  options)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
+            _logManager = logManager;
             _messageBank = messageBank;
             _accountDeletionManager = accountDeletionManager;
             _options = options.Value;
@@ -48,6 +49,13 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             {
                 string[] split;
                 string result = "";
+
+                string role = "";
+                if (Thread.CurrentPrincipal.IsInRole(_options.User))
+                    role = _options.User;
+                else if (Thread.CurrentPrincipal.IsInRole(_options.Admin))
+                    role = _options.Admin;
+
                 result = await _accountDeletionManager.DeleteAccountAsync(CancellationTokenSource.Token).ConfigureAwait(false);
                 if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false)))
                 {
@@ -55,12 +63,16 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                     {
                         split = result.Split(": ");
                         return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
+                        _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), "Server", Thread.CurrentPrincipal.Identity.Name, role, "Info" , "Account Deletion Success" );
                     }
                     split = result.Split(": ");
                     return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
+                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), "Server", Thread.CurrentPrincipal.Identity.Name, role, "Info", "Account Deletion Success");
+
                 }
                 split = result.Split(": ");
                 return StatusCode(Convert.ToInt32(split[0]), split[2]);
+                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), "Error", "unknownUser", "unknown", split[0], split[2]);
             }
             catch (OperationCanceledException tce)
             {
