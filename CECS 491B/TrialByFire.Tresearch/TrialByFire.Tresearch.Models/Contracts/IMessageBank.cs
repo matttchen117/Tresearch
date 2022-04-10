@@ -14,6 +14,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
         {
             generic,
             unhandledException,
+            operationCancelled,
 
             verifySuccess,
             notEnabled,
@@ -46,6 +47,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
 
             refreshSessionSuccess,
             refreshSessionFail,
+            refreshSessionNotAllowed,
 
             badNameOrPass,
             badEmail,

@@ -19,21 +19,17 @@ namespace TrialByFire.Tresearch.Managers.Implementations
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
-
         private IMessageBank _messageBank { get; }
-        private ILogoutService _logoutService { get; }
         private BuildSettingsOptions _options { get; }
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
             TimeSpan.FromSeconds(5));
 
-        public LogoutManager(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, 
-            ILogoutService logoutService, IOptionsSnapshot<BuildSettingsOptions> options)
+        public LogoutManager(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> options)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
             _messageBank = messageBank;
-            _logoutService = logoutService;
             _options = options.Value;
         }
 
@@ -47,16 +43,10 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         public async Task<string> LogoutAsync(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if(Thread.CurrentPrincipal != null)
+            if(!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
             {
-                try
-                {
-                    return await _logoutService.LogoutAsync(_cancellationTokenSource.Token)
-                        .ConfigureAwait(false);
-                }catch (Exception ex)
-                {
-                    return _options.UncaughtExceptionMessage + ex.Message;
-                }
+                return await _messageBank.GetMessage(IMessageBank.Responses.logoutSuccess)
+                .ConfigureAwait(false);
             }
             return await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated)
                 .ConfigureAwait(false);

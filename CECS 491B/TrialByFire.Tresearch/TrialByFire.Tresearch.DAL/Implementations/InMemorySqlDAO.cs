@@ -20,21 +20,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = new MessageBank();
         }
 
-        public async Task<int> RefreshSessionAsync(IRefreshSessionInput refreshSessionInput, 
-            CancellationToken cancellationToken = default)
-        {
-            foreach(Account a in InMemoryDatabase.Accounts)
-            {
-                if(a.Username.Equals(refreshSessionInput.Username) && 
-                    a.AuthorizationLevel.Equals(refreshSessionInput.AuthorizationLevel))
-                {
-                    a.Token = refreshSessionInput.Token;
-                    return 1;
-                }
-            }
-            return 0;
-        }
-
         public async Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default)
         {
             foreach(UserHashObject u in InMemoryDatabase.UserHashTable)
@@ -47,20 +32,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return null;
         }
 
-        public async Task<int> LogoutAsync(IAccount account, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            int index = InMemoryDatabase.Accounts.IndexOf(account);
-            if(index != -1)
-            {
-                InMemoryDatabase.Accounts[index].Token = null;
-            }
-            if(InMemoryDatabase.Accounts[index].Token == null)
-            {
-                return 1;
-            }
-            return 0;
-        }
         public async Task<int> StoreLogAsync(ILog log, string destination, CancellationToken cancellationToken = default)
         {
             switch(destination)
@@ -105,27 +76,28 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return 0;
         }
 
-        public async Task<int> AuthenticateAsync(IOTPClaim otpClaim, string jwtToken,
+        public async Task<int> AuthenticateAsync(IAuthenticationInput authenticationInput,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             List<string> results = new List<string>();
-            IAccount account = new Account(otpClaim.Username, otpClaim.AuthorizationLevel);
+            IAccount account = new UserAccount(authenticationInput.OTPClaim.Username, 
+                authenticationInput.OTPClaim.AuthorizationLevel);
             // Find account in db
             int index = InMemoryDatabase.Accounts.IndexOf(account);
             if (index >= 0)
             {
                 IAccount dbAccount = InMemoryDatabase.Accounts[index];
                 // find otp claim in db
-                index = InMemoryDatabase.OTPClaims.IndexOf(otpClaim);
+                index = InMemoryDatabase.OTPClaims.IndexOf(authenticationInput.OTPClaim);
                 IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[index];
                 // if otps do not match
-                if (!otpClaim.OTP.Equals(dbOTPClaim.OTP))
+                if (!authenticationInput.OTPClaim.OTP.Equals(dbOTPClaim.OTP))
                 {
                     // increment fail count
-                    ++InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount;
+                    ++InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(authenticationInput.OTPClaim)].FailCount;
                     // if fail count is 5 or more, disable account
-                    if (InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount >= 5)
+                    if (InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(authenticationInput.OTPClaim)].FailCount >= 5)
                     {
                         return 4;
                     }
@@ -135,9 +107,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     }
                 }
                 // check that the otp was entered within 2 minutes of being created
-                if ((otpClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
+                if ((authenticationInput.OTPClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (authenticationInput.OTPClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
                 {
-                    InMemoryDatabase.Accounts[index].Token = jwtToken;
+                    InMemoryDatabase.Accounts[index].Token = authenticationInput.Account.Token;
                     return 1;
                 }
                 else

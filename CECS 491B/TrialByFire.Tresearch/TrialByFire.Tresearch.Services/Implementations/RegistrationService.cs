@@ -31,7 +31,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                IAccount account = new Account(email, passphrase, authorizationLevel, true, false);
+                IAccount account = new UserAccount(email, passphrase, authorizationLevel, true, false);
                 string createResult = await _sqlDAO.CreateAccountAsync(account, cancellationToken).ConfigureAwait(false);
 
                 if(cancellationToken.IsCancellationRequested && createResult == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)

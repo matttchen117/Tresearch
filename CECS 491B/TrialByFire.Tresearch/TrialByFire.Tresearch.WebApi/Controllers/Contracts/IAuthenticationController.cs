@@ -8,7 +8,5 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
             string authorizationLevel, CancellationToken cancellationToken = default);
         public Task<IActionResult> AuthenticateAsync(string username, string otp, 
             string authorizationLevel, DateTime now, CancellationToken cancellationToken = default);
-
-        public Task<IActionResult> RefreshSessionAsync(CancellationToken cancellationToken = default);
     }
 }

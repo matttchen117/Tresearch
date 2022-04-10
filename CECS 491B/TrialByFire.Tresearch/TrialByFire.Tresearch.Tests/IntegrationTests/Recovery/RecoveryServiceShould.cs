@@ -49,7 +49,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         {
             //Arrange
             IRecoveryService recoveryService = TestProvider.GetService<IRecoveryService>();
-            IAccount account = new Account(username, passphrase, authorizationLevel, accountStatus, confirmed);
+            IAccount account = new UserAccount(username, passphrase, authorizationLevel, accountStatus, confirmed);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expectedAccount = username;
             string expectedStatusCode = statusCode;

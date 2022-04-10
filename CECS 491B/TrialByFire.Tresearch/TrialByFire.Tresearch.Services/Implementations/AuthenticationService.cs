@@ -48,15 +48,19 @@ namespace TrialByFire.Tresearch.Services.Implementations
         //
         // Returns:
         //     The result of the Authentication process and a JWT token on success.
-        public async Task<List<string>> AuthenticateAsync(IOTPClaim otpClaim, 
+        public async Task<List<string>> AuthenticateAsync(IAuthenticationInput authenticationInput, 
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             List<string> results = new List<string>();
             try
             {
-                string jwtToken = await CreateJwtToken(otpClaim).ConfigureAwait(false);
-                int result = await _sqlDAO.AuthenticateAsync(otpClaim, jwtToken, cancellationToken).ConfigureAwait(false);
+                authenticationInput.UserHash = await _sqlDAO.GetUserHashAsync(authenticationInput.Account)
+                    .ConfigureAwait(false);
+                authenticationInput.Account.Token = await CreateJwtToken(authenticationInput)
+                    .ConfigureAwait(false);
+                int result = await _sqlDAO.AuthenticateAsync(authenticationInput, cancellationToken)
+                    .ConfigureAwait(false);
                 switch (result)
                 {
                     case 0:
@@ -64,7 +68,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                         break;
                     case 1:
                         results.Add(await _messageBank.GetMessage(IMessageBank.Responses.authenticationSuccess).ConfigureAwait(false));
-                        results.Add(jwtToken);
+                        results.Add(authenticationInput.Account.Token);
                         break;
                     case 2:
                         results.Add(await _messageBank.GetMessage(IMessageBank.Responses.otpExpired)
@@ -126,29 +130,32 @@ namespace TrialByFire.Tresearch.Services.Implementations
         //
         // Returns:
         //     The result of the JWT creation process and the JWT token on success.
-        private async Task<string> CreateJwtToken(ICreateJwtInput jwtInput, CancellationToken cancellation 
+        private async Task<string> CreateJwtToken(IAuthenticationInput authenticationInput, CancellationToken cancellation 
             = default)
         {
-            // break payload into parts
-            Dictionary<string, string> claimValuePairs = new Dictionary<string, string>();
-            claimValuePairs.Add(_options.RoleIdentityIdentifier1, jwtInput.Username);
-            claimValuePairs.Add(_options.RoleIdentityIdentifier2, jwtInput.AuthorizationLevel);
-
-            // create identity to place into JWT
             try
             {
+                // break payload into parts
+                Dictionary<string, string> claimValuePairs = new Dictionary<string, string>();
+                claimValuePairs.Add(_options.RoleIdentityIdentifier1, authenticationInput.Account.Username);
+                claimValuePairs.Add(_options.RoleIdentityIdentifier2, authenticationInput.Account.AuthorizationLevel);
+                claimValuePairs.Add(_options.RoleIdentityIdentifier3, authenticationInput.UserHash);
+                // create identity to place into JWT
                 IRoleIdentity roleIdentity = new RoleIdentity(true, claimValuePairs[_options.RoleIdentityIdentifier1], 
-                    claimValuePairs[_options.RoleIdentityIdentifier2]);
+                    claimValuePairs[_options.RoleIdentityIdentifier2], claimValuePairs[_options.RoleIdentityIdentifier3]);
                 //create jwt and set values
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var keyValue = _options.JWTTokenKey;
                 var key = Encoding.UTF8.GetBytes(keyValue);
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    Subject = new ClaimsIdentity(new[] { new Claim(_options.RoleIdentityIdentifier1, 
-                    claimValuePairs[_options.RoleIdentityIdentifier1]), 
+                    Subject = new ClaimsIdentity(new[] { 
+                        new Claim(_options.RoleIdentityIdentifier1, 
+                            claimValuePairs[_options.RoleIdentityIdentifier1]), 
                         new Claim(_options.RoleIdentityIdentifier2, 
-                        claimValuePairs[_options.RoleIdentityIdentifier2]) }),
+                            claimValuePairs[_options.RoleIdentityIdentifier2]),
+                        new Claim(_options.RoleIdentityIdentifier3,
+                            claimValuePairs[_options.RoleIdentityIdentifier3])}),
                     Expires = DateTime.UtcNow.AddMinutes(30),
                     IssuedAt = DateTime.UtcNow,
                     Issuer = _options.JwtIssuer,
@@ -167,26 +174,15 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        public async Task<List<string>> RefreshSessionAsync(IRefreshSessionInput refreshSessionInput, CancellationToken cancellationToken = default)
+        public async Task<List<string>> RefreshSessionAsync(IAuthenticationInput authenticationInput, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             List<string> results = new List<string>();
             try
             {
-                string jwt = await CreateJwtToken(refreshSessionInput, cancellationToken).ConfigureAwait(false);
-                int result = await _sqlDAO.RefreshSessionAsync(refreshSessionInput, cancellationToken).ConfigureAwait(false);
-                switch(result)
-                {
-                    case 0:
-                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.refreshSessionFail).ConfigureAwait(false));
-                        break;
-                    case 1:
-                        results.Add(await _messageBank.GetMessage(IMessageBank.Responses.refreshSessionSuccess).ConfigureAwait(false));
-                        results.Add(jwt);
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
+                string jwt = await CreateJwtToken(authenticationInput, cancellationToken).ConfigureAwait(false);
+                results.Add(await _messageBank.GetMessage(IMessageBank.Responses.refreshSessionSuccess).ConfigureAwait(false));
+                results.Add(jwt);
             }
             catch(Exception ex)
             {

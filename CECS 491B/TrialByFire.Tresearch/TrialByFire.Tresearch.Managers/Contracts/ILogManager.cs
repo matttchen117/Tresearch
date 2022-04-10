@@ -25,11 +25,9 @@ namespace TrialByFire.Tresearch.Managers.Contracts
             Datastore,
         }
 
-        public Task<string> StoreAnalyticLogAsync(DateTime timestamp, Levels level, string username,
-            string authorizationLevel, Categories category, string description,
-            CancellationToken cancellationToken = default);
-        public Task<string> StoreArchiveLogAsync(DateTime timestamp, Levels level, string username,
-            string authorizationLevel, Categories category, string description,
-            CancellationToken cancellationToken = default);
+        public Task<string> StoreAnalyticLogAsync(DateTime timestamp, Levels level, Categories category, 
+            string description, CancellationToken cancellationToken = default);
+        public Task<string> StoreArchiveLogAsync(DateTime timestamp, Levels level, Categories category, 
+            string description, CancellationToken cancellationToken = default);
     }
 }

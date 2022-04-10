@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Models.Contracts
 {
-    public interface ICreateJwtInput
+    public interface IAuthenticationInput
     {
-        public string Username { get; set; }
-        public string AuthorizationLevel { get; set; }
+        public IAccount? Account { get; set; }
+        public IOTPClaim? OTPClaim { get; set; }
+
+        string? UserHash { get; set; }
     }
 }

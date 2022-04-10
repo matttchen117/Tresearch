@@ -36,11 +36,13 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
             int minute, int second, string expected)
         {
             // Arrange
+            IAccount account = new UserAccount(username, authorizationLevel);
             OTPClaim otpClaim = new OTPClaim(username, otp, authorizationLevel, new DateTime(year, month, day, hour, minute, second));
+            IAuthenticationInput authenticationInput = new AuthenticationInput(account, otpClaim);
             IAuthenticationService authenticationService = TestProvider.GetService<IAuthenticationService>();
 
             // Act
-            List<string> results = await authenticationService.AuthenticateAsync(otpClaim)
+            List<string> results = await authenticationService.AuthenticateAsync(authenticationInput)
                 .ConfigureAwait(false);
 
             // Assert
@@ -63,18 +65,61 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
             int minute, int second, string expected)
         {
             // Arrange
-            OTPClaim otpClaim = new OTPClaim(username, otp, authorizationLevel, new DateTime(year, month, day, hour, minute, second));
+            IAccount account = new UserAccount(username, authorizationLevel);
+            IOTPClaim otpClaim = new OTPClaim(username, otp, authorizationLevel, new DateTime(year, month, day, hour, minute, second));
+            IAuthenticationInput authenticationInput = new AuthenticationInput(account, otpClaim);
             IAuthenticationService authenticationService = TestProvider.GetService<IAuthenticationService>();
             CancellationTokenSource cancellationTokenSource =
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             // Act
-            List<string> results = await authenticationService.AuthenticateAsync(otpClaim, 
+            List<string> results = await authenticationService.AuthenticateAsync(authenticationInput, 
                 cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, results[0]);
 
+        }
+
+        [Theory]
+        [InlineData("drakat7@gmail.com", "user", "refreshSessionSuccess")]
+        public async Task RefreshTheSessionAsync(string username, string authorizationLevel, string expected)
+        {
+            // Arrange
+            IAccount account = new UserAccount(username, authorizationLevel);
+            IAuthenticationInput authenticationInput = new AuthenticationInput(account);
+            IAuthenticationService authenticationService = TestProvider.GetService<IAuthenticationService>();
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
+            Enum.TryParse(expected, out IMessageBank.Responses response);
+            string expectedResult = await messageBank.GetMessage(response).ConfigureAwait(false);
+
+            // Act
+            List<string> results = await authenticationService.RefreshSessionAsync(authenticationInput)
+                .ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal(expectedResult, results[0]);
+        }
+
+        [Theory]
+        [InlineData("drakat7@gmail.com", "user", "refreshSessionSuccess")]
+        public async Task RefreshTheSessionAsyncWithin5Seconds(string username, string authorizationLevel,
+            string expected)
+        {
+            // Arrange
+            IAccount account = new UserAccount(username, authorizationLevel);
+            IAuthenticationInput authenticationInput = new AuthenticationInput(account);
+            IAuthenticationService authenticationService = TestProvider.GetService<IAuthenticationService>();
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
+            Enum.TryParse(expected, out IMessageBank.Responses response);
+            string expectedResult = await messageBank.GetMessage(response).ConfigureAwait(false);
+
+            // Act
+            List<string> results = await authenticationService.RefreshSessionAsync(authenticationInput)
+                .ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal(expectedResult, results[0]);
         }
     }
 }

@@ -37,7 +37,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
         {
             // Arrange
             IOTPRequestService otpRequestService = TestProvider.GetService<IOTPRequestService>();
-            IAccount account = new Account(username, passphrase, authorizationLevel);
+            IAccount account = new UserAccount(username, passphrase, authorizationLevel);
             IOTPClaim otpClaim = new OTPClaim(account);
 
             // Act
@@ -62,7 +62,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
         {
             // Arrange
             IOTPRequestService otpRequestService = TestProvider.GetService<IOTPRequestService>();
-            IAccount account = new Account(username, passphrase, authorizationLevel);
+            IAccount account = new UserAccount(username, passphrase, authorizationLevel);
             IOTPClaim otpClaim = new OTPClaim(account);
             CancellationTokenSource cancellationTokenSource =
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));

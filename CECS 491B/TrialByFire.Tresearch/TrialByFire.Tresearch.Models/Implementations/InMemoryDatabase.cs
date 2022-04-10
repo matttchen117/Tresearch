@@ -93,45 +93,45 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<IAccount> InitializeAccounts()
         {
             List<IAccount> accounts = new List<IAccount>();
-            accounts.Add(new Account("drakat7@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new Account("drakat7@gmail.com", "abcDEF123", "admin", true, true));
+            accounts.Add(new UserAccount("drakat7@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new UserAccount("drakat7@gmail.com", "abcDEF123", "admin", true, true));
             // for otp request tests
-            accounts.Add(new Account("aarry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new Account("barry@gmail.com", "abcDEF123", "admin", true, true));
-            accounts.Add(new Account("carry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new Account("darry@gmail.com", "abcDEF123", "user", false, true));
-            accounts.Add(new Account("earry@gmail.com", "abcDEF123", "user", false, false));
-            accounts.Add(new Account("farry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new UserAccount("aarry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new UserAccount("barry@gmail.com", "abcDEF123", "admin", true, true));
+            accounts.Add(new UserAccount("carry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new UserAccount("darry@gmail.com", "abcDEF123", "user", false, true));
+            accounts.Add(new UserAccount("earry@gmail.com", "abcDEF123", "user", false, false));
+            accounts.Add(new UserAccount("farry@gmail.com", "abcDEF123", "user", true, true));
             // for authentication tests
-            accounts.Add(new Account("garry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new Account("harry@gmail.com", "abcDEF123", "admin", true, true));
-            accounts.Add(new Account("iarry@gmail.com", "abcDEF123", "admin", true, true));
-            accounts.Add(new Account("jarry@gmail.com", "abcDEF123", "admin", true, true));
-            accounts.Add(new Account("karry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new Account("larry@gmail.com", "abcDEF123", "user", false, true));
-            accounts.Add(new Account("marry@gmail.com", "abcDEF123", "user", false, false));
-            accounts.Add(new Account("narry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new Account("oarry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new Account("parry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new UserAccount("garry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new UserAccount("harry@gmail.com", "abcDEF123", "admin", true, true));
+            accounts.Add(new UserAccount("iarry@gmail.com", "abcDEF123", "admin", true, true));
+            accounts.Add(new UserAccount("jarry@gmail.com", "abcDEF123", "admin", true, true));
+            accounts.Add(new UserAccount("karry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new UserAccount("larry@gmail.com", "abcDEF123", "user", false, true));
+            accounts.Add(new UserAccount("marry@gmail.com", "abcDEF123", "user", false, false));
+            accounts.Add(new UserAccount("narry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new UserAccount("oarry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new UserAccount("parry@gmail.com", "abcDEF123", "user", true, true));
 
             /*            Viet adding new accounts
                         [InlineData("grizzly@gmail.com", "user", "success")]
                         [InlineData("salewa@gmail.com", "admin", "success")]
                         Accounts for AccountDeletionController*/
-            accounts.Add(new Account("grizzly@gmail.com", "asdfasdf", "user", true, true));
-            accounts.Add(new Account("salewa@gmail.com", "asdfasdf123", "admin", true, true));
+            accounts.Add(new UserAccount("grizzly@gmail.com", "asdfasdf", "user", true, true));
+            accounts.Add(new UserAccount("salewa@gmail.com", "asdfasdf123", "admin", true, true));
 
             /*            Accounts for AccountDeletionManager
                         [InlineData("trizip@gmail.com", "user", "success")]
                         [InlineData("switchblade@gmail.com", "admin", "success")]*/
-            accounts.Add(new Account("trizip@gmail.com", "asdfasdf", "user", true, true));
-            accounts.Add(new Account("switchblade@gmail.com", "asdfasdf123", "admin", true, true));
+            accounts.Add(new UserAccount("trizip@gmail.com", "asdfasdf", "user", true, true));
+            accounts.Add(new UserAccount("switchblade@gmail.com", "asdfasdf123", "admin", true, true));
             /*            Accounts for AccountDeletionService
                         [InlineData("altyn@gmail.com", "user", "success")]
                         [InlineData("ryst@gmail.com", "admin", "success")]*/
 
-            accounts.Add(new Account("altyn@gmail.com", "asdfasdf", "user", true, true));
-            accounts.Add(new Account("ryst@gmail.com", "asdfasdf123", "admin", true, true));
+            accounts.Add(new UserAccount("altyn@gmail.com", "asdfasdf", "user", true, true));
+            accounts.Add(new UserAccount("ryst@gmail.com", "asdfasdf123", "admin", true, true));
             return accounts;
         }
 

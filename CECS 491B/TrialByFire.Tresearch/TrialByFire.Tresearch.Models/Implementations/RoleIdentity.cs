@@ -18,11 +18,14 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public string AuthorizationLevel { get; }
 
-        public RoleIdentity(bool isAuthenticated, string name, string authorizationLevel)
+        public string UserHash { get; }
+
+        public RoleIdentity(bool isAuthenticated, string name, string authorizationLevel, string userHash)
         {
             IsAuthenticated = isAuthenticated;
             Name = name;
             AuthorizationLevel = authorizationLevel;
+            UserHash = userHash;
         }
     }
 }

@@ -34,6 +34,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "200: Server: success";
                 case Responses.unhandledException:
                     return "600: Server: Unhandled Exception: ";
+                case Responses.operationCancelled:
+                    return "400: Server: Operation Cancelled Exception: ";
 
                 case Responses.verifySuccess:
                     return "200: Server: Account Verification success.";
@@ -92,6 +94,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "200: Server: Refresh Session Success.";
                 case Responses.refreshSessionFail:
                     return "400: Data: Refresh Session Failed: ";
+                case Responses.refreshSessionNotAllowed:
+                    return "400: Server: Refresh Session Failed: User is not logged in.";
 
                 case Responses.storeLogFail:
                     return "503: Database: Failed to store the log.";

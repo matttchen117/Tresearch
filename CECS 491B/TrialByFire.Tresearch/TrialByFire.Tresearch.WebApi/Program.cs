@@ -29,7 +29,6 @@ builder.Services.AddScoped<IRecoveryService, RecoveryService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 builder.Services.AddScoped<IUADService, UADService>();
 builder.Services.AddScoped<IValidationService, ValidationService>();
-builder.Services.AddScoped<ILogoutService, LogoutService>();
 builder.Services.AddScoped<ITagService, TagService>();
 // Managers
 builder.Services.AddScoped<ILogManager, LogManager>();

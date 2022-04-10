@@ -26,7 +26,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         {
 
             //Arrange
-            IAccount account = new Account(email, passphrase, "user", true, false);
+            IAccount account = new UserAccount(email, passphrase, "user", true, false);
             IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
             string expected = statusCode;
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));

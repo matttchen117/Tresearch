@@ -25,23 +25,21 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _buildSettings = options.Value;
         }
 
-        public async Task<string> StoreAnalyticLogAsync(DateTime timestamp, Levels level, string username, 
-            string authorizationLevel, Categories category, string description, 
-            CancellationToken cancellationToken = default)
+        public async Task<string> StoreAnalyticLogAsync(DateTime timestamp, Levels level, Categories category, 
+            string description, CancellationToken cancellationToken = default)
         {
-            ILog log = await _logService.CreateLogAsync(timestamp, level.ToString(), username, authorizationLevel, 
-                category.ToString(), description, _cancellationTokenSource.Token).ConfigureAwait(false);
+            ILog log = await _logService.CreateLogAsync(timestamp, level.ToString(), category.ToString(), 
+                description, _cancellationTokenSource.Token).ConfigureAwait(false);
             return await _logService.StoreLogAsync(log, _buildSettings.AnalyticTable, 
                 _cancellationTokenSource.Token).ConfigureAwait(false);
         }
 
-        public async Task<string> StoreArchiveLogAsync(DateTime timestamp, Levels level, string username, 
-            string authorizationLevel, Categories category, string description, 
-            CancellationToken cancellationToken = default)
+        public async Task<string> StoreArchiveLogAsync(DateTime timestamp, Levels level, Categories category,
+            string description, CancellationToken cancellationToken = default)
         {
-            ILog log = await _logService.CreateLogAsync(timestamp, level.ToString(), username, authorizationLevel,
-                category.ToString(), description, _cancellationTokenSource.Token).ConfigureAwait(false);
-            return await _logService.StoreLogAsync(log, _buildSettings.ArchiveTable, 
+            ILog log = await _logService.CreateLogAsync(timestamp, level.ToString(), category.ToString(),
+                description, _cancellationTokenSource.Token).ConfigureAwait(false);
+            return await _logService.StoreLogAsync(log, _buildSettings.ArchiveTable,
                 _cancellationTokenSource.Token).ConfigureAwait(false);
         }
     }

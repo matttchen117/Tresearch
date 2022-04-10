@@ -21,25 +21,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _options = options.Value;
         }
 
-        public async Task<int> RefreshSessionAsync(IRefreshSessionInput refreshSessionInput,
-            CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            using (var connection = new SqlConnection(_options.SqlConnectionString))
-            {
-                //Perform sql statement
-                var procedure = "dbo.[RefreshSession]";
-                var parameters = new DynamicParameters();
-                parameters.Add("Username", refreshSessionInput.Username);
-                parameters.Add("AuthorizationLevel", refreshSessionInput.AuthorizationLevel);
-                parameters.Add("Token", refreshSessionInput.Token);
-                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
-                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
-                    .ConfigureAwait(false);
-                return parameters.Get<int>("Result");
-            }
-        }
 
         public async Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default)
         {
@@ -58,23 +39,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return parameters.Get<string>("Result");
             }
         }
-        public async Task<int> LogoutAsync(IAccount account, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            using (var connection = new SqlConnection(_options.SqlConnectionString))
-            {
-                //Perform sql statement
-                var procedure = "[Logout]";
-                var parameters = new DynamicParameters();
-                parameters.Add("Username", account.Username);
-                parameters.Add("AuthorizationLevel", account.AuthorizationLevel);
-                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
-                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
-                    .ConfigureAwait(false);
-                return parameters.Get<int>("Result");
-            }
-        }
+
         public async Task<int> StoreLogAsync(ILog log, string destination, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -84,7 +49,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 var parameters = new DynamicParameters();
                 parameters.Add("Timestamp", log.Timestamp);
                 parameters.Add("Level", log.Level);
-                parameters.Add("Username", log.UserHash);
+                parameters.Add("UserHash", log.UserHash);
                 parameters.Add("Category", log.Category);
                 parameters.Add("Description", log.Description);
                 parameters.Add("Hash", log.Hash);
@@ -226,7 +191,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var procedure = "dbo.[GetAccount]";
                     var parameters = new { Username = email, AuthorizationLevel = authorizationLevel };
 
-                    var Accounts = await connection.QueryAsync<Account>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    var Accounts = await connection.QueryAsync<UserAccount>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                     //Check if account was returned
                     if (Accounts.Count() < 1)
@@ -871,7 +836,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<int> AuthenticateAsync(IOTPClaim otpClaim, string jwtToken,
+        public async Task<int> AuthenticateAsync(IAuthenticationInput authenticationInput,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -880,11 +845,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 //Perform sql statement
                 var procedure = "[Authenticate]";
                 var parameters = new DynamicParameters();
-                parameters.Add("Username", otpClaim.Username);
-                parameters.Add("OTP", otpClaim.OTP);
-                parameters.Add("AuthorizationLevel", otpClaim.AuthorizationLevel);
-                parameters.Add("TimeCreated", otpClaim.TimeCreated);
-                parameters.Add("Token", jwtToken);
+                parameters.Add("Username", authenticationInput.OTPClaim.Username);
+                parameters.Add("OTP", authenticationInput.OTPClaim.OTP);
+                parameters.Add("AuthorizationLevel", authenticationInput.OTPClaim.AuthorizationLevel);
+                parameters.Add("TimeCreated", authenticationInput.OTPClaim.TimeCreated);
                 parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
                     commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))

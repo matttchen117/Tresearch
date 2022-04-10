@@ -12,10 +12,10 @@ DROP TABLE IF EXISTS NodeTags
 DROP TABLE IF EXISTS Tags
 DROP TABLE IF EXISTS Nodes
 DROP TABLE IF EXISTS OTPClaims
-DROP TABLE IF EXISTS UserHashTable
-DROP TABLE IF EXISTS Accounts
 DROP TABLE IF EXISTS AnalyticLogs
 DROP TABLE IF EXISTS ArchiveLogs
+DROP TABLE IF EXISTS UserHashTable
+DROP TABLE IF EXISTS Accounts
 
 DROP PROCEDURE IF EXISTS GetLogs
 DROP PROCEDURE IF EXISTS DeleteLogs
@@ -57,6 +57,10 @@ DROP PROCEDURE IF EXISTS DeleteArchiveableLogs
 DROP PROCEDURE IF EXISTS Logout
 DROP PROCEDURE IF EXISTS StoreLog
 DROP PROCEDURE IF EXISTS GetUserHash
+DROP PROCEDURE IF EXISTS Search
+DROP PROCEDURE IF EXISTS RefreshSession
+
+DROP TYPE IF EXISTS SearchTagList
 
 CREATE TABLE [dbo].Accounts(
 	UserID INT IDENTITY(1,1),
@@ -65,7 +69,6 @@ CREATE TABLE [dbo].Accounts(
     AuthorizationLevel VARCHAR(40),
     AccountStatus BIT,
     Confirmed BIT,
-    Token VARCHAR(64) NULL,
 	CONSTRAINT user_accounts_ck UNIQUE (UserID),
     CONSTRAINT user_account_pk PRIMARY KEY(Username, AuthorizationLevel)
 );
@@ -120,7 +123,7 @@ CREATE TABLE NodeTags(
 	CONSTRAINT user_ratings_pk PRIMARY KEY(UserHash, NodeID)
 );*/
 
-CREATE TYPE dbo.SearchTagList AS TABLE
+CREATE TYPE SearchTagList AS TABLE
 (
 	Tag VARCHAR(100)
 );
@@ -357,7 +360,6 @@ CREATE PROCEDURE Authenticate
     @OTP VARCHAR(128),
     @AuthorizationLevel VARCHAR(40),
 	@TimeCreated DateTime,
-	@Token VARCHAR(64) NULL,
 	@Result int OUTPUT
 AS
 BEGIN
@@ -388,18 +390,6 @@ BEGIN
 						WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel), 0
 					)
 				)
-
-				IF(@Result = 1)
-					BEGIN
-						UPDATE Accounts 
-						SET Token = @Token 
-						WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel
-
-						SELECT @RowCount = @@ROWCOUNT
-
-						IF(@RowCount != 1)
-							SET @Result = @RowCount
-					END
 
 				IF(@Result = 3)
 					BEGIN
@@ -544,69 +534,6 @@ GO
 -- Create date: 3/29/2022
 -- Description:	Stores the otp for the User
 -- =============================================
-CREATE PROCEDURE Logout 
-	-- Add the parameters for the stored procedure here
-	@Username VARCHAR(128),
-	@AuthorizationLevel VARCHAR(40),
-	@Result int OUTPUT
-AS
-BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
-	SET NOCOUNT ON;
-	DECLARE @RowCount int;
-	DECLARE @TranCounter int;
-	SET @TranCounter = @@TRANCOUNT;
-	IF @TranCounter > 0
-		SAVE TRANSACTION ProcedureSave
-	ELSE
-		BEGIN TRAN
-			BEGIN TRY;
-				-- Insert statements for procedure here
-
-				-- 0 = No Account Found, 1 = Success, 2 = Duplicate account found, 3 = Rollback occurred
-
-				UPDATE Accounts
-				SET Token = null
-				WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel 
-
-				SELECT @RowCount = @@ROWCOUNT
-
-				IF(@RowCount = 0)
-					SET @Result = 0
-				ELSE IF(@RowCount = 1)
-					SET @Result = 1
-				ELSE
-					SET @Result = 2
-
-				COMMIT TRANSACTION
-			END TRY
-		BEGIN CATCH
-			IF @TranCounter = 0
-				BEGIN
-					SET @Result = 3
-					ROLLBACK TRANSACTION
-				END
-			ELSE
-				IF XACT_STATE() <> -1
-					BEGIN
-						SET @Result = 3
-						ROLLBACK TRANSACTION ProcedureSave
-					END
-		END CATCH
-	RETURN @Result;
-END
-GO
-
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
--- =============================================
--- Author:		Matthew Chen
--- Create date: 3/29/2022
--- Description:	Stores the otp for the User
--- =============================================
 CREATE PROCEDURE StoreLog 
 	-- Add the parameters for the stored procedure here
 	@Timestamp DATETIME,
@@ -684,7 +611,7 @@ GO
 -- =============================================
 CREATE PROCEDURE Search 
 	-- Add the parameters for the stored procedure here
-	@TagList AS dbo.SearchTagList READONLY,
+	@TagList AS SearchTagList READONLY,
 	@Result int OUTPUT
 AS
 BEGIN
@@ -743,7 +670,9 @@ BEGIN
 
 	BEGIN TRY;
 		--IF(EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'TrialByFire.Tresearch.IntegrationTestDB' AND TABLE_NAME = 'UserHashTable'))
-		SET @Result = (SELECT UserHash FROM UserHashTable WHERE UserID = @Username AND UserRole = @AuthorizationLevel);
+		SET @Result = (SELECT UserHash 
+					   FROM UserHashTable 
+					   WHERE UserID =  (SELECT UserID FROM Accounts WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel));
 
 		IF(@Result IS NOT NULL)
 			RETURN 1;
@@ -753,65 +682,6 @@ BEGIN
 		RETURN 0;
 	END CATCH
 	RETURN 0;
-END
-GO
-
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
--- =============================================
--- Author:		Matthew Chen
--- Create date: 4/9/2022
--- Description:	Stores the otp for the User
--- =============================================
-CREATE PROCEDURE RefreshSession 
-	-- Add the parameters for the stored procedure here
-	@Username VARCHAR(100),
-	@AuthorizationLevel VARCHAR(40),
-	@Token VARCHAR(128),
-	@Result int OUTPUT
-AS
-BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
-
-	-- 0 = Fail, 1 = Success, 2 = Rollback
-	SET NOCOUNT ON;
-	DECLARE @RowCount int;
-	DECLARE @TranCounter int;
-	SET @TranCounter = @@TRANCOUNT;
-	IF @TranCounter > 0
-		SAVE TRANSACTION ProcedureSave
-	ELSE
-		BEGIN TRAN
-			BEGIN TRY;
-				UPDATE Accounts SET Token = @Token WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel;
-
-				SELECT @RowCount = @@ROWCOUNT
-
-				IF(@RowCount = 0)
-					SET @Result = 0
-				ELSE
-					SET @Result = 1
-
-				COMMIT TRANSACTION
-			END TRY
-		BEGIN CATCH
-			IF @TranCounter = 0
-				BEGIN
-					-- output could be a table
-					SET @Result = 2
-					ROLLBACK TRANSACTION
-				END
-			ELSE
-				IF XACT_STATE() <> -1
-					BEGIN
-						SET @Result = 2
-						ROLLBACK TRANSACTION ProcedureSave
-					END
-		END CATCH
-	RETURN @Result;
 END
 GO
 
@@ -924,6 +794,7 @@ begin
          VALUES(@Username, @AuthorizationLevel, @NodeID, @NodeParentID, @NodeTitle, @Summary, @Visibility);
 end*/
 
+/*
 -- =============================================
 -- Author:		Pammy Poor
 -- Description:	Creates a user id 
@@ -949,7 +820,7 @@ begin
 		BEGIN
 			INSERT INTO UserHashTable(UserID, UserRole, UserHash) VALUES(@UserID, @UserRole, @UserHash);
 		END
-end
+end*/
 
 -- =============================================
 -- Author:		Pammy Poor

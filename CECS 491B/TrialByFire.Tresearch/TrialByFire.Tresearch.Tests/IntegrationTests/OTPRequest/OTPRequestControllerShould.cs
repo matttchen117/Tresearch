@@ -33,31 +33,39 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
         }
 
         [Theory]
-        [InlineData("drakat7@gmail.com", "abcDEF123", "user", "guest", "guest", "503: Server: Email failed to send.")]
-        [InlineData("drakat7@gmail.com", "abcDEF123", "admin", "guest", "guest", "503: Server: Email failed to send.")]
-        [InlineData("aarry@gmail.com", "#$%", "user", "guest", "guest", "400: Data: Invalid Username or " +
+        [InlineData("drakat7@gmail.com", "abcDEF123", "user", "guest", "guest", "", "503: Server: Email failed to send.")]
+        [InlineData("drakat7@gmail.com", "abcDEF123", "admin", "guest", "guest", "", "503: Server: Email failed to send.")]
+        [InlineData("aarry@gmail.com", "#$%", "user", "guest", "guest", "", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("aarry@gmail.com", "abcdef#$%", "user", "guest", "guest", "400: Data: Invalid Username or " +
+        [InlineData("aarry@gmail.com", "abcdef#$%", "user", "guest", "guest", "", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("aarry@gmail.com", "abcdEF123", "user", "guest", "guest", "400: Data: Invalid Username or " +
+        [InlineData("aarry@gmail.com", "abcdEF123", "user", "guest", "guest", "", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "guest", "guest", "500: Database: The Account was not found.")]
-        [InlineData("barry@gmail.com", "abcDEF123", "admin", "billy@yahoo.com", "admin", "403: Server: Active session found. " +
-            "Please logout and try again.")]
-        [InlineData("darry@gmail.com", "abcDEF123", "user", "guest", "guest", "401: Database: Account disabled. " +
+        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "guest", "guest", "", "500: Database: The Account was not found.")]
+        [InlineData("barry@gmail.com", "abcDEF123", "admin", "barry@yahoo.com", 
+                    "E5D6801551E6079FCAF2B10403FA86F9B9EC40B0D7A70256EDA0A9988ABAB4CC250681D5054D18E224DCF0CADB730BCF6E07546F2B775A0E31D64C3DC41BC159", 
+                    "admin", "403: Server: Active session found. Please logout and try again.")]
+        [InlineData("darry@gmail.com", "abcDEF123", "user", "guest", "guest", "", "401: Database: Account disabled. " +
             "Perform account recovery or contact system admin.")]
-        [InlineData("earry@gmail.com", "abcDEF123", "user", "guest", "guest", "401: Database: Please confirm your " +
+        [InlineData("earry@gmail.com", "abcDEF123", "user", "guest", "guest", "", "401: Database: Please confirm your " +
             "account before attempting to login.")]
-        public async Task RequestTheOTP(string username, string passphrase, string authorizationLevel, string currentIdentity, string currentRole,
-            string expected)
+        public async Task RequestTheOTP(string username, string passphrase, string authorizationLevel, 
+            string currentIdentity, string currentRole, string userHash, string expected)
         {
             // Arrange
-            IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
-            IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+            IRoleIdentity roleIdentity;
+            IRolePrincipal rolePrincipal;
             if (!currentIdentity.Equals("guest"))
             {
-                Thread.CurrentPrincipal = rolePrincipal;
+                roleIdentity = new RoleIdentity(true, currentIdentity, currentRole, userHash);
             }
+            else
+            {
+                roleIdentity = new RoleIdentity(true, currentIdentity, currentRole, "E64C56A055B741393268F7EE26EF3AA00FC58D6272C06DE31932B71EB965A68CCB9F32AEBD74E25708AD501C7D7AAA1E5C4CE4C9010149FBA08B2C5351A57F34");
+
+            }
+            rolePrincipal = new RolePrincipal(roleIdentity);
+            Thread.CurrentPrincipal = rolePrincipal;
             IOTPRequestController otpRequestController = TestProvider.GetService<IOTPRequestController>();
             string[] expecteds = expected.Split(": ");
             ObjectResult expectedResult = new ObjectResult(expecteds[2])

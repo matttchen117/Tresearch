@@ -99,6 +99,7 @@ class LoginForm extends React.Component  {
                         //navigate('/Login/Authentication');
                 }).catch(err => {
                         console.log(err.data);
+                        sessionStorage.setItem('authorization', err.headers['authorization']);
                     })
                 :
                 axios.post('https://localhost:7010/OTPRequest/requestotp?username=' + this.state.username.toLowerCase() + 
@@ -107,9 +108,11 @@ class LoginForm extends React.Component  {
                         console.log(response.data);
                         console.log(response.headers['authorization']);
                         this.setState({verified: true});
+                        sessionStorage.setItem('authorization', response.headers['authorization']);
                         //navigate('/Login/Authentication');
                 }).catch(err => {
                     console.log(err.data)
+                    sessionStorage.setItem('authorization', err.headers['authorization']);
                     this.setState({verified: true}); // remvoe later once added in api key
                 })
             }

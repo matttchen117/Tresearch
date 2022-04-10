@@ -8,6 +8,8 @@ using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Services.Implementations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using TrialByFire.Tresearch.Managers.Contracts;
+using TrialByFire.Tresearch.Managers.Implementations;
 
 namespace TrialByFire.Tresearch.Tests
 {
@@ -32,6 +34,7 @@ namespace TrialByFire.Tresearch.Tests
             // Service
             TestServices.AddScoped<IValidationService, ValidationService>();
             TestServices.AddScoped<ILogService, LogService>();
+            TestServices.AddScoped<ILogManager, LogManager>();
             TestServices.AddScoped<IAuthenticationService, AuthenticationService>();
             TestServices.AddScoped<IAuthorizationService, AuthorizationService>();
         }

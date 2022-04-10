@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Models.Contracts
 {
-    public interface IOTPClaim : ICreateJwtInput
+    public interface IOTPClaim
     {
         string Username { get; set; }
 

@@ -10,9 +10,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 {
     public interface ISqlDAO
     {
-        public Task<int> RefreshSessionAsync(IRefreshSessionInput refreshSessionInput, CancellationToken cancellationToken = default);
         public Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default);
-        public Task<int> LogoutAsync(IAccount account, CancellationToken cancellationToken = default);
         public Task<int> StoreLogAsync(ILog log, string destination, CancellationToken cancellationToken = default);
         public Task<string> EnableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> DisableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
@@ -32,7 +30,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         // Authentication
         public Task<int> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken = default);
-        public Task<int> AuthenticateAsync(IOTPClaim otpClaim, string jwtToken, CancellationToken cancellationToken = default);
+        public Task<int> AuthenticateAsync(IAuthenticationInput authenticationInput, CancellationToken cancellationToken = default);
 
         // Request OTP
         public Task<int> StoreOTPAsync(IAccount account, IOTPClaim otpClaim, CancellationToken cancellationToken = default);

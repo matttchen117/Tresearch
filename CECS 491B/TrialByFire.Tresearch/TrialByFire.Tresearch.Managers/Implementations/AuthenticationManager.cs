@@ -27,7 +27,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private IMessageBank _messageBank { get; }
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
-            TimeSpan.FromSeconds(5));
+            /*TimeSpan.FromSeconds(5)*/);
 
         public AuthenticationManager(ISqlDAO sqlDAO, ILogService logService, 
             IAccountVerificationService accountVerificationService, 
@@ -61,17 +61,18 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             List<string> results = new List<string>();
             try
             {
-                if (Thread.CurrentPrincipal == null)
+                if (Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
-                    IAccount account = new Account(username, authorizationLevel);
-                    OTPClaim resultClaim = new OTPClaim(username, otp, authorizationLevel, now);
+                    IAccount account = new UserAccount(username, authorizationLevel);
+                    IOTPClaim resultClaim = new OTPClaim(username, otp, authorizationLevel, now);
                     string result = await _accountVerificationService.VerifyAccountAsync(account, 
                         _cancellationTokenSource.Token)
                         .ConfigureAwait(false);
                     if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses
                         .verifySuccess).ConfigureAwait(false)))
                     {
-                        results = await _authenticationService.AuthenticateAsync(resultClaim, 
+                        IAuthenticationInput authenticationInput = new AuthenticationInput(account, resultClaim);
+                        results = await _authenticationService.AuthenticateAsync(authenticationInput, 
                             _cancellationTokenSource.Token).ConfigureAwait(false);
                     }
                     else
@@ -91,9 +92,34 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
         public async Task<List<string>> RefreshSessionAsync(CancellationToken cancellationToken = default)
         {
-            Account account = new Account(Thread.CurrentPrincipal.Identity.Name, (Thread.CurrentPrincipal.Identity as IRoleIdentity).AuthorizationLevel);
-            return await _authenticationService.RefreshSessionAsync(account, _cancellationTokenSource.Token)
-                .ConfigureAwait(false);
+            // Account account = new Account(Thread.CurrentPrincipal.Identity.Name, (Thread.CurrentPrincipal.Identity as IRoleIdentity).AuthorizationLevel);
+            // Currently leveraging middleware
+            // 
+            List<string> results = new List<string>();
+            try
+            {
+                if(!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
+                {
+                    IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name,
+                (Thread.CurrentPrincipal.Identity as IRoleIdentity).AuthorizationLevel);
+                    IAuthenticationInput authenticationInput = new AuthenticationInput(account,
+                        (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash);
+                    return await _authenticationService.RefreshSessionAsync(authenticationInput, _cancellationTokenSource.Token)
+                        .ConfigureAwait(false);
+                }
+                else
+                {
+                    results.Add(await _messageBank.GetMessage(IMessageBank.Responses.refreshSessionNotAllowed)
+                        .ConfigureAwait(false));
+                    return results;
+                }
+            }catch(Exception ex)
+            {
+                results.Add(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException)
+                    .ConfigureAwait(false) + ex.Message);
+                return results;
+            }
+
         }
     }
 }

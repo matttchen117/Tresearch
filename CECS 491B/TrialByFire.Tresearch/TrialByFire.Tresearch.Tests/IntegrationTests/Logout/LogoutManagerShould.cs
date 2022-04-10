@@ -21,44 +21,65 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Logout
     {
         public LogoutManagerShould() : base(new string[] { })
         {
-            TestServices.AddScoped<ILogoutService, LogoutService>();
             TestServices.AddScoped<ILogoutManager, LogoutManager>();
             TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
-        [InlineData("guest", "guest", "401: Server: No active session found. Please login and try again.")]
-        [InlineData("aarry@gmail.com", "user", "200: Server: Logout success.")]
-        public async Task LogTheUserOutAsync(string currentIdentity, string currentRole, string expected)
+        [InlineData("guest", "guest", "", "notAuthenticated")]
+        [InlineData("aarry@gmail.com", "user", 
+                    "AE57D4CD0E7DC14F7C8C7EEF4DC8C8B833567A71021C1D123328D9B85C3825D8B72376D162C7F03C78D3CE048104A6BB0047979544F4852679D937048258558D", 
+                    "logoutSuccess")]
+        public async Task LogTheUserOutAsync(string currentIdentity, string currentRole, 
+            string userHash, string expected)
         {
             // Arrange
-            IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
-            IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+            IRoleIdentity roleIdentity;
+            IRolePrincipal rolePrincipal;
             if (!currentIdentity.Equals("guest"))
             {
-                Thread.CurrentPrincipal = rolePrincipal;
+                roleIdentity = new RoleIdentity(true, currentIdentity, currentRole, userHash);
             }
+            else
+            {
+                roleIdentity = new RoleIdentity(true, currentIdentity, currentRole, "E64C56A055B741393268F7EE26EF3AA00FC58D6272C06DE31932B71EB965A68CCB9F32AEBD74E25708AD501C7D7AAA1E5C4CE4C9010149FBA08B2C5351A57F34");
+            }
+            rolePrincipal = new RolePrincipal(roleIdentity);
+            Thread.CurrentPrincipal = rolePrincipal;
             ILogoutManager logoutManager = TestProvider.GetService<ILogoutManager>();
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
+            Enum.TryParse(expected, out IMessageBank.Responses response);
+            string expectedResult = await messageBank.GetMessage(response).ConfigureAwait(false);
 
             // Act
             string result = await logoutManager.LogoutAsync().ConfigureAwait(false);
 
             // Assert
-            Assert.Equal(expected, result);
+            Assert.Equal(expectedResult, result);
         }
 
         [Theory]
-        [InlineData("guest", "guest", "401: Server: No active session found. Please login and try again.")]
-        [InlineData("aarry@gmail.com", "user", "200: Server: Logout success.")]
-        public async Task LogTheUserOutAsyncWithin5Seconds(string currentIdentity, string currentRole, string expected)
+        [InlineData("guest", "guest", "", "401: Server: No active session found. Please login and try again.")]
+        [InlineData("aarry@gmail.com", "user",
+                    "AE57D4CD0E7DC14F7C8C7EEF4DC8C8B833567A71021C1D123328D9B85C3825D8B72376D162C7F03C78D3CE048104A6BB0047979544F4852679D937048258558D",
+                    "200: Server: Logout success.")]
+        public async Task LogTheUserOutAsyncWithin5Seconds(string currentIdentity, string currentRole, 
+            string userHash, string expected)
         {
             // Arrange
-            IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
-            IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            if(!currentIdentity.Equals("guest"))
+            IRoleIdentity roleIdentity;
+            IRolePrincipal rolePrincipal;
+            if (!currentIdentity.Equals("guest"))
             {
-                Thread.CurrentPrincipal = rolePrincipal;
+                roleIdentity = new RoleIdentity(true, currentIdentity, currentRole, userHash);
             }
+            else
+            {
+                roleIdentity = new RoleIdentity(true, currentIdentity, currentRole, "E64C56A055B741393268F7EE26EF3AA00FC58D6272C06DE31932B71EB965A68CCB9F32AEBD74E25708AD501C7D7AAA1E5C4CE4C9010149FBA08B2C5351A57F34");
+
+            }
+            rolePrincipal = new RolePrincipal(roleIdentity);
+            Thread.CurrentPrincipal = rolePrincipal;
             ILogoutManager logoutManager = TestProvider.GetService<ILogoutManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(
                 TimeSpan.FromSeconds(5));

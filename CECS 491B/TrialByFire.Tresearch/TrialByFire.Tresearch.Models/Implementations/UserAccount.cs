@@ -7,7 +7,7 @@ using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Models.Implementations
 {
-    public class Account : IAccount
+    public class UserAccount : IAccount
     {
         public string Username { get; set; }
 
@@ -21,7 +21,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public string? Token { get; set; }
 
-        public Account(string username, string passphrase, string authorizationLevel, bool accountStatus, bool confirmed)
+        public UserAccount(string username, string passphrase, string authorizationLevel, bool accountStatus, bool confirmed)
         {
             Username = username;
             Passphrase = passphrase;
@@ -30,20 +30,20 @@ namespace TrialByFire.Tresearch.Models.Implementations
             Confirmed = confirmed;
         }     
         
-        public Account(string passphrase, string authorizationLevel, bool accountStatus, bool confirmed)
+        public UserAccount(string passphrase, string authorizationLevel, bool accountStatus, bool confirmed)
         {
             Passphrase = passphrase;
             AuthorizationLevel = authorizationLevel;
             AccountStatus = accountStatus;
             Confirmed = confirmed;
         }
-        public Account(string username, string passphrase, string authorizationLevel)
+        public UserAccount(string username, string passphrase, string authorizationLevel)
         {
             Username = username;
             Passphrase = passphrase;
             AuthorizationLevel = authorizationLevel;
         }
-        public Account(string username, string authorizationLevel)
+        public UserAccount(string username, string authorizationLevel)
         {
             Username = username;
             AuthorizationLevel = authorizationLevel;
@@ -60,6 +60,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 }
             }
             return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return (Username + AuthorizationLevel).GetHashCode();
         }
     }
 

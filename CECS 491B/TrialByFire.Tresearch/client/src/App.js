@@ -41,9 +41,9 @@ class App extends React.Component {
             <Route path ="/Register/Confirm/:confirmationGuid" element = {<Confirm guid={this.state.confirmationGuid}/>}/>
             <Route path = "/Register/AccountConfirmed" element = {<AccountConfirmed/>}/>
             <Route path="/Register" element = {<Register />}/>
-            <Route path="/Login/Login" element = {<LoginForm />}/>
+            <Route path="/Login/Login" element = {<Login />}/>
             <Route path="/Login/Authentication" element = {<Authentication />}/>
-            <Route path="/Logout/Logout" element = {<LogoutForm />}/>
+            <Route path="/Logout/Logout" element = {<Logout />}/>
             <Route path = "/Recover" element = {<Recover/>} />
             <Route path = "/Recover/RecoverySent" element = {<RecoverySent/>} />
             <Route path = "/Recover/Enable/:recoveryConfirm" element = {<RecoveryConfirm guid={this.state.recoveryConfirm}/>}/>

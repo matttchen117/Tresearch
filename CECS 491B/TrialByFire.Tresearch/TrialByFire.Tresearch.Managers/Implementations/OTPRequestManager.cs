@@ -26,7 +26,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private IMessageBank _messageBank { get; }
         private IMailService _mailService { get; }
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
-            TimeSpan.FromSeconds(5));
+            /*TimeSpan.FromSeconds(5)*/);
 
         public OTPRequestManager(ISqlDAO sqlDAO, ILogService logService, IOTPRequestService otpRequestService, 
             IAccountVerificationService accountVerificationService, IMessageBank messageBank, IMailService mailService)
@@ -65,7 +65,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             string result;
             try
             {
-                if(Thread.CurrentPrincipal == null)
+                if(Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
                     // Basic input validation will be done at client side
                     /*Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
@@ -74,7 +74,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     result = await _validationService.ValidateInputAsync(keyValuePairs);
                     if (result.Equals(_messageBank.SuccessMessages["generic"]))
                     {*/
-                    IAccount account = new Account(username, passphrase, authorizationLevel);
+                    IAccount account = new UserAccount(username, passphrase, authorizationLevel);
                     IOTPClaim otpClaim = new OTPClaim(account);
                     result = await _accountVerificationService.VerifyAccountAsync(account, 
                         _cancellationTokenSource.Token).ConfigureAwait(false);
