@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Managers.Contracts
 {
@@ -13,6 +9,6 @@ namespace TrialByFire.Tresearch.Managers.Contracts
         public Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> CreateTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken));
-        public Task<Tuple<List<string>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken));
     }
 }

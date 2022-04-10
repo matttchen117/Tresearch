@@ -19,31 +19,17 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             InMemoryDatabase = new InMemoryDatabase();
             _messageBank = new MessageBank();
         }
-
-       /* public List<IKPI> LoadKPI(DateTime now)
+        public async Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            foreach(UserHashObject u in InMemoryDatabase.UserHashTable)
+            {
+                if(u.UserID.Equals(account.Username) && u.UserRole.Equals(account.AuthorizationLevel))
+                {
+                    return u.UserHash;
+                }
+            }
+            return null;
         }
-
-        INodesCreated ISqlDAO.GetNodesCreated(DateTime nodeCreationDate)
-        {
-            throw new NotImplementedException();
-        }
-
-        IDailyLogin ISqlDAO.GetDailyLogin(DateTime nodeCreationDate)
-        {
-            throw new NotImplementedException();
-        }
-
-        ITopSearch ISqlDAO.GetTopSearch(DateTime nodeCreationDate)
-        {
-            throw new NotImplementedException();
-        }
-
-        IDailyRegistration ISqlDAO.GetDailyRegistration(DateTime nodeCreationDate)
-        {
-            throw new NotImplementedException();
-        }*/
 
         public async Task<int> LogoutAsync(IAccount account, CancellationToken cancellationToken = default)
         {
@@ -59,12 +45,30 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             return 0;
         }
-        public async Task<string> StoreLogAsync(ILog log, CancellationToken cancellationToken = default)
+        public async Task<int> StoreLogAsync(ILog log, string destination, CancellationToken cancellationToken = default)
         {
-            InMemoryDatabase.Logs.Add(log);
-            return await _messageBank.GetMessage(IMessageBank.Responses.generic).ConfigureAwait(false);
+            switch(destination)
+            {
+                case "AnalyticLogs":
+                    InMemoryDatabase.AnalyticLogs.Add(log);
+                    if (InMemoryDatabase.AnalyticLogs.Contains(log))
+                    {
+                        return 1;
+                    }
+                    break;
+                case "ArchiveLogs":
+                    InMemoryDatabase.ArchiveLogs.Add(log);
+                    if (InMemoryDatabase.ArchiveLogs.Contains(log))
+                    {
+                        return 1;
+                    }
+                    break;
+                default:
+                    return 0;
+            };
+            return 0;
         }
-        public async Task<int> VerifyAccountAsync(IAccount account, 
+        public async Task<int> VerifyAccountAsync(IAccount account,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -131,7 +135,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<int> StoreOTPAsync(IAccount account, IOTPClaim otpClaim, 
+        public async Task<string> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "";
+        }
+        public async Task<int> StoreOTPAsync(IAccount account, IOTPClaim otpClaim,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -244,25 +252,30 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         }
 
+        public async Task<string> CreateOTPAsync(string username, string authorizationLevel, int failCount, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
 
 
-
-        public async Task<string> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Tuple<int, string>> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (InMemoryDatabase.Accounts.Contains(account))
-                    return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;
+
+                if(InMemoryDatabase.Accounts.Contains(account))
+                    return Tuple.Create(InMemoryDatabase.Accounts.Count-1, await _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated));
 
                 InMemoryDatabase.Accounts.Add(account);
+
                 if (cancellationToken.IsCancellationRequested)
                 {
                     InMemoryDatabase.Accounts.Remove(account);
                     throw new OperationCanceledException();
                 }
-                
-                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+
+                return Tuple.Create(-1,await _messageBank.GetMessage(IMessageBank.Responses.generic));
             }
             catch (OperationCanceledException)
             {
@@ -271,7 +284,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch(Exception ex)
             {
-                return _messageBank.GetMessage(IMessageBank.Responses.accountCreateFail).Result;
+                return Tuple.Create(-1,_messageBank.GetMessage(IMessageBank.Responses.accountCreateFail).Result);
             }
 
         }
@@ -380,12 +393,17 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                if (!InMemoryDatabase.Accounts.Contains(new Account(confirmationLink.Username, "doesnt matter", confirmationLink.AuthorizationLevel, true, false)))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound);
+                if (InMemoryDatabase.ConfirmationLinks.Contains(confirmationLink))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkExists);
+
                 InMemoryDatabase.ConfirmationLinks.Add(confirmationLink);
                 if (cancellationToken.IsCancellationRequested)
                 {
                     string rollbackResult = await RemoveConfirmationLinkAsync(confirmationLink);
                     if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
-                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                        return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
                     else
                         throw new OperationCanceledException();
                 }
@@ -890,12 +908,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return -1;
         }
 
-        public async Task<string> AddTagToNodesAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> AddTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             return "200";
         }
 
-        public async Task<string> RemoveTagFromNodeAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> RemoveTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             return "200";
         }
@@ -905,17 +923,36 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return Tuple.Create(new List<string>(), "200");
         }
 
-        public async Task<string> CreateTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return "200";
-        }
-
-        public async Task<Tuple<List<string>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             return Tuple.Create(new List<string>(), "200");
         }
 
-        public async Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> CreateTagAsync(string tagName, int count,CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
+
+        public async Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Tuple.Create(new List<ITag>(), "200");
+        }
+
+        public async Task<Tuple<List<string>, string>> GetTagsDescAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Tuple.Create(new List<string>(), "200");
+        }
+
+        public async Task<string> DeleteTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
+
+        public async Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
+        public async Task<string> CreateUserHashAsync(int ID, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
         {
             return "200";
         }
@@ -987,5 +1024,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return Tuple.Create(nullNode, "500: Database: " + ex.Message);
             }
         }
+
+        
     }
 }

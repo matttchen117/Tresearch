@@ -26,23 +26,23 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         {
 
             //Arrange
-            IAccount account = new Account(email, email, passphrase, "user", true, false);
+            IAccount account = new Account(email, passphrase, "user", true, false);
             IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
             string expected = statusCode;
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
             //Act
-            string results = await registrationService.CreateAccountAsync(email, passphrase, authorizationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
+            Tuple<int, string> results = await registrationService.CreateAccountAsync(email, passphrase, authorizationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
-            Assert.Equal(expected, results);
+            Assert.Equal(expected, results.Item2);
         }
 
 
         [Theory]
         [InlineData("IntegrationRegistrationService4@gmail.com", "user", "200: Server: success")]
         [InlineData("IntegrationRegistrationService5@gmail.com", "user", "409: Database: The confirmation link already exists.")]
-        [InlineData("IntegrationRegistrationService99@gmail.com", "user", "404: Database: The account was not found.")]
+        [InlineData("IntegrationRegistrationService99@gmail.com", "user", "500: Database: The Account was not found.")]
         public async Task CreateTheLinkAsync(string email, string authorizationLevel, string statusCode)
         {
             //Arrange
@@ -59,7 +59,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         [Theory]
         [InlineData("IntegrationRegistrationService6@gmail.com", "user", "200: Server: success")]
         [InlineData("IntegrationRegistrationService7@gmail.com", "user", "200: Server: success")]
-        [InlineData("IntegrationRegistrationService99@gmail.com", "user", "404: Database: The account was not found.")]
+        [InlineData("IntegrationRegistrationService99@gmail.com", "user", "500: Database: The Account was not found.")]
         public async Task ConfirmTheUserAsync(string email, string authenticationLevel, string statusCode)
         {
             //Arrange
@@ -90,6 +90,22 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 
             //Assert
             Assert.Equal(expected, result);
+        }
+
+        [Theory]
+        [InlineData("pammypoor@gmail.com", "1D479F5F473B624F8DAE5A64BA677DAD94F0ED9C4B091D9B812B363B37BF070F3656867B3D3D4E318B04404DC2001F53E5DBA2069EF40C46C0DF77EF8FEF95A6")]
+        public async Task HashValue(string value, string expected)
+        {
+            //Arrange
+            IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+
+            //Act
+            string result = await registrationService.HashValueAsync(value, cancellationTokenSource.Token);
+
+            //Assert
+            Assert.Equal(expected, result);
+
         }
     }
 }

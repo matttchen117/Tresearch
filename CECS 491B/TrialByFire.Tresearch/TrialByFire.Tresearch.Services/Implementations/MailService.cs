@@ -37,11 +37,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     url = url
                 });
                 var result = client.SendEmailAsync(confirmation).Result;
-                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                if (result.IsSuccessStatusCode)
+                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                else
+                    return _messageBank.GetMessage(IMessageBank.Responses.sendEmailFail).Result;
             } 
             catch(Exception ex)
             {
-                return "500: Server: " + ex.Message;
+                return _options.UncaughtExceptionMessage + ex.Message;
             }
         }
 
@@ -56,11 +59,15 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 var to = new EmailAddress(email);
                 var msg = MailHelper.CreateSingleEmail(from, to, subject, plainBody, htmlBody);
                 var response = await client.SendEmailAsync(msg, cancellationToken).ConfigureAwait(false);
-            } catch
+                if (response.IsSuccessStatusCode)
+                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                else
+                    return _messageBank.GetMessage(IMessageBank.Responses.sendEmailFail).Result;
+            } 
+            catch(Exception ex)
             {
-                return _messageBank.GetMessage(IMessageBank.Responses.sendEmailFail).Result;
+                return _options.UncaughtExceptionMessage + ex.Message;
             }
-            return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
         }
 
         public async Task<string> SendRecoveryAsync(string email, string url, CancellationToken cancellationToken = default(CancellationToken))
@@ -78,12 +85,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 });
                 cancellationToken.ThrowIfCancellationRequested();
                 var result = client.SendEmailAsync(confirmation).Result;
-                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
-
+                if (result.IsSuccessStatusCode)
+                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                else
+                    return _messageBank.GetMessage(IMessageBank.Responses.sendEmailFail).Result;
             }
             catch(Exception ex)
             {
-                return _messageBank.GetMessage(IMessageBank.Responses.sendEmailFail).Result;
+                return _options.UncaughtExceptionMessage + ex.Message;
             }
         }
     }

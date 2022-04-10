@@ -24,8 +24,9 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private IOTPRequestService _otpRequestService { get; }
         private IAccountVerificationService _accountVerificationService { get; }
         private IMessageBank _messageBank { get; }
-
         private IMailService _mailService { get; }
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
+            TimeSpan.FromSeconds(5));
 
         public OTPRequestManager(ISqlDAO sqlDAO, ILogService logService, IOTPRequestService otpRequestService, 
             IAccountVerificationService accountVerificationService, IMessageBank messageBank, IMailService mailService)
@@ -75,19 +76,19 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     {*/
                     IAccount account = new Account(username, passphrase, authorizationLevel);
                     IOTPClaim otpClaim = new OTPClaim(account);
-                    result = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken)
-                        .ConfigureAwait(false);
+                    result = await _accountVerificationService.VerifyAccountAsync(account, 
+                        _cancellationTokenSource.Token).ConfigureAwait(false);
                     if(result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)
                         .ConfigureAwait(false)))
                     {
                         result = await _otpRequestService.RequestOTPAsync(account, otpClaim,
-                        cancellationToken).ConfigureAwait(false);
+                        _cancellationTokenSource.Token).ConfigureAwait(false);
                         if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.storeOTPSuccess)
                             .ConfigureAwait(false)))
                         {
                             // No API Key right now
                             result = await _mailService.SendOTPAsync(account.Username, otpClaim.OTP,
-                                otpClaim.OTP, otpClaim.OTP, cancellationToken).ConfigureAwait(false);
+                                otpClaim.OTP, otpClaim.OTP, _cancellationTokenSource.Token).ConfigureAwait(false);
                         }
                     }
                     return result;

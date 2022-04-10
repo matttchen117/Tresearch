@@ -50,5 +50,26 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 return "500: Database: " + ex.Message;
             }  
         }
+
+        public async Task<string> VerifyAccountAuthorizedNodeChangesAsync(List<long> nodeIDs, IAccount account, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                cancellationToken.ThrowIfCancellationRequested();
+
+                string result = await _sqlDAO.IsAuthorizedToMakeNodeChangesAsync(nodeIDs, account, cancellationToken);
+
+                return result;
+            }
+            catch(InvalidOperationException)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.notFoundOrAuthorized);
+            }
+            catch(Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
     }
 }

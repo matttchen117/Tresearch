@@ -20,6 +20,100 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = messageBank;
             _options = options.Value;
         }
+        public async Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Perform sql statement
+                    var procedure = "dbo.[RemoveHashIdentity]";                                                                 // Name of store procedure
+                    var value = new { UserHash = hashedEmail };                                                                 // Parameters of stored procedure
+                    int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    //Check if cancellation is requested ... remove user identity from hash table
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        
+                    }
+
+                    return await _messageBank.GetMessage(IMessageBank.Responses.generic);
+                }
+            }
+            catch (SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    case 2627:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated);
+                    case 547:   //Adding recovery link violates foreign key constraint (AKA NO ACCOUNT)
+                        return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+                    default:
+                        return "500: Database: " + ex.Message;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Cancellation requested, nothing to rollback
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return _options.UncaughtExceptionMessage + ex.Message;
+            }
+        }
+
+        public async Task<string> CreateUserHashAsync(int id, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Perform sql statement
+                    var procedure = "dbo.[CreateUserHash]";                                                                 // Name of store procedure
+                    var value = new { UserID = id, UserHash = hashedEmail };          // Parameters of stored procedure
+                    int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    //Check if cancellation is requested ... remove user identity from hash table
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        
+                    }
+
+                    return await _messageBank.GetMessage(IMessageBank.Responses.generic);
+                }
+            }
+
+            catch (OperationCanceledException)
+            {
+                // Cancellation requested, nothing to rollback
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return _options.UncaughtExceptionMessage + ex.Message;
+            }
+        }
+        
+        public async Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using (var connection = new SqlConnection(_options.SqlConnectionString))
+            {
+                //Perform sql statement
+                var procedure = "dbo.[GetUserHash]";
+                var parameters = new DynamicParameters();
+                parameters.Add("Username", account.Username);
+                parameters.Add("AuthorizationLevel", account.AuthorizationLevel);
+                parameters.Add("Result", dbType: DbType.AnsiString, size: 128, direction: ParameterDirection.Output);
+                var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
+                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                    .ConfigureAwait(false);
+                return parameters.Get<string>("Result");
+            }
+        }
         public async Task<int> LogoutAsync(IAccount account, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -37,26 +131,26 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return parameters.Get<int>("Result");
             }
         }
-        public async Task<string> StoreLogAsync(ILog log, CancellationToken cancellationToken = default)
+        public async Task<int> StoreLogAsync(ILog log, string destination, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-
             using(var connection = new SqlConnection(_options.SqlConnectionString))
             {
                 var procedure = "[StoreLog]";
-                var value = new { Timestamp = log.Timestamp, Level = log.Level, Username = log.Username,
-                Category = log.Category, Description = log.Description };
-                int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                if (affectedRows != 1)
-                {
-                    affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    if (affectedRows != 1)
-                    {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.storeLogFail).ConfigureAwait(false);
-                    }
-                }
+                var parameters = new DynamicParameters();
+                parameters.Add("Timestamp", log.Timestamp);
+                parameters.Add("Level", log.Level);
+                parameters.Add("@UserHash", log.UserHash);
+                parameters.Add("Category", log.Category);
+                parameters.Add("Description", log.Description);
+                parameters.Add("Hash", log.Hash);
+                parameters.Add("Destination", destination);
+                parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
+                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                    .ConfigureAwait(false);
+                return parameters.Get<int>("Result");
             }
-            return await _messageBank.GetMessage(IMessageBank.Responses.generic).ConfigureAwait(false);
         }
 
 
@@ -72,7 +166,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                using (var connection = new SqlConnection(_options.SqlConnectionString)) 
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     //Perform sql statement
                     var procedure = "dbo.[DisableAccount]";                                                                 // Name of store procedure
@@ -725,7 +819,50 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> CreateOTPAsync(string username, string authorizationLevel, int failCount, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    await connection.OpenAsync();
+
+                    //Perform Sql Statement
+                    var procedure = "dbo.[CreateOTP]";
+                    var value = new
+                    {
+                        Username = username, 
+                        AuthorizationLevel = authorizationLevel,
+                        FailCount = failCount
+                    };
+                    var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    
+                    if (affectedRows == 1)
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    else
+                        return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;    //CHECK IF THIS IS ACCOUNT ALREADY EXISTS
+                }
+            }
+            catch (SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    case 2627: return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;
+                    default: return "500: Database: " + ex.Message;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback handled
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500 : Database: " + ex;
+            }
+        }
+        public async Task<Tuple<int, string>> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -739,25 +876,25 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var value = new
                     {
                         Username = account.Username,
-                        Email = account.Email,
                         Passphrase = account.Passphrase,
                         AuthorizationLevel = account.AuthorizationLevel,
                         AccountStatus = account.AccountStatus,
                         Confirmed = account.Confirmed
                     };
-                    var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    if (affectedRows == 1)
-                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
-                    else
-                        return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;    //CHECK IF THIS IS ACCOUNT ALREADY EXISTS
+
+                    var userID = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    return Tuple.Create(userID, await _messageBank.GetMessage(IMessageBank.Responses.generic));
                 }
             }
             catch(SqlException ex)
             {
                 switch (ex.Number)
                 {
-                    case 2627: return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;
-                    default: return "500: Database: " + ex.Message;
+                    case 2627:
+                        return Tuple.Create(-1, await _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated));
+                    default: 
+                        return Tuple.Create(-1,  _options.UncaughtExceptionMessage + ex.Message);
                 }
             }
             catch(OperationCanceledException)
@@ -767,9 +904,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return "500 : Database: " + ex;
+                return Tuple.Create(-1, _options.UncaughtExceptionMessage + ex.Message);
             }
         }
+        public string DeleteAccount()
+        {
 
 
         /// <summary>
@@ -1588,95 +1727,225 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 }
             }
         }
-
-        public async Task<string> AddTagToNodesAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        /// <summary>
+        ///     AddTagAsync(nodeIDs, tagName)
+        ///         Adds a tag to list of node(s) passed in. 
+        /// </summary>
+        /// <param name="nodeIDs">List of node IDs to add tag</param>
+        /// <param name="tagName">String tag name</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status</returns>
+        public async Task<string> AddTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
+                //Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
+                // Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
+                    //Open connection
                     await connection.OpenAsync();
-
+                    //Iterate through each tag and add tag to each node
                     foreach(var nodeId in nodeIDs)
                     {
+                        //Set up command
                         var procedure = "dbo.[AddTagToNode]";
-                        var value = new
+                        var parameters = new
                         {
                             NodeID = nodeId,
                             TagName = tagName
                         };
-                        var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                        //Execute command
+                        var executed = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     }
+                    //Check if cancellation token requests cancellation
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        string rollbackResult = await RemoveTagFromNodeAsync(nodeIDs, tagName);
-                        if (rollbackResult.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
-                            throw new OperationCanceledException();
+                        //Perform rollback
+                        string rollbackResult = await RemoveTagAsync(nodeIDs, tagName);
+                        //Check if rollback was successful
+                        if (rollbackResult.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess)))
+                            return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
                         else
-                            return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                            return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
                     }
-                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    //Tag has been added, return success
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess);
                 }
             }
             catch (SqlException ex)
             {
+                //Check sql exception
                 switch (ex.Number)
                 {
-                    default: return "500: Database: " + ex.Message;
+                    //Unable to connect to database
+                    case -1:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
+                    //Adding tag to node violates foreign key constraint (AKA tag doesn't exist in bank)
+                    case 547:   
+                        return _messageBank.GetMessage(IMessageBank.Responses.tagNotFound).Result;
+                    default: 
+                        return _options.UncaughtExceptionMessage + ex.Message;
                 }
             }
             catch (OperationCanceledException)
             {
-                // Rollback handled
-                throw;
+                // Rollback already handled
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
             }
             catch (Exception ex)
             {
-                return "500 : Database: " + ex;
+                return _options.UncaughtExceptionMessage + ex.Message;
             }
         }
 
-        public async Task<string> RemoveTagFromNodeAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        /// <summary>
+        ///     RemoveTagAsync(nodeIDs, tagName)
+        ///         Removes tag from list of nodes
+        /// </summary>
+        /// <param name="nodeIDs">List of node IDs</param>
+        /// <param name="tagName">String tag name</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status</returns>
+        public async Task<string> RemoveTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
+                //Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
+                //Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
+                    //Open connection to database
                     await connection.OpenAsync();
+                    //Iterate through each tag and remoe tag from node
                     foreach (var nodeId in nodeIDs)
                     {
+                        //Set up command
                         var procedure = "dbo.[RemoveTagFromNode]";
                         var value = new
                         {
                             NodeID = nodeId,
                             TagName = tagName
                         };
-                        var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                        //Execute command
+                        var execute = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     }
-                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+
+                    //Check if cancellation token requests cancellation
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        //Perform rollback
+                        string rollbackResult = await AddTagAsync(nodeIDs, tagName);
+                        //Check if rollback was successful
+                        if (rollbackResult.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess)))
+                            return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                        else
+                            return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
+                    }
+                    //Tag has been removed, return success message
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess);
                 }
             }
             catch (SqlException ex)
             {
                 switch (ex.Number)
                 {
-                    default: return "500: Database: " + ex.Message;
+                    //Unable to connect to database
+                    case -1:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
+                    default: 
+                        return _options.UncaughtExceptionMessage + ex.Message;
                 }
             }
             catch (OperationCanceledException)
             {
                 // Rollback handled
-                throw;
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
             }
             catch (Exception ex)
             {
-                return "500 : Database: " + ex;
+                return _options.UncaughtExceptionMessage + ex.Message;
             }
         }
 
+        /// <summary>
+        ///     GetNodeTagsAsync(nodeIDs)
+        ///         Gets list of tags that a list of node(s) share in common. If only one nod is passed in, all tags are returned
+        /// </summary>
+        /// <param name="nodeIDs">List of node IDs</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>List of tags and string status</returns>
         public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+           
+            try
+            {
+                //Throw Cancellation Exception if token requests cancellation
+                cancellationToken.ThrowIfCancellationRequested();
+                //Establish connection to database
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Open connection to database
+                    await connection.OpenAsync();
+                    
+                    List<string> tags = new List<string>();         //List of tags that all node(s) share in common
+                    
+                    //Iterate through each node to get list of tags for each node then intersec
+                    foreach (var nodeId in nodeIDs)
+                    {
+                        //Set up command
+                        var procedure = "dbo.[GetNodeTags]";
+                        var value = new
+                        {
+                            NodeID = nodeId
+                        };
+                        //Execute command: Get tags for current node
+                        List<string> results = new List<string>(await connection.QueryAsync<string>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+                        //Checks if node did not exist
+                        if (results.Contains("-1 invalid"))
+                            return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound));
+                        //Checks if first node in list
+                        if (nodeId == nodeIDs.First())
+                        {
+                            //set first tag list as base list
+                            tags = results;
+                        }
+                        //Get tags that are shared between all nodes
+                        tags = tags.Intersect(results).ToList();
+                    }
+                    //Tags have been retrieved, return success message
+
+                    if(cancellationToken.IsCancellationRequested)
+                        return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+
+                    return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess));
+                }
+            }
+            catch (SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail));
+                    default: 
+                        return Tuple.Create(new List<string>(), _options.UncaughtExceptionMessage + ex.Message);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback handled
+                return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(new List<string>(), _options.UncaughtExceptionMessage + ex.Message);
+            }
+        }
+
+        public async Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             List<string> tags = new List<string>();
             try
@@ -1688,13 +1957,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     foreach (var nodeId in nodeIDs)
                     {
 
-                        var procedure = "dbo.[GetNodeTags]";
+                        var procedure = "dbo.[GetNodeTagsDesc]";
                         var value = new
                         {
                             NodeID = nodeId
                         };
                         List<string> results = new List<string>(await connection.QueryAsync<string>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
-                        if(nodeId == nodeIDs.First())
+                        if (nodeId == nodeIDs.First())
                         {
                             tags = results;
                         }
@@ -1722,7 +1991,15 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> CreateTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        /// <summary>
+        ///     CreateTagAsync(tagName, count)
+        ///         Creaes a tag in bank with a count of tags
+        /// </summary>
+        /// <param name="tagName">Tag</param>
+        /// <param name="count"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<string> CreateTagAsync(string tagName, int count, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -1731,50 +2008,64 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     await connection.OpenAsync();
 
-                    //Perform Sql Statement
+                    //Set up Statement
                     var procedure = "dbo.[CreateTag]";
                     var value = new
                     {
-                        TagName = tagName
+                        TagName = tagName,
+                        TagCount = count
                     };
-                    var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    //Execute statement
+                    var execute = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
-                    if(cancellationToken.IsCancellationRequested && affectedRows > 0)
+                    //Check if cancellationToken requests cancellation
+                    if(cancellationToken.IsCancellationRequested)
                     {
                         //Rollback
-                        string resultRollback = await RemoveTagAsync(tagName);
-                        if (resultRollback != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
-                            return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                        string resultRollback = await DeleteTagAsync(tagName);
+                        //Check if rollback successfull
+                        if (resultRollback.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess)))
+                            return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
                         else
-                            throw new OperationCanceledException();
+                            return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
                     }
-
-                    if (affectedRows == 1)
-                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
-                    else
-                        return _messageBank.GetMessage(IMessageBank.Responses.tagAlreadyExist).Result;    //CHECK IF THIS IS tag ALREADY EXISTS
+                    //Tag created, return success
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess);
                 }
             }
             catch (SqlException ex)
             {
                 switch (ex.Number)
                 {
-                    case 2627: return _messageBank.GetMessage(IMessageBank.Responses.tagAlreadyExist).Result;
-                    default: return "500: Database: " + ex.Message;
+                    //Unable to connect to database
+                    case -1:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
+                    //Adding tag violates primary key constraint (AKA tag already exists in database)
+                    case 2627: 
+                        return await _messageBank.GetMessage(IMessageBank.Responses.tagDuplicate);
+                    default: 
+                        return _options.UncaughtExceptionMessage + ex.Message;
                 }
             }
             catch (OperationCanceledException)
             {
                 // Rollback handled
-                throw;
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
             }
             catch (Exception ex)
             {
-                return "500 : Database: " + ex;
+                return _options.UncaughtExceptionMessage + ex.Message;
             }
         }
 
-        public async Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        /// <summary>
+        ///     DeleteTagAsync(tagName)
+        ///         Deletes tag from tag bank
+        /// </summary>
+        /// <param name="tagName">String tag to delete from bank</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status</returns>
+        public async Task<string> DeleteTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -1783,46 +2074,100 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     await connection.OpenAsync();
 
-                    //Perform Sql Statement
+                    //create command
                     var procedure = "dbo.[RemoveTag]";
                     var value = new
                     {
                         TagName = tagName
                     };
-                    var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    //Execute command, returns count of tags
+                    int count = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
-                    if (cancellationToken.IsCancellationRequested && affectedRows > 0)
+                    if (cancellationToken.IsCancellationRequested)
                     {
                         //Rollback
-                        string resultRollback = await CreateTagAsync(tagName);
-                        if (resultRollback != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
-                            return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                        string resultRollback = await CreateTagAsync( tagName, 0);
+                        //Check if rollback successful
+                        if (resultRollback.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess)))
+                            return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
                         else
-                            throw new OperationCanceledException();
+                            return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
                     }
-                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    //Tag deleted, return success
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess);
                 }
             }
             catch (SqlException ex)
             {
                 switch (ex.Number)
                 {
-                    case 2627: return _messageBank.GetMessage(IMessageBank.Responses.tagDoesNotExist).Result;
-                    default: return "500: Database: " + ex.Message;
+                    //Unable to connect to database
+                    case -1:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
+                    default: 
+                        return _options.UncaughtExceptionMessage + ex.Message;
                 }
             }
             catch (OperationCanceledException)
             {
                 // Rollback handled
-                throw;
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
             }
             catch (Exception ex)
             {
-                return "500 : Database: " + ex;
+                return _options.UncaughtExceptionMessage + ex.Message;
             }
         }
 
-        public async Task<Tuple<List<string>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        /// <summary>
+        ///     GetTgsAsync()
+        ///         Returns a list of tags in tag bank
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation  Token</param>
+        /// <returns>List of tags and sting status</returns>
+        public async Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+           
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                //Establish connection
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Open connection
+                    await connection.OpenAsync();
+                    //Setup statement
+                    var procedure = "dbo.[GetTags]";
+                    var value = new { };
+                    //Execute statement
+                    List<ITag> results = new List<ITag>(await connection.QueryAsync<Tag>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+                    //tags retrieved, return success
+                    return Tuple.Create(results, await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess));
+                }
+            }
+            catch (SqlException ex)
+            {
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail));
+                    default: 
+                        return Tuple.Create(new List<ITag>(), _options.UncaughtExceptionMessage + ex.Message);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback handled
+                return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(new List<ITag>(), _options.UncaughtExceptionMessage + ex.Message);
+            }
+        }
+
+        public async Task<Tuple<List<string>, string>> GetTagsDescAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             List<string> tags = null;
             try
@@ -1831,7 +2176,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     await connection.OpenAsync();
-                    var procedure = "dbo.[GetTags]";
+                    var procedure = "dbo.[GetTagsDesc]";
                     var value = new { };
                     List<string> results = new List<string>(await connection.QueryAsync<string>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
 
@@ -1853,7 +2198,41 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return Tuple.Create(tags, "500: Database: " + ex.Message);
+                return Tuple.Create(tags, _options.UncaughtExceptionMessage + ex.Message);
+            }
+        }
+
+        public async Task<string> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    foreach (var nodeId in nodeIDs)
+                    {
+                        var procedure = "dbo.[IsAuthorizedNodeChanges]";
+                        var value = new
+                        {
+                            NodeID = nodeId,
+                            Username = account.Username,
+                            AuthorizationLevel = account.AuthorizationLevel
+                        };
+                        var isAuthorized = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                        if (isAuthorized == 0)
+                            return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized);
+                    }
+                    return await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess);
+                }
+            }
+            catch(OperationCanceledException)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+            }
+            catch(Exception ex)
+            {
+                return  _options.UncaughtExceptionMessage + ex.Message;
             }
         }
 

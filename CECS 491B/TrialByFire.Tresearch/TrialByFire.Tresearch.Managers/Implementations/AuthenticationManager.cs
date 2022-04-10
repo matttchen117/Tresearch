@@ -26,6 +26,9 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private IAuthenticationService _authenticationService { get; }
         private IMessageBank _messageBank { get; }
 
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
+            TimeSpan.FromSeconds(5));
+
         public AuthenticationManager(ISqlDAO sqlDAO, ILogService logService, 
             IAccountVerificationService accountVerificationService, 
             IAuthenticationService authenticationService, IMessageBank messageBank)
@@ -62,12 +65,14 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 {
                     IAccount account = new Account(username, authorizationLevel);
                     IOTPClaim resultClaim = new OTPClaim(username, otp, authorizationLevel, now);
-                    string result = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken)
+                    string result = await _accountVerificationService.VerifyAccountAsync(account, 
+                        _cancellationTokenSource.Token)
                         .ConfigureAwait(false);
                     if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses
                         .verifySuccess).ConfigureAwait(false)))
                     {
-                        results = await _authenticationService.AuthenticateAsync(resultClaim, cancellationToken).ConfigureAwait(false);
+                        results = await _authenticationService.AuthenticateAsync(resultClaim, 
+                            _cancellationTokenSource.Token).ConfigureAwait(false);
                     }
                     else
                     {

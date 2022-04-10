@@ -28,7 +28,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public IList<IDailyRegistration> DailyRegistrations { get; set; }
         public IList<IView> Views { get; set; }
 
-        public IList<ILog> Logs { get; set; }
+        public IList<ILog> AnalyticLogs { get; set; }
+        public IList<ILog> ArchiveLogs { get; set; }
+        public IList<IUserHashObject> UserHashTable { get; set; }
 
         public InMemoryDatabase()
         {
@@ -44,7 +46,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
             DailyRegistrations = InitializeDailyRegistrations();
             ConfirmationLinks = InitializeConfirmationLinks();
             Views = InitializeViews();
-            Logs = InitializeLogs();
+            AnalyticLogs = InitializeAnalyticLogs();
+            ArchiveLogs = InitializeArchiveLogs();
+            UserHashTable = InitializeUserHashTable();
             RecoveryLinks = InitializeRecoveryLinks();
         }
 
@@ -89,45 +93,56 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<IAccount> InitializeAccounts()
         {
             List<IAccount> accounts = new List<IAccount>();
-            accounts.Add(new Account("drakat7@gmail.com", "drakat7@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new Account("drakat7@gmail.com", "drakat7@gmail.com", "abcDEF123", "admin", true, true));
+            accounts.Add(new Account("drakat7@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new Account("drakat7@gmail.com", "abcDEF123", "admin", true, true));
             // for otp request tests
-            accounts.Add(new Account("aarry@gmail.com", "aarry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new Account("barry@gmail.com", "barry@gmail.com", "abcDEF123", "admin", true, true));
-            accounts.Add(new Account("carry@gmail.com", "carry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new Account("darry@gmail.com", "darry@gmail.com", "abcDEF123", "user", false, true));
-            accounts.Add(new Account("earry@gmail.com", "earry@gmail.com", "abcDEF123", "user", false, false));
-            accounts.Add(new Account("farry@gmail.com", "farry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new Account("aarry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new Account("barry@gmail.com", "abcDEF123", "admin", true, true));
+            accounts.Add(new Account("carry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new Account("darry@gmail.com", "abcDEF123", "user", false, true));
+            accounts.Add(new Account("earry@gmail.com", "abcDEF123", "user", false, false));
+            accounts.Add(new Account("farry@gmail.com", "abcDEF123", "user", true, true));
             // for authentication tests
-            accounts.Add(new Account("garry@gmail.com", "garry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new Account("harry@gmail.com", "harry@gmail.com", "abcDEF123", "admin", true, true));
-            accounts.Add(new Account("iarry@gmail.com", "iarry@gmail.com", "abcDEF123", "admin", true, true));
-            accounts.Add(new Account("jarry@gmail.com", "jarry@gmail.com", "abcDEF123", "admin", true, true));
-            accounts.Add(new Account("karry@gmail.com", "karry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new Account("larry@gmail.com", "larry@gmail.com", "abcDEF123", "user", false, true));
-            accounts.Add(new Account("marry@gmail.com", "marry@gmail.com", "abcDEF123", "user", false, false));
-            accounts.Add(new Account("narry@gmail.com", "narry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new Account("oarry@gmail.com", "oarry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new Account("parry@gmail.com", "parry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new Account("garry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new Account("harry@gmail.com", "abcDEF123", "admin", true, true));
+            accounts.Add(new Account("iarry@gmail.com", "abcDEF123", "admin", true, true));
+            accounts.Add(new Account("jarry@gmail.com", "abcDEF123", "admin", true, true));
+            accounts.Add(new Account("karry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new Account("larry@gmail.com", "abcDEF123", "user", false, true));
+            accounts.Add(new Account("marry@gmail.com", "abcDEF123", "user", false, false));
+            accounts.Add(new Account("narry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new Account("oarry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new Account("parry@gmail.com", "abcDEF123", "user", true, true));
 
             /*            Viet adding new accounts
                         [InlineData("grizzly@gmail.com", "user", "success")]
                         [InlineData("salewa@gmail.com", "admin", "success")]
                         Accounts for AccountDeletionController*/
-            accounts.Add(new Account("grizzly@gmail.com", "grizzly@gmail.com", "asdfasdf", "user", true, true));
-            accounts.Add(new Account("salewa@gmail.com", "salewa@gmail.com", "asdfasdf123", "admin", true, true));
+            accounts.Add(new Account("grizzly@gmail.com", "asdfasdf", "user", true, true));
+            accounts.Add(new Account("salewa@gmail.com", "asdfasdf123", "admin", true, true));
 
             /*            Accounts for AccountDeletionManager
                         [InlineData("trizip@gmail.com", "user", "success")]
                         [InlineData("switchblade@gmail.com", "admin", "success")]*/
-            accounts.Add(new Account("trizip@gmail.com", "trizip@gmail.com", "asdfasdf", "user", true, true));
-            accounts.Add(new Account("switchblade@gmail.com", "switchblade@gmail.com", "asdfasdf123", "admin", true, true));
+            accounts.Add(new Account("trizip@gmail.com", "asdfasdf", "user", true, true));
+            accounts.Add(new Account("switchblade@gmail.com", "asdfasdf123", "admin", true, true));
             /*            Accounts for AccountDeletionService
                         [InlineData("altyn@gmail.com", "user", "success")]
                         [InlineData("ryst@gmail.com", "admin", "success")]*/
 
-            accounts.Add(new Account("altyn@gmail.com", "altyn@gmail.com", "asdfasdf", "user", true, true));
-            accounts.Add(new Account("ryst@gmail.com", "ryst@gmail.com", "asdfasdf123", "admin", true, true));
+            //Accounts for Registration
+            accounts.Remove(new Account("pammypoor+UnitConrReg1@gmail.com", "myPassphrase", "user", true, false));
+            accounts.Add(new Account("pammypoor+UnitConrReg2@gmail.com", "myPassphrase", "user", true, false));
+
+            accounts.Add(new Account("pammypoor+UnitManReg2@gmail.com", "myPassphrase", "user", true, false));
+
+            accounts.Add(new Account("pammypoor+UnitSerReg2@gmail.com", "myPassphrase", "user", true, false));
+            accounts.Add(new Account("pammypoor+UnitSerReg3@gmail.com", "myPassphrase", "user", true, false));
+            accounts.Add(new Account("pammypoor+UnitSerReg4@gmail.com", "myPassphrase", "user", true, true));
+
+            accounts.Add(new Account("altyn@gmail.com", "asdfasdf", "user", true, true));
+            accounts.Add(new Account("ryst@gmail.com", "asdfasdf123", "admin", true, true));
+
             return accounts;
         }
 
@@ -146,6 +161,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodes.Add(new Node(200002, 200003, "Title 3", "Summary 3", false, "billy@yahoo.com"));
             nodes.Add(new Node(200003, 200004, "Title 4", "Summary 4", true, "billy@yahoo.com"));
             nodes.Add(new Node(200004, 200004, "Title 5", "Summary 5", true, "billy@yahoo.com"));
+
+            nodes.Add(new Node(67890, 67890, "Underwater Basket Weaving", "Hardest class offered at CSULB", true, "82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b"));
+            nodes.Add(new Node(67891, 67891, "Subject1", "This is a easy subject", true, "82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b"));
+            nodes.Add(new Node(67892, 67891, "Subject2", "Somewhat hard subject", true, "82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b"));
+            nodes.Add(new Node(67893, 67891, "Subject3", "This is a hard subject", true, "82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b"));
 
             return nodes;
         }
@@ -569,6 +589,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<IConfirmationLink> InitializeConfirmationLinks()
         {
             List<IConfirmationLink> confirmationLinks = new List<IConfirmationLink>();
+
+            confirmationLinks.Add(new ConfirmationLink("pammypoor+UnitSerReg3@gmail.com", "user", Guid.NewGuid(), DateTime.Now));
             return confirmationLinks;
         }
 
@@ -584,10 +606,44 @@ namespace TrialByFire.Tresearch.Models.Implementations
             return views;
         }
 
-        private List<ILog> InitializeLogs()
+        private List<ILog> InitializeAnalyticLogs()
         {
             List<ILog> logs = new List<ILog>();
             return logs;
+        }
+
+        private List<ILog> InitializeArchiveLogs()
+        {
+            List<ILog> logs = new List<ILog>();
+            return logs;
+        }
+
+        private List<IUserHashObject> InitializeUserHashTable()
+        {
+            List<IUserHashObject> userHashObjects = new List<IUserHashObject>();
+            userHashObjects.Add(new UserHashObject("drakat7@gmail.com", "user", "0B1CC9CFB7380E8E7A80726D12CB997C936D95B514E7F921187119FD80996BBACA103C08EFCC39553EFF5DFC368D4D8D197C9080C7015AE4DA2E87884E7DE9A6"));
+            userHashObjects.Add(new UserHashObject("drakat7@gmail.com", "admin", "D8FC97AC79D370FC43BE4528C72B02AD7B560DC707956B77D5892504754E6C2484C07BF28243FF3CD1A2EA6F778BBBF924B384A34975D6A7D590A40CEE455A32"));
+            userHashObjects.Add(new UserHashObject("aarry@gmail.com", "user", "AE57D4CD0E7DC14F7C8C7EEF4DC8C8B833567A71021C1D123328D9B85C3825D8B72376D162C7F03C78D3CE048104A6BB0047979544F4852679D937048258558D"));
+            userHashObjects.Add(new UserHashObject("barry@gmail.com", "admin", "E5D6801551E6079FCAF2B10403FA86F9B9EC40B0D7A70256EDA0A9988ABAB4CC250681D5054D18E224DCF0CADB730BCF6E07546F2B775A0E31D64C3DC41BC159"));
+            userHashObjects.Add(new UserHashObject("carry@gmail.com", "user", "CB3C47AD9DCEFA2CAC50D472CAFA954F00476EA58B11E8F2CD32E46F4C3DC1C990867A78D484BB25E8FF2FB44CE9F99F356E275E7E2684FFF714BAC11B663FBF"));
+            userHashObjects.Add(new UserHashObject("darry@gmail.com", "user", "F188DBA08CB0C30B6FA09BD87146F15CA3D08AAABB501C5D439F8D8A33E76EA6E701E066C8DB8870895A29BCF72004E35BC0B827912F12E119BD218F5BF0BCCE"));
+            userHashObjects.Add(new UserHashObject("earry@gmail.com", "user", "E26732DF9CF51AC7668A5BA02B116070F16F11D0BE2A3BFE73F2B87D429DE5C96754D976FE474EE67A59887E8C5646AE177144E37A0D4B339CD9B3D16107F3D0"));
+            userHashObjects.Add(new UserHashObject("farry@gmail.com", "user", "8F88CE35DBF55AEFCBE6CF68CEB21CDD04B2D8B9FFC0A5024F88AF94EC5E2FFAB231E549FF0E5A50F08302CFE2B2925A6D368B49D22794B710AC6F78685E0A0C"));
+            userHashObjects.Add(new UserHashObject("garry@gmail.com", "user", "8C89E7886643911D171624EEFDF875F6B45C0052A761A6A713E9D26EFCF66F9D47ADD4899E98C6A8525CCB7D68F9BAB1EF1A75D4F1558726103FF0BE7B6A32B2"));
+            userHashObjects.Add(new UserHashObject("harry@gmail.com", "admin", "D8D551BF832A6BEF37557C4DEC5321EE15AD69562991FC0EEBD54711CDD58931F31661635CD64518B327ADAF8CD788A5293A0E0BD528C6D0A1EEA7F282AA9143"));
+            userHashObjects.Add(new UserHashObject("iarry@gmail.com", "admin", "C0EB8D659C0129F28EA863560115E7FB30AF64739F680A86C28850EC5BFCCD29BD9F0520899857B9BD72063F575737DFC61DCBD75DDE9F8A93E8E15ABD923F0F"));
+            userHashObjects.Add(new UserHashObject("jarry@gmail.com", "admin", "3CC3F278EEDCA0885C1043D16B11527C746F881A263044440D5F8FA7C93FB8A07E0BDE21A1F3395E60BFC231B96EA08809B5A2043710AC9153E48699CA292F86"));
+            userHashObjects.Add(new UserHashObject("karry@gmail.com", "user", "66B41BF3C0D1C7E958C76409230A95EC1A0F33CBC376AC146CE0A85967590B5C8DE9C2EEFDB488072EB1DE456D965078ED283EE42F0076C91BD06BB66640951B"));
+            userHashObjects.Add(new UserHashObject("larry@gmail.com", "user", "7F4BA1D5E240AE1B8F8B5E5F3ECF1833ABE41B5A77B83383EF26868D77F0567EF6CEA2A3E38D54CC8AFB9E1E79DA7C215A4CE530932C13278FBBAEA7D98EDF18"));
+            userHashObjects.Add(new UserHashObject("marry@gmail.com", "user", "13CE5ABC3473B264F1A413C78855DBFFBCC37C52153EF65F6FA790D66CC6146EBC2CFBEF0554C31BAB65F35A05F19EB6FB833F0393A7E07CC67B85E8B2272434"));
+            userHashObjects.Add(new UserHashObject("narry@gmail.com", "user", "FCB748D5CC578967ECDC2E7DA7A5128AD7AE0198C460EDE2205161CAC3F794484E5BE6AB93B0ED10E6E766461AC37E754F549B6D0B523C2903FC1CD14DEAA3D9"));
+            userHashObjects.Add(new UserHashObject("oarry@gmail.com", "user", "700F13E5C73A02ED040D5F5D06BCD381C05639967F3B2F81F8BB6ED72CF89C4FB6B8BB67C9C3D4318A5260F3BE8CAAF9AD8A65210CA7CC751F7B66AE7DEE7A48"));
+            userHashObjects.Add(new UserHashObject("parry@gmail.com", "user", "531267DC5B626D7E54C51CB1F9B5A4E786FBDB53C0F62A851DDE68C7F9A402AA852B3654BFDE4C94B68603C603F88AC0F0FF67A4A4E7849EB244F1DF5237CEF1"));
+            userHashObjects.Add(new UserHashObject("qarry@gmail.com", "user", "96077B964424761F51F2A59340F0E40ADB225C69087AD599D13E8622BEA4A0EABBD0BFEEBAAF9CD4F9CDFA2AE765630B9AD9C0668E5BF9C5F1CAD6EA7F96FE92"));
+            userHashObjects.Add(new UserHashObject("rarry@gmail.com", "user", "104FE34A615CA8D52BDF5AF486999767CD43DEF539FD52973B5CFB6A08753AB0382AD2111530F50B5614B9E6F6333CCB3DA65F9E25E81F5B8305CFAAC2A76303"));
+            userHashObjects.Add(new UserHashObject("sarry@gmail.com", "admin", "4901F9B280F604E861C14451768BEF3F10E8DD9808662B76BB8BFC9A12D0DF2D2B8FC5162D0271FED66057B9F0000B1D49AC2110D168CE37CEF47E1A20304B85"));
+
+            return userHashObjects;
         }
     }
 }

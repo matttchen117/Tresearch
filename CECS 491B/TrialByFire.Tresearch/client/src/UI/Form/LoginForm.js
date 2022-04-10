@@ -96,13 +96,13 @@ class LoginForm extends React.Component  {
                         console.log(response.data);
                         console.log(response.headers['authorization']);
                         localStorage.setItem('authorization', response.headers['authorization']);
-                        //navigate('/Login/Authentication');
+                        window.location = '/Portal';
                 }).catch(err => {
                         console.log(err.data);
                     })
                 :
                 axios.post('https://localhost:7010/OTPRequest/requestotp?username=' + this.state.username.toLowerCase() + 
-                '&passphrase=' + this.state.passphrase + '&authorizationLevel=user')
+                '&passphrase=' + this.hashInput(this.state.passphrase) + '&authorizationLevel=user')
                 .then(response => {
                         console.log(response.data);
                         console.log(response.headers['authorization']);

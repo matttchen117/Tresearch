@@ -14,6 +14,8 @@ namespace TrialByFire.Tresearch.Models.Contracts
         {
             generic,
 
+            databaseConnectionFail,
+
             verifySuccess,
             notEnabled,
             notConfirmed,
@@ -35,6 +37,19 @@ namespace TrialByFire.Tresearch.Models.Contracts
             unknownRole,
             logoutFail,
             logoutRollback,
+
+            logSuccess,
+            logFail,
+            logRollback,
+
+            tagAddSuccess,
+            tagRemoveSuccess,
+            tagCreateSuccess,
+            tagDeleteSuccess,
+            tagGetSuccess,
+            tagRetrievalFail,
+            tagDuplicate,
+            tagNotFound,
 
             badNameOrPass,
             badEmail,
@@ -78,6 +93,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             dailyLoginsExists,
             dailyLoginNotInserted,
             dailyLoginNotExist,
+
             topSearchExists,
             topSearchNotInserted,
             topSearchNotExist,
