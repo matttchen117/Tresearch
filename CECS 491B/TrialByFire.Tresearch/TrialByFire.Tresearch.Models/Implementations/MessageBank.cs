@@ -106,6 +106,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "502: Server: Unable to get tag data.";
 
 
+                case Responses.userRateSuccess:
+                    return "200: Server: User rating added.";
+
                 case Responses.createNodeSuccess:
                     return "200: Server: Create Node Success";
 

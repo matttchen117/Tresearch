@@ -832,8 +832,16 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 switch (ex.Number)
                 {
-                    case 2627: return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;
-                    default: return "500: Database: " + ex.Message;
+                    //Unable to connect to database
+                    case -1:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
+                    //Adding otp violates foreign key constraint (AKA account doesn't exist in bank)
+                    case 547:
+                        return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+                    case 2627: 
+                        return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;
+                    default: 
+                        return _options.UnhandledExceptionMessage + ex.Message;
                 }
             }
             catch (OperationCanceledException)
@@ -2312,5 +2320,58 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 }
             }
         }*/
+
+        public async Task<string> RateNodeAsync(string userHash, long nodeID, int rating, CancellationToken cancellationToken)
+        {
+            try
+            {
+                //Throw Cancellation Exception if token requests cancellation
+                cancellationToken.ThrowIfCancellationRequested();
+                // Establish connection to database
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Open connection
+                    await connection.OpenAsync();
+                    var procedure = "dbo.[RateNode]";
+                    var parameters = new
+                    {
+                        UserHash = userHash,
+                        NodeID = nodeID,
+                        Rating = rating
+                    };
+                    //Execute command
+                    var executed = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    //Check if cancellation token requests cancellation
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        //Perform rollback
+                        
+                    }
+                    //Tag has been added, return success
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess);
+                }
+            }
+            catch (SqlException ex)
+            {
+                //Check sql exception
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
+                    default:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback already handled
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+            }
+            catch (Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+            }
+        }
     }
 }

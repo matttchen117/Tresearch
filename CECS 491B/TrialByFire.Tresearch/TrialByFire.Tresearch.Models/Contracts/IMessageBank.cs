@@ -53,6 +53,9 @@ namespace TrialByFire.Tresearch.Models.Contracts
             tagDuplicate,
             tagNotFound,
 
+            //Rating
+            userRateSuccess,
+
             jwtValidationSuccess,
             jwtValidationFail,
 

@@ -1073,6 +1073,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+        public async Task<string> RateNodeAsync(string userHash, long nodeID, int rating, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            InMemoryDatabase.Ratings.Add(new Rating(userHash, nodeID, rating));
+            return await _messageBank.GetMessage(IMessageBank.Responses.userRateSuccess);
+        }
+
         
     }
 }

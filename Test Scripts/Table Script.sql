@@ -45,6 +45,7 @@ DROP PROCEDURE IF EXISTS GetTagNames
 DROP PROCEDURE IF EXISTS IncrementRecoveryLinksCreated
 DROP PROCEDURE IF EXISTS IncrementTagCount
 DROP PROCEDURE IF EXISTS IsAuthorizedNodeChanges
+DROP PROCEDURE IF EXISTS RateNode
 DROP PROCEDURE IF EXISTS RemoveConfirmationLink
 DROP PROCEDURE IF EXISTS RemoveRecoveryLink
 DROP PROCEDURE IF EXISTS RemoveTag
@@ -1170,6 +1171,34 @@ as
 begin
 	UPDATE Tags SET TagCount = TagCount + 1 WHERE TagName = @TagName
 end
+
+-- =============================================
+-- Author:		Pammy Poor
+-- Description:	Rates Node
+-- =============================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[RateNode]    
+(
+	@UserHash VARCHAR(128),
+	@NodeID BIGINT,
+	@Rating int
+)
+as
+BEGIN
+	IF EXISTS (SELECT * FROM UserRatings WHERE UserHash = @UserHash AND NodeID = @NodeID)
+		BEGIN
+			UPDATE UserRatings SET Rating = @Rating WHERE UserHash = @UserHash AND NodeID = @NodeID;
+		END
+	ELSE
+		BEGIN
+			INSERT UserRatings(UserHash, NodeID, Rating) VALUES (@UserHash, @NodeID, @Rating);
+		END
+END
+
+
 
 -- =============================================
 -- Author:		Pammy Poor

@@ -181,7 +181,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
 
         [Theory]
         [MemberData(nameof(RemoveTagData))]
-        public async Task RemoveTagAsync(List<long> nodeIDs, string tagName, string expected)
+        public async Task RemoveNodeTagAsync(List<long> nodeIDs, string tagName, string expected)
         {
             //Arrange
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();

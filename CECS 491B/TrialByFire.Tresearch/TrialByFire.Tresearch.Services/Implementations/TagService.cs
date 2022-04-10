@@ -3,7 +3,6 @@ using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
-using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
