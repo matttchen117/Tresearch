@@ -21,7 +21,7 @@ function AuthenticatedNavBar() {
     }
     
     const handleSettingsClick = (e) => {
-        window.location = '/Setings';
+        window.location = '/Settings';
     }
 
     const renderMenu = (

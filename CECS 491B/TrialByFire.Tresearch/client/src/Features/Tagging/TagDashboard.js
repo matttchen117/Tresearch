@@ -65,9 +65,28 @@ function TagDashboard() {
      
     const fetchTableData = () => {
         async function fetchData() {
-            const request = await axios.get("https://localhost:7010/Tag/taglist");
-            const responseData = await request.data;
-            setData(responseData);
+            const request = await axios.get("https://localhost:7010/Tag/taglist")
+            .then((response => {
+                setData(response);
+            }))
+            .catch((err => {
+                switch(err.response.status){
+                    case 401: {
+                            console.log("Not Authorized");
+                            localStorage.removeItem('authorization');
+                            window.location.assign(window.location.origin);
+                            window.location = '/';
+                    }
+                        break;
+                    case 503: {
+                            console.log("Database offline");
+                            
+                    }
+                        break;
+                }
+            }))
+            
+            
         }
         fetchData();
     }
@@ -110,7 +129,20 @@ function TagDashboard() {
             switch(err.response.status){
                 case 409: setAlertData({message: 'Tag already exists'});
                     break;
-                default: setAlertData({message: 'Unable to create tag'});
+                case 401: {
+                        console.log("Not Authorized");
+                        localStorage.removeItem('authorization');
+                        window.location.assign(window.location.origin);
+                        window.location = '/';
+                }
+                    break;
+                case 503: {
+                        console.log("Database offline");
+                        setAlertData({message: 'Database offline'});
+                }
+                    break;
+                default: 
+                    setAlertData({message: 'Unable to create tag'});
             }
         }))
     }

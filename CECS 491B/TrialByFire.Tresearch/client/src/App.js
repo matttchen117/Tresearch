@@ -20,6 +20,7 @@ import Tagger from "./Features/Tagging/Tagger";
 import InactiveLink from "./Features/Registration/InactiveLink";
 import Portal from "./Pages/Portal/Portal";
 import AdminPortal from "./Pages/AdminPortal/AdminPortal";
+import Error404 from "./Pages/Error404/Error404";
 
 class App extends React.Component {
   constructor(props){
@@ -38,23 +39,32 @@ class App extends React.Component {
         <Router>
           <header></header>
           <Routes>
+            //Any page that doesn't have path will load as Error 404
+            <Route path = '*' exact = {true} element = {<Error404/>}/>    
             <Route path="/" element = {<Home />}/>
             <Route path = "/Portal" element ={<Portal />}/>
+           
+            
+            <Route path="/Login/Login" element = {<LoginForm />}/>
+            <Route path="/Login/Authentication" element = {<Authentication />}/>
+            <Route path="/Logout/Logout" element = {<LogoutForm />}/>
+            
             <Route path="/Register/ConfirmationSent" element = {<ConfirmationSent />}/>
             <Route path="/Register/EULATerms" element = {<EULATerms/>} />
             <Route path ="/Register/Confirm/:confirmationGuid" element = {<Confirm guid={this.state.confirmationGuid}/>}/>
             <Route path ="/Register/InactiveLink/:inactiveLinkGuid" element = {<InactiveLink guid={this.state.inactiveLinkGuid}/>}/>
             <Route path = "/Register/AccountConfirmed" element = {<AccountConfirmed/>}/>
             <Route path="/Register" element = {<Register />}/>
-            <Route path="/Login/Login" element = {<LoginForm />}/>
-            <Route path="/Login/Authentication" element = {<Authentication />}/>
-            <Route path="/Logout/Logout" element = {<LogoutForm />}/>
+
             <Route path = "/Recover" element = {<Recover/>} />
             <Route path = "/Recover/RecoverySent" element = {<RecoverySent/>} />
             <Route path = "/Recover/Enable/:recoveryConfirm" element = {<RecoveryConfirm guid={this.state.recoveryConfirm}/>}/>
             <Route path = "/Recover/AccountEnabled" element = {<AccountEnabled/>} />
-            <Route path = "/Admin/TagDashboard" element = {<TagDashboard/>} />
+            
+            
             <Route path = "/Admin/Dashboard" element = {<AdminPortal/>} />
+            <Route path = "/Admin/TagDashboard" element = {<TagDashboard/>} />
+            
             <Route path = "/Tagger" element = {<Tagger/>} exact/>
           </Routes>
         </Router>

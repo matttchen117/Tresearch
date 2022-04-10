@@ -38,6 +38,7 @@ builder.Services.AddScoped<IOTPRequestManager, OTPRequestManager>();
 builder.Services.AddScoped<IRecoveryManager, RecoveryManager>();
 builder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
 builder.Services.AddScoped<ILogoutManager, LogoutManager>();
+builder.Services.AddScoped<ILogManager, LogManager>();
 builder.Services.AddScoped<ITagManager, TagManager>();
 // Unnecessary, only here temporarily for successful build
 

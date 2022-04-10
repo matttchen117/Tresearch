@@ -12,67 +12,73 @@ function Tagger() {
   //Holds array of tags user can add to their current node (does not inlcude tags in tagData)
   const [tagOptions, setTagOptions] = useState([]);
   //Holds null value, when an item is selected, we want search bar to not have previously selected item highlighted
-  const nullSearch = null;  
+  const nullSearch = useState([]);  
 
   //Array of nodes this views context
-  const nodeData = [1 , 2];
+  const nodeData = [1];
 
-  /**
-   * Fetches tag(s) that the current node has tagged. Returns an 
-   */
-  const fetchNodeTags = () => {
-    async function fetchData() {
-        // Get array of tags node currently has tagged
-        const request = await axios.post("https://localhost:7010/Tag/nodeTagList", nodeData );
-        //Set tag array
-        setTagData(request.data);
-    }
-    //Run async fetch data function
-    fetchData();  
+  
+
+  const handleSelection = (e) =>{
+    
   }
 
-  const fetchTagOptions = () => {
+  const handleClick = (e) => {
+    
+  }
+
+
+
+  const fetchNodeTags = () => {
     async function fetchData() {
-      const res = await axios.get("https://localhost:7010/Tag/taglist")
-      const resData = res.data;
-      let diff = await resData.filter(x => !tagData.includes(x));
-      const options = diff.map(d=> ({
-        "value": d,
-        "label": d
-      }))
-      setTagOptions(options);
+      await axios.post("https://localhost:7010/Tag/nodeTagList", nodeData)
+        .then(response => {
+          const responseData = response.data;
+          setTagData(responseData);
+        })
+        .catch(err => {
+          switch(err.response.data){
+            case 403: {
+                setTagData(nullSearch);
+                console.log('test');
+            }
+          }
+        })
     }
     fetchData();
   }
 
-  const handleSelection = (e) =>{
-    const value = e.value;
-    axios.post("https://localhost:7010/Tag/addTag?tagName="+value ,nodeData)
-        .then((response => {
-          fetchNodeTags();
-          fetchTagOptions();
-        }))
-        .catch((err => {
-            console.log(err);
-        }))
+  const fetchTagOptions = () => {
+    
+    async function fetchData() {
+        await axios.get("https://localhost:7010/Tag/taglist")
+        .then(response => {
+          const responseData = response.data;
+          const options = responseData.map(d => ({
+            "value": d.tagName,
+            "label": d.tagName
+          }));
+          setTagOptions(options);
+        })
+    }
+    fetchData();
   }
 
-  const handleClick = (e) => {
-    var value = e.target.getAttribute('data-item');
-    axios.post("https://localhost:7010/Tag/removeTag?tagName="+value ,nodeData)
-        .then((response => {
-          fetchNodeTags();
-          fetchTagOptions();
-        }))
-        .catch((err => {
-            console.log(err);
-        }))
-  }
-
-  const SetNode = (
+  const refresh  = (
+    
     useEffect(() => {
+      axios.defaults.headers.common['Authorization'] = localStorage.getItem('authorization');
       fetchNodeTags();
       fetchTagOptions();
+      const intervalRefresh = setInterval(() => {
+        fetchNodeTags();
+        fetchTagOptions();
+      }, 5000)
+
+      return() => {
+        clearInterval(intervalRefresh);
+      }
+      
     }, [])
   )
 
@@ -95,7 +101,6 @@ function Tagger() {
   
   return (
     <div className="tagger-wrapper">
-        {<SetNode/>}
         <div className = "tagger-table-wrapper">
             {renderTags}
         </div>

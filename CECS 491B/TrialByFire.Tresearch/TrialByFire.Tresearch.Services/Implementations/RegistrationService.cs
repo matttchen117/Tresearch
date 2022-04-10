@@ -249,7 +249,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             try
             {
                 Rfc2898DeriveBytes pbkdf2 = new Rfc2898DeriveBytes(value, 0, iterations: 10000, HashAlgorithmName.SHA512);
-                return string.Join(string.Empty, Array.ConvertAll(pbkdf2.GetBytes(32), b => b.ToString("X2")));
+                return string.Join(string.Empty, Array.ConvertAll(pbkdf2.GetBytes(64), b => b.ToString("X2")));
             }
             catch(Exception ex)
             {

@@ -93,7 +93,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         }
 
         [Theory]
-        [InlineData("pammypoor@gmail.com", "1D479F5F473B624F8DAE5A64BA677DAD94F0ED9C4B091D9B812B363B37BF070F")]
+        [InlineData("pammypoor@gmail.com", "1D479F5F473B624F8DAE5A64BA677DAD94F0ED9C4B091D9B812B363B37BF070F3656867B3D3D4E318B04404DC2001F53E5DBA2069EF40C46C0DF77EF8FEF95A6")]
         public async Task HashValue(string value, string expected)
         {
             //Arrange
