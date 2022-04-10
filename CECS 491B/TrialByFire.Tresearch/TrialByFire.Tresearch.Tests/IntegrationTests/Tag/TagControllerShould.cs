@@ -88,7 +88,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             IRoleIdentity roleIdentity4 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
             var tagNameCase4 = "Tresearch Controller Add Tag4";
             var nodeListCase4 = new List<long> { };
-            var resultCase4 = "404: Database: Node not found.";
+            var resultCase4 = "404: Database: The node was not found.";
 
             //User Authorized, Tag doesn't exist
             IRoleIdentity roleIdentity5 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
@@ -216,7 +216,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             IRoleIdentity roleIdentity4 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
             var tagNameCase4 = "Tresearch Controller Delete Tag4";
             var nodeListCase4 = new List<long> { };
-            var resultCase4 = "404: Database: Node not found.";
+            var resultCase4 = "404: Database: The node was not found.";
 
             //User Authorized, Tag doesn't exist
             IRoleIdentity roleIdentity5 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");

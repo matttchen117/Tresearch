@@ -51,8 +51,6 @@ namespace TrialByFire.Tresearch.Models.Contracts
             tagDuplicate,
             tagNotFound,
 
-            nodeNotFound,
-
             badNameOrPass,
             badEmail,
             notAuthenticated,

@@ -901,6 +901,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return Tuple.Create(new List<string>(), "200");
         }
 
+        public async Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Tuple.Create(new List<string>(), "200");
+        }
+
         public async Task<string> CreateTagAsync(string tagName, int count,CancellationToken cancellationToken = default(CancellationToken))
         {
             return "200";
@@ -997,5 +1002,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return Tuple.Create(nullNode, "500: Database: " + ex.Message);
             }
         }
+
+        
     }
 }

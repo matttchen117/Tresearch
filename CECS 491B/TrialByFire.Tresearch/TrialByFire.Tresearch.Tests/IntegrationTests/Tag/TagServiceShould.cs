@@ -60,7 +60,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             //No node is passed in
             var tagNameCase4 = "Tresearch Service Add Tag4";
             var nodeListCase4 = new List<long> { };
-            var resultCase4 = "404: Database: Node not found.";
+            var resultCase4 = "404: Database: The node was not found.";
 
             //Tag doesn't exist
             var tagNameCase5 = "Tresearch Service Add Tag5";
@@ -124,7 +124,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             //No node is passed in
             var tagNameCase4 = "Tresearch Service Delete Tag4";
             var nodeListCase4 = new List<long> { };
-            var resultCase4 = "404: Database: Node not found.";
+            var resultCase4 = "404: Database: The node was not found.";
 
             //Tag doesn't exist
             var tagNameCase5 = "Tresearch Service Delete Tag5";
@@ -197,7 +197,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 
             //No nodes passed in
             var nodeListCase4 = new List<long> { };
-            string expectedCase4 = "404: Database: Node not found.";
+            string expectedCase4 = "404: Database: The node was not found.";
             var expectedTags4 = new List<string> { };
 
             return new[]
