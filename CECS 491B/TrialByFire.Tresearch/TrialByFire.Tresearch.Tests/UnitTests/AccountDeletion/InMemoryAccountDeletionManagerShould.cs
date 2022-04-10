@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -18,10 +20,15 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
 {
-    public class InMemoryAccountDeletionManagerShould : InMemoryTestDependencies
+    public class InMemoryAccountDeletionManagerShould : TestBaseClass
     {
-        public InMemoryAccountDeletionManagerShould() : base()
+        public InMemoryAccountDeletionManagerShould() : base(new string[] { })
         {
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestServices.AddScoped<IAccountDeletionService, AccountDeletionService>();
+            TestServices.AddScoped<IAccountDeletionManager, AccountDeletionManager>();
+            TestProvider = TestServices.BuildServiceProvider();
+
         }
 
         [Theory]
@@ -38,17 +45,29 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
         public void DeleteTheUser(string currentIdentity, string currentRole, string userHash, 
             string expected)
         {
+
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole, userHash);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            Thread.CurrentPrincipal = rolePrincipal;
-            IAccountDeletionManager accountDeletionManager = new AccountDeletionManager(SqlDAO, LogService, AccountDeletionService);
+            if (!currentIdentity.Equals("guest"))
+            {
+                Thread.CurrentPrincipal = rolePrincipal;
+            }
+
+
+            IAccountDeletionManager accountDeletionManager = TestProvider.GetService<IAccountDeletionManager>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(
+                TimeSpan.FromSeconds(5));
+
 
             // Act
-            string result = accountDeletionManager.DeleteAccount();
+            string result = await accountDeletionManager.DeleteAccountAsync(cancellationTokenSource.Token).ConfigureAwait(false);
+
 
             // Assert
             Assert.Equal(expected, result);
+
+
 
         }
 

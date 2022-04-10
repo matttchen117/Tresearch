@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -18,11 +20,16 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
 {
-    public class InMemoryAccountDeletionControllerShould : InMemoryTestDependencies
+    public class InMemoryAccountDeletionControllerShould : TestBaseClass
     {
 
-        public InMemoryAccountDeletionControllerShould() : base()
+        public InMemoryAccountDeletionControllerShould() : base(new string[] { })
         {
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestServices.AddScoped<IAccountDeletionService, AccountDeletionService>();
+            TestServices.AddScoped<IAccountDeletionManager, AccountDeletionManager>();
+            TestServices.AddScoped<IAccountDeletionController, AccountDeletionController>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
 
@@ -44,16 +51,26 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole, userHash);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            Thread.CurrentPrincipal = rolePrincipal;
-            //IAccountDeletionService accountDeletionService = new AccountDeletionService(sqlDAO, logService, rolePrincipal);
-            IAccountDeletionManager accountDeletionManager = new AccountDeletionManager(SqlDAO, LogService, AccountDeletionService);
-            IAccountDeletionController accountDeletionController = new AccountDeletionController(SqlDAO, LogService, accountDeletionManager);
+            if (!currentIdentity.Equals("guest"))
+            {
+                Thread.CurrentPrincipal = rolePrincipal;
+            }
+
+
+
+            IAccountDeletionController accountDeletionController = TestProvider.GetService<IAccountDeletionController>();
+            string[] expecteds = expected.Split(": ");
+            ObjectResult expectedResult = new ObjectResult(expecteds[2]) { StatusCode = Convert.ToInt32(expecteds[0]) };
+
 
             // Act
-            string result = accountDeletionController.DeleteAccount();
+            IActionResult result = await accountDeletionController.DeleteAccountAsync().ConfigureAwait(false);
+            var objectResult = result as ObjectResult;
+
 
             // Assert
-            Assert.Equal(expected, result);
+            Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);
+            Assert.Equal(expectedResult.Value, objectResult.Value);
 
         }
     }

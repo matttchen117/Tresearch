@@ -34,7 +34,7 @@ class RegistrationForm extends React.Component  {
         e.preventDefault();
         
         if(this.handleInput() == true){
-            axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/Recovery/SendRecovery?email=' + this.state.email.toLowerCase() + '&authorizationLevel=user')
+            axios.post('https://localhost:7010/Recovery/SendRecovery?email=' + this.state.email.toLowerCase() + '&authorizationLevel=user')
             .then(res => {
                 this.setState({errorMessage: ''})
                 window.location = '/Recover/RecoverySent';

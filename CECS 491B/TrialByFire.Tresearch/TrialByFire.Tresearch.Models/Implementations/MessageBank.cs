@@ -37,6 +37,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.operationCancelled:
                     return "400: Server: Operation Cancelled Exception: ";
 
+                case Responses.databaseConnectionFail:
+                    return "503: Database: Unable to connect to database.";
+
                 case Responses.verifySuccess:
                     return "200: Server: Account Verification success.";
                 case Responses.notEnabled:
@@ -85,6 +88,27 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.logRollback:
                     return "400: Database: Log rollback occurred.";
 
+                case Responses.tagAddSuccess:
+                    return "200: Server: Tag added to node(s).";
+                case Responses.tagRemoveSuccess:
+                    return "200: Server: Tag removed from node(s).";
+                case Responses.tagCreateSuccess:
+                    return "200: Server: Tag created in tag bank.";
+                case Responses.tagDeleteSuccess:
+                    return "200: Server: Tag removed from tag bank.";
+                case Responses.tagGetSuccess:
+                    return "200: Server: Tag(s) retrieved.";
+                case Responses.tagNotFound:
+                    return "404: Database: Tag not found.";
+                case Responses.tagDuplicate:
+                    return "409: Database: The tag already exists.";
+                case Responses.tagRetrievalFail:
+                    return "502: Server: Unable to get tag data.";
+
+
+                case Responses.createNodeSuccess:
+                    return "200: Server: Create Node Success";
+
                 case Responses.jwtValidationSuccess:
                     return "200: Server: JWT Validation Success.";
                 case Responses.jwtValidationFail:
@@ -124,6 +148,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.notFoundOrAuthorized:
                     return "404: Database: Account not found or not authorized to perform the " +
                 "operation.";
+                case Responses.nodeNotFound:
+                    return "404: Database: The node was not found.";
                 case Responses.tagDoesNotExist:
                     return "404: Database: Tag not found.";
                 case Responses.recoveryLinkNotFound:
@@ -136,12 +162,12 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "409: Database: The recovery link arealdy exists.";
                 case Responses.confirmationLinkExists:
                     return "409: Database: The confirmation link already exists.";
-                case Responses.tagAlreadyExist:
-                    return "409: Database: The tag already exists.";
+
                 case Responses.recoveryLinkExpired:
                     return "410: Server: The recovery link has expired.";
                 case Responses.confirmationLinkExpired:
                     return "410: Server: The confirmation link has expired.";
+
                 case Responses.cookieFail:
                     return "503: Server: Authentication Cookie creation failed.";
                 case Responses.sendEmailFail:
@@ -168,6 +194,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "503: Database: The database is down. Please try again later.";
                 case Responses.rollbackFailed:
                     return "504: Server rollback failed";
+                case Responses.createNodeFail:
+                    return "503: Database: Failed to create node.";
+                case Responses.nodeAlreadyExists:
+                    return "409: Database: Node Already Exists";
                 case Responses.createdNodesExists:
                     return "Fail - Created Nodes Already Exists";
                 case Responses.createdNodeNotExist:
@@ -192,6 +222,25 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "Fail - Daily Registration Not Inserted";
                 case Responses.dailyRegistrationNotExist:
                     return "Fail - Daily Registration to Update Does Not Exist";
+
+
+
+                case Responses.accountDeletionSuccess:
+                    return "200: Server: Account Deletion Successful.";
+                case Responses.getAdminsSuccess:
+                    return "200: Server: Get Admins Success.";
+                case Responses.lastAdminFail:
+                    return "503: Database: Cannot delete last admin in system";
+                //this is when user clicks accountDeletion in twice before waiting for their first delete request to go thru
+                case Responses.accountAlreadyDeleted:
+                    return "503: Database: Account is already deleted";
+                case Responses.accountDeleteFail:
+                    return "503: Database: Failed to delete account";
+                case Responses.verificationFailure:
+                    return "401: Server: Failure to authenticate and verify user for deletion.";
+
+
+
                 default:
                     return "error";
             }
@@ -220,6 +269,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("notFoundOrEnabled", "404: Database: The account was not found or it has been disabled.");
             errorMessages.Add("notFoundOrAuthorized", "404: Database: Account not found or not authorized to perform the " +
                 "operation.");
+            errorMessages.Add("nodeNotFound", "404: Database: The node was not found.");
             errorMessages.Add("recoveryLinkNotFound", "404: Database: The recovery link was not found");
             // 408 Errors - Server side timeout
             errorMessages.Add("cancellationRequested", "408: Server: Cancellation token requested cancellation.");
@@ -232,6 +282,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("accountEnableFail", "503: Database: Failed to enable the account.");
             errorMessages.Add("recoveryLinkRemoveFail", "503: Database: Failed to remove recovery link.");
             errorMessages.Add("recoveryLinkCreateFail", "504: Database: Failed to create recovery link.");
+            errorMessages.Add("createNodeFail", "503: Database: Failed to create node.");
             errorMessages.Add("otpFail", "503: Database: Failed to create OTP.");
             errorMessages.Add("databaseFail", "503: Database: The database is down. Please try again later.");
             errorMessages.Add("logoutFail", "503: Server: Logout failed.");

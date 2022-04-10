@@ -26,10 +26,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         public async Task RegisterTheUser(string email, string passphrase, string authorizationLevel, string statusCode)
         {
             //Arrange
-            string baseUrl = "https://trialbyfiretresearch.azurewebsites.net/Register/Confirm?guid=";
             IRegistrationManager registrationManager = TestProvider.GetService<IRegistrationManager>();
             //Act
-            string results = await registrationManager.CreateAndSendConfirmationAsync(email, passphrase, authorizationLevel, baseUrl).ConfigureAwait(false);
+            string results = await registrationManager.CreateAndSendConfirmationAsync(email, passphrase, authorizationLevel).ConfigureAwait(false);
 
             //Assert
             Assert.Equal(statusCode , results);

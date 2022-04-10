@@ -16,6 +16,8 @@ namespace TrialByFire.Tresearch.Models.Contracts
             unhandledException,
             operationCancelled,
 
+            databaseConnectionFail,
+
             verifySuccess,
             notEnabled,
             notConfirmed,
@@ -42,6 +44,15 @@ namespace TrialByFire.Tresearch.Models.Contracts
             logFail,
             logRollback,
 
+            tagAddSuccess,
+            tagRemoveSuccess,
+            tagCreateSuccess,
+            tagDeleteSuccess,
+            tagGetSuccess,
+            tagRetrievalFail,
+            tagDuplicate,
+            tagNotFound,
+
             jwtValidationSuccess,
             jwtValidationFail,
 
@@ -63,6 +74,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             recoveryLinkLimitReached,
             notFoundOrEnabled,
             notFoundOrAuthorized,
+            nodeNotFound,
             recoveryLinkNotFound,
             cancellationRequested,
             confirmationLinkCreateFail,
@@ -82,12 +94,15 @@ namespace TrialByFire.Tresearch.Models.Contracts
             otpFail,
             databaseFail,
             rollbackFailed,
+            createNodeFail,
+            nodeAlreadyExists,
             createdNodesExists,
             createdNodeNotExist,
             createdNodeNotInserted,
             dailyLoginsExists,
             dailyLoginNotInserted,
             dailyLoginNotExist,
+
             topSearchExists,
             topSearchNotInserted,
             topSearchNotExist,
@@ -95,9 +110,18 @@ namespace TrialByFire.Tresearch.Models.Contracts
             dailyRegistrationNotInserted,
             dailyRegistrationNotExist,
             storeLogFail,
+
+            getAdminsSuccess,
+            accountDeletionSuccess,
+            lastAdminFail,
+            accountAlreadyDeleted,
+            accountDeleteFail,
+            verificationFailure,
+
             nodeTagNodeDoesNotExist,
             tagAlreadyExist,
             tagDoesNotExist,
+            createNodeSuccess,
         }
         public Task<string> GetMessage(Responses response);
     }

@@ -11,6 +11,7 @@
     position: relative;
     padding-left:15%;
     padding-right: 15%;
+    z-index: -1;
 }
 
 .eula-wrapper {

@@ -10,6 +10,8 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 {
     public interface ISqlDAO
     {
+        public Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> CreateUserHashAsync(int ID, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default);
         public Task<int> StoreLogAsync(ILog log, string destination, CancellationToken cancellationToken = default);
         public Task<string> EnableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
@@ -21,12 +23,14 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public Task<int> GetRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> RemoveRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> CreateRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken));
-        public Task<string> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> CreateOTPAsync(string username, string authorizationLevel, int failCount, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<int, string>> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> CreateConfirmationLinkAsync(IConfirmationLink _confirmationlink, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> UpdateAccountToUnconfirmedAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> UpdateAccountToConfirmedAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> RemoveConfirmationLinkAsync(IConfirmationLink confirmationLink, CancellationToken cancellationToken = default(CancellationToken));
         public Task<Tuple<IConfirmationLink, string>> GetConfirmationLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, IAccount account, CancellationToken cancellationToken = default(CancellationToken));
 
         // Authentication
         public Task<int> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken = default);
@@ -39,7 +43,12 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         //public List<IKPI> LoadKPI(DateTime now);
 
         // Delete account
-        public string DeleteAccount();
+        public Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken));
+
+
+        // Get admins
+        public Task<string> GetAmountOfAdminsAsync(CancellationToken cancellationToken = default(CancellationToken));
+
 
         // KPI Methods
         public Task<IViewKPI> GetViewKPIAsync(CancellationToken cancellationToken = default);
@@ -57,7 +66,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         /*
             Ian's Methods
          */
-        
+
         /*
         public string CreateNode();
 
@@ -98,7 +107,8 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
 
 
-
+        public Task<string> CreateNodeAsync(INode node, CancellationToken cancellationToken = default);
+        public Task<Tuple<INode, string>> GetNodeAsync(long nID, CancellationToken cancellationToken = default);
         public string CreateNodesCreated(INodesCreated nodesCreated);
 
         public Task<List<NodesCreated>> GetNodesCreatedAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
@@ -127,11 +137,13 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration);
 
-        public Task<string> AddTagToNodesAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken));
-        public Task<string> RemoveTagFromNodeAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> AddTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> RemoveTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken));
         public Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken));
-        public Task<string> CreateTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken));
-        public Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken));
-        public Task<Tuple<List<string>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> CreateTagAsync(string tagName, int count, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> DeleteTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<List<string>, string>> GetTagsDescAsync(CancellationToken cancellationToken = default(CancellationToken));
     }
 }

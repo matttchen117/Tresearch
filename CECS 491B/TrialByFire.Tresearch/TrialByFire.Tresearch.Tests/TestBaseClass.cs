@@ -37,8 +37,9 @@ namespace TrialByFire.Tresearch.Tests
             TestServices.AddScoped<ILogManager, LogManager>();
             TestServices.AddScoped<IAuthenticationService, AuthenticationService>();
             TestServices.AddScoped<IAuthorizationService, AuthorizationService>();
+            TestServices.AddScoped<IAccountVerificationService, AccountVerificationService>();
         }
+
+
     }
 }
-
-

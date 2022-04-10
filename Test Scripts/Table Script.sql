@@ -24,6 +24,7 @@ DROP PROCEDURE IF EXISTS ConfirmAccount
 DROP PROCEDURE IF EXISTS CreateAccount
 DROP PROCEDURE IF EXISTS CreateConfirmationLink	
 DROP PROCEDURE IF EXISTS CreateNode
+DROP PROCEDURE IF EXISTS CreateOTP
 DROP PROCEDURE IF EXISTS CreateRecoveryLink
 DROP PROCEDURE IF EXISTS CreateTag
 DROP PROCEDURE IF EXISTS CreateUserHash
@@ -79,8 +80,8 @@ CREATE TABLE [dbo].UserHashTable(
 	CONSTRAINT user_hashtable_fk FOREIGN KEY (UserID) REFERENCES Accounts(UserID),
 	CONSTRAINT user_hashtable_pk PRIMARY KEY(UserHash)
 );
-
-CREATE TABLE OTPClaims(
+ 
+CREATE TABLE [dbo].OTPClaims(
 	Username VARCHAR(100),
 	OTP VARCHAR(100),
 	AuthorizationLevel VARCHAR(40),
@@ -91,7 +92,7 @@ CREATE TABLE OTPClaims(
 	CONSTRAINT otp_claims_pk PRIMARY KEY(Username, AuthorizationLevel)
 );
 
-CREATE TABLE Nodes(
+CREATE TABLE [dbo].Nodes(
 	UserHash VARCHAR(128),
 	NodeID BIGINT PRIMARY KEY,
 	NodeParentID BIGINT,
@@ -101,12 +102,12 @@ CREATE TABLE Nodes(
 	CONSTRAINT node_owner_fk FOREIGN KEY(UserHash) REFERENCES UserHashTable(UserHash)
 );
 
-CREATE TABLE Tags(
+CREATE TABLE [dbo].Tags(
 	TagName VARCHAR(100) PRIMARY KEY,
 	TagCount BIGINT
 );
 
-CREATE TABLE NodeTags(
+CREATE TABLE [dbo].NodeTags(
     TagName VARCHAR(100),
     NodeID BIGINT,
 	CONSTRAINT tag_name_fk FOREIGN KEY (TagName) REFERENCES Tags(TagName),
@@ -114,14 +115,14 @@ CREATE TABLE NodeTags(
 	CONSTRAINT node_id_fk FOREIGN KEY (NodeID) REFERENCES Nodes(NodeID)
 );
 
-/*CREATE TABLE UserRatings(
-	UserHash VARCHAR(128)
+CREATE TABLE [dbo].UserRatings(
+	UserHash VARCHAR(128),
 	NodeID BIGINT,
 	Rating INT,
 	CONSTRAINT user_ratings_fk FOREIGN KEY (UserHash) REFERENCES UserHashTable(UserHash),
 	CONSTRAINT user_ratings_node_fk FOREIGN KEY (NodeID) REFERENCES Nodes(NodeID),
 	CONSTRAINT user_ratings_pk PRIMARY KEY(UserHash, NodeID)
-);*/
+);
 
 CREATE TYPE SearchTagList AS TABLE
 (
@@ -130,45 +131,46 @@ CREATE TYPE SearchTagList AS TABLE
 GO
 
 --shouldn’t you combine both EditDate and EditTime into one attribute so the datatype can be DateTime
-CREATE TABLE TreeHistories(
+CREATE TABLE [dbo].TreeHistories(
 	EditDate DATE,
 	EditTime TIME,
 );
 
-CREATE TABLE ViewsWebPages(
+CREATE TABLE [dbo].ViewsWebPages(
 	ViewName VARCHAR(100),
 	Visits INT,
 	AverageDuration FLOAT
 );
 
 -- Keep number of registrations on a given date
-CREATE TABLE DailyRegistrations(
+CREATE TABLE [dbo].DailyRegistrations(
 	RegistrationDate DATE PRIMARY KEY,
 	RegistrationCount INT
 );
 
 -- Keep all of the logins for a given date
-CREATE TABLE DailyLogins(
+CREATE TABLE [dbo].DailyLogins(
 	LoginDate DATE PRIMARY KEY,
 	LoginCount INT
 );
 
-CREATE TABLE TopSearches(
+CREATE TABLE [dbo].TopSearches(
 	TopSearchDate DATE PRIMARY KEY,
 	SearchString VARCHAR(100),
 	SearchCount INT
 );
 
-CREATE TABLE NodesCreated(
+CREATE TABLE [dbo].NodesCreated(
 	NodeCreationDate DATE PRIMARY KEY,
 	NodeCreationTime INT,
 );
 
-CREATE TABLE EmailConfirmationLinks(
+CREATE TABLE [dbo].EmailConfirmationLinks(
 	Username VARCHAR(100),
 	AuthorizationLevel VARCHAR(40),
 	GuidLink UNIQUEIDENTIFIER PRIMARY KEY,
 	TimeCreated DateTime,
+	CONSTRAINT confirmation_unique UNIQUE (Username, AuthorizationLevel),
 	CONSTRAINT confirmation_links_fk FOREIGN KEY(Username, AuthorizationLevel) REFERENCES Accounts(Username, AuthorizationLevel)
 );
 
@@ -180,7 +182,7 @@ CREATE TABLE EmailRecoveryLinks(
 	CONSTRAINT recovery_links_fk FOREIGN KEY(Username, AuthorizationLevel) REFERENCES Accounts(Username, AuthorizationLevel),
 );
 
-CREATE TABLE EmailRecoveryLinksCreated(
+CREATE TABLE [dbo].EmailRecoveryLinksCreated(
 	Username VARCHAR(100),
 	AuthorizationLevel VARCHAR(40),
 	LinkCount int,
@@ -188,7 +190,8 @@ CREATE TABLE EmailRecoveryLinksCreated(
 	CONSTRAINT recovery_count_fk FOREIGN KEY(Username, AuthorizationLevel) REFERENCES Accounts(Username, AuthorizationLevel)
 );
 
-CREATE TABLE AnalyticLogs(
+
+CREATE TABLE [dbo].AnalyticLogs(
 	Timestamp DATETIME,
 	Level VARCHAR(30),
 	UserHash VARCHAR(128),
@@ -198,7 +201,7 @@ CREATE TABLE AnalyticLogs(
 	CONSTRAINT analytic_logs_fk_01 FOREIGN KEY (UserHash) REFERENCES UserHashTable(UserHash)
 );
 
-CREATE TABLE ArchiveLogs(
+CREATE TABLE [dbo].ArchiveLogs(
 	Timestamp DATETIME,
 	Level VARCHAR(30),
 	UserHash VARCHAR(128),
@@ -626,7 +629,22 @@ BEGIN
 	ELSE
 		BEGIN TRAN
 			BEGIN TRY;
-				
+				-- Insert statements for procedure here
+
+				-- 0 = Fail, 1 = success, 2 = Rollback occurred
+				IF @Destination = 'Analytic'
+					INSERT INTO AnalyticLogs(Timestamp, Level, UserHash, Category, Description, Hash) VALUES
+					(@Timestamp, @Level, @UserHash, @Category, @Description, @Hash);
+				ELSE IF @Destination = 'Archive'
+					INSERT INTO ArchiveLogs(Timestamp, Level, UserHash, Category, Description, Hash) VALUES
+					(@Timestamp, @Level, @UserHash, @Category, @Description, @Hash);			
+
+				SELECT @RowCount = @@ROWCOUNT
+
+				IF(@RowCount = 1)
+					SET @Result = 1
+				ELSE
+					SET @Result = 0
 
 				COMMIT TRANSACTION
 			END TRY
@@ -648,14 +666,6 @@ BEGIN
 END
 GO
 
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
--- =============================================
--- Author:		Matthew Chen
--- Create date: 3/29/2022
--- Description:	Stores the otp for the User
 -- =============================================
 CREATE PROCEDURE GetUserHash 
 	-- Add the parameters for the stored procedure here
@@ -703,8 +713,11 @@ begin
 	IF NOT EXISTS(SELECT * FROM NodeTags WHERE NodeID = @NodeID AND TagName = @TagName)
 	BEGIN
 		INSERT INTO NodeTags(Nodeid, TagName) VALUES(@NodeID, @TagName);
+		UPDATE Tags SET TagCount = TagCount + 1 WHERE TagName= @TagName
 	END
 end
+
+
 
 
 -- =============================================
@@ -742,11 +755,12 @@ CREATE PROCEDURE [dbo].[CreateAccount]
 	@AccountStatus bit,
 	@Confirmed bit
 )
-as
-begin
+AS
+BEGIN
 	INSERT INTO Accounts(Username, Passphrase, AuthorizationLevel, AccountStatus, Confirmed)
 		 VALUES(@Username, @Passphrase, @AuthorizationLevel, @AccountStatus, @Confirmed);
-end
+	SELECT UserID FROM Accounts WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
+END
 
 
 -- =============================================
@@ -769,7 +783,6 @@ begin
 Insert into EmailConfirmationLinks(Username, GUIDLink, AuthorizationLevel, TimeCreated) values (@Username, @GUIDLink, @AuthorizationLevel, @TimeCreated)
 end
 
-/*
 -- =============================================
 --Author:        Jessie Lazo
 -- Description:    Creates a Node
@@ -780,8 +793,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[CreateNode]
 (
-    @Username VARCHAR(100),
-    @AuthorizationLevel VARCHAR(40),
+    @UserHash VARCHAR(128),
     @NodeID BIGINT,
     @NodeParentID BIGINT,
     @NodeTitle VARCHAR(100),
@@ -790,9 +802,29 @@ CREATE PROCEDURE [dbo].[CreateNode]
 )
 as
 begin
-    INSERT INTO Nodes(Username, AuthorizationLevel, NodeID, NodeParentID, NodeTitle, Summary, Visibility)
-         VALUES(@Username, @AuthorizationLevel, @NodeID, @NodeParentID, @NodeTitle, @Summary, @Visibility);
-end*/
+    INSERT INTO Nodes(UserHash, NodeID, NodeParentID, NodeTitle, Summary, Visibility)
+         VALUES(@UserHash, @NodeID, @NodeParentID, @NodeTitle, @Summary, @Visibility);
+end
+
+-- =============================================
+--Author:        Pammy Poor
+-- Description:    Create OTP
+-- =============================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[CreateOTP]
+(
+    @Username VARCHAR(100),
+	@AuthorizationLevel VARCHAR(40),
+	@FailCount INT
+)
+as
+begin
+    INSERT INTO OTPClaims(Username, AuthorizationLevel, FailCount)
+         VALUES(@Username, @AuthorizationLevel, @FailCount);
+end
 
 /*
 -- =============================================
@@ -805,8 +837,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[CreateUserHash]    
 (
-	@UserID VARCHAR(100),
-	@UserRole VARCHAR(40),
+	@UserID INT,
 	@UserHash VARCHAR(128)
 )
 as
@@ -814,11 +845,10 @@ begin
 	IF EXISTS( SELECT * FROM UserHashTable with (updlock, serializable) WHERE UserHash = @UserHash)
 		BEGIN
 			UPDATE UserHashTable SET UserID = @UserID WHERE UserHash = @UserHash;
-			UPDATE UserHashTable SET UserRole = @UserRole WHERE UserHash = @UserHash;
 		END
 	ELSE
 		BEGIN
-			INSERT INTO UserHashTable(UserID, UserRole, UserHash) VALUES(@UserID, @UserRole, @UserHash);
+			INSERT INTO UserHashTable(UserID, UserHash) VALUES(@UserID, @UserHash);
 		END
 end*/
 
@@ -842,7 +872,7 @@ begin
 Insert into EmailRecoveryLinks(Username, GUIDLink, TimeCreated, AuthorizationLevel) values (@Username, @GUIDLink, @TimeCreated, @AuthorizationLevel)
 end
 
-/*
+
 -- =============================================
 -- Author:		Pammy Poor
 -- Description:	Creates a user tag
@@ -853,7 +883,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE PROCEDURE [dbo].[CreateTag]    
 (
-	@TagName VARCHAR(100)
+	@TagName VARCHAR(100),
 	@TagCount BIGINT 
 )
 as
@@ -876,7 +906,7 @@ CREATE procedure [dbo].[DecrementRecoveryLinksCreated]
 as
 begin
 	UPDATE EmailRecoveryLinksCreated SET LinkCount = LinkCount - 1 WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel 
-end*/
+end
 
 -- =============================================
 -- Author:		Pammy Poor
@@ -894,7 +924,6 @@ begin
 	UPDATE Tags SET TagCount = TagCount - 1 WHERE TagName = @TagName
 end
 
-/*
 -- =============================================
 -- Author:		Viet Nguyen
 -- Description:	Deletes a user and relevant data
@@ -907,26 +936,15 @@ CREATE PROCEDURE [dbo].[DeleteAccountStoredProcedure]
 @Username VARCHAR(100), @AuthorizationLevel VARCHAR(40)
 AS 
 BEGIN 
-	DELETE FROM NodeTags WHERE NodeTags.NodeID IN 
-    (SELECT NodeTags.NodeID
-    FROM Nodes  
-    INNER JOIN NodeTags ON NodeTags.NodeID = Nodes.NodeID
-    WHERE Nodes.Username = @Username AND Nodes.AuthorizationLevel = @AuthorizationLevel);
-
-    DELETE FROM UserRatings 
-    WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
 
     DELETE FROM EmailConfirmationLinks     WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
     DELETE FROM EmailRecoveryLinks     WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
-    DELETE FROM EmailConfirmationLinksCreated     WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
     DELETE FROM EmailRecoveryLinksCreated     WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
-
-    DELETE FROM Nodes WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
-
     DELETE FROM OTPClaims WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
-
+	UPDATE UserHashTable SET UserID = NULL WHERE UserID = (SELECT UserID FROM Accounts Where Username = @Username and AuthorizationLevel = @AuthorizationLevel);
     DELETE FROM Accounts WHERE Username = @Username and AuthorizationLevel = @AuthorizationLevel;
-END*/
+
+END
 
 -- =============================================
 -- Author:		Pammy Poor
@@ -1189,7 +1207,7 @@ BEGIN
 	  THEN CAST(1 AS BIT)
 	  ELSE CAST(0 AS BIT)
 END
-end
+END
 
 -- =============================================
 -- Author:		Pammy Poor
@@ -1225,10 +1243,12 @@ as
 begin
 	IF EXISTS(SELECT * FROM Tags WHERE TagName = @TagName)
 		BEGIN
+			DECLARE @TagCount BIGINT = (SELECT TagCount FROM Tags WHERE TagName = @TagName)
 			DELETE NodeTags WHERE TagName = @TagName
 			DELETE Tags WHERE TagName = @TagName
+			SELECT @TagCount
 		END
-end
+END
 
 -- =============================================
 -- Author:		Pammy Poor
@@ -1246,6 +1266,7 @@ CREATE PROCEDURE [dbo].[RemoveTagFromNode]
 as
 begin
 	DELETE FROM NodeTags where NodeID = @NodeID AND TagName = @TagName;
+	UPDATE Tags SET TagCount = TagCount - 1 WHERE TagName= @TagName
 end
 
 -- =============================================

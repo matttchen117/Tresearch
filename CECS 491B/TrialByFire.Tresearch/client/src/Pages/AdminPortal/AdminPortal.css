@@ -1,0 +1,30 @@
+
+
+
+.side-menu-container {
+    background-color: #f4f4f9;
+    height: 100%;
+    position: fixed;
+    width: 250px;
+}
+
+.side-menu  li a{
+    display: block;
+    width: 100%;
+}
+
+.side-menu-item  {
+    list-style: none;
+    padding: 25px;
+    text-align: left;
+}
+
+.side-menu-item  a{
+    text-decoration: none;
+    font-size: 1em;
+    color: #283618;
+}
+
+.side-menu a:hover{
+    color: green;
+}

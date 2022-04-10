@@ -31,11 +31,11 @@ namespace TrialByFire.Tresearch.Middlewares
                 // This should check if httpContext.User is not null
                 // The Thread.CurrentPrincipal could be running on a different thread from the logout
 
-                // This is not working, is always not null, but has no values
+            // This is not working, is always not null, but has no values
 
-                // Authorization is usually used default header - gets transferred all the time
-                // ALL hardcoding should be in config
-                // for custom headers, follow format X-{HeaderName}
+            // Authorization is usually used default header - gets transferred all the time
+            // ALL hardcoding should be in config
+            // for custom headers, follow format X-{HeaderName}
 
                 if (httpContext.Request.Headers.ContainsKey(_options.CurrentValue.JWTHeaderName))
                 {

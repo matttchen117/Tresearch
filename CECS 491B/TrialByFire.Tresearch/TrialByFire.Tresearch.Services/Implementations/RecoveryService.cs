@@ -41,12 +41,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 Tuple<IRecoveryLink, string> linkResult = await _sqlDAO.GetRecoveryLinkAsync(guid, cancellationToken);
+                if (cancellationToken.IsCancellationRequested)
+                    throw new OperationCanceledException();
                 return linkResult;
             }
             catch (OperationCanceledException ex)
             {
                 //Service has been cancelled
-                return Tuple.Create(nullLink, _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result);
+                throw;
             }
             catch (Exception ex)
             {
@@ -69,12 +71,22 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 if (recoveryLink == null)
                     return _messageBank.GetMessage(IMessageBank.Responses.recoveryLinkNotFound).Result;
                 string result = await _sqlDAO.RemoveRecoveryLinkAsync(recoveryLink, cancellationToken);
+                if(cancellationToken.IsCancellationRequested && result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
+                {
+                    string rollbackResult = await _sqlDAO.CreateRecoveryLinkAsync(recoveryLink);
+                    if (rollbackResult.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
+                        throw new OperationCanceledException();
+                    else
+                        return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
+                }
+                else if (cancellationToken.IsCancellationRequested)
+                    throw new OperationCanceledException();
                 return result;
             }
             catch (OperationCanceledException)
             {
                 //Service has been cancelled
-                return _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result;
+                throw;
             }
             catch (Exception ex)
             {
@@ -82,6 +94,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
+        /// <summary>
+        ///     GetAccountAsync(email, authorizationLevel)
+        ///         Returns Account from database matching credentials
+        /// </summary>
+        /// <param name="email">Email of account to get</param>
+        /// <param name="authorizationLevel">Authorization Level of account</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>String with status code</returns>
         public async Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken= default(CancellationToken))
         {
             IAccount nullAccount = null;
@@ -96,8 +116,8 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch (OperationCanceledException)
             {
-                //Service has been cancelled
-                return Tuple.Create(nullAccount, _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).Result);
+                //Service has been cancelled...no rollback necessary
+                throw;
             }
             catch (Exception ex)
             {
@@ -105,18 +125,23 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-
+        /// <summary>
+        ///     CreateRecoveryLinkAsync(account)
+        ///        Creates and updates database with recovery link
+        /// </summary>
+        /// <param name="account">Account to create recovery link for</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>String with status code</returns>
         public async Task<Tuple<IRecoveryLink, string>> CreateRecoveryLinkAsync(IAccount account, CancellationToken cancellationToken=default(CancellationToken))
         {
             IRecoveryLink linkCreated;
             IRecoveryLink nullLink = null;
-            string result = "";
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                linkCreated  = new RecoveryLink(account.Username, account.AuthorizationLevel, DateTime.Now, Guid.NewGuid());
-                result = await _sqlDAO.CreateRecoveryLinkAsync(linkCreated, cancellationToken);
+                linkCreated  = new RecoveryLink(account.Email, account.AuthorizationLevel, DateTime.Now, Guid.NewGuid());
+                string result = await _sqlDAO.CreateRecoveryLinkAsync(linkCreated, cancellationToken);
 
                 if (cancellationToken.IsCancellationRequested && result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
                 {
@@ -128,14 +153,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     else
                         throw new OperationCanceledException();
                 }
+                else if (cancellationToken.IsCancellationRequested)
+                    throw new OperationCanceledException();
                 return Tuple.Create(linkCreated, result);
 
             } catch (OperationCanceledException ex)
             {
                 // No rollback necessary
                 throw;
-
-
             }
             catch (Exception ex)
             {
@@ -143,6 +168,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
+        /// <summary>
+        ///     EnableAccountAync(email, authorizationLevel)
+        ///         Updates account status to enabled
+        /// </summary>
+        /// <param name="email">Email of account</param>
+        /// <param name="authorizationLevel">Authorization Level of account</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>String status code</returns>
         public async Task<string> EnableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken= default(CancellationToken))
         {
             string result = "";
@@ -155,15 +188,16 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 if(cancellationToken.IsCancellationRequested && result == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                 {
                     string rollbackResult = await _sqlDAO.DisableAccountAsync(email, authorizationLevel, cancellationToken);
-                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                    if (rollbackResult != await _messageBank.GetMessage(IMessageBank.Responses.generic))
                         return rollbackResult;
-                } else if(cancellationToken.IsCancellationRequested)
+                } 
+                else if(cancellationToken.IsCancellationRequested)
                     throw new OperationCanceledException();
                 return result;
             }
             catch (OperationCanceledException ex)
             {
-                return _messageBank.ErrorMessages["cancellationRequested"];
+                throw;
             }
             catch (Exception ex)
             {
@@ -179,10 +213,10 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 string result = await _sqlDAO.DisableAccountAsync(email, authorizationLevel, cancellationToken);
-                if (cancellationToken.IsCancellationRequested && result == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                if (cancellationToken.IsCancellationRequested && result == await _messageBank.GetMessage(IMessageBank.Responses.generic))
                 {
                     string rollbackResult = await _sqlDAO.DisableAccountAsync(email, authorizationLevel, cancellationToken);
-                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                    if (rollbackResult != await _messageBank.GetMessage(IMessageBank.Responses.generic))
                         return rollbackResult;
                 }
                 else if (cancellationToken.IsCancellationRequested)
@@ -201,6 +235,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
         }
 
+        /// <summary>
+        ///     DecrementRecoveryLinkCountAsync(email, authorizationLevel)
+        ///         Decrements count of recovery links user has created this month
+        /// </summary>
+        /// <param name="email">Email of account</param>
+        /// <param name="authorizationLevel">AuthorizationLevel of account</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>string status code</returns>
         public async Task<string> DecrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -210,7 +252,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 if (cancellationToken.IsCancellationRequested && result == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                 {
                     string rollbackResult = await _sqlDAO.IncrementRecoveryLinkCountAsync(email, authorizationLevel);
-                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                    if (rollbackResult != await _messageBank.GetMessage(IMessageBank.Responses.generic))
                         return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
                     else
                         throw new OperationCanceledException();
@@ -230,13 +272,21 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
+        /// <summary>
+        ///     IncrementRecoveryLinkCountAsync(email, authorizationLevel)
+        ///         Increments count of recovery links user has created this month
+        /// </summary>
+        /// <param name="email">Email of account</param>
+        /// <param name="authorizationLevel">Authorization level of account</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>String status code</returns>
         public async Task<string> IncrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 string result = await _sqlDAO.IncrementRecoveryLinkCountAsync(email, authorizationLevel, cancellationToken).ConfigureAwait(false);
-                if (cancellationToken.IsCancellationRequested && result == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                if (cancellationToken.IsCancellationRequested && result == await _messageBank.GetMessage(IMessageBank.Responses.generic))
                 {
                     string rollbackResult = await _sqlDAO.DecrementRecoveryLinkCountAsync(email, authorizationLevel);
                     if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
@@ -259,6 +309,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
+        /// <summary>
+        ///     GetRecoveryLinkCountAsync(string email, string authorizationLevel)
+        ///         Returns Count of recovery links user has created this month
+        /// </summary>
+        /// <param name="email">Email of user</param>
+        /// <param name="authorizationLevel">Authorization Level of user</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Integer amount of recovery links created</returns>
         public async Task<int> GetRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             try

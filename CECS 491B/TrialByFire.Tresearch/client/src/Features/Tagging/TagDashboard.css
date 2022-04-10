@@ -2,80 +2,53 @@
     position: relative;
 }
 
-.tag-dashboard-table-container{
-    margin-right: auto;
-    margin-left: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 50%;
-}
-
-.tag-dashboard-table {
+.tag-dashboard-table-container {
     border: 1px  solid #f3f3f3;
     border-collapse: collapse;
-    font-size: 1em;
-    margin: 25px;
-    min-width: 400px;
-    width: 100%;
-}
-
-.row-tag-table{
-    line-height: 20px;
-    display: inline-block;
-}
-
-.tag-dashboard-table span{
-    
-    color: gray;
-    float: left;
-}
-
-.tag-dashboard-table table{
-    overflow: auto;
-    height: 100px;
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+    width: 500px;
 }
 
 
-.tag-dashboard-table thead{
-    background-color: #788770;
-    color: #ffffff;
+.tag-dashboard-table th{
+    table-layout: fixed;
+    font-size: 30px;
+    background: #f3f3f3;
+}
+
+.tag-dashboard-table tbody {
     display: block;
-    
-}
-
-.tag-dashboard-table tbody{
-    display: block;
-    max-height: 500px;
+    max-height: 650px;
     overflow-y: auto;
     overflow-x: hidden;
-}
-
-.tag-dashboard-table th {
-    font-size: 20px;
-    padding: 10px 10px;
     width: 100%;
+    margin-right: 20px;
 }
-.tag-dashboard-table tr {
-    display: flex;
-    cursor: pointer;
-    width: 100%;
 
-}
-.tag-dashboard-table td{
-
-    text-align: left;
-    padding: 5px 5px;
-    float: right;
+::-webkit-scrollbar {
+    width: 0;    
 }
 
 .tag-dashboard-table tbody tr:nth-of-type(even){
     background-color: #f3f3f3;
 }
 
+.table-item-name {
+    float: left;
+}
+
+.tag-dashboard-table td {
+    font-size: 20px;
+    text-align: right;
+    
+}
+
+
 .tag-dashboard-create-form {
     display: inline-block;
-   
+    margin-top: 25px;
 }
 
 .tag-dashboard-create-input-container {
@@ -98,4 +71,20 @@
     display: block;
     float: right;
 
+}
+
+.delete-icon-tag-table {
+    cursor: pointer;
+}
+
+.tag-dashboard-back-container{
+    text-align: left;
+    margin-top: 15px;
+    margin-left: 15px;
+}
+
+.tag-dashboard-back-container a {
+    text-decoration: none;
+    font-size: 1em;
+    color: #283618;
 }

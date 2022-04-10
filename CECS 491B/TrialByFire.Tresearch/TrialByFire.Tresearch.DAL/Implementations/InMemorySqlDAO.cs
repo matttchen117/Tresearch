@@ -55,7 +55,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             };
             return 0;
         }
-        public async Task<int> VerifyAccountAsync(IAccount account, 
+        public async Task<int> VerifyAccountAsync(IAccount account,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -123,7 +123,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<int> StoreOTPAsync(IAccount account, IOTPClaim otpClaim, 
+        public async Task<string> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "";
+        }
+        public async Task<int> StoreOTPAsync(IAccount account, IOTPClaim otpClaim,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -151,88 +155,115 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
 
-        public string DeleteAccount()
+        public async Task<string> GetAmountOfAdminsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            bool accountExists = false;
+            cancellationToken.ThrowIfCancellationRequested();
+
+            int adminsLeft = InMemoryDatabase.Accounts.Count();
+
+            if(adminsLeft > 1)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.getAdminsSuccess).ConfigureAwait(false);
+            }
+
+            return await _messageBank.GetMessage(IMessageBank.Responses.lastAdminFail).ConfigureAwait(false);
+
+            
+
+        }
+
+        //Can optimize all the for loops
+        public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+
             string accountName = Thread.CurrentPrincipal.Identity.Name;
             string accountRole = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
+            IAccount account = new Account(accountName, accountRole);
             try
             {
-                for (int i = 0; i < InMemoryDatabase.Accounts.Count; i++)
+                if (InMemoryDatabase.Accounts.Contains(account))
                 {
-                    if ((InMemoryDatabase.Accounts[i].Username.Equals(accountName)) && (InMemoryDatabase.Accounts[i].AuthorizationLevel.Equals(accountRole)))
+                    for (int j = 0; j < InMemoryDatabase.OTPClaims.Count; j++)
                     {
-                        accountExists = true;
-                        InMemoryDatabase.Accounts.RemoveAt(i);
-                        break;
+                        if (InMemoryDatabase.OTPClaims[j].Username.Equals(accountName))
+                        {
+                            InMemoryDatabase.OTPClaims.RemoveAt(j);
+                            break;
+                        }
                     }
-                }
-                if (accountExists)
-                {
-                    for (int i = 0; i < InMemoryDatabase.OTPClaims.Count; i++)
+                    for (int j = 0; j < InMemoryDatabase.Nodes.Count; j++)
                     {
-                        if (InMemoryDatabase.OTPClaims[i].Username.Equals(accountName))
+                        if (InMemoryDatabase.Nodes[j].accountOwner.Equals(accountName))
+                        {
+                            if (InMemoryDatabase.NodeTags[j].NodeID.Equals(InMemoryDatabase.Nodes[j].nodeID))
+                            {
+                                InMemoryDatabase.NodeTags.RemoveAt(j);
+                            }
+                            InMemoryDatabase.Nodes.RemoveAt(j);
+                        }
+                    }
+                    for (int j = 0; j < InMemoryDatabase.Ratings.Count; j++)
+                    {
+                        if (InMemoryDatabase.Ratings[j].username.Equals(accountName))
+                        {
+                            InMemoryDatabase.Ratings.RemoveAt(j);
+                        }
+                    }
+                    for (int j = 0; j < InMemoryDatabase.ConfirmationLinks.Count; j++)
+                    {
+                        if (InMemoryDatabase.ConfirmationLinks[j].Username.Equals(accountName))
+                        {
+                            InMemoryDatabase.ConfirmationLinks.RemoveAt(j);
+                            break;
+                        }
+                    }
 
-                        {
-                            InMemoryDatabase.OTPClaims.RemoveAt(i);
-                            break;
-                        }
-                    }
-                    for (int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
-                    {
-                        if (InMemoryDatabase.Nodes[i].accountOwner.Equals(accountName))
-                        {
-                            InMemoryDatabase.Nodes.RemoveAt(i);
-                        }
-                    }
-                    for (int i = 0; i < InMemoryDatabase.Ratings.Count; i++)
-                    {
-                        if (InMemoryDatabase.Ratings[i].username.Equals(accountName))
-                        {
-                            InMemoryDatabase.Ratings.RemoveAt(i);
-                        }
-                    }
-                    for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count; i++)
-                    {
-                        if (InMemoryDatabase.ConfirmationLinks[i].Username.Equals(accountName))
-                        {
-                            InMemoryDatabase.ConfirmationLinks.RemoveAt(i);
-                            break;
-                        }
-                    }
-                    return _messageBank.SuccessMessages["generic"];
+                    InMemoryDatabase.Accounts.Remove(account);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false);
+
                 }
+                
                 else
                 {
-                    return _messageBank.ErrorMessages["accountNotFound"];
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).ConfigureAwait(false);
                 }
+
             }
+
+
             catch (AccountDeletionFailedException adfe)
             {
-                return adfe.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false);
             }
 
         }
 
+        public async Task<string> CreateOTPAsync(string username, string authorizationLevel, int failCount, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
 
 
-
-        public async Task<string> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Tuple<int, string>> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (InMemoryDatabase.Accounts.Contains(account))
-                    return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;
+
+                if(InMemoryDatabase.Accounts.Contains(account))
+                    return Tuple.Create(InMemoryDatabase.Accounts.Count-1, await _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated));
 
                 InMemoryDatabase.Accounts.Add(account);
+
                 if (cancellationToken.IsCancellationRequested)
                 {
                     InMemoryDatabase.Accounts.Remove(account);
                     throw new OperationCanceledException();
                 }
-                
-                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+
+                return Tuple.Create(-1,await _messageBank.GetMessage(IMessageBank.Responses.generic));
             }
             catch (OperationCanceledException)
             {
@@ -241,7 +272,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch(Exception ex)
             {
-                return _messageBank.GetMessage(IMessageBank.Responses.accountCreateFail).Result;
+                return Tuple.Create(-1,_messageBank.GetMessage(IMessageBank.Responses.accountCreateFail).Result);
             }
 
         }
@@ -350,12 +381,17 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                if (!InMemoryDatabase.Accounts.Contains(new Account(confirmationLink.Username, "doesnt matter", confirmationLink.AuthorizationLevel, true, false)))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound);
+                if (InMemoryDatabase.ConfirmationLinks.Contains(confirmationLink))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkExists);
+
                 InMemoryDatabase.ConfirmationLinks.Add(confirmationLink);
                 if (cancellationToken.IsCancellationRequested)
                 {
                     string rollbackResult = await RemoveConfirmationLinkAsync(confirmationLink);
                     if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
-                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                        return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
                     else
                         throw new OperationCanceledException();
                 }
@@ -860,12 +896,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return -1;
         }
 
-        public async Task<string> AddTagToNodesAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> AddTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             return "200";
         }
 
-        public async Task<string> RemoveTagFromNodeAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> RemoveTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             return "200";
         }
@@ -875,19 +911,108 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return Tuple.Create(new List<string>(), "200");
         }
 
-        public async Task<string> CreateTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return "200";
-        }
-
-        public async Task<Tuple<List<string>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             return Tuple.Create(new List<string>(), "200");
         }
 
-        public async Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> CreateTagAsync(string tagName, int count,CancellationToken cancellationToken = default(CancellationToken))
         {
             return "200";
         }
+
+        public async Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Tuple.Create(new List<ITag>(), "200");
+        }
+
+        public async Task<Tuple<List<string>, string>> GetTagsDescAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Tuple.Create(new List<string>(), "200");
+        }
+
+        public async Task<string> DeleteTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
+
+        public async Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
+        public async Task<string> CreateUserHashAsync(int ID, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
+
+        public async Task<string> CreateNodeAsync(INode node, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                bool nodeExists = false;
+                foreach(var n in InMemoryDatabase.Nodes)
+                {
+                    if(node.nodeID == n.nodeID)
+                    {
+                        nodeExists = true;
+                    }
+                }
+                if (nodeExists)
+                {
+                    return _messageBank.GetMessage(IMessageBank.Responses.nodeAlreadyExists).Result;
+                }
+
+                InMemoryDatabase.Nodes.Add(node);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    InMemoryDatabase.Nodes.Remove(node);
+                    throw new OperationCanceledException();
+                }
+
+                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return _messageBank.GetMessage(IMessageBank.Responses.createNodeFail).Result;
+            }
+        }
+
+        public async Task<Tuple<INode, string>> GetNodeAsync(long nID, CancellationToken cancellationToken = default)
+        {
+            INode nullNode = null;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                Node node;
+                foreach(Node n in InMemoryDatabase.Nodes){
+                    if (nID.Equals(n.nodeID))
+                    {
+                        INode temp;
+                        temp = n;
+                        return Tuple.Create(temp, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
+                    }
+                }
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException();
+                }
+                return Tuple.Create(nullNode, _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).Result);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return Tuple.Create(nullNode, "500: Database: " + ex.Message);
+            }
+        }
+
+        
     }
 }
