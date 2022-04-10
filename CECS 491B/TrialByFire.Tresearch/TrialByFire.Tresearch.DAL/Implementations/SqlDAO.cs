@@ -309,6 +309,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+
+
+
         /// <summary>
         ///     RemoveRecoveryLinkAsync()
         ///         Removes recovery link from database.
@@ -904,51 +907,121 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return Tuple.Create(-1, _options.UncaughtExceptionMessage + ex.Message);
             }
         }
-        public string DeleteAccount()
-        {
 
-            int affectedRows;
-            string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
+
+
+        /// <summary>
+        /// Get amount of admins method that runs stored procedure to see if there are enough admins left to delete an admin account
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns>Message indicating if there are enough admins left</returns>
+
+        public async Task<string> GetAmountOfAdminsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            int affectedRows = 0;
             try
             {
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (Thread.CurrentPrincipal.Equals(null))
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
+                }
+
+
+
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    var readQuery = "SELECT * FROM Accounts WHERE Username = @username AND AuthorizationLevel = @role";
-                    var account = connection.ExecuteScalar<int>(readQuery, new { username = Thread.CurrentPrincipal.Identity.Name, role = userAuthLevel });
-                    if (account == 0)
+
+
+
+                    var procedure = "dbo.[GetAmountOfAdmins]";
+                    affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    
+                    Console.WriteLine(affectedRows);
+                    //changed up logic for affectedRows, if there is more than 1 row
+                    //then this should be valid.
+                    
+                    if (affectedRows > 1)
                     {
-                        return _messageBank.ErrorMessages["notFoundOrAuthorized"];
+                        return await _messageBank.GetMessage(IMessageBank.Responses.getAdminsSuccess).ConfigureAwait(false);
                     }
                     else
                     {
-                        var storedProcedure = "CREATE PROCEDURE dbo.deleteAccount @username varchar(25) AS BEGIN" +
-                            "DELETE FROM Accounts WHERE Username = @username;" +
-                            "DELETE FROM OTPClaims WHERE Username = @username;" +
-                            "DELETE FROM Nodes WHERE account_own = @username;" +
-                            "DELETE FROM UserRatings WHERE Username = @username;" +
-                            "DELETE FROM EmailConfirmationLinks WHERE username = @username;" +
-                            "END";
-
-                        affectedRows = connection.Execute(storedProcedure, Thread.CurrentPrincipal.Identity.Name);
+                        return await _messageBank.GetMessage(IMessageBank.Responses.lastAdminFail).ConfigureAwait(false);
                     }
-
-
-                }
-
-                if (affectedRows >= 1)
-                {
-                    return _messageBank.SuccessMessages["generic"];
-                }
-                else
-                {
-                    return _messageBank.ErrorMessages["notFoundOrAuthorized"];
                 }
             }
-            catch (AccountDeletionFailedException adfe)
+
+
+            //be clear in message
+            catch (OperationCanceledException)
             {
-                return adfe.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
 
+            catch (Exception ex)
+            {
+                return ("500: Database " + ex.Message);
+
+            }
+
+        }
+
+
+        /// <summary>
+        /// DAO method to delete account and all user identifying information
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns>message stating if delete was successful</returns>
+
+
+        public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            int affectedRows;
+            if (Thread.CurrentPrincipal.Equals(null))
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
+            }
+            string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
+            string userName = Thread.CurrentPrincipal.Identity.Name;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();                                                      
+
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+                }
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var parameters = new { Username = userName, AuthorizationLevel = userAuthLevel };
+                    var procedure = "dbo.[DeleteAccountStoredProcedure]";
+                    affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+                    }
+                    if(affectedRows == 0)
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false);
+                    }
+                }
+
+            }
+            catch (OperationCanceledException)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return ("500: Database " + ex.Message);
+            }
         }
 
         public async Task<int> VerifyAccountAsync(IAccount account,

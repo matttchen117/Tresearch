@@ -8,6 +8,7 @@ using TrialByFire.Tresearch.Models.Contracts;
 namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class Account : IAccount
+
     {
         public string Username { get; set; }
         public string? Email { get; set; }
@@ -60,6 +61,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
             }
             return false;
         }
+
+
     }
 
 

@@ -24,14 +24,13 @@ namespace TrialByFire.Tresearch.Tests
         public IAuthenticationService AuthenticationService { get; }
         public IAuthorizationService AuthorizationService { get; }
         public IValidationService ValidationService { get; }
-        public IAccountDeletionService AccountDeletionService { get; }
 
         public InMemoryTestDependencies()
         {
             /*_buildSettingsOptions = new BuildSettingsOptions()
             {
                 Environment = "Test",
-                SqlConnectionString = "Server=MATTS-PC;Initial Catalog=TrialByFire.Tresearch.IntegrationTestDB; Integrated Security=true",
+                SqlConnectionString = "Data Source=tresearchstudentserver.database.windows.net;Initial Catalog=tresearchStudentServer;User ID=tresearchadmin;Password=CECS491B!;Connect Timeout=30;Encrypt=True;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False",
                 SendGridAPIKey = ""
             };*/
             //BuildSettingsOptions = Options.Create(_buildSettingsOptions) as IOptionsSnapshot<BuildSettingsOptions>;
@@ -41,7 +40,6 @@ namespace TrialByFire.Tresearch.Tests
             //AuthenticationService = new AuthenticationService(SqlDAO, LogService, MessageBank);
             AuthorizationService = new AuthorizationService(SqlDAO, LogService);
             ValidationService = new ValidationService(MessageBank);
-            AccountDeletionService = new AccountDeletionService(SqlDAO, LogService);
         }
     }
 }

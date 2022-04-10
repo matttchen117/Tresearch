@@ -44,7 +44,12 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         //public List<IKPI> LoadKPI(DateTime now);
 
         // Delete account
-        public string DeleteAccount();
+        public Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken));
+
+
+        // Get admins
+        public Task<string> GetAmountOfAdminsAsync(CancellationToken cancellationToken = default(CancellationToken));
+
 
         // KPI Methods
         public Task<IViewKPI> GetViewKPIAsync(CancellationToken cancellationToken = default);

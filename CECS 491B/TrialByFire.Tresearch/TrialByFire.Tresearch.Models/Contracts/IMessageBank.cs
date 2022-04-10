@@ -101,6 +101,14 @@ namespace TrialByFire.Tresearch.Models.Contracts
             dailyRegistrationNotInserted,
             dailyRegistrationNotExist,
             storeLogFail,
+
+            getAdminsSuccess,
+            accountDeletionSuccess,
+            lastAdminFail,
+            accountAlreadyDeleted,
+            accountDeleteFail,
+            verificationFailure,
+
             nodeTagNodeDoesNotExist,
             tagAlreadyExist,
             tagDoesNotExist,

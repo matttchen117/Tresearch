@@ -167,65 +167,87 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
 
-        public string DeleteAccount()
+        public async Task<string> GetAmountOfAdminsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            bool accountExists = false;
+            cancellationToken.ThrowIfCancellationRequested();
+
+            int adminsLeft = InMemoryDatabase.Accounts.Count();
+
+            if(adminsLeft > 1)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.getAdminsSuccess).ConfigureAwait(false);
+            }
+
+            return await _messageBank.GetMessage(IMessageBank.Responses.lastAdminFail).ConfigureAwait(false);
+
+            
+
+        }
+
+        //Can optimize all the for loops
+        public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+
             string accountName = Thread.CurrentPrincipal.Identity.Name;
             string accountRole = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
+            IAccount account = new Account(accountName, accountRole);
             try
             {
-                for (int i = 0; i < InMemoryDatabase.Accounts.Count; i++)
+                if (InMemoryDatabase.Accounts.Contains(account))
                 {
-                    if ((InMemoryDatabase.Accounts[i].Username.Equals(accountName)) && (InMemoryDatabase.Accounts[i].AuthorizationLevel.Equals(accountRole)))
+                    for (int j = 0; j < InMemoryDatabase.OTPClaims.Count; j++)
                     {
-                        accountExists = true;
-                        InMemoryDatabase.Accounts.RemoveAt(i);
-                        break;
+                        if (InMemoryDatabase.OTPClaims[j].Username.Equals(accountName))
+                        {
+                            InMemoryDatabase.OTPClaims.RemoveAt(j);
+                            break;
+                        }
                     }
-                }
-                if (accountExists)
-                {
-                    for (int i = 0; i < InMemoryDatabase.OTPClaims.Count; i++)
+                    for (int j = 0; j < InMemoryDatabase.Nodes.Count; j++)
                     {
-                        if (InMemoryDatabase.OTPClaims[i].Username.Equals(accountName))
+                        if (InMemoryDatabase.Nodes[j].accountOwner.Equals(accountName))
+                        {
+                            if (InMemoryDatabase.NodeTags[j].NodeID.Equals(InMemoryDatabase.Nodes[j].nodeID))
+                            {
+                                InMemoryDatabase.NodeTags.RemoveAt(j);
+                            }
+                            InMemoryDatabase.Nodes.RemoveAt(j);
+                        }
+                    }
+                    for (int j = 0; j < InMemoryDatabase.Ratings.Count; j++)
+                    {
+                        if (InMemoryDatabase.Ratings[j].username.Equals(accountName))
+                        {
+                            InMemoryDatabase.Ratings.RemoveAt(j);
+                        }
+                    }
+                    for (int j = 0; j < InMemoryDatabase.ConfirmationLinks.Count; j++)
+                    {
+                        if (InMemoryDatabase.ConfirmationLinks[j].Username.Equals(accountName))
+                        {
+                            InMemoryDatabase.ConfirmationLinks.RemoveAt(j);
+                            break;
+                        }
+                    }
 
-                        {
-                            InMemoryDatabase.OTPClaims.RemoveAt(i);
-                            break;
-                        }
-                    }
-                    for (int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
-                    {
-                        if (InMemoryDatabase.Nodes[i].accountOwner.Equals(accountName))
-                        {
-                            InMemoryDatabase.Nodes.RemoveAt(i);
-                        }
-                    }
-                    for (int i = 0; i < InMemoryDatabase.Ratings.Count; i++)
-                    {
-                        if (InMemoryDatabase.Ratings[i].username.Equals(accountName))
-                        {
-                            InMemoryDatabase.Ratings.RemoveAt(i);
-                        }
-                    }
-                    for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count; i++)
-                    {
-                        if (InMemoryDatabase.ConfirmationLinks[i].Username.Equals(accountName))
-                        {
-                            InMemoryDatabase.ConfirmationLinks.RemoveAt(i);
-                            break;
-                        }
-                    }
-                    return _messageBank.SuccessMessages["generic"];
+                    InMemoryDatabase.Accounts.Remove(account);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false);
+
                 }
+                
                 else
                 {
-                    return _messageBank.ErrorMessages["accountNotFound"];
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).ConfigureAwait(false);
                 }
+
             }
+
+
             catch (AccountDeletionFailedException adfe)
             {
-                return adfe.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false);
             }
 
         }

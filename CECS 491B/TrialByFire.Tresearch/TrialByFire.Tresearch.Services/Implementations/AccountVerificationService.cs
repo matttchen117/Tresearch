@@ -21,7 +21,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _messageBank = messageBank;
         }
 
-        public async Task<string> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken = default)
+        public async Task<string> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
