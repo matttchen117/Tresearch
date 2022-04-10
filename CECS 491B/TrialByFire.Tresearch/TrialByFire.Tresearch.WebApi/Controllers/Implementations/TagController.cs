@@ -41,7 +41,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             if (Thread.CurrentPrincipal != null)
             {
-                Tuple<List<ITag>, string> result = await _tagManager.GetTagsAsync("asc", _cancellationTokenSource.Token);
+                Tuple<List<ITag>, string> result = await _tagManager.GetTagsAsync( _cancellationTokenSource.Token);
                 string[] split;
                 split = result.Item2.Split(":");
 
@@ -64,26 +64,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 errorSplit = errorResult.Split(":");
                 _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), "Error", "unknown", "unknown", errorSplit[0], errorSplit[2]);
                 return StatusCode(Convert.ToInt32(errorSplit[0]), errorSplit[2]);
-            }
-        }
-
-        [HttpPost("getPossibleTags")]
-        public async Task<IActionResult> GetPossibleTagsAsync(List<long> nodeIDs)
-        {
-            try
-            {
-                Tuple<List<ITag>, string> result = await _tagManager.GetPossibleTagsAsync(nodeIDs, _cancellationTokenSource.Token);
-                string[] split;
-                split = result.Item2.Split(":");
-                return StatusCode(Convert.ToInt32(split[0]), result.Item1);
-            }
-            catch (OperationCanceledException)
-            {
-                return StatusCode(408, "Request time out");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
             }
         }
 
@@ -147,7 +127,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
-                Tuple<List<string>, string> result = await _tagManager.GetNodeTagsAsync(nodeIDs, "asc",_cancellationTokenSource.Token);
+                Tuple<List<string>, string> result = await _tagManager.GetNodeTagsAsync(nodeIDs,_cancellationTokenSource.Token);
                 string[] split;
                 split = result.Item2.Split(":");
                 return StatusCode(Convert.ToInt32(split[0]), result.Item1);

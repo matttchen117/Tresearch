@@ -18,7 +18,11 @@ function AuthenticatedNavBar() {
         position: {x, y},
         id: "contextmenu"
       });
-    }    
+    }
+    
+    const handleSettingsClick = (e) => {
+        window.location = '/Setings';
+    }
 
     const renderMenu = (
         <div className = "nav-profile">
@@ -28,7 +32,7 @@ function AuthenticatedNavBar() {
               </div>
             </ContextMenuTrigger>
             <ContextMenu id = "contextmenu" className = "nav-context-menu">
-              <MenuItem >Settings</MenuItem>
+              <MenuItem onClick={handleSettingsClick}>Settings</MenuItem>
               <MenuItem >Logout</MenuItem>
             </ContextMenu>
         </div>

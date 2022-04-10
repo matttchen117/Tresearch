@@ -9,49 +9,16 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 {
-    public class SqlDAOShould : TestBaseClass, IDisposable
+    /// <summary>
+    ///     SqlDAOShould tests the Data Access Object Layer of the Tag Feature.  
+    /// </summary>
+    public class SqlDAOShould : TestBaseClass, IClassFixture<TagSqlDatabaseFixture>
     {
-        public SqlDAOShould() : base(new string[] { })
+        TagSqlDatabaseFixture fixture;                                                                   
+        public SqlDAOShould(TagSqlDatabaseFixture fixture) : base(new string[] { })
         {
+            this.fixture = fixture;
             TestProvider = TestServices.BuildServiceProvider();
-
-            IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
-            BuildSettingsOptions optionsValue = options.Value;
-
-            string script = File.ReadAllText("../../../IntegrationTests/Tag/DAOIntegrationSetup.sql");
-            
-            IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
-
-            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
-            {
-                connection.Open();
-                foreach (string command in commands)
-                    if (!string.IsNullOrWhiteSpace(command.Trim()))
-                        using (var com = new SqlCommand(command, connection))
-                            com.ExecuteNonQuery();
-            }
-        }
-
-        public void Dispose()
-        {
-            IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
-            BuildSettingsOptions optionsValue = options.Value;
-
-            string script = File.ReadAllText("../../../IntegrationTests/Tag/DAOIntegrationCleanup.sql");
-
-            IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
-
-            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
-            {
-                connection.Open();
-                foreach (string command in commands)
-                    if (!string.IsNullOrWhiteSpace(command.Trim()))
-                        using (var com = new SqlCommand(command, connection))
-                        {
-                            com.ExecuteNonQuery();
-                        }
-
-            }
         }
 
         [Theory]
@@ -262,6 +229,48 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
                 new object[] { nodeListCase3, expectedCase3, expectedTags3 },
                 new object[] { nodeListCase4, expectedCase4, expectedTags4 }
             };
+        }
+    }
+
+    public class TagSqlDatabaseFixture : TestBaseClass, IDisposable
+    {
+        public TagSqlDatabaseFixture() : base(new string[] { })
+        {
+            TestProvider = TestServices.BuildServiceProvider();
+            IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
+            BuildSettingsOptions optionsValue = options.Value;
+
+            string script = File.ReadAllText("../../../IntegrationTests/Tag/SetupAndCleanup/DAOIntegrationSetup.sql");
+
+            IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
+            {
+                connection.Open();
+                foreach (string command in commands)
+                    if (!string.IsNullOrWhiteSpace(command.Trim()))
+                        using (var com = new SqlCommand(command, connection))
+                            com.ExecuteNonQuery();
+            }
+        }
+
+        public void Dispose()
+        {
+            IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
+            BuildSettingsOptions optionsValue = options.Value;
+
+            string script = File.ReadAllText("../../../IntegrationTests/Tag/SetupAndCleanup/DAOIntegrationCleanup.sql");
+
+            IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
+            {
+                connection.Open();
+                foreach (string command in commands)
+                    if (!string.IsNullOrWhiteSpace(command.Trim()))
+                        using (var com = new SqlCommand(command, connection))
+                            com.ExecuteNonQuery();
+            }
         }
     }
 }

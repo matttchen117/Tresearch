@@ -11,48 +11,13 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 {
-    public class TagServiceShould : TestBaseClass, IDisposable
+    public class TagServiceShould : TestBaseClass, IClassFixture<TagServiceDatabaseFixture>
     {
         public TagServiceShould() : base(new string[] { })
         {
             TestServices.AddScoped<ITagService, TagService>();
             TestServices.AddScoped<IMessageBank, MessageBank>();
             TestProvider = TestServices.BuildServiceProvider();
-
-            IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
-            BuildSettingsOptions optionsValue = options.Value;
-
-            string script = File.ReadAllText("../../../IntegrationTests/Tag/ServiceIntegrationSetup.sql");
-
-            IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
-
-            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
-            {
-                connection.Open();
-                foreach (string command in commands)
-                    if (!string.IsNullOrWhiteSpace(command.Trim()))
-                        using (var com = new SqlCommand(command, connection))
-                            com.ExecuteNonQuery();
-            }
-        }
-
-        public void Dispose()
-        {
-            IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
-            BuildSettingsOptions optionsValue = options.Value;
-
-            string script = File.ReadAllText("../../../IntegrationTests/Tag/ServiceIntegrationCleanup.sql");
-
-            IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
-
-            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
-            {
-                connection.Open();
-                foreach (string command in commands)
-                    if (!string.IsNullOrWhiteSpace(command.Trim()))
-                        using (var com = new SqlCommand(command, connection))
-                            com.ExecuteNonQuery();
-            }
         }
 
         [Theory]
@@ -293,6 +258,48 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 
             //Assert
             Assert.Equal(expected, result);
+        }
+    }
+
+    public class TagServiceDatabaseFixture : TestBaseClass, IDisposable
+    {
+        public TagServiceDatabaseFixture() : base(new string[] { })
+        {
+            TestProvider = TestServices.BuildServiceProvider();
+            IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
+            BuildSettingsOptions optionsValue = options.Value;
+
+            string script = File.ReadAllText("../../../IntegrationTests/Tag/SetupAndCleanup/ServiceIntegrationSetup.sql");
+
+            IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
+            {
+                connection.Open();
+                foreach (string command in commands)
+                    if (!string.IsNullOrWhiteSpace(command.Trim()))
+                        using (var com = new SqlCommand(command, connection))
+                            com.ExecuteNonQuery();
+            }
+        }
+
+        public void Dispose()
+        {
+            IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
+            BuildSettingsOptions optionsValue = options.Value;
+
+            string script = File.ReadAllText("../../../IntegrationTests/Tag/SetupAndCleanup/ServiceIntegrationCleanup.sql");
+
+            IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
+            {
+                connection.Open();
+                foreach (string command in commands)
+                    if (!string.IsNullOrWhiteSpace(command.Trim()))
+                        using (var com = new SqlCommand(command, connection))
+                            com.ExecuteNonQuery();
+            }
         }
     }
 }

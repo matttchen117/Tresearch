@@ -35,6 +35,8 @@ namespace TrialByFire.Tresearch.Tests
             TestServices.AddScoped<IAuthenticationService, AuthenticationService>();
             TestServices.AddScoped<IAuthorizationService, AuthorizationService>();
         }
+
+
     }
 }
 

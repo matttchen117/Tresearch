@@ -2154,7 +2154,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch(OperationCanceledException)
             {
-                throw;
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
             }
             catch(Exception ex)
             {
