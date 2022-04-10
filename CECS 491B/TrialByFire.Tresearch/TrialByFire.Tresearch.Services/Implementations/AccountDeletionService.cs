@@ -33,8 +33,12 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
         }
 
-        //ANOTHER METHOD IN SERVICE, AND MANAGER SHOULD CALL GETADMINS METHOD, MANAGER CALLS SERVICE CALLS DAO, RETURN BACK OPPOSITE WAY
 
+        /// <summary>
+        /// Method to delete account by calling DAO to delete object
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns> Returns a message indicating success or failure </returns>
         public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
 
@@ -45,29 +49,20 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
                 result = await _sqlDAO.DeleteAccountAsync(cancellationToken).ConfigureAwait(false);
 
-                //added await to if statement
-                //instead of an else if here, i can just return result instead, make the manager figure out status codes for me
+                //redundant code here
                 if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false)))
                 {
                     return await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false);
-
                 }
                 else if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).ConfigureAwait(false)))
                 {
                     return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).ConfigureAwait(false);
                 } 
-
                 else
                 {
-                    //doing account was not found here
                     return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false);
-
-                    //return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).ConfigureAwait(false);
                 }
-
-
             }
-
             catch (OperationCanceledException)
             {
                 return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
@@ -76,27 +71,21 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false); ;
             }
-
-
-            
             catch (Exception ex)
             {
                 return _options.UncaughtExceptionMessage + ex.Message;
             }
-            
-
-            
-
         }
 
+        /// <summary>
+        /// method to get if there is more than 1 admin in database as business rule
+        /// so that at least 1 admin account is always attached to application at all times
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns>returns message indicating failure or success based on whether more than 1 admin exists or not.</returns>
         public async Task<string> GetAmountOfAdminsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             return await _sqlDAO.GetAmountOfAdminsAsync(cancellationToken).ConfigureAwait(false);
         }
-
-
-
-
-
     }
 }

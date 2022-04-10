@@ -38,43 +38,30 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         /// <summary>
         /// entry point for Account Deletion Requests
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Message stating if deletion succeeded or error during deletion</returns>
 
         [HttpPost]
         [Route("DeleteAccount")]
         public async Task<IActionResult> DeleteAccountAsync()
         {
-
             try
             {
                 string[] split;
                 string result = "";
-
-
                 result = await _accountDeletionManager.DeleteAccountAsync(CancellationTokenSource.Token).ConfigureAwait(false);
-
                 if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false)))
                 {
-
                     if (_options.Environment.Equals("Test"))
                     {
-
                         split = result.Split(": ");
                         return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                     }
-
                     split = result.Split(": ");
                     return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
-
                 }
-
                 split = result.Split(": ");
                 return StatusCode(Convert.ToInt32(split[0]), split[2]);
-
             }
-
-
-
             catch (OperationCanceledException tce)
             {
                 return StatusCode(400, tce.Message);
@@ -83,16 +70,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             {
                 return StatusCode(400, ex.Message);
             }
-
-
-
-
-
-
-
-
-
-
         }
 
     }

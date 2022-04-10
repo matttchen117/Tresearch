@@ -35,7 +35,7 @@ function Settings() {
                     <h1>Settings</h1>
                 </div> 
                 <div className = "Settings-text">
-                   <Button type= "buton"color="red" name="Delete Account" onClick={handleDelete}/>
+                   <Button type= "button" color="greed" name="Delete Account" onClick={handleDelete}/>
                 </div>
         </div>
 

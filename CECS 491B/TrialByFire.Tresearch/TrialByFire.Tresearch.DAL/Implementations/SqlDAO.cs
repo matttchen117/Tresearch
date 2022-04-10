@@ -773,28 +773,18 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
 
         /// <summary>
-        /// VIET GETAMOUNTOFADMINS STORED PROCEDURE
+        /// Get amount of admins method that runs stored procedure to see if there are enough admins left to delete an admin account
         /// </summary>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        /// 
-        //if i get an error, just throw, status code part of error message, if error, catch here or layer above.
-        //task of type int, custom exceptions for my specific feature,
-        //just make return type a string, return success or failure
-        //specific success message for feature, rn just generic success, for logs, we should know what operation succeeded,
+        /// <returns>Message indicating if there are enough admins left</returns>
+
         public async Task<string> GetAmountOfAdminsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             int affectedRows = 0;
             try
             {
 
-                //service layer catches throw
                 cancellationToken.ThrowIfCancellationRequested();
-
-                //for objects being passed in 
-                //do in manager, manager for business rules
-                //maybe unneccessary, check with prof
-
 
                 if (Thread.CurrentPrincipal.Equals(null))
                 {
@@ -826,8 +816,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 }
             }
 
-            //subset of exception, there are further subsets, can mess around with it,
-            //able to have it even more specific
+
             //be clear in message
             catch (OperationCanceledException)
             {
@@ -836,7 +825,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
             catch (Exception ex)
             {
-                //might need to make specific exception
                 return ("500: Database " + ex.Message);
 
             }
@@ -845,90 +833,57 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
 
         /// <summary>
-        /// VIET DELETEACCOUNTASYNC STORED PROCEDURE
+        /// DAO method to delete account and all user identifying information
         /// </summary>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <returns>message stating if delete was successful</returns>
 
-        //do string, return -1 from query
-        //do logic necessary to make distinction from rowsaffected = 0 from success or failure, 
-        //could first look for it, might have to do it nested, select first and then check, if row back or not, if row back then delete, if not then cancel and 
-        //dont waste resources going into delete
-        //check for what their role is in beforehand, using isInRole method.
+
         public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-
             int affectedRows;
-
-            //same thing as getadmins
             if (Thread.CurrentPrincipal.Equals(null))
             {
                 return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
             }
-
             string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
             string userName = Thread.CurrentPrincipal.Identity.Name;
-
-
             try
             {
-
-                cancellationToken.ThrowIfCancellationRequested();                                                       // Check if cancellation token has requested cancellation
+                cancellationToken.ThrowIfCancellationRequested();                                                      
 
                 if (cancellationToken.IsCancellationRequested)
                 {
                     return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
-
                 }
-
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
-
                 {
-
                     var parameters = new { Username = userName, AuthorizationLevel = userAuthLevel };
-
                     var procedure = "dbo.[DeleteAccountStoredProcedure]";
-
                     affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-
                     if (cancellationToken.IsCancellationRequested)
                     {
                         return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
                     }
-
-                    //affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-
-                    //RIGHT HERE CHECK IF CANCELLED, IF IT IS DO ROLLBACK
-
-                    //created if and else for affectedRows
-
-                    //error checking
                     if(affectedRows == 0)
                     {
                         return await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false);
                     }
-
                     else
                     {
                         return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false);
                     }
-
                 }
-                //return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false);
-
 
             }
             catch (OperationCanceledException)
             {
                 return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
-           
             catch (Exception ex)
             {
-                //might need to make specific exception
                 return ("500: Database " + ex.Message);
             }
-
         }
 
         public async Task<int> VerifyAccountAsync(IAccount account,

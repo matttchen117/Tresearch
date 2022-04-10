@@ -35,18 +35,20 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _accountVerificationService = accountVerificationService;
         }
 
-
+        /// <summary>
+        /// Manager layer for account deletion, contains business rules for deletion. Verifies by creating account based on current thread using username and role
+        /// and verifies using accountVerificationService
+        /// 
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns>Message indicating if there are enough admins left, or message</returns>
+       
         public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
 
             try
             {
-
-
                 cancellationToken.ThrowIfCancellationRequested();
-
-
-
                 string userName = Thread.CurrentPrincipal.Identity.Name;
                 string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
                 string admins = "";
@@ -67,8 +69,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                         {
                             return await _accountDeletionService.DeleteAccountAsync(cancellationToken).ConfigureAwait(false);
                         }
-
-
                         return await _messageBank.GetMessage(IMessageBank.Responses.getAdminsSuccess).ConfigureAwait(false);
 
                     }
@@ -79,24 +79,13 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 }
                 else
                 {
-                    //not sure if this is the right message to be sending back
-                    //return await _messageBank.GetMessage(IMessageBank.Responses.notConfirmed);
                     return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound);
                 }
-
-
-
-
             }
-
             catch (OperationCanceledException)
             {
                 return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
-
-
-
-            //might be returning wrong thing here
             catch (Exception ex)
             {
                 return _options.UncaughtExceptionMessage + ex.Message;
