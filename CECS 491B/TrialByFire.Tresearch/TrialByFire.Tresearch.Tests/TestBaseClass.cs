@@ -39,5 +39,3 @@ namespace TrialByFire.Tresearch.Tests
 
     }
 }
-
-

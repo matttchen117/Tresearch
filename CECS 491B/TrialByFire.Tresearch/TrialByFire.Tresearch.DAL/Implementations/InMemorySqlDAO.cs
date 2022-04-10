@@ -68,7 +68,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             };
             return 0;
         }
-        public async Task<int> VerifyAccountAsync(IAccount account, 
+        public async Task<int> VerifyAccountAsync(IAccount account,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -139,7 +139,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             return "";
         }
-        public async Task<int> StoreOTPAsync(IAccount account, IOTPClaim otpClaim, 
+        public async Task<int> StoreOTPAsync(IAccount account, IOTPClaim otpClaim,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -252,7 +252,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     InMemoryDatabase.Accounts.Remove(account);
                     throw new OperationCanceledException();
                 }
-                
+
                 return Tuple.Create(-1,await _messageBank.GetMessage(IMessageBank.Responses.generic));
             }
             catch (OperationCanceledException)
@@ -375,7 +375,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound);
                 if (InMemoryDatabase.ConfirmationLinks.Contains(confirmationLink))
                     return await _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkExists);
-                
+
                 InMemoryDatabase.ConfirmationLinks.Add(confirmationLink);
                 if (cancellationToken.IsCancellationRequested)
                 {
@@ -930,9 +930,72 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return "200";
         }
 
-        public async Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> CreateNodeAsync(INode node, CancellationToken cancellationToken = default)
         {
-            return Tuple.Create(new List<string>(), "200");
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                bool nodeExists = false;
+                foreach(var n in InMemoryDatabase.Nodes)
+                {
+                    if(node.nodeID == n.nodeID)
+                    {
+                        nodeExists = true;
+                    }
+                }
+                if (nodeExists)
+                {
+                    return _messageBank.GetMessage(IMessageBank.Responses.nodeAlreadyExists).Result;
+                }
+
+                InMemoryDatabase.Nodes.Add(node);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    InMemoryDatabase.Nodes.Remove(node);
+                    throw new OperationCanceledException();
+                }
+
+                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return _messageBank.GetMessage(IMessageBank.Responses.createNodeFail).Result;
+            }
+        }
+
+        public async Task<Tuple<INode, string>> GetNodeAsync(long nID, CancellationToken cancellationToken = default)
+        {
+            INode nullNode = null;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                Node node;
+                foreach(Node n in InMemoryDatabase.Nodes){
+                    if (nID.Equals(n.nodeID))
+                    {
+                        INode temp;
+                        temp = n;
+                        return Tuple.Create(temp, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
+                    }
+                }
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException();
+                }
+                return Tuple.Create(nullNode, _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).Result);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return Tuple.Create(nullNode, "500: Database: " + ex.Message);
+            }
         }
     }
 }

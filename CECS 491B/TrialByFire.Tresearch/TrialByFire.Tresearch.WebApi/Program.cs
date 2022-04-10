@@ -40,6 +40,7 @@ builder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
 builder.Services.AddScoped<ILogoutManager, LogoutManager>();
 builder.Services.AddScoped<ILogManager, LogManager>();
 builder.Services.AddScoped<ITagManager, TagManager>();
+builder.Services.AddScoped<IUADManager, UADManager>();  
 // Unnecessary, only here temporarily for successful build
 
 builder.Services.AddControllers();

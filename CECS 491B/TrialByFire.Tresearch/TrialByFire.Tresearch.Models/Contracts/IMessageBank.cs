@@ -67,6 +67,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             recoveryLinkLimitReached,
             notFoundOrEnabled,
             notFoundOrAuthorized,
+            nodeNotFound,
             recoveryLinkNotFound,
             cancellationRequested,
             confirmationLinkCreateFail,
@@ -86,22 +87,26 @@ namespace TrialByFire.Tresearch.Models.Contracts
             otpFail,
             databaseFail,
             rollbackFailed,
+            createNodeFail,
+            nodeAlreadyExists,
             createdNodesExists,
             createdNodeNotExist,
             createdNodeNotInserted,
             dailyLoginsExists,
             dailyLoginNotInserted,
             dailyLoginNotExist,
-            
+
             topSearchExists,
             topSearchNotInserted,
             topSearchNotExist,
             dailyRegistrationExists,
             dailyRegistrationNotInserted,
             dailyRegistrationNotExist,
-            storeLogFail
-            
-            
+            storeLogFail,
+            nodeTagNodeDoesNotExist,
+            tagAlreadyExist,
+            tagDoesNotExist,
+            createNodeSuccess,
         }
         public Task<string> GetMessage(Responses response);
     }

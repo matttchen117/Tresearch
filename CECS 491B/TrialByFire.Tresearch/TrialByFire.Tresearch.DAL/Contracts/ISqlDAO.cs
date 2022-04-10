@@ -103,7 +103,8 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
 
 
-
+        public Task<string> CreateNodeAsync(INode node, CancellationToken cancellationToken = default);
+        public Task<Tuple<INode, string>> GetNodeAsync(long nID, CancellationToken cancellationToken = default);
         public string CreateNodesCreated(INodesCreated nodesCreated);
 
         public Task<List<NodesCreated>> GetNodesCreatedAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
