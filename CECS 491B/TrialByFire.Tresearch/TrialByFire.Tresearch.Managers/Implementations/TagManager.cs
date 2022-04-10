@@ -31,7 +31,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
         /// <summary>
         ///     AddTagToNodesAsync(nodeIDs, tagName)
-        ///         Adds a tag to a list of nodes. Account is checked if valid and is authorized to make changes to nodes.
+        ///         Adds a tag to a list of nodes. UserAccount is checked if valid and is authorized to make changes to nodes.
         /// </summary>
         /// <param name="nodeIDs">List of nodes' ids to add tag</param>
         /// <param name="tagName">String tag to add to nodes</param>
@@ -54,8 +54,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     else
                         return await _messageBank.GetMessage(IMessageBank.Responses.unknownRole);
 
-                    //Account with user's username and role
-                    IAccount account = new Account(Thread.CurrentPrincipal.Identity.Name, role);
+                    //UserAccount with user's username and role
+                    IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
 
                     //Verify if account is enabled and confirmed
                     string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken);
@@ -84,13 +84,13 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             }
             catch(Exception ex)
             {
-                return _options.UncaughtExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
 
         /// <summary>
         ///     RemoveTagFromNodes(nodeIDs, tagName)
-        ///         Removes a tag from a list of nodes. Account is checked if valid and is authorized to make changes to nodes.
+        ///         Removes a tag from a list of nodes. UserAccount is checked if valid and is authorized to make changes to nodes.
         /// </summary>
         /// <param name="nodeIDs">List of node ids to add tag </param>
         /// <param name="tagName">String tag name</param>
@@ -113,8 +113,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     else
                         return await _messageBank.GetMessage(IMessageBank.Responses.unknownRole);
 
-                    //Account with user's username and role
-                    IAccount account = new Account(Thread.CurrentPrincipal.Identity.Name, role);
+                    //UserAccount with user's username and role
+                    IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
 
                     //Verify if account is enabled and confirmed
                     string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken);
@@ -143,7 +143,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             }
             catch (Exception ex)
             {
-                return _options.UncaughtExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
     
@@ -171,8 +171,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     else
                         return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.unknownRole));
 
-                    //Account with user's username and role
-                    IAccount account = new Account(Thread.CurrentPrincipal.Identity.Name, role);
+                    //UserAccount with user's username and role
+                    IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
 
                     //Verify if account is enabled and confirmed
                     string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken);
@@ -203,7 +203,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             }
             catch (Exception ex)
             {
-                return Tuple.Create(new List<string>(), _options.UncaughtExceptionMessage + ex.Message);
+                return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
             }
         }
 
@@ -231,8 +231,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     else
                         return await _messageBank.GetMessage(IMessageBank.Responses.unknownRole);
 
-                    //Account with user's username and role
-                    IAccount account = new Account(Thread.CurrentPrincipal.Identity.Name, role);
+                    //UserAccount with user's username and role
+                    IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
 
                     //Verify if account is enabled and confirmed
                     string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken);
@@ -255,7 +255,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             }
             catch (Exception ex)
             {
-                return _options.UncaughtExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
 
@@ -283,8 +283,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     else
                         return await _messageBank.GetMessage(IMessageBank.Responses.unknownRole);
 
-                    //Account with user's username and role
-                    IAccount account = new Account(Thread.CurrentPrincipal.Identity.Name, role);
+                    //UserAccount with user's username and role
+                    IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
 
                     //Verify if account is enabled and confirmed
                     string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken);
@@ -307,7 +307,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             }
             catch (Exception ex)
             {
-                return _options.UncaughtExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
 
@@ -333,8 +333,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     else
                         return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.unknownRole));
 
-                    //Account with user's username and role
-                    IAccount account = new Account(Thread.CurrentPrincipal.Identity.Name, role);
+                    //UserAccount with user's username and role
+                    IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
 
                     //Verify if account is enabled and confirmed
                     string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken);
@@ -358,7 +358,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             }
             catch(Exception ex)
             {
-                return Tuple.Create(new List<ITag>(), _options.UncaughtExceptionMessage + ex.Message);
+                return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
             }
         }
     }

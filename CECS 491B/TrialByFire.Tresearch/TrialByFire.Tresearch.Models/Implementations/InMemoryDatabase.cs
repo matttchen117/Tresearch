@@ -131,17 +131,17 @@ namespace TrialByFire.Tresearch.Models.Implementations
                         [InlineData("ryst@gmail.com", "admin", "success")]*/
 
             //Accounts for Registration
-            accounts.Remove(new Account("pammypoor+UnitConrReg1@gmail.com", "myPassphrase", "user", true, false));
-            accounts.Add(new Account("pammypoor+UnitConrReg2@gmail.com", "myPassphrase", "user", true, false));
+            accounts.Remove(new UserAccount("pammypoor+UnitConrReg1@gmail.com", "myPassphrase", "user", true, false));
+            accounts.Add(new UserAccount("pammypoor+UnitConrReg2@gmail.com", "myPassphrase", "user", true, false));
 
-            accounts.Add(new Account("pammypoor+UnitManReg2@gmail.com", "myPassphrase", "user", true, false));
+            accounts.Add(new UserAccount("pammypoor+UnitManReg2@gmail.com", "myPassphrase", "user", true, false));
 
-            accounts.Add(new Account("pammypoor+UnitSerReg2@gmail.com", "myPassphrase", "user", true, false));
-            accounts.Add(new Account("pammypoor+UnitSerReg3@gmail.com", "myPassphrase", "user", true, false));
-            accounts.Add(new Account("pammypoor+UnitSerReg4@gmail.com", "myPassphrase", "user", true, true));
+            accounts.Add(new UserAccount("pammypoor+UnitSerReg2@gmail.com", "myPassphrase", "user", true, false));
+            accounts.Add(new UserAccount("pammypoor+UnitSerReg3@gmail.com", "myPassphrase", "user", true, false));
+            accounts.Add(new UserAccount("pammypoor+UnitSerReg4@gmail.com", "myPassphrase", "user", true, true));
 
-            accounts.Add(new Account("altyn@gmail.com", "asdfasdf", "user", true, true));
-            accounts.Add(new Account("ryst@gmail.com", "asdfasdf123", "admin", true, true));
+            accounts.Add(new UserAccount("altyn@gmail.com", "asdfasdf", "user", true, true));
+            accounts.Add(new UserAccount("ryst@gmail.com", "asdfasdf123", "admin", true, true));
 
             return accounts;
         }

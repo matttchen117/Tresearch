@@ -38,10 +38,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             "Please try again.")]
         [InlineData("iarry@gmail.com", "abcdef#$%", "admin", "guest", "guest", "", 2022, 3, 4, 5, 6, 0, "400: Data: Invalid Username or OTP. " +
             "Please try again.")]
-        [InlineData("iarrygmail.com", "ABCdef123", "admin", "guest", "guest", "", 2022, 3, 4, 5, 6, 0, "500: Database: The Account was not found.")]
+        [InlineData("iarrygmail.com", "ABCdef123", "admin", "guest", "guest", "", 2022, 3, 4, 5, 6, 0, "500: Database: The UserAccount was not found.")]
         [InlineData("karry@gmail.com", "ABCdef123", "user", "guest", "guest", "", 2023, 3, 4, 5, 6, 0, "400: Data: The OTP has expired. Please request " +
             "a new one.")]
-        [InlineData("larry@gmail.com", "ABCdef123", "user", "guest", "guest", "", 2022, 3, 4, 5, 6, 0, "401: Database: Account disabled. " +
+        [InlineData("larry@gmail.com", "ABCdef123", "user", "guest", "guest", "", 2022, 3, 4, 5, 6, 0, "401: Database: UserAccount disabled. " +
             "Perform account recovery or contact system admin.")]
         [InlineData("marry@gmail.com", "ABCdef123", "user", "guest", "guest", "", 2022, 3, 4, 5, 6, 0, "401: Database: Please confirm your " +
             "account before attempting to login.")]
@@ -87,10 +87,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             "Please try again.")]
         [InlineData("iarry@gmail.com", "abcdef#$%", "admin", "guest", "guest", "", 2022, 3, 4, 5, 6, 0, "400: Data: Invalid Username or OTP. " +
             "Please try again.")]
-        [InlineData("iarrygmail.com", "ABCdef123", "admin", "guest", "guest", "", 2022, 3, 4, 5, 6, 0, "500: Database: The Account was not found.")]
+        [InlineData("iarrygmail.com", "ABCdef123", "admin", "guest", "guest", "", 2022, 3, 4, 5, 6, 0, "500: Database: The UserAccount was not found.")]
         [InlineData("karry@gmail.com", "ABCdef123", "user", "guest", "guest", "", 2023, 3, 4, 5, 6, 0, "400: Data: The OTP has expired. Please request " +
             "a new one.")]
-        [InlineData("larry@gmail.com", "ABCdef123", "user", "guest", "guest", "", 2022, 3, 4, 5, 6, 0, "401: Database: Account disabled. " +
+        [InlineData("larry@gmail.com", "ABCdef123", "user", "guest", "guest", "", 2022, 3, 4, 5, 6, 0, "401: Database: UserAccount disabled. " +
             "Perform account recovery or contact system admin.")]
         [InlineData("marry@gmail.com", "ABCdef123", "user", "guest", "guest", "", 2022, 3, 4, 5, 6, 0, "401: Database: Please confirm your " +
             "account before attempting to login.")]

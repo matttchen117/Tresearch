@@ -53,7 +53,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                    
                     
 
-                    //Create an account in Account Tables
+                    //Create an account in UserAccount Tables
                     Tuple<int, string> resultCreateAccount = await _registrationService.CreateAccountAsync(email, passphrase, authorizationLevel, cancellationToken);
 
                     //Create a UserID, UserRole and UserHash in UserHashTable
@@ -74,7 +74,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     if (resultCreateOTP != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                         return resultCreateOTP;
 
-                    //Create Account Confirmation Link
+                    //Create UserAccount Confirmation Link
                     Tuple<IConfirmationLink, string> confirmationLinkResult = await _registrationService.CreateConfirmationAsync(email, authorizationLevel, cancellationToken).ConfigureAwait(false);
                     
                     //Check if confirmation link was successfully created

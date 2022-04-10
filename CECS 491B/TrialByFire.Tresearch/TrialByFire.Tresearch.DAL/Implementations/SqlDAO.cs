@@ -60,7 +60,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return _options.UncaughtExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
 
@@ -93,7 +93,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return _options.UncaughtExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
         
@@ -142,7 +142,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         ///     DisableAccountAsync()
         ///         Disables accounts account passed in asynchrnously.
         /// </summary>
-        /// <param name="account">Account to disable</param>
+        /// <param name="account">UserAccount to disable</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>String with statuscode</returns>
         public async Task<string> DisableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
@@ -191,7 +191,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         ///     EnableAccountAsync()
         ///         Enables accounts account passed in asynchrnously.
         /// </summary>
-        /// <param name="account">Account to enable</param>
+        /// <param name="account">UserAccount to enable</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>String with statuscode</returns>
         public async Task<string> EnableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
@@ -270,7 +270,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                     //Check if account was returned
                     if (Accounts.Count() < 1)
-                        return Tuple.Create(nullAccount, _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result);            //Account doesn't exist
+                        return Tuple.Create(nullAccount, _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result);            //UserAccount doesn't exist
 
                     IAccount account = Accounts.FirstOrDefault();
 
@@ -878,7 +878,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     case 2627:
                         return Tuple.Create(-1, await _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated));
                     default: 
-                        return Tuple.Create(-1,  _options.UncaughtExceptionMessage + ex.Message);
+                        return Tuple.Create(-1,  await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
                 }
             }
             catch(OperationCanceledException)
@@ -888,7 +888,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return Tuple.Create(-1, _options.UncaughtExceptionMessage + ex.Message);
+                return Tuple.Create(-1, await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
             }
         }
 
@@ -1768,7 +1768,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     case 547:   
                         return _messageBank.GetMessage(IMessageBank.Responses.tagNotFound).Result;
                     default: 
-                        return _options.UncaughtExceptionMessage + ex.Message;
+                        return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
                 }
             }
             catch (OperationCanceledException)
@@ -1778,7 +1778,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return _options.UncaughtExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
 
@@ -1838,7 +1838,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     case -1:
                         return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
                     default: 
-                        return _options.UncaughtExceptionMessage + ex.Message;
+                        return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
                 }
             }
             catch (OperationCanceledException)
@@ -1848,7 +1848,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return _options.UncaughtExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
 
@@ -1913,7 +1913,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     case -1:
                         return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail));
                     default: 
-                        return Tuple.Create(new List<string>(), _options.UncaughtExceptionMessage + ex.Message);
+                        return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
                 }
             }
             catch (OperationCanceledException)
@@ -1923,7 +1923,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return Tuple.Create(new List<string>(), _options.UncaughtExceptionMessage + ex.Message);
+                return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
             }
         }
 
@@ -2026,7 +2026,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     case 2627: 
                         return await _messageBank.GetMessage(IMessageBank.Responses.tagDuplicate);
                     default: 
-                        return _options.UncaughtExceptionMessage + ex.Message;
+                        return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
                 }
             }
             catch (OperationCanceledException)
@@ -2036,7 +2036,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return _options.UncaughtExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
 
@@ -2087,7 +2087,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     case -1:
                         return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
                     default: 
-                        return _options.UncaughtExceptionMessage + ex.Message;
+                        return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
                 }
             }
             catch (OperationCanceledException)
@@ -2097,7 +2097,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return _options.UncaughtExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
 
@@ -2135,7 +2135,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     case -1:
                         return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail));
                     default: 
-                        return Tuple.Create(new List<ITag>(), _options.UncaughtExceptionMessage + ex.Message);
+                        return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
                 }
             }
             catch (OperationCanceledException)
@@ -2145,7 +2145,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return Tuple.Create(new List<ITag>(), _options.UncaughtExceptionMessage + ex.Message);
+                return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
             }
         }
 
@@ -2180,7 +2180,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return Tuple.Create(tags, _options.UncaughtExceptionMessage + ex.Message);
+                return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
             }
         }
 
@@ -2214,7 +2214,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch(Exception ex)
             {
-                return  _options.UncaughtExceptionMessage + ex.Message;
+                return  await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
 

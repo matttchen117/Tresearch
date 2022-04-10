@@ -41,13 +41,13 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "503: Database: Unable to connect to database.";
 
                 case Responses.verifySuccess:
-                    return "200: Server: Account Verification success.";
+                    return "200: Server: UserAccount Verification success.";
                 case Responses.notEnabled:
-                    return "401: Database: Account disabled. Perform account recovery or contact system admin.";
+                    return "401: Database: UserAccount disabled. Perform account recovery or contact system admin.";
                 case Responses.notConfirmed:
                     return "401: Database: Please confirm your account before attempting to login.";
                 case Responses.accountNotFound:
-                    return "500: Database: The Account was not found.";
+                    return "500: Database: The UserAccount was not found.";
 
                 case Responses.authenticationSuccess:
                     return "200: Server: Authentication success.";
@@ -58,7 +58,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.otpExpired:
                     return "400: Data: The OTP has expired. Please request a new one.";
                 case Responses.duplicateAccountData:
-                    return "500: Database: Duplicate Account found.";
+                    return "500: Database: Duplicate UserAccount found.";
                 case Responses.authenticationRollback:
                     return "400: Database: Authentication rollback occurred.";
 
@@ -134,19 +134,19 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.notAuthorized:
                     return "403: Database: You are not authorized to perform this operation.";
                 case Responses.alreadyEnabled:
-                    return "403: Server: Account is already enabled.";
+                    return "403: Server: UserAccount is already enabled.";
                 case Responses.accountAlreadyConfirmed:
-                    return "403: Server: Account is already confirmed";
+                    return "403: Server: UserAccount is already confirmed";
                 case Responses.accountAlreadyUnconfirmed:
-                    return "403: Server: Account is already unconfirmed";
+                    return "403: Server: UserAccount is already unconfirmed";
                 case Responses.recoveryLinkLimitReached:
-                    return "403: Server: Account has reached limit of five attempts this month";
+                    return "403: Server: UserAccount has reached limit of five attempts this month";
                 case Responses.notFoundOrEnabled:
                     return "404: Database: The account was not found or it has been disabled.";
                 case Responses.confirmationLinkNotFound:
                     return "404: Database: The confirmation link was not found.";
                 case Responses.notFoundOrAuthorized:
-                    return "404: Database: Account not found or not authorized to perform the " +
+                    return "404: Database: UserAccount not found or not authorized to perform the " +
                 "operation.";
                 case Responses.nodeNotFound:
                     return "404: Database: The node was not found.";
@@ -157,7 +157,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.cancellationRequested:
                     return "408: Server: Cancellation token requested cancellation.";
                 case Responses.accountAlreadyCreated:
-                    return "409: Server: Account  already exists";
+                    return "409: Server: UserAccount  already exists";
                 case Responses.recoveryLinkExists:
                     return "409: Database: The recovery link arealdy exists.";
                 case Responses.confirmationLinkExists:
@@ -226,14 +226,14 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
 
                 case Responses.accountDeletionSuccess:
-                    return "200: Server: Account Deletion Successful.";
+                    return "200: Server: UserAccount Deletion Successful.";
                 case Responses.getAdminsSuccess:
                     return "200: Server: Get Admins Success.";
                 case Responses.lastAdminFail:
                     return "503: Database: Cannot delete last admin in system";
                 //this is when user clicks accountDeletion in twice before waiting for their first delete request to go thru
                 case Responses.accountAlreadyDeleted:
-                    return "503: Database: Account is already deleted";
+                    return "503: Database: UserAccount is already deleted";
                 case Responses.accountDeleteFail:
                     return "503: Database: Failed to delete account";
                 case Responses.verificationFailure:
@@ -261,13 +261,13 @@ namespace TrialByFire.Tresearch.Models.Implementations
             // 403 Errors - Forbidden (User identity known, not Authorized)
             errorMessages.Add("alreadyAuthenticated", "403: Server: Active session found. Please logout and try again.");
             errorMessages.Add("notAuthorized", "403: Database: You are not authorized to perform this operation.");
-            errorMessages.Add("alreadyEnabled", "403: Server: Account is already enabled.");
-            errorMessages.Add("recoveryLinkLimitReached", "403: Server: Account has reached limit of five attempts this month");
+            errorMessages.Add("alreadyEnabled", "403: Server: UserAccount is already enabled.");
+            errorMessages.Add("recoveryLinkLimitReached", "403: Server: UserAccount has reached limit of five attempts this month");
             // 404 Errors - Not Found (Resource not found, interchangeable with 403 to hide existence
             //              of resource)
             errorMessages.Add("accountNotFound", "404: Database: The account was not found.");
             errorMessages.Add("notFoundOrEnabled", "404: Database: The account was not found or it has been disabled.");
-            errorMessages.Add("notFoundOrAuthorized", "404: Database: Account not found or not authorized to perform the " +
+            errorMessages.Add("notFoundOrAuthorized", "404: Database: UserAccount not found or not authorized to perform the " +
                 "operation.");
             errorMessages.Add("nodeNotFound", "404: Database: The node was not found.");
             errorMessages.Add("recoveryLinkNotFound", "404: Database: The recovery link was not found");

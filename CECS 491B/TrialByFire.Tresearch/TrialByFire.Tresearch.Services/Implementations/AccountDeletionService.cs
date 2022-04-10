@@ -73,7 +73,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch (Exception ex)
             {
-                return _options.UncaughtExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
 

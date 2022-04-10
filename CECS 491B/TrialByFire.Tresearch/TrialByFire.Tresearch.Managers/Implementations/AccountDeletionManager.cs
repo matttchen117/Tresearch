@@ -55,7 +55,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 string confirmed = "";
 
                 //verifying account here
-                IAccount account = new Account(userName, userAuthLevel);
+                IAccount account = new UserAccount(userName, userAuthLevel);
                 confirmed = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken).ConfigureAwait(false);
 
 
@@ -88,7 +88,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             }
             catch (Exception ex)
             {
-                return _options.UncaughtExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
 
             }
 

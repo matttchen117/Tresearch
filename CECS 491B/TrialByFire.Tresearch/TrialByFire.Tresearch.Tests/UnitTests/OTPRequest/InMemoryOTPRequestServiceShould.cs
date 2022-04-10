@@ -36,7 +36,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             "Passphrase. Please try again.")]
         [InlineData("aarry@gmail.com", "abcdEF123", "user", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "500: Database: The Account was not found.")]
+        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "500: Database: The UserAccount was not found.")]
         public async Task RequestTheOTPAsync(string username, string passphrase, string authorizationLevel, string expected)
         {
             // Arrange
@@ -61,7 +61,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
             "Passphrase. Please try again.")]
         [InlineData("aarry@gmail.com", "abcdEF123", "user", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "500: Database: The Account was not found.")]
+        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "500: Database: The UserAccount was not found.")]
         public async Task RequestTheOTPAsyncWithin5Seconds(string username, string passphrase, string authorizationLevel, string expected)
         {
             // Arrange

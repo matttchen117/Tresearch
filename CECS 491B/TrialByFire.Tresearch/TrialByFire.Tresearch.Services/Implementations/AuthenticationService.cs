@@ -55,9 +55,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
             List<string> results = new List<string>();
             try
             {
-                authenticationInput.UserHash = await _sqlDAO.GetUserHashAsync(authenticationInput.Account)
+                authenticationInput.UserHash = await _sqlDAO.GetUserHashAsync(authenticationInput.UserAccount)
                     .ConfigureAwait(false);
-                authenticationInput.Account.Token = await CreateJwtToken(authenticationInput)
+                authenticationInput.UserAccount.Token = await CreateJwtToken(authenticationInput)
                     .ConfigureAwait(false);
                 int result = await _sqlDAO.AuthenticateAsync(authenticationInput, cancellationToken)
                     .ConfigureAwait(false);
@@ -68,7 +68,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                         break;
                     case 1:
                         results.Add(await _messageBank.GetMessage(IMessageBank.Responses.authenticationSuccess).ConfigureAwait(false));
-                        results.Add(authenticationInput.Account.Token);
+                        results.Add(authenticationInput.UserAccount.Token);
                         break;
                     case 2:
                         results.Add(await _messageBank.GetMessage(IMessageBank.Responses.otpExpired)
@@ -137,8 +137,8 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 // break payload into parts
                 Dictionary<string, string> claimValuePairs = new Dictionary<string, string>();
-                claimValuePairs.Add(_options.RoleIdentityIdentifier1, authenticationInput.Account.Username);
-                claimValuePairs.Add(_options.RoleIdentityIdentifier2, authenticationInput.Account.AuthorizationLevel);
+                claimValuePairs.Add(_options.RoleIdentityIdentifier1, authenticationInput.UserAccount.Username);
+                claimValuePairs.Add(_options.RoleIdentityIdentifier2, authenticationInput.UserAccount.AuthorizationLevel);
                 claimValuePairs.Add(_options.RoleIdentityIdentifier3, authenticationInput.UserHash);
                 // create identity to place into JWT
                 IRoleIdentity roleIdentity = new RoleIdentity(true, claimValuePairs[_options.RoleIdentityIdentifier1], 

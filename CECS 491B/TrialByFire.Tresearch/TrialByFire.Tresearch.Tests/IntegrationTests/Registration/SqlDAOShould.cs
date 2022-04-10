@@ -34,13 +34,13 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 
         public static IEnumerable<object[]> AccountInfo()
         {
-            // Account has hash, success
-            IAccount account1 = new Account("sqlDAORegTest1@gmail.com", "1e5645a39fd80695b37f8fd4cf96bef2632e0d0aaf78ca13c42066196a2838535414e82ffa24adf950683d528deed5757675870b7d4708a2f814ea9000237de8", "user", true, false);
+            // UserAccount has hash, success
+            IAccount account1 = new UserAccount("sqlDAORegTest1@gmail.com", "1e5645a39fd80695b37f8fd4cf96bef2632e0d0aaf78ca13c42066196a2838535414e82ffa24adf950683d528deed5757675870b7d4708a2f814ea9000237de8", "user", true, false);
             string expected1 = "200: Server: success";
 
-            //Account has hash, Already has account
-            IAccount account2 = new Account("sqlDAORegTest2@gmail.com", "1e5645a39fd80695b37f8fd4cf96bef2632e0d0aaf78ca13c42066196a2838535414e82ffa24adf950683d528deed5757675870b7d4708a2f814ea9000237de8", "user", true, false);
-            string expected2 = "409: Server: Account  already exists";
+            //UserAccount has hash, Already has account
+            IAccount account2 = new UserAccount("sqlDAORegTest2@gmail.com", "1e5645a39fd80695b37f8fd4cf96bef2632e0d0aaf78ca13c42066196a2838535414e82ffa24adf950683d528deed5757675870b7d4708a2f814ea9000237de8", "user", true, false);
+            string expected2 = "409: Server: UserAccount  already exists";
 
             return new[]
             {

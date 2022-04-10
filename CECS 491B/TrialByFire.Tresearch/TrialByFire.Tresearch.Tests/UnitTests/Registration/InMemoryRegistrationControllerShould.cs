@@ -27,8 +27,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         }
 
         [Theory]
-        [InlineData("pammypoor+UnitConrReg1@gmail.com", "myValidPassphrase", "200: Server:  success")]     //Account doesn't exist
-        [InlineData("pammypoor+UnitConrReg2@gmail.com", "myPassphrase", "409: Server: Account  already exists")]
+        [InlineData("pammypoor+UnitConrReg1@gmail.com", "myValidPassphrase", "200: Server:  success")]     //UserAccount doesn't exist
+        [InlineData("pammypoor+UnitConrReg2@gmail.com", "myPassphrase", "409: Server: UserAccount  already exists")]
         public async Task RegisterTheUser(string email, string passphrase, string statusCode)
         {
             //Arrange

@@ -22,7 +22,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         }
         [Theory]
         [InlineData("trialbyfire.tresearch+IntRegMan1@gmail.com", "myPassword","user", "200: Server: success")]
-        [InlineData("trialbyfire.tresearch+IntRegMan2@gmail.com", "unFortunateName","user", "409: Server: Account  already exists")]
+        [InlineData("trialbyfire.tresearch+IntRegMan2@gmail.com", "unFortunateName","user", "409: Server: UserAccount  already exists")]
         public async Task RegisterTheUser(string email, string passphrase, string authorizationLevel, string statusCode)
         {
             //Arrange

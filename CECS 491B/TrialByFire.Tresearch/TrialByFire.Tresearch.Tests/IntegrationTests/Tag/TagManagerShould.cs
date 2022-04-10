@@ -117,7 +117,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             IRoleIdentity roleIdentity11 = new RoleIdentity(false, "tagManagerIntegrationNotEnabled@tresearch.system", "user");
             var tagNameCase11 = "Tresearch Manager Add Tag3";
             var nodeListCase11 = new List<long> { 8019303365 };
-            var resultCase11 = "401: Database: Account disabled. Perform account recovery or contact system admin.";
+            var resultCase11 = "401: Database: UserAccount disabled. Perform account recovery or contact system admin.";
 
             //User is not confirmed
             IRoleIdentity roleIdentity12 = new RoleIdentity(false, "tagManagerIntegrationNotConfirmed@tresearch.system", "user");
@@ -125,11 +125,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             var nodeListCase12 = new List<long> { 8019303366 };
             var resultCase12 = "401: Database: Please confirm your account before attempting to login.";
 
-            //Account  does not exist
+            //UserAccount  does not exist
             IRoleIdentity roleIdentity13 = new RoleIdentity(false, "tagManagerNoAccount@tresearch.system", "user");
             var tagNameCase13 = "Tresearch Manager Add Tag3";
             var nodeListCase13 = new List<long> {  };
-            var resultCase13 = "500: Database: The Account was not found.";
+            var resultCase13 = "500: Database: The UserAccount was not found.";
 
             return new[]
             {
@@ -240,7 +240,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             IRoleIdentity roleIdentity11 = new RoleIdentity(false, "tagManagerIntegrationNotEnabled@tresearch.system", "user");
             var tagNameCase11 = "Tresearch Manager Delete Tag3";
             var nodeListCase11 = new List<long> { 8019303365 };
-            var resultCase11 = "401: Database: Account disabled. Perform account recovery or contact system admin.";
+            var resultCase11 = "401: Database: UserAccount disabled. Perform account recovery or contact system admin.";
 
             //User is not confirmed
             IRoleIdentity roleIdentity12 = new RoleIdentity(false, "tagManagerIntegrationNotConfirmed@tresearch.system", "user");
@@ -248,11 +248,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             var nodeListCase12 = new List<long> { 8019303366 };
             var resultCase12 = "401: Database: Please confirm your account before attempting to login.";
 
-            //Account  does not exist
+            //UserAccount  does not exist
             IRoleIdentity roleIdentity13 = new RoleIdentity(false, "tagManagerNoAccount@tresearch.system", "user");
             var tagNameCase13 = "Tresearch Manager Delete Tag3";
             var nodeListCase13 = new List<long> { };
-            var resultCase13 = "500: Database: The Account was not found.";
+            var resultCase13 = "500: Database: The UserAccount was not found.";
 
             return new[]
             {
@@ -365,7 +365,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             IRoleIdentity roleIdentity9 = new RoleIdentity(false, "tagManagerIntegrationNotEnabled@tresearch.system", "user");
             var tagListCase9 = new List<string> { };
             var nodeListCase9 = new List<long> { 8019303365 };
-            var resultCase9 = "401: Database: Account disabled. Perform account recovery or contact system admin.";
+            var resultCase9 = "401: Database: UserAccount disabled. Perform account recovery or contact system admin.";
 
             //User is not confirmed
             IRoleIdentity roleIdentity10 = new RoleIdentity(false, "tagManagerIntegrationNotConfirmed@tresearch.system", "user");
@@ -373,11 +373,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             var nodeListCase10 = new List<long> { 8019303366 };
             var resultCase10 = "401: Database: Please confirm your account before attempting to login.";
 
-            //Account  does not exist
+            //UserAccount  does not exist
             IRoleIdentity roleIdentity11 = new RoleIdentity(false, "tagManagerNoAccount@tresearch.system", "user");
             var tagListCase11 = new List<string> { };
             var nodeListCase11 = new List<long> { };
-            var resultCase11 = "500: Database: The Account was not found.";
+            var resultCase11 = "500: Database: The UserAccount was not found.";
 
             return new[]
             {
@@ -437,10 +437,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             string resultCase3 = "401: Server: No active session found. Please login and try again.";
 
             
-            //Account  does not exist
+            //UserAccount  does not exist
             IRoleIdentity roleIdentity4 = new RoleIdentity(false, "tagManagerNoAccount@tresearch.system", "admin");
             string tagName4 = "Tresearch Manager Doesnt Managaer";
-            var resultCase4 = "500: Database: The Account was not found.";
+            var resultCase4 = "500: Database: The UserAccount was not found.";
 
             return new[]
            {
@@ -493,10 +493,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             string resultCase3 = "401: Server: No active session found. Please login and try again.";
 
 
-            //Account  does not exist
+            //UserAccount  does not exist
             IRoleIdentity roleIdentity4 = new RoleIdentity(false, "tagManagerNoAccount@tresearch.system", "admin");
             string tagName4 = "Tresearch Manager Doesnt Managaer";
-            var resultCase4 = "500: Database: The Account was not found.";
+            var resultCase4 = "500: Database: The UserAccount was not found.";
 
             //User is Authenticated and Authorized as admin, tag exists and other nodes have this tag
             IRoleIdentity roleIdentity5 = new RoleIdentity(false, "tagManagerIntegrationAdmin1@tresearch.system", "admin");
@@ -549,7 +549,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 
             //User is not enabled
             IRoleIdentity roleIdentity3 = new RoleIdentity(false, "tagManagerIntegrationNotEnabled@tresearch.system", "user");
-            string resultCase3 = "401: Database: Account disabled. Perform account recovery or contact system admin.";
+            string resultCase3 = "401: Database: UserAccount disabled. Perform account recovery or contact system admin.";
 
             //User is not confirmed
             IRoleIdentity roleIdentity4 = new RoleIdentity(false, "tagManagerIntegrationNotConfirmed@tresearch.system", "user");
@@ -559,9 +559,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             IRoleIdentity roleIdentity5 = new RoleIdentity(false, "tagManagerIntegrationAdmin1@tresearch.system", "wrong");
             string resultCase5 = "400: Server: Unknown role used.";
 
-            //Account not found
+            //UserAccount not found
             IRoleIdentity roleIdentity6 = new RoleIdentity(false, "tagManagerNoAccount@tresearch.system", "user");
-            var resultCase6 = "500: Database: The Account was not found.";
+            var resultCase6 = "500: Database: The UserAccount was not found.";
 
             return new[]
             {

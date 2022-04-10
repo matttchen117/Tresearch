@@ -21,7 +21,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         [Theory]
         [InlineData("IntegrationRegistrationService1@gmail.com", "myRegisterPassword", "user", "200: Server: success")]
         [InlineData("IntegrationRegistrationService2@gmail.com", "unFortunateName", "user", "200: Server: success")]
-        [InlineData("IntegrationRegistrationService3@gmail.com", "unFortunateName", "user", "409: Server: Account  already exists")]
+        [InlineData("IntegrationRegistrationService3@gmail.com", "unFortunateName", "user", "409: Server: UserAccount  already exists")]
         public async Task CreateTheAccountAsync(string email, string passphrase, string authorizationLevel, string statusCode)
         {
 
@@ -42,7 +42,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         [Theory]
         [InlineData("IntegrationRegistrationService4@gmail.com", "user", "200: Server: success")]
         [InlineData("IntegrationRegistrationService5@gmail.com", "user", "409: Database: The confirmation link already exists.")]
-        [InlineData("IntegrationRegistrationService99@gmail.com", "user", "500: Database: The Account was not found.")]
+        [InlineData("IntegrationRegistrationService99@gmail.com", "user", "500: Database: The UserAccount was not found.")]
         public async Task CreateTheLinkAsync(string email, string authorizationLevel, string statusCode)
         {
             //Arrange
@@ -59,7 +59,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         [Theory]
         [InlineData("IntegrationRegistrationService6@gmail.com", "user", "200: Server: success")]
         [InlineData("IntegrationRegistrationService7@gmail.com", "user", "200: Server: success")]
-        [InlineData("IntegrationRegistrationService99@gmail.com", "user", "500: Database: The Account was not found.")]
+        [InlineData("IntegrationRegistrationService99@gmail.com", "user", "500: Database: The UserAccount was not found.")]
         public async Task ConfirmTheUserAsync(string email, string authenticationLevel, string statusCode)
         {
             //Arrange

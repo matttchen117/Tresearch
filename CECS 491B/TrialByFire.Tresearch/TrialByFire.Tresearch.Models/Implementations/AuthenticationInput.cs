@@ -9,23 +9,23 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class AuthenticationInput : IAuthenticationInput
     {
-        public IAccount? Account { get; set; }
+        public IAccount? UserAccount { get; set; }
         public IOTPClaim? OTPClaim { get; set; }
         public string? UserHash { get; set; }
         public AuthenticationInput(IAccount account)
         {
-            Account = account;
+            UserAccount = account;
         }
 
         public AuthenticationInput(IAccount account, IOTPClaim otpClaim)
         {
-            Account = account;
+            UserAccount = account;
             OTPClaim = otpClaim;
         }
 
         public AuthenticationInput(IAccount account, string userHash)
         {
-            Account = account;
+            UserAccount = account;
             UserHash = userHash;
         }
 
@@ -37,7 +37,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public AuthenticationInput(IAccount account, IOTPClaim otpClaim, string userHash)
         {
-            Account = account;
+            UserAccount = account;
             OTPClaim = otpClaim;
             UserHash = userHash;
         }

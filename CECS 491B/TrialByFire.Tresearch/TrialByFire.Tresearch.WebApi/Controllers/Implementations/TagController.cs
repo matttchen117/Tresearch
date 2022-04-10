@@ -52,9 +52,12 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                     role = _options.Admin;
 
                 if (result.Item2.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
-                    _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), "Server", Thread.CurrentPrincipal.Identity.Name, role, "Info", "Get Tags Succeeded");
+                    _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, "Get Tags Succeeded");
                 else
-                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), "Error", Thread.CurrentPrincipal.Identity.Name, role, split[1], split[2]);
+                {
+                    Enum.TryParse(split[1], out ILogManager.Categories category);
+                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Error, category, split[2]);
+                }
                 return StatusCode(Convert.ToInt32(split[0]), result.Item1);
             }
             else
@@ -62,7 +65,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 string errorResult = await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated);
                 string[] errorSplit;
                 errorSplit = errorResult.Split(":");
-                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), "Error", "unknown", "unknown", errorSplit[0], errorSplit[2]);
+                Enum.TryParse(errorSplit[0], out ILogManager.Categories category);
+                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Error, category, errorSplit[2]);
                 return StatusCode(Convert.ToInt32(errorSplit[0]), errorSplit[2]);
             }
         }

@@ -35,19 +35,19 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.OTPRequest
 
 
         [Theory]
-        [InlineData("drakat7@gmail.com", "abcDEF123", "user", "guest", "guest", "", "503: Server: Email failed to send.")]
-        [InlineData("drakat7@gmail.com", "abcDEF123", "admin", "guest", "guest", "", "503: Server: Email failed to send.")]
+        [InlineData("drakat7@gmail.com", "abcDEF123", "user", "guest", "guest", "", "200: Server: StoreOTP success.")]
+        [InlineData("drakat7@gmail.com", "abcDEF123", "admin", "guest", "guest", "", "200: Server: StoreOTP success.")]
         [InlineData("aarry@gmail.com", "#$%", "user", "guest", "guest", "", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
         [InlineData("aarry@gmail.com", "abcdef#$%", "user", "guest", "guest", "", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
         [InlineData("aarry@gmail.com", "abcdEF123", "user", "guest", "guest", "", "400: Data: Invalid Username or " +
             "Passphrase. Please try again.")]
-        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "guest", "guest", "", "500: Database: The Account was not found.")]
+        [InlineData("aarry@gmail.com", "abcDEF123", "admin", "guest", "guest", "", "500: Database: The UserAccount was not found.")]
         [InlineData("barry@gmail.com", "abcDEF123", "admin", "barry@yahoo.com",
                     "E5D6801551E6079FCAF2B10403FA86F9B9EC40B0D7A70256EDA0A9988ABAB4CC250681D5054D18E224DCF0CADB730BCF6E07546F2B775A0E31D64C3DC41BC159",
                     "admin", "403: Server: Active session found. Please logout and try again.")]
-        [InlineData("darry@gmail.com", "abcDEF123", "user", "guest", "guest", "", "401: Database: Account disabled. " +
+        [InlineData("darry@gmail.com", "abcDEF123", "user", "guest", "guest", "", "401: Database: UserAccount disabled. " +
             "Perform account recovery or contact system admin.")]
         [InlineData("earry@gmail.com", "abcDEF123", "user", "guest", "guest", "", "401: Database: Please confirm your " +
             "account before attempting to login.")]

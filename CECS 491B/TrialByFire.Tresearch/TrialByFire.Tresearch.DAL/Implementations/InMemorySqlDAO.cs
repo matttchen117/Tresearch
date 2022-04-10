@@ -109,7 +109,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 // check that the otp was entered within 2 minutes of being created
                 if ((authenticationInput.OTPClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (authenticationInput.OTPClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
                 {
-                    InMemoryDatabase.Accounts[index].Token = authenticationInput.Account.Token;
+                    InMemoryDatabase.Accounts[index].Token = authenticationInput.UserAccount.Token;
                     return 1;
                 }
                 else
@@ -180,7 +180,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
             string accountName = Thread.CurrentPrincipal.Identity.Name;
             string accountRole = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
-            IAccount account = new Account(accountName, accountRole);
+            IAccount account = new UserAccount(accountName, accountRole);
             try
             {
                 if (InMemoryDatabase.Accounts.Contains(account))
@@ -381,7 +381,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (!InMemoryDatabase.Accounts.Contains(new Account(confirmationLink.Username, "doesnt matter", confirmationLink.AuthorizationLevel, true, false)))
+                if (!InMemoryDatabase.Accounts.Contains(new UserAccount(confirmationLink.Username, "doesnt matter", confirmationLink.AuthorizationLevel, true, false)))
                     return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound);
                 if (InMemoryDatabase.ConfirmationLinks.Contains(confirmationLink))
                     return await _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkExists);

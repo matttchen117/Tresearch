@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Exceptions;
 using TrialByFire.Tresearch.Managers.Contracts;
+using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
@@ -25,11 +27,13 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private IAccountVerificationService _accountVerificationService { get; }
         private IMessageBank _messageBank { get; }
         private IMailService _mailService { get; }
+        private BuildSettingsOptions _options { get; }
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
-            /*TimeSpan.FromSeconds(5)*/);
+            TimeSpan.FromSeconds(5));
 
         public OTPRequestManager(ISqlDAO sqlDAO, ILogService logService, IOTPRequestService otpRequestService, 
-            IAccountVerificationService accountVerificationService, IMessageBank messageBank, IMailService mailService)
+            IAccountVerificationService accountVerificationService, IMessageBank messageBank, 
+            IMailService mailService, IOptionsSnapshot<BuildSettingsOptions> options)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
@@ -37,13 +41,14 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _accountVerificationService = accountVerificationService;
             _messageBank = messageBank;
             _mailService = mailService;
+            _options = options.Value;
         }
 
         //
         // Summary:
         //     Checks that the User is not currently logged in. Calls the Validation Service to
         //     do basic input validation on the Users inputted username and passphrase. Creates
-        //     Account and OTPClaim objects to be passed in to the call to the OTPRequestService.
+        //     UserAccount and OTPClaim objects to be passed in to the call to the OTPRequestService.
         //     Emails to OTP to the User.
         //
         // Parameters:
@@ -52,7 +57,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         //   passphrase:
         //     The passphrase entered by the User requesting the OTP.
         //   authorizationLevel:
-        //     The selected authorization level for the Account that the User is trying to get an
+        //     The selected authorization level for the UserAccount that the User is trying to get an
         //     OTP for.
         //
         // Returns:
@@ -87,8 +92,11 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                             .ConfigureAwait(false)))
                         {
                             // No API Key right now
-                            result = await _mailService.SendOTPAsync(account.Username, otpClaim.OTP,
-                                otpClaim.OTP, otpClaim.OTP, _cancellationTokenSource.Token).ConfigureAwait(false);
+                            if (!_options.Environment.Equals("Test"))
+                            {
+                                result = await _mailService.SendOTPAsync(account.Username, otpClaim.OTP,
+                                    otpClaim.OTP, otpClaim.OTP, _cancellationTokenSource.Token).ConfigureAwait(false);
+                            }
                         }
                     }
                     return result;

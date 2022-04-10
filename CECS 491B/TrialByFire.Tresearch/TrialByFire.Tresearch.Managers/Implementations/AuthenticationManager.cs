@@ -27,7 +27,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private IMessageBank _messageBank { get; }
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
-            /*TimeSpan.FromSeconds(5)*/);
+            TimeSpan.FromSeconds(5));
 
         public AuthenticationManager(ISqlDAO sqlDAO, ILogService logService, 
             IAccountVerificationService accountVerificationService, 
@@ -50,7 +50,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         //   otp:
         //     The otp entered by the User attempting to Authenticate.
         //   authorizationLevel:
-        //     The selected authorization level for the Account that the User is trying to Authenticate for.
+        //     The selected authorization level for the UserAccount that the User is trying to Authenticate for.
         //
         // Returns:
         //     The result of the operation.
@@ -92,7 +92,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
         public async Task<List<string>> RefreshSessionAsync(CancellationToken cancellationToken = default)
         {
-            // Account account = new Account(Thread.CurrentPrincipal.Identity.Name, (Thread.CurrentPrincipal.Identity as IRoleIdentity).AuthorizationLevel);
+            // UserAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, (Thread.CurrentPrincipal.Identity as IRoleIdentity).AuthorizationLevel);
             // Currently leveraging middleware
             // 
             List<string> results = new List<string>();

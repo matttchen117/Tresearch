@@ -8,7 +8,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
 {
     public interface IAuthenticationInput
     {
-        public IAccount? Account { get; set; }
+        public IAccount? UserAccount { get; set; }
         public IOTPClaim? OTPClaim { get; set; }
 
         string? UserHash { get; set; }

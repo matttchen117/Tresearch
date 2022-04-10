@@ -42,9 +42,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         
 
         [Theory]   
-        [InlineData("IntegrationRecoveryService3@gmail.com", "myPassphrase", "409: Database: The recovery link arealdy exists.", "user", false, true)]          //Account already has a link
-        [InlineData("IntegrationRecoveryService4@gmail.com", "myPassphrase", "200: Server: success", "user", false, true)]                                      //Account does not have a link
-        [InlineData("IntegrationRecoveryService99@gmail.com", "myAccountDoesntExist", "404: Database: The account was not found.", "admin", false, false)]      //Account doesn't exist
+        [InlineData("IntegrationRecoveryService3@gmail.com", "myPassphrase", "409: Database: The recovery link arealdy exists.", "user", false, true)]          //UserAccount already has a link
+        [InlineData("IntegrationRecoveryService4@gmail.com", "myPassphrase", "200: Server: success", "user", false, true)]                                      //UserAccount does not have a link
+        [InlineData("IntegrationRecoveryService99@gmail.com", "myAccountDoesntExist", "404: Database: The account was not found.", "admin", false, false)]      //UserAccount doesn't exist
         public async Task CreateALinkAsync(string username, string passphrase, string statusCode, string authorizationLevel, bool accountStatus, bool confirmed)
         {
             //Arrange
@@ -66,8 +66,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         }
 
         [Theory] //UPDATE WITH SQL SCRIPT
-        [InlineData("IntegrationRecoveryService5@gmail.com", "user", "200: Server: success", true)]     //Account has recovery link
-        [InlineData("IntegrationRecoveryService6@gmail.com", "admin", "200: Server: success", false)]    //Account has no recoveryLink
+        [InlineData("IntegrationRecoveryService5@gmail.com", "user", "200: Server: success", true)]     //UserAccount has recovery link
+        [InlineData("IntegrationRecoveryService6@gmail.com", "admin", "200: Server: success", false)]    //UserAccount has no recoveryLink
         public async Task RemoveALinkAsync(string username, string authorizationLevel, string statusCode, bool create)
         {
             //Arrange
@@ -113,7 +113,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         [Theory]
         [InlineData("IntegrationRecoveryService9@gmail.com", "user", "200: Server: success")]                               //Already has 2 links
         [InlineData("IntegrationRecoveryService10@gmail.com", "user", "200: Server: success")]                              // Has no count, procedure will add
-        [InlineData("IntegrationRecoveryService99@Gmail.com", "admin", "404: Database: The account was not found.")]        //Account doesn't exist
+        [InlineData("IntegrationRecoveryService99@Gmail.com", "admin", "404: Database: The account was not found.")]        //UserAccount doesn't exist
         public async Task IncrementTotalLinksAsync(string username, string  authorizationLevel, string statusCode)
         {
             //Arrange
@@ -131,7 +131,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         [Theory]
         [InlineData("IntegrationRecoveryService11@gmail.com", "user", "200: Server: success")]         //Already has 2 links
         [InlineData("IntegrationRecoveryService12@gmail.com", "admin", "200: Server: success")]        // Has no count, procedure will do nothing
-        [InlineData("IntegrationRecoveryService99@Gmail.com", "admin", "200: Server: success")]        //Account doesn't exist, do nothing
+        [InlineData("IntegrationRecoveryService99@Gmail.com", "admin", "200: Server: success")]        //UserAccount doesn't exist, do nothing
         public async Task DecrementTotalLinksAsync(string username, string authorizationLevel, string statusCode)
         {
             //Arrange
@@ -149,7 +149,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         [Theory]
         [InlineData("IntegrationRecoveryService13@gmail.com", "user", 2)]         //Already has 2 links
         [InlineData("IntegrationRecoveryService14@gmail.com", "admin", 0)]        // Has no count, procedure will do nothing
-        [InlineData("IntegrationRecoveryService99@Gmail.com", "admin", 0)]        //Account doesn't exist, do nothing
+        [InlineData("IntegrationRecoveryService99@Gmail.com", "admin", 0)]        //UserAccount doesn't exist, do nothing
         public async Task GetTotalLinksAsync(string username, string authorizationLevel, int count)
         {
             //Arrange
@@ -165,9 +165,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         }
 
         [Theory]
-        [InlineData("IntegrationRecoveryService15@gmail.com", "user", "200: Server: success")]          //Account is disabled
-        [InlineData("IntegrationRecoveryService16@gmail.com", "admin", "200: Server: success")]         //Account is enabled
-        [InlineData("IntegrationRecoveryService99@Gmail.com", "admin", "404: Database: The account was not found.")]                              //Account doesn't exist
+        [InlineData("IntegrationRecoveryService15@gmail.com", "user", "200: Server: success")]          //UserAccount is disabled
+        [InlineData("IntegrationRecoveryService16@gmail.com", "admin", "200: Server: success")]         //UserAccount is enabled
+        [InlineData("IntegrationRecoveryService99@Gmail.com", "admin", "404: Database: The account was not found.")]                              //UserAccount doesn't exist
         public async Task EnableAccountAsync(string email, string authorizationLevel, string statusCode)
         {
             //Arrange
@@ -183,9 +183,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Recovery
         }
 
         [Theory]
-        [InlineData("IntegrationRecoveryService17@gmail.com", "user", "200: Server: success")]          //Account is disabled
-        [InlineData("IntegrationRecoveryService18@gmail.com", "admin", "200: Server: success")]         //Account is enabled
-        [InlineData("IntegrationRecoveryService99@Gmail.com", "admin", "404: Database: The account was not found.")]                              //Account doesn't exist
+        [InlineData("IntegrationRecoveryService17@gmail.com", "user", "200: Server: success")]          //UserAccount is disabled
+        [InlineData("IntegrationRecoveryService18@gmail.com", "admin", "200: Server: success")]         //UserAccount is enabled
+        [InlineData("IntegrationRecoveryService99@Gmail.com", "admin", "404: Database: The account was not found.")]                              //UserAccount doesn't exist
         public async Task DsiableAccountAsync(string email, string authorizationLevel, string statusCode)
         {
             //Arrange

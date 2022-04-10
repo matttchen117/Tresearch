@@ -32,22 +32,15 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
         }
 
         [Theory]
-        [InlineData("trizip@gmail.com", "user",
-                    "278DB29E1AD1C3E5EE52FEEFA738BC20EE32AF5B33EE0C25F5B73EEE3599839771381A750D3F67E14C14978208559509C83D60D4F425ACE728EBB8305875138F",
-                    "success")]
-        [InlineData("switchblade@gmail.com", "admin",
-                    "E4AB115F44C7D8C9D5F2465043AC9F02DC1432697273A08400C2C8FACDD94CCE6FA69663AE44463378B79588F7EE178E1E98C16161E485F74DDC139DAEF1BCED",
-                    "success")]
-        [InlineData("greenKeyCard@gmail.com", "user",
-                    "63855EDCC64EB97A041304FC59FCC649694F640CF11D4F33A2395917E89085F5E027697A00E456839B2B879A69EB3738C8501BE0D43D4D8A0DFF7AE03CD12E23",
-                    "Database: The account was not found.")]
+        [InlineData("trizip@gmail.com", "user", "200: Server: Account Deletion Successful.")]
+        [InlineData("switchblade@gmail.com", "admin", "200: Server: Account Deletion Successful.")]
+        [InlineData("greenKeyCard@gmail.com", "user", "500: Database: The Account was not found.")]
 
-        public void DeleteTheUser(string currentIdentity, string currentRole, string userHash, 
-            string expected)
+        public async Task DeleteTheUserAsync(string currentIdentity, string currentRole, string expected)
         {
 
             // Arrange
-            IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole, userHash);
+            IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             if (!currentIdentity.Equals("guest"))
             {

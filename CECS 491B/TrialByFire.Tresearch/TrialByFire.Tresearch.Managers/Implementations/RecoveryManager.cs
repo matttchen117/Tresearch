@@ -112,7 +112,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 //Check if recovery link is older than 24 hours
                 if (!recoveryLink.Item1.isValid())
                     return _messageBank.GetMessage(IMessageBank.Responses.recoveryLinkExpired).Result;
-                //Enable Account
+                //Enable UserAccount
                 string enableResult = await _recoveryService.EnableAccountAsync(recoveryLink.Item1.Username, recoveryLink.Item1.AuthorizationLevel, cancellationToken);
 
                 if (cancellationToken.IsCancellationRequested)

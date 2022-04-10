@@ -42,7 +42,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         //   passphrase:
         //     The passphrase entered by the User requesting the OTP.
         //   authorizationLevel:
-        //     The selected authorization level for the Account that the User is trying to get an
+        //     The selected authorization level for the UserAccount that the User is trying to get an
         //     OTP for.
         //
         // Returns:

@@ -46,7 +46,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         //   otp:
         //     The otp entered by the User attempting to Authenticate.
         //   authorizationLevel:
-        //     The selected authorization level for the Account that the User is trying Authenticate for.
+        //     The selected authorization level for the UserAccount that the User is trying Authenticate for.
         //
         // Returns:
         //     The result of the operation with any status codes if applicable.

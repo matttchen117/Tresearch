@@ -65,7 +65,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch(Exception ex)
             {
-                return _options.UncaughtExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
 
@@ -101,7 +101,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch (Exception ex)
             {
-                return _options.UncaughtExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
 
@@ -128,7 +128,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch (Exception ex)
             {
-                return Tuple.Create(tags, _options.UncaughtExceptionMessage + ex.Message);
+                return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
             }
         }
 
@@ -153,7 +153,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch (Exception ex)
             {
-                return Tuple.Create(new List<string>(), _options.UncaughtExceptionMessage + ex.Message);
+                return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
             }
         }
 
@@ -173,7 +173,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch (Exception ex)
             {
-                return _options.UncaughtExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
 
@@ -191,7 +191,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch (Exception ex)
             {
-                return Tuple.Create(new List<ITag>(), _options.UncaughtExceptionMessage + ex.Message);
+                return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
             }
         }
 
@@ -212,7 +212,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch (Exception ex)
             {
-                return Tuple.Create(tags, _options.UncaughtExceptionMessage + ex.Message);
+                return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
             }
         }
 
@@ -239,7 +239,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch (Exception ex)
             {
-                return _options.UncaughtExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
     }

@@ -37,7 +37,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         }
 
         /// <summary>
-        /// entry point for Account Deletion Requests
+        /// entry point for UserAccount Deletion Requests
         /// </summary>
         /// <returns>Message stating if deletion succeeded or error during deletion</returns>
 
@@ -63,16 +63,16 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                     {
                         split = result.Split(": ");
                         return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
-                        _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), "Server", Thread.CurrentPrincipal.Identity.Name, role, "Info" , "Account Deletion Success" );
+                        _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server , "UserAccount Deletion Success" );
                     }
                     split = result.Split(": ");
+                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, "UserAccount Deletion Success");
                     return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
-                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), "Server", Thread.CurrentPrincipal.Identity.Name, role, "Info", "Account Deletion Success");
-
                 }
                 split = result.Split(": ");
+                Enum.TryParse(split[0], out ILogManager.Categories category);
+                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Error, category, split[2]);
                 return StatusCode(Convert.ToInt32(split[0]), split[2]);
-                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), "Error", "unknownUser", "unknown", split[0], split[2]);
             }
             catch (OperationCanceledException tce)
             {
