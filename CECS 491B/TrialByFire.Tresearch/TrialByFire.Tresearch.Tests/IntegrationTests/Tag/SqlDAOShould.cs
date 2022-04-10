@@ -72,7 +72,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             //Arrange
             Assert.Equal(expected, result);
         }
-
+        [Theory]
+        [MemberData(nameof(GetNodeTagData))]
         public async Task GetNodeTagsAsync(List<long> nodeIDs, string expected, List<string> expectedTags)
         {
             //Arrange

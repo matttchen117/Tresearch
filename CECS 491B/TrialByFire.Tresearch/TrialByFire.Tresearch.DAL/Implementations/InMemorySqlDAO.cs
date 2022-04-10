@@ -898,17 +898,66 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public async Task<string> AddTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return "200";
+            if (!InMemoryDatabase.Tags.Contains(new Tag(tagName, 0)))
+                return await _messageBank.GetMessage(IMessageBank.Responses.tagDoesNotExist);
+            for(int i = 0; i  < nodeIDs.Count; i++)
+            {
+                INodeTag nodeTag = new NodeTag(nodeIDs[i], tagName);
+                if (!InMemoryDatabase.NodeTags.Contains(nodeTag))
+                    InMemoryDatabase.NodeTags.Add(nodeTag);
+            }
+
+            return await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess);
         }
 
         public async Task<string> RemoveTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return "200";
+            for (int i = 0; i  < nodeIDs.Count; i++)
+            {
+                INodeTag nodeTag = new NodeTag(nodeIDs[i], tagName);
+                if (!InMemoryDatabase.NodeTags.Contains(nodeTag))
+                    InMemoryDatabase.NodeTags.Remove(nodeTag);
+            }
+
+            return await _messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess);
         }
 
         public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return Tuple.Create(new List<string>(), "200");
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                List<string> tags = new List<string>();
+                for (int i = 0; i < nodeIDs.Count; i++)
+                {
+
+                    List<string> results = new List<string>();
+                    for (int j = 0; j < InMemoryDatabase.NodeTags.Count; j++)
+                    {
+                        if (nodeIDs[i].Equals(InMemoryDatabase.NodeTags[j].NodeID))
+                            results.Add(InMemoryDatabase.NodeTags[j].TagName);
+                    }
+                    if (nodeIDs[i] == nodeIDs.First())
+                    {
+                        tags = results;
+                    }
+                    tags = tags.Intersect(results).ToList();
+                }
+
+                if (cancellationToken.IsCancellationRequested)
+                    return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+
+                return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess));
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback handled
+                return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
+            }
         }
 
         public async Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
@@ -918,12 +967,17 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public async Task<string> CreateTagAsync(string tagName, int count,CancellationToken cancellationToken = default(CancellationToken))
         {
-            return "200";
+            ITag tag = new Tag(tagName, count);
+            if (InMemoryDatabase.Tags.Contains(tag))
+                return await _messageBank.GetMessage(IMessageBank.Responses.tagDuplicate);
+            InMemoryDatabase.Tags.Add(tag);
+            return await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess);
         }
 
         public async Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            return Tuple.Create(new List<ITag>(), "200");
+            List<ITag> tags = InMemoryDatabase.Tags.AsList<ITag>();
+            return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess));
         }
 
         public async Task<Tuple<List<string>, string>> GetTagsDescAsync(CancellationToken cancellationToken = default(CancellationToken))
@@ -933,7 +987,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public async Task<string> DeleteTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return "200";
+            ITag tag = new Tag(tagName);
+            for (int i = 0; i < InMemoryDatabase.NodeTags.Count(); i++)
+                if (InMemoryDatabase.NodeTags[i].TagName.Equals(tagName))
+                    InMemoryDatabase.NodeTags.RemoveAt(i);
+            if (InMemoryDatabase.Tags.Contains(tag))
+                InMemoryDatabase.Tags.Remove(tag);
+            return await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess);
         }
 
         public async Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
