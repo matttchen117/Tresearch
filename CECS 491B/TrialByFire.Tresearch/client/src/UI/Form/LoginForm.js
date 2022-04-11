@@ -102,7 +102,7 @@ class LoginForm extends React.Component  {
                         console.log(response.data);
                         console.log(response.headers['authorization']);
                         sessionStorage.setItem('authorization', response.headers['authorization']);
-                        //window.location = '/Portal';
+                        window.location = '/Portal';
                 }).catch(err => {
                         console.log(err.data);
                         //sessionStorage.setItem('authorization', err.headers['authorization']);

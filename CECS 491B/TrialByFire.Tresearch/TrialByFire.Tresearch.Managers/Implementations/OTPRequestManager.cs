@@ -30,7 +30,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private IMailService _mailService { get; }
         private BuildSettingsOptions _options { get; }
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
-            /*TimeSpan.FromSeconds(5)*/);
+            TimeSpan.FromSeconds(5));
 
         public OTPRequestManager(ISqlDAO sqlDAO, ILogManager logManager, IOTPRequestService otpRequestService, 
             IAccountVerificationService accountVerificationService, IMessageBank messageBank, 

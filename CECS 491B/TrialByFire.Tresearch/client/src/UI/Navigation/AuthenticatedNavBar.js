@@ -1,6 +1,7 @@
 import React from "react";
 import logo from './logo.png';
 import { ContextMenu, ContextMenuTrigger, MenuItem, showMenu } from "react-contextmenu";
+import axios, {AxiosResponse, AxiosError} from 'axios';
 
 import './AuthenticatedNavBar.css';
 
@@ -24,6 +25,20 @@ function AuthenticatedNavBar() {
         window.location = '/Settings';
     }
 
+    const handleLogoutClick = (e) => {
+      e.preventDefault();
+      axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
+      axios.post('https://localhost:7010/Logout/logout', {})
+      .then(response => {
+          console.log(response.data);
+          sessionStorage.removeItem('authorization');
+      }).catch(err => {
+            console.log(err.data);
+            sessionStorage.removeItem('authorization');
+      })
+      window.location = '/';
+  }
+
     const renderMenu = (
         <div className = "nav-profile">
             <ContextMenuTrigger id = "contextmenu">
@@ -33,7 +48,7 @@ function AuthenticatedNavBar() {
             </ContextMenuTrigger>
             <ContextMenu id = "contextmenu" className = "nav-context-menu">
               <MenuItem onClick={handleSettingsClick}>Settings</MenuItem>
-              <MenuItem >Logout</MenuItem>
+              <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
             </ContextMenu>
         </div>
     );
