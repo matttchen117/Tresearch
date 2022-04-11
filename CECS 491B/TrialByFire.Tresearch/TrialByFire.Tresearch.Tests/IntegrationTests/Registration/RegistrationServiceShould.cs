@@ -24,17 +24,17 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
         }
 
 
+        
+
         [Theory]
-        [InlineData("IntegrationRegistrationService1@gmail.com", "myRegisterPassword", "user", "200: Server: success")]
-        [InlineData("IntegrationRegistrationService2@gmail.com", "unFortunateName", "user", "200: Server: success")]
-        [InlineData("IntegrationRegistrationService3@gmail.com", "unFortunateName", "user", "409: Server: UserAccount  already exists")]
-        public async Task CreateTheAccountAsync(string email, string passphrase, string authorizationLevel, string statusCode)
+        [MemberData(nameof(AccountData))]
+        public async Task CreateTheAccountAsync(string email, string passphrase, string authorizationLevel, IMessageBank.Responses response)
         {
 
             //Arrange
-            IAccount account = new UserAccount(email, passphrase, "user", true, false);
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
+            string expected = await messageBank.GetMessage(response);  
             IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
-            string expected = statusCode;
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
             //Act
@@ -46,21 +46,23 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 
 
         [Theory]
-        [InlineData("IntegrationRegistrationService4@gmail.com", "user", "200: Server: success")]
-        [InlineData("IntegrationRegistrationService5@gmail.com", "user", "409: Database: The confirmation link already exists.")]
-        [InlineData("IntegrationRegistrationService99@gmail.com", "user", "500: Database: The UserAccount was not found.")]
-        public async Task CreateTheLinkAsync(string email, string authorizationLevel, string statusCode)
+        [MemberData(nameof(ConfirmationLinkData))]
+        public async Task CreateTheLinkAsync(string email, string authorizationLevel, IMessageBank.Responses response)
         {
             //Arrange
             IRegistrationService registrationService = TestProvider.GetService<IRegistrationService>();
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
+            string expected = await messageBank.GetMessage(response);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
             //Act
             Tuple<IConfirmationLink, string> results = await registrationService.CreateConfirmationAsync(email, authorizationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
-            Assert.Equal(statusCode, results.Item2);        // GUID contains 36 characters
+            Assert.Equal(expected, results.Item2);        // GUID contains 36 characters
         }
+
+        
 
         [Theory]
         [MemberData(nameof(ConfirmData))]
@@ -113,29 +115,94 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 
         }
 
+        public static IEnumerable<object[]> AccountData()
+        {
+            // Account doesn't exist
+            var username1 = "regServiceCreateUser1@tresearch.system";
+            var passphrase1 = "test1";
+            var role1 = "user";
+            var expected1 = IMessageBank.Responses.generic;
+
+            // Account already exists
+            var username2 = "regServiceCreateUser2@tresearch.system";
+            var passphrase2 = "test2";
+            var role2 = "user";
+            var expected2 = IMessageBank.Responses.accountAlreadyCreated;
+
+            return new[]
+            {
+                new object[] { username1, passphrase1, role1,  expected1 },
+                new object[] { username2, passphrase2, role2,  expected2 }
+            };
+        }
+
+        public static IEnumerable<object[]> ConfirmationLinkData()
+        {
+            // Account exists, user, link doesnt already exist
+            var username1 = "regServiceUser1@tresearch.system";
+            var role1 = "user";
+            var expected1 = IMessageBank.Responses.generic;
+
+            // Account does not exist, already exists
+            var username2 = "regServiceUser2@tresearch.system";
+            var role2 = "user";
+            var expected2 = IMessageBank.Responses.confirmationLinkExists;
+
+            // Account does not exist
+            var username3 = "regServiceUserDoesNotExist@gmail.com";
+            var role3 = "user";
+            var expected3 = IMessageBank.Responses.accountNotFound;
+
+            //Account exists, user, link already exists
+
+            //Account exists, admin,  link already exists 
+
+            return new[]
+            {
+                new object[] { username1, role1,  expected1 },
+                new object[] { username2, role2,  expected2 },
+                new object[] { username3, role3, expected3 }
+            };
+        }
+
         public static IEnumerable<object[]> ConfirmData()
         {
             /**
              *  Case 0: Account exists. Not confirmed
-             *      
+             *      Account:
+             *          Username: regServiceUserNotConfirmedEnabled@tresearch.system
+             *          AuthorizationLevel: user
+             *          AccountStatus: True
+             *          Confirmed: False
              */
-            var guid0 = "d3592438-07a9-462c-a6c7-db4b9b99cf45";
-            var res0 = IMessageBank.Responses.generic;
+            var user0 = "regServiceUserNotConfirmedEnabled@tresearch.system";
+            var role0 = "user";
+            var res0  = IMessageBank.Responses.generic;
 
             /**
              *  Case 1: Account exists. Already confirmed. 
+             *      Account:
+             *          Username: regServiceUserConfirmedEnabled@tresearch.system
+             *          AuthorizationLevel: user
+             *          AccountStatus: True
+             *          Confirmed: True
              */
-            var guid1 = "d3592438-07a9-462c-a6c7-db4b9b99cf43";
-            var res1 = IMessageBank.Responses.confirmationLinkNotFound;
+            var user1 = "regServiceUserConfirmedEnabled@tresearch.system";
+            var role1 = "user";
+            var res1 = IMessageBank.Responses.generic;
 
             /**
              *  Case 2: Account does not exist.
              */
+            var user2 = "regServiceAccountNotExist@tresearch.system";
+            var role2 = "user";
+            var res2 = IMessageBank.Responses.accountNotFound;
 
             return new[]
             {
-                new object[] { guid0, res0 },
-                new object[] { guid1, res1 }
+                new object[] { user0, role0, res0 },
+                new object[] { user1, role1, res1 },
+                new object[] { user2, role2, res2 }
             };
         }
 
@@ -189,7 +256,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
             IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
             BuildSettingsOptions optionsValue = options.Value;
 
-            string script = File.ReadAllText("../../../IntegrationTests/Registration/SetupAndCleanup/ServiceIntegrationSetup.sql");
+            string script = File.ReadAllText("../../../IntegrationTests/Registration/SetupAndCleanup/ManagerIntegrationSetup.sql");
 
             IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
@@ -208,7 +275,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
             IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
             BuildSettingsOptions optionsValue = options.Value;
 
-            string script = File.ReadAllText("../../../IntegrationTests/Registration/SetupAndCleanup/ServiceIntegrationCleanup.sql");
+            string script = File.ReadAllText("../../../IntegrationTests/Registration/SetupAndCleanup/ManagerIntegrationCleanup.sql");
 
             IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 

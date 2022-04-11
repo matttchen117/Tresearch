@@ -26,3 +26,5 @@ DELETE Accounts WHERE Username = 'regServiceUser3@tresearch.system';
 DELETE Accounts WHERE Username = 'regServiceUserNotConfirmedEnabled@tresearch.system';
 DELETE Accounts WHERE Username = 'regServiceUserConfirmedNotEnabled@tresearch.system';
 DELETE Accounts WHERE Username = 'regServiceUserConfirmedEnabled@tresearch.system';
+DELETE Accounts WHERE Username = 'regServiceCreateUser1@tresearch.system';
+DELETE Accounts WHERE Username = 'regServiceCreateUser2@tresearch.system';

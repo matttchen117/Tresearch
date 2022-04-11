@@ -812,7 +812,7 @@ begin
          VALUES(@Username, @AuthorizationLevel, @FailCount);
 end
 
-/*
+
 -- =============================================
 -- Author:		Pammy Poor
 -- Description:	Creates a user id 
@@ -836,7 +836,7 @@ begin
 		BEGIN
 			INSERT INTO UserHashTable(UserID, UserHash) VALUES(@UserID, @UserHash);
 		END
-end*/
+end
 
 -- =============================================
 -- Author:		Pammy Poor
