@@ -119,7 +119,7 @@ class LoginForm extends React.Component  {
                 }).catch(err => {
                     console.log(err.data)
                     //sessionStorage.setItem('authorization', err.headers['authorization']);
-                    this.setState({verified: true}); // remvoe later once added in api key
+                    //this.setState({verified: true}); // remvoe later once added in api key
                 })
             }
         }

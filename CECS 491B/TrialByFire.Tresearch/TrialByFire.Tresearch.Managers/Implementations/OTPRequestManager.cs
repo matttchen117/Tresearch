@@ -100,7 +100,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                             if (!_options.Environment.Equals("Test"))
                             {
                                 result = await _mailService.SendOTPAsync(account.Username, otp,
-                                    otpClaim.OTP, otpClaim.OTP, _cancellationTokenSource.Token).ConfigureAwait(false);
+                                    otp, otp, _cancellationTokenSource.Token).ConfigureAwait(false);
                                 // FOR TESTING ONLY
                                 _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
                                  category: ILogManager.Categories.Server, otp);
