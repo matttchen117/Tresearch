@@ -2348,7 +2348,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         
                     }
                     //Tag has been added, return success
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.userRateSuccess);
                 }
             }
             catch (SqlException ex)
@@ -2359,6 +2359,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Unable to connect to database
                     case -1:
                         return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
+                    case 547:   //Adding rating violates foreign key constraint (AKA NO ACCOUNT)
+                        return _messageBank.GetMessage(IMessageBank.Responses.userRateFail).Result;
                     default:
                         return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
                 }

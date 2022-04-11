@@ -3,7 +3,7 @@
 namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
 {
     /// <summary>
-    /// Helper class to access get and post requests regarding tagging feature
+    /// Interface to access get and post requests regarding tagging feature
     /// </summary>
     public interface ITagController
     {

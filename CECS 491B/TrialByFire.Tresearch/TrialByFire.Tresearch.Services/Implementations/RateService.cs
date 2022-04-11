@@ -46,6 +46,5 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
-
     }
 }

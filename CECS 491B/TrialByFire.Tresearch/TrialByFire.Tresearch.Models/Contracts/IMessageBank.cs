@@ -55,6 +55,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
 
             //Rating
             userRateSuccess,
+            userRateFail,
 
             jwtValidationSuccess,
             jwtValidationFail,

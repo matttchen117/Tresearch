@@ -108,6 +108,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
                 case Responses.userRateSuccess:
                     return "200: Server: User rating added.";
+                case Responses.userRateFail:
+                    return "502: Server: Unable rate node.";
 
                 case Responses.createNodeSuccess:
                     return "200: Server: Create Node Success";

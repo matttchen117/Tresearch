@@ -31,6 +31,7 @@ DELETE Tags WHERE TagName = 'Tresearch SqlDAO Get Tag3';
 DELETE NodeTags WHERE TagName = 'Tresearch SqlDAO Get Tag4';
 DELETE Tags WHERE TagName = 'Tresearch SqlDAO Get Tag4';
 
+DELETE NodeTags WHere NodeID = 2022030532;
 DELETE NodeTags WHere NodeID = 2022030533;
 DELETE NodeTags WHere NodeID = 2022030534;
 DELETE NodeTags WHere NodeID = 2022030535;

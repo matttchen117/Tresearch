@@ -1184,7 +1184,7 @@ CREATE PROCEDURE [dbo].[RateNode]
 (
 	@UserHash VARCHAR(128),
 	@NodeID BIGINT,
-	@Rating int
+	@Rating INT
 )
 as
 BEGIN
