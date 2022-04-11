@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,10 +63,13 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
             }
             rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
+            byte[] salt = new byte[0];
+            byte[] key = KeyDerivation.Pbkdf2(passphrase, salt, KeyDerivationPrf.HMACSHA512, 10000, 64);
+            string hash = Convert.ToHexString(key);
             IOTPRequestManager otpRequestManager = TestProvider.GetService<IOTPRequestManager>();
 
             // Act
-            string result = await otpRequestManager.RequestOTPAsync(username, passphrase,
+            string result = await otpRequestManager.RequestOTPAsync(username, hash,
                 authorizationLevel).ConfigureAwait(false);
 
             // Assert
@@ -107,12 +111,15 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
             }
             rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
+            byte[] salt = new byte[0];
+            byte[] key = KeyDerivation.Pbkdf2(passphrase, salt, KeyDerivationPrf.HMACSHA512, 10000, 64);
+            string hash = Convert.ToHexString(key);
             IOTPRequestManager otpRequestManager = TestProvider.GetService<IOTPRequestManager>();
             CancellationTokenSource cancellationTokenSource =
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             // Act
-            string result = await otpRequestManager.RequestOTPAsync(username, passphrase, 
+            string result = await otpRequestManager.RequestOTPAsync(username, hash, 
                 authorizationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert
