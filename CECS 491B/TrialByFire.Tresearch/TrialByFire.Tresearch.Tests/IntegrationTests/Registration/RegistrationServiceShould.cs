@@ -256,7 +256,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
             IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
             BuildSettingsOptions optionsValue = options.Value;
 
-            string script = File.ReadAllText("../../../IntegrationTests/Registration/SetupAndCleanup/ManagerIntegrationSetup.sql");
+            string script = File.ReadAllText("../../../IntegrationTests/Registration/SetupAndCleanup/ServiceIntegrationSetup.sql");
 
             IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
@@ -275,7 +275,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
             IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
             BuildSettingsOptions optionsValue = options.Value;
 
-            string script = File.ReadAllText("../../../IntegrationTests/Registration/SetupAndCleanup/ManagerIntegrationCleanup.sql");
+            string script = File.ReadAllText("../../../IntegrationTests/Registration/SetupAndCleanup/ServiceIntegrationCleanup.sql");
 
             IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
