@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/0c18eb88-e2db-4d5b-8ecc-d2e172e0c5b9/resourceGroups/appsvc_windows_centralus/providers/Microsoft.Web/sites/TrialByFireTresearch",
+    "appService.deploySubpath": "."
+}

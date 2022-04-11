@@ -1,48 +1,9 @@
-.navbar-container {
-    margin: 0;
-    overflow: hidden;
+.header-image img{
+    max-width: 100%;
+    max-height: 100vh;
+    margin: auto;
 }
 
-.navbar-container ul {
-    margin: 0;
-    padding: 0;
-    display: flex;
-}
-
-.navbar-container ul li {
-    display: inline-block;
-    list-style-type: none;
-    cursor: pointer;
-    color: #0D6129;
+.home-content-container {
     
 }
-
-.navbar-container ul li:hover {
-    text-decoration: underline;
-}
-
-.sec {
-    font-size: 25px;
-    padding-top: 25px;
-    padding-right: 25px;
-}
-
-.navbar-container li a{
-    display: block;
-    line-height:1em;
-    padding-left: 3em;
-    text-decoration: none;
-}
-nav ul li:first-child {
-    margin-right: auto;
-    
-}
-
-.logo img{
-    height: 60px;
-    width: 250px;
-    padding-left: 0px;
-    padding-top: 10px;
-    
-}
-

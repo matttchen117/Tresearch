@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
@@ -17,10 +20,15 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 {
-	public class InMemoryUADControllerShould : InMemoryTestDependencies
+	public class InMemoryUADControllerShould : TestBaseClass
 	{
-		public InMemoryUADControllerShould() : base()
+		public InMemoryUADControllerShould() : base(new string[] { })
 		{
+			TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+			TestServices.AddScoped<IUADService, UADService>();
+			TestServices.AddScoped<IUADManager, UADManager>();
+			TestServices.AddScoped<IUADController, UADController>();
+			TestProvider = TestServices.BuildServiceProvider();
 		}
 
 		[Theory]
@@ -29,12 +37,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.UAD
 		public async Task LoadKPI(int year, int month, int day, string expected)
 		{
 			// Arrange
-			IMessageBank messageBank = new MessageBank();
-			IAuthenticationService authenticationService = new AuthenticationService(SqlDAO, LogService, messageBank);
-			IAuthorizationService authorizationService = new AuthorizationService(SqlDAO, LogService);
-			IUADService uadService = new UADService(SqlDAO, LogService);
-			IUADManager uadManager = new UADManager(SqlDAO, LogService, uadService, authenticationService, authorizationService, messageBank);
-			IUADController uadController = new UADController(SqlDAO, LogService, uadManager);
+			IUADController uadController = TestProvider.GetService<IUADController>();
 
 			// Act
 			List<IKPI> results = new List<IKPI>();

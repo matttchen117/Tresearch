@@ -8,48 +8,65 @@ using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 {
-    public class RegistrationControllerShould : IntegrationTestDependencies
+    public class RegistrationControllerShould : TestBaseClass
     {
-        public IRegistrationService _registrationService { get; set; }
-
-        public IMailService _mailService { get; set; }
-        public IRegistrationManager _registrationManager { get; set; }
-
-        public IRegistrationController _registrationController { get; set; }
-
-        public RegistrationControllerShould() : base()
+        public RegistrationControllerShould() : base(new string[] { })
         {
-            _mailService = new MailService(MessageBank);
-            _registrationService = new RegistrationService(SqlDAO, LogService);
-            _registrationManager = new RegistrationManager(SqlDAO, LogService, _registrationService, _mailService, ValidationService, MessageBank);
-            _registrationController = new RegistrationController(SqlDAO, LogService, _registrationService, _mailService, MessageBank, ValidationService, _registrationManager);
+            TestServices.AddScoped<IMailService, MailService>();
+            TestServices.AddScoped<IRegistrationService, RegistrationService>();
+            TestServices.AddScoped<IRegistrationManager, RegistrationManager>();
+            TestServices.AddScoped<IRegistrationController, RegistrationController>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
-        [InlineData("fezAshtray@gmail.com", "myRegisterPassword")]
-        [InlineData("cassieKat@hotmail.com", "unFortunateName")]
-        public void RegisterTheUser(string email, string passphrase)
+        [InlineData("trialbyfire.tresearch+IntRegCon1@gmail.com", "myPassword", "200: Server: success")]
+        [InlineData("trialbyfire.tresearch+IntRegCon2@gmail.com", "myPassword", "409: Server: UserAccount  already exists")]
+        public async Task RegisterTheUser(string email, string passphrase, string statusCode)
         {
             // Arrange
-
+            string[] splitExpectation;
+            splitExpectation = statusCode.Split(":");
+            ObjectResult expectedResult = new ObjectResult(splitExpectation[2])
+            { StatusCode = Convert.ToInt32(splitExpectation[0]) };
+            IRegistrationController registrationController = TestProvider.GetService<IRegistrationController>();
 
             //Act
-            IActionResult results = _registrationController.RegisterAccount(email, passphrase);
+            IActionResult results = await registrationController.RegisterAccountAsync(email, passphrase).ConfigureAwait(false); 
             var objectResult = results as ObjectResult;
 
             //Assert
-            Assert.Equal(200, objectResult.StatusCode);
+            Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);
+            Assert.Equal(expectedResult.Value, objectResult.Value);
         }
 
-        public void ConfirmTheUser(string url)
+        [Theory]
+        [InlineData("f92c1817-a3b0-4bce-b96a-5deb38ccf05d", "200: Server: success")]
+        [InlineData("3404629b-af83-4d70-8cd2-bd5cfd65e9ea", "200: Server: success")]
+        [InlineData("7d8929f6-40b9-441d-9b48-1ea24e60fcf1", "404: Database: The confirmation link was not found.")]
+        public async void ConfirmTheUser(string guid, string statusCode)
         {
+            //Arrange
+            string[] splitExpectation;
+            splitExpectation = statusCode.Split(":");
+            ObjectResult expectedResult = new ObjectResult(splitExpectation[2])
+            { StatusCode = Convert.ToInt32(splitExpectation[0]) };
+            IRegistrationController registrationController = TestProvider.GetService<IRegistrationController>();
 
+            //Act
+            IActionResult results = await registrationController.ConfirmAccountAsync(guid).ConfigureAwait(false);
+            var objectResult = results as ObjectResult;
+
+            //Assert
+            Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);
+            Assert.Equal(expectedResult.Value, objectResult.Value);
         }
 
     }

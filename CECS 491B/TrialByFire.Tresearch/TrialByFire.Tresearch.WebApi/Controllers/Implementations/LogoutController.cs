@@ -17,24 +17,20 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
     public class LogoutController : Controller, ILogoutController
     {
         private ISqlDAO _sqlDAO { get; }
-        private ILogService _logService { get; }
+        private ILogManager _logManager { get; }
         private IMessageBank _messageBank { get; }
 
         private ILogoutManager _logoutManager { get; }
 
-        private BuildSettingsOptions _buildSettingsOptions { get; }
-
-        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
-            TimeSpan.FromSeconds(5));
-
-        public LogoutController(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, 
-            ILogoutManager logoutManager, IOptions<BuildSettingsOptions> buildSettingsOptions)
+        private BuildSettingsOptions _options { get; }
+        public LogoutController(ISqlDAO sqlDAO, ILogManager logManager, IMessageBank messageBank, 
+            ILogoutManager logoutManager, IOptionsSnapshot<BuildSettingsOptions> options)
         {
             _sqlDAO = sqlDAO;
-            _logService = logService;
+            _logManager = logManager;
             _messageBank = messageBank;
             _logoutManager = logoutManager;
-            _buildSettingsOptions = buildSettingsOptions.Value;
+            _options = options.Value;
         }
 
         //
@@ -47,38 +43,53 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         [Route("logout")]
         // Do Async if want to log something for DB (last time logged in)
         // Only Async if require operation to be done
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> LogoutAsync()
         {
-            // Check if the cookie is here at this point
-            // Middleware is included in everywhere async, therefore everywhere should be async 
-
-            string[] split;
-            string result = "";
             try
             {
-                result = await _logoutManager.Logout(_cancellationTokenSource.Token).ConfigureAwait(false);
-                if (result.Equals(_messageBank.SuccessMessages["generic"]))
+                string result = await _logoutManager.LogoutAsync().ConfigureAwait(false);
+                string[] split = result.Split(": ");
+                if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.logoutSuccess)
+                    .ConfigureAwait(false)))
                 {
-                    if(_buildSettingsOptions.Environment.Equals("Test"))
+                    if (_options.Environment.Equals("Test"))
                     {
-                        split = result.Split(": ");
                         return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                     }
                     HttpContext.User = null;
-                    Response.Cookies.Delete("TresearchAuthenticationCookie");
-                    split = result.Split(": ");
+                    Response.Headers.Remove(_options.JWTHeaderName);
+                    _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
+                        category: ILogManager.Categories.Server, 
+                        await _messageBank.GetMessage(IMessageBank.Responses.logoutSuccess).ConfigureAwait(false));
                     return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                 }
+                if (Enum.TryParse(split[1], out ILogManager.Categories category))
+                {
+                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                    category, split[2]);
+                }
+                else
+                {
+                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                    category: ILogManager.Categories.Server, split[2] + ": Bad category passed back.");
+                }
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
             catch (OperationCanceledException tce)
             {
+                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                    category: ILogManager.Categories.Server, await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + tce.Message);
                 return StatusCode(400, tce.Message);
             }
-            catch (Exception ex){
-                return StatusCode(400, ex.Message);
+            catch (Exception ex)
+            {
+                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level:
+                    ILogManager.Levels.Error,
+                    category: ILogManager.Categories.Server, await
+                    _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false)
+                    + ex.Message);
+                return StatusCode(600, ex.Message);
             }
-            split = result.Split(": ");
-            return StatusCode(Convert.ToInt32(split[0]), split[2]);
         }
     }
 }

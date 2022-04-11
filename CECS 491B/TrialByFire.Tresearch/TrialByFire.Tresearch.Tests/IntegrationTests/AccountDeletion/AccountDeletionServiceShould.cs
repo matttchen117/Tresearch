@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,34 +17,53 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.UnitTests.AccountDeletion
+namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
 {
-    public class AccountDeletionServiceShould : IntegrationTestDependencies
+    public class AccountDeletionServiceShould : TestBaseClass
     {
-        public AccountDeletionServiceShould() : base()
+
+        public AccountDeletionServiceShould() : base(new string[] { })
         {
+            TestServices.AddScoped<ISqlDAO, SqlDAO>();
+            TestServices.AddScoped<IAccountDeletionService, AccountDeletionService>();
+            TestProvider = TestServices.BuildServiceProvider();
+
         }
 
         [Theory]
-        [InlineData("altyn@gmail.com", "user", "success")]
-        [InlineData("ryst@gmail.com", "admin", "success")]
-        [InlineData("redKeyCard@gmail.com", "admin", "Database: The account was not found.")]
+        [InlineData("altyn@gmail.com", "user", "200: Server: Account Deletion Successful.")]
+        [InlineData("ryst@gmail.com", "admin", "200: Server: Account Deletion Successful.")]
 
+        [InlineData("redKeyCard@gmail.com", "admin", "200: Server: Account Deletion Successful.")]
 
-        public void DeleteTheUser(string currentIdentity, string currentRole, string expected)
+        public async Task DeleteTheUserAsync(string currentIdentity, string currentRole, string expected)
         {
+
+
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
-            IAccountDeletionService accountDeletionService = new AccountDeletionService(SqlDAO, LogService);
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
+            IAccountDeletionService accountDeletionService = TestProvider.GetService<IAccountDeletionService>();
 
             // Act
-            string result = accountDeletionService.DeleteAccount();
+            string result = await accountDeletionService.DeleteAccountAsync(cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, result);
+
         }
+
+        /*
+        public async Task DeleteTheUserAsyncWithin5Seconds(string currentIdentity, string currentRole, string expected)
+        {
+
+        }
+        */
+
+
 
 
 

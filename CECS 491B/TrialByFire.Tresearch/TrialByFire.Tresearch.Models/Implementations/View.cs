@@ -16,7 +16,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public View()
         {
-            date = DateTime.Now;
+            date = DateTime.Now.ToUniversalTime();
             viewName = "";
             visits = -1;
             averageDuration = -1;
