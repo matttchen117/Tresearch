@@ -9,18 +9,36 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class Log : ILog
     {
-        public DateTime timestamp { get; }
-        public string level { get; }
-        public string username { get; }
-        public string category { get; }
-        public string description { get; }
-        public Log(DateTime timestamp, string level, string username, string category, string description)
+        public DateTime Timestamp { get; }
+        public string Level { get; }
+        public string UserHash { get; }
+        public string Category { get; }
+        public string Description { get; }
+        public string Hash { get; }
+        public Log(DateTime timestamp, string level, string userHash, string category, string description, 
+            string hash)
         {
-            this.timestamp = timestamp;
-            this.level = level;
-            this.username = username;
-            this.category = category;
-            this.description = description;
+            Timestamp = timestamp;
+            Level = level;
+            UserHash = userHash;
+            Category = category;
+            Description = description;
+            Hash = hash;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if(!(obj == null))
+            {
+                if(obj is Log)
+                {
+                    ILog log = (ILog)obj;
+                    return Timestamp.Equals(log.Timestamp) && Level.Equals(log.Level) &&
+                        UserHash.Equals(log.UserHash) && Category.Equals(log.Category) && 
+                        Description.Equals(log.Description) && Hash.Equals(log.Hash);
+                }
+            }
+            return false;
         }
     }
 }

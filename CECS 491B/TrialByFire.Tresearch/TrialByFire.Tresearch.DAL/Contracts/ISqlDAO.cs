@@ -10,36 +10,63 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 {
     public interface ISqlDAO
     {
-        public List<string> CreateAccount(IAccount account);
-        public List<string> CreateConfirmationLink(IConfirmationLink _confirmationlink);
-
-        public List<string> ConfirmAccount(IAccount account);
-
-        public List<string> RemoveConfirmationLink(IConfirmationLink confirmationLink);
-        public IConfirmationLink GetConfirmationLink(string url);
-
-        public IAccount GetUnconfirmedAccount(string email);
+        public Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> CreateUserHashAsync(int ID, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default);
+        public Task<int> StoreLogAsync(ILog log, string destination, CancellationToken cancellationToken = default);
+        public Task<string> EnableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> DisableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken= default(CancellationToken));
+        public Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> DecrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> IncrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<int> GetRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> RemoveRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> CreateRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> CreateOTPAsync(string username, string authorizationLevel, int failCount, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<int, string>> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> CreateConfirmationLinkAsync(IConfirmationLink _confirmationlink, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> UpdateAccountToUnconfirmedAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> UpdateAccountToConfirmedAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> RemoveConfirmationLinkAsync(IConfirmationLink confirmationLink, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<IConfirmationLink, string>> GetConfirmationLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, IAccount account, CancellationToken cancellationToken = default(CancellationToken));
 
         // Authentication
-        public string VerifyAccount(IAccount account);
-        public List<string> Authenticate(IOTPClaim otpClaim);
-
-        // Authorization
-        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredAuthLevel);
+        public Task<int> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken = default);
+        public Task<int> AuthenticateAsync(IAuthenticationInput authenticationInput, CancellationToken cancellationToken = default);
 
         // Request OTP
-        public string StoreOTP(IOTPClaim otpClaim);
+        public Task<int> StoreOTPAsync(IAccount account, IOTPClaim otpClaim, CancellationToken cancellationToken = default);
 
         // Usage Analysis Dashboard
-        public List<IKPI> LoadKPI(DateTime now);
+        //public List<IKPI> LoadKPI(DateTime now);
 
         // Delete account
-        public string DeleteAccount(IRolePrincipal rolePrincipal);
+        public Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken));
+
+
+        // Get admins
+        public Task<string> GetAmountOfAdminsAsync(CancellationToken cancellationToken = default(CancellationToken));
+
+
+        // KPI Methods
+        public Task<IViewKPI> GetViewKPIAsync(CancellationToken cancellationToken = default);
+        public Task<IViewDurationKPI> GetViewDurationKPIAsync(CancellationToken cancellationToken = default);
+        public Task<ILoginKPI> GetLoginKPIAsync(DateTime now, CancellationToken cancellationToken = default);
+        public Task<INodeKPI> GetNodeKPIAsync(DateTime now, CancellationToken cancellationToken = default);
+        public Task<IRegistrationKPI> GetRegistrationKPIAsync(DateTime now, CancellationToken cancellationToken = default);
+        public Task<ISearchKPI> GetSearchKPIAsync(DateTime now, CancellationToken cancellationToken = default);
+
+
+        public string CreateView(IView view);
+        public Task<List<View>> GetAllViewsAsync(CancellationToken cancellationToken = default);
+
 
         /*
             Ian's Methods
          */
-        
+
         /*
         public string CreateNode();
 
@@ -80,10 +107,11 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
 
 
-
+        public Task<string> CreateNodeAsync(INode node, CancellationToken cancellationToken = default);
+        public Task<Tuple<INode, string>> GetNodeAsync(long nID, CancellationToken cancellationToken = default);
         public string CreateNodesCreated(INodesCreated nodesCreated);
 
-        public List<NodesCreated> GetNodesCreated(DateTime nodeCreationDate);
+        public Task<List<NodesCreated>> GetNodesCreatedAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
 
         public string UpdateNodesCreated(INodesCreated nodesCreated);
 
@@ -91,22 +119,31 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         public string CreateDailyLogin(IDailyLogin dailyLogin);
 
-        public List<DailyLogin> GetDailyLogin(DateTime nodeCreationDate);
+        public Task<List<DailyLogin>> GetDailyLoginAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
 
         public string UpdateDailyLogin(IDailyLogin dailyLogin);
 
 
         public string CreateTopSearch(ITopSearch topSearch);
 
-        public List<TopSearch> GetTopSearch(DateTime nodeCreationDate);
+        public Task<List<TopSearch>> GetTopSearchAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
 
         public string UpdateTopSearch(ITopSearch topSearch);
 
 
         public string CreateDailyRegistration(IDailyRegistration dailyRegistration);
 
-        public List<DailyRegistration> GetDailyRegistration(DateTime nodeCreationDate);
+        public Task<List<DailyRegistration>> GetDailyRegistrationAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
 
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration);
+
+        public Task<string> AddTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> RemoveTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> CreateTagAsync(string tagName, int count, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> DeleteTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<List<string>, string>> GetTagsDescAsync(CancellationToken cancellationToken = default(CancellationToken));
     }
 }

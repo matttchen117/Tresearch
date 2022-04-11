@@ -25,11 +25,30 @@ namespace TrialByFire.Tresearch.Services.Implementations
 			this._logService = _logService;
 		}
 
-		public List<IKPI> LoadKPI(DateTime now)
+		public async Task<List<IKPI>> LoadKPIAsync(DateTime now, CancellationToken cancellationToken = default)
 		{
+			cancellationToken.ThrowIfCancellationRequested();
 			List<IKPI> kpiList = new List<IKPI>();
-			kpiList = _sqlDAO.LoadKPI(now);
-			return _sqlDAO.LoadKPI(now);
+            try
+            {
+				kpiList.Add(await _sqlDAO.GetViewKPIAsync(cancellationToken).ConfigureAwait(false));
+				kpiList.Add(await _sqlDAO.GetViewDurationKPIAsync(cancellationToken).ConfigureAwait(false));
+				kpiList.Add(await _sqlDAO.GetNodeKPIAsync(now, cancellationToken).ConfigureAwait(false));
+				kpiList.Add(await _sqlDAO.GetSearchKPIAsync(now, cancellationToken).ConfigureAwait(false));
+				kpiList.Add(await _sqlDAO.GetLoginKPIAsync(now, cancellationToken).ConfigureAwait(false));
+				kpiList.Add(await _sqlDAO.GetRegistrationKPIAsync(now, cancellationToken).ConfigureAwait(false));
+				return kpiList;
+            }
+            catch(TaskCanceledException tcex)
+            {
+				kpiList.Add(new KPI(tcex.Message));
+				return kpiList;
+            }
+            catch(Exception ex)
+            {
+				kpiList.Add(new KPI(ex.Message));
+				return kpiList;
+            }
 		}
 	}
 }

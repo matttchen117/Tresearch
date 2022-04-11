@@ -4,21 +4,31 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class ConfirmationLink : IConfirmationLink
     {
-        public string Username { get; set; }
+        public string? Username { get; set; }
+        public string? AuthorizationLevel { get; set; }
+        public Guid? GUIDLink { get; set; }
+        public DateTime? TimeCreated { get; set; }
 
-        public Guid UniqueIdentifier { get; set; }
-
-        public DateTime Datetime { get; set; }
-
-        public ConfirmationLink()
+        public ConfirmationLink() { }
+        public ConfirmationLink(string username, string authorizationLevel, Guid uniqueIdentifier, DateTime timeCreated)
         {
+            Username = username;
+            AuthorizationLevel = authorizationLevel;
+            GUIDLink = uniqueIdentifier;
+            TimeCreated = timeCreated;
+        }
 
-        }
-        public ConfirmationLink(string username, Guid uniqueIdentifier, DateTime timestamp)
+        public override bool Equals(object? obj)
         {
-            this.Username = username;
-            this.UniqueIdentifier = uniqueIdentifier;
-            this.Datetime = timestamp;
-        }
+            if (!(obj == null))
+            {
+                if (obj is IConfirmationLink)
+                {
+                    IConfirmationLink link = (IConfirmationLink)obj;
+                    return (Username.Equals(link.Username)  && AuthorizationLevel.Equals(link.AuthorizationLevel));
+                }
+            }
+            return false;
+        } 
     }
 }

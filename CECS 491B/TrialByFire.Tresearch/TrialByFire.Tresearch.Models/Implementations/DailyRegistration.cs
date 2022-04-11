@@ -11,7 +11,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public DailyRegistration()
         {
-            registrationDate = DateTime.Now;
+            registrationDate = DateTime.Now.ToUniversalTime();
             registrationCount = -1;
         }
         public DailyRegistration(DateTime registrationDate, int registrationCount)

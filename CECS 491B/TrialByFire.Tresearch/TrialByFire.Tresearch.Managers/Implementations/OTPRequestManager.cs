@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Exceptions;
 using TrialByFire.Tresearch.Managers.Contracts;
+using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
@@ -21,35 +23,32 @@ namespace TrialByFire.Tresearch.Managers.Implementations
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
-
-        private IValidationService _validationService { get; }
-        private IAuthenticationService _authenticationService { get; }
-
-        private IRolePrincipal _rolePrincipal { get; }
         private IOTPRequestService _otpRequestService { get; }
+        private IAccountVerificationService _accountVerificationService { get; }
         private IMessageBank _messageBank { get; }
-
         private IMailService _mailService { get; }
+        private BuildSettingsOptions _options { get; }
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
+            TimeSpan.FromSeconds(5));
 
-        public OTPRequestManager(ISqlDAO sqlDAO, ILogService logService, IValidationService validationService, 
-            IAuthenticationService authenticationService, IRolePrincipal rolePrincipal, 
-            IOTPRequestService otpRequestService, IMessageBank messageBank, IMailService mailService)
+        public OTPRequestManager(ISqlDAO sqlDAO, ILogService logService, IOTPRequestService otpRequestService, 
+            IAccountVerificationService accountVerificationService, IMessageBank messageBank, 
+            IMailService mailService, IOptionsSnapshot<BuildSettingsOptions> options)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
-            _validationService = validationService;
-            _authenticationService = authenticationService;
-            _rolePrincipal = rolePrincipal;
             _otpRequestService = otpRequestService;
+            _accountVerificationService = accountVerificationService;
             _messageBank = messageBank;
             _mailService = mailService;
+            _options = options.Value;
         }
 
         //
         // Summary:
         //     Checks that the User is not currently logged in. Calls the Validation Service to
         //     do basic input validation on the Users inputted username and passphrase. Creates
-        //     Account and OTPClaim objects to be passed in to the call to the OTPRequestService.
+        //     UserAccount and OTPClaim objects to be passed in to the call to the OTPRequestService.
         //     Emails to OTP to the User.
         //
         // Parameters:
@@ -58,37 +57,54 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         //   passphrase:
         //     The passphrase entered by the User requesting the OTP.
         //   authorizationLevel:
-        //     The selected authorization level for the Account that the User is trying to get an
+        //     The selected authorization level for the UserAccount that the User is trying to get an
         //     OTP for.
         //
         // Returns:
         //     The result of the operation.
-        public string RequestOTP(string username, string passphrase, string authorizationLevel)
+        public async Task<string> RequestOTPAsync(string username, string passphrase, 
+            string authorizationLevel, CancellationToken cancellationToken = default)
         {
+            // Fires operation cancelled exception
+            cancellationToken.ThrowIfCancellationRequested();
             string result;
             try
             {
-                if(_rolePrincipal.IsInRole("guest"))
+                if(Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
-                    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+                    // Basic input validation will be done at client side
+                    /*Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
                     keyValuePairs.Add("username", username);
                     keyValuePairs.Add("passphrase", passphrase);
-                    result = _validationService.ValidateInput(keyValuePairs);
+                    result = await _validationService.ValidateInputAsync(keyValuePairs);
                     if (result.Equals(_messageBank.SuccessMessages["generic"]))
+                    {*/
+                    IAccount account = new UserAccount(username, passphrase, authorizationLevel);
+                    IOTPClaim otpClaim = new OTPClaim(account);
+                    result = await _accountVerificationService.VerifyAccountAsync(account, 
+                        _cancellationTokenSource.Token).ConfigureAwait(false);
+                    if(result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)
+                        .ConfigureAwait(false)))
                     {
-                        IAccount account = new Account(username, passphrase, authorizationLevel);
-                        IOTPClaim otpClaim = new OTPClaim(account);
-                        result = _otpRequestService.RequestOTP(account, otpClaim);
-                        if(result.Equals(_messageBank.SuccessMessages["generic"]))
+                        result = await _otpRequestService.RequestOTPAsync(account, otpClaim,
+                        _cancellationTokenSource.Token).ConfigureAwait(false);
+                        if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.storeOTPSuccess)
+                            .ConfigureAwait(false)))
                         {
-                            result = _mailService.SendOTP(account.Username, otpClaim.OTP, otpClaim.OTP, otpClaim.OTP);
+                            // No API Key right now
+                            if (!_options.Environment.Equals("Test"))
+                            {
+                                result = await _mailService.SendOTPAsync(account.Username, otpClaim.OTP,
+                                    otpClaim.OTP, otpClaim.OTP, _cancellationTokenSource.Token).ConfigureAwait(false);
+                            }
                         }
                     }
                     return result;
                 }
                 else
                 {
-                    return _messageBank.ErrorMessages["alreadyAuthenticated"];
+                    return await _messageBank.GetMessage(IMessageBank.Responses.alreadyAuthenticated)
+                        .ConfigureAwait(false);
                 }
             }catch(AccountCreationFailedException acfe)
             {

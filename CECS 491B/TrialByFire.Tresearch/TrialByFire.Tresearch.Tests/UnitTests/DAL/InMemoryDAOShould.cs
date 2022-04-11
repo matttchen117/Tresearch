@@ -25,7 +25,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
             NodesCreated nodesCreated = new NodesCreated(new DateTime(year, month, day), count);
 
             // Act
-            string result = sqlDAO.CreateNodesCreated(nodesCreated);
+            string result = SqlDAO.CreateNodesCreated(nodesCreated);
 
             // Assert
             Assert.Equal(expected, result);
@@ -47,7 +47,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
             NodesCreated nodesCreated = new NodesCreated(new DateTime (year, month, day), count);
 
             // Act
-            string result = sqlDAO.UpdateNodesCreated(nodesCreated);
+            string result = SqlDAO.UpdateNodesCreated(nodesCreated);
 
             // Assert
             Assert.Equal(expected , result);
@@ -63,7 +63,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
             DailyLogin dailyLogin = new DailyLogin(new DateTime(year, month, day), count);
 
             // Act
-            string result = sqlDAO.CreateDailyLogin(dailyLogin);
+            string result = SqlDAO.CreateDailyLogin(dailyLogin);
 
             // Assert
             Assert.Equal(expected, result);
@@ -84,7 +84,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
             DailyLogin dailyLogin = new DailyLogin(new DateTime (year, month, day), count);
 
             // Act
-            string result = sqlDAO.UpdateDailyLogin(dailyLogin);
+            string result = SqlDAO.UpdateDailyLogin(dailyLogin);
 
             // Assert
             Assert.Equal(expected, result);
@@ -99,7 +99,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
             TopSearch topSearch = new TopSearch(new DateTime(year, month, day), searchString, count);
 
             // Act
-            string result = sqlDAO.CreateTopSearch(topSearch);
+            string result = SqlDAO.CreateTopSearch(topSearch);
 
             // Assert
             Assert.Equal(expected, result);
@@ -122,7 +122,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
             TopSearch topSearch = new TopSearch(new DateTime(year, month, day), searchString, count);
 
             // Act
-            string result = sqlDAO.UpdateTopSearch(topSearch);
+            string result = SqlDAO.UpdateTopSearch(topSearch);
 
             // Assert
             Assert.Equal(expected, result);
@@ -137,7 +137,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
             DailyRegistration dailyRegistration = new DailyRegistration(new DateTime(year, month, day), count);
             
             // Act
-            string result = sqlDAO.CreateDailyRegistration(dailyRegistration);
+            string result = SqlDAO.CreateDailyRegistration(dailyRegistration);
 
             // Assert
             Assert.Equal(expected, result);
@@ -160,7 +160,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
             DailyRegistration dailyRegistration = new DailyRegistration(new DateTime(year, month, day), count);
 
             // Act
-            string result = sqlDAO.UpdateDailyRegistration(dailyRegistration);
+            string result = SqlDAO.UpdateDailyRegistration(dailyRegistration);
 
             // Assert
             Assert.Equal(expected, result);

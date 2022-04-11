@@ -11,8 +11,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public NodesCreated()
         {
-            nodesCreatedDate = DateTime.Now;
-            nodesCreatedCount = -1;
+            nodeCreationDate = DateTime.Now.ToUniversalTime();
+            nodeCreationCount = -1;
         }
 
         public NodesCreated(DateTime nodesCreatedDate, int nodesCreatedCount)

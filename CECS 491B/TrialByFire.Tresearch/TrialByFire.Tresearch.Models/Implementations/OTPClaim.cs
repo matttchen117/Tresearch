@@ -11,9 +11,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class OTPClaim : IOTPClaim
     {
-        public string Username { get; }
+        public string Username { get; set; }
 
-        public string AuthorizationLevel { get; }
+        public string AuthorizationLevel { get; set; }
 
         public string OTP { get; }
 
@@ -54,7 +54,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             Username = account.Username;
             AuthorizationLevel = account.AuthorizationLevel;
             OTP = GenerateRandomOTP();
-            TimeCreated = DateTime.Now;
+            TimeCreated = DateTime.Now.ToUniversalTime().ToUniversalTime();
             FailCount = 0;
         }
 

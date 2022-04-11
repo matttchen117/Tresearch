@@ -7,94 +7,68 @@ using TrialByFire.Tresearch.Services.Implementations;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 {
-    public class RegistrationManagerShould
+    public class RegistrationManagerShould : TestBaseClass
     {
-        public ISqlDAO _sqlDAO { get; set; }
-        public ILogService _logService { get; set; }
-        public IMessageBank _messageBank { get; set; }
-
-        public IRegistrationService _registrationService { get; set; }
-
-        public IMailService _mailService { get; set; }
-
-        public IValidationService _validationService { get; set; }
-        public IRegistrationManager _registrationManager { get; set; }
-
-        public RegistrationManagerShould()
+        public RegistrationManagerShould() : base(new string[] { })
         {
-            _messageBank = new MessageBank();
-            _sqlDAO = new SqlDAO(_messageBank);
-            _mailService = new MailService(_messageBank);
-            _validationService = new ValidationService(_messageBank);
-            _logService = new SqlLogService(_sqlDAO);
-            _registrationService = new RegistrationService(_sqlDAO, _logService);
-            _registrationManager = new RegistrationManager(_sqlDAO, _logService, _registrationService, _mailService, _validationService, _messageBank);
+            TestServices.AddScoped<IMailService, MailService>();
+            TestServices.AddScoped<IRegistrationService, RegistrationService>();
+            TestServices.AddScoped<IRegistrationManager, RegistrationManager>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
         [Theory]
-        [InlineData("skiPatrol@gmail.com", "myRegisterPassword")]
-        [InlineData("snowboarder@hotmail.com", "unFortunateName")]
-        public void RegisterTheUser(string email, string passphrase)
-        {
-            //Arrange 
-
-            //Act
-            List<string> results = _registrationManager.CreatePreConfirmedAccount(email, passphrase);
-
-            //Assert
-            Assert.Equal('S', results.Last()[0]);
-        }
-
-        [Theory]
-        [InlineData("confirmMeMan@gmail.com", "myPassword", "user", true, false)]
-        [InlineData("confirmMeMan2@gmail.com", "myPassword", "user", true, false)]
-        public void ConfirmTheUser(string email, string passphrase, string authenticationLevel, bool status, bool confirmed)
+        [InlineData("trialbyfire.tresearch+IntRegMan1@gmail.com", "myPassword","user", "200: Server: success")]
+        [InlineData("trialbyfire.tresearch+IntRegMan2@gmail.com", "unFortunateName","user", "409: Server: UserAccount  already exists")]
+        public async Task RegisterTheUser(string email, string passphrase, string authorizationLevel, string statusCode)
         {
             //Arrange
-            IConfirmationLink link = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now);
-            string url = link.UniqueIdentifier.ToString();
-            _sqlDAO.CreateConfirmationLink(link);
-            IAccount _account = new Account(email, email, passphrase, authenticationLevel, status, confirmed);
-            _sqlDAO.CreateAccount(_account);
-
+            IRegistrationManager registrationManager = TestProvider.GetService<IRegistrationManager>();
             //Act
-            List<string> results = _registrationManager.ConfirmAccount(url);
+            string results = await registrationManager.CreateAndSendConfirmationAsync(email, passphrase, authorizationLevel).ConfigureAwait(false);
 
             //Assert
-            Assert.Equal('S', results.Last()[0]);
-        }
-        [Theory]
-        [InlineData("pammypoor@gmail.com", "www.google.com")]
-        [InlineData("jelazo@live.com", "www.tresearch.systems/")]
-        public void SendConfirmation(string email, string url)
-        {
-
-            //Act
-            List<string> results = _registrationManager.SendConfirmation(email, url);
-
-            //Assert
-            Assert.Equal('S', results.Last()[0]);
+            Assert.Equal(statusCode , results);
         }
 
-
         [Theory]
-        [InlineData("cottonEyedJoe@gmail.com", -1)]
-        [InlineData("innnout@live.com", 0)]
-        public void checkLinkValidity(string email, int sub)
+        [InlineData("trialbyfire.tresearch+IntRegMan4@gmail.com", "7f5c634a-ef48-49c2-a20c-adde83b6837d", "200: Server: success")]
+        [InlineData("trialbyfire.tresearch+IntRegMan5@gmail.com", "5278f32c-353f-487d-9145-4320125fc433", "200: Server: success")] //User is already enabled
+        [InlineData("trialbyfire.tresearch+IntRegMan5@gmail.com", "7f5c634a-ef47-49c2-a20c-adde85b6837d", "404: Database: The confirmation link was not found.")]
+        public async Task ConfirmTheUser(string username, string guid, string statusCode)
         {
             //Arrange
-            DateTime now = DateTime.Now;
-            IConfirmationLink link = new ConfirmationLink(email, Guid.NewGuid(), now.AddDays(sub));
-            Boolean expected;
-            if (sub < 0)
+            IRegistrationManager registrationManager = TestProvider.GetService<IRegistrationManager>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            string expected = statusCode;
+
+            //Act
+            string result = await registrationManager.ConfirmAccountAsync(guid, cancellationTokenSource.Token);
+
+            //Assert
+            Assert.Equal(expected, result);
+        }
+
+        [Theory]
+        [InlineData(-24)]
+        [InlineData(-23)]
+        [InlineData(0)]
+        public void checkLinkInValidity(int minusHours)
+        {
+            //Arrange
+            IRegistrationManager registrationManager = TestProvider.GetService<IRegistrationManager>();
+            IConfirmationLink confirmationLink = new ConfirmationLink("test@gmail.com", "user", Guid.NewGuid(), DateTime.Now.AddHours(minusHours));
+            bool expected;
+            if (minusHours <= -24)
                 expected = false;
             else
                 expected = true;
 
             //Act
-            bool actual = _registrationManager.IsConfirmationLinkValid(link);
+            bool actual = registrationManager.IsConfirmationLinkInvalid(confirmationLink);
 
             //Assert
             Assert.Equal(expected, actual);

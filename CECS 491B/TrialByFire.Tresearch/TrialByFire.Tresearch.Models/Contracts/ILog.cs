@@ -8,10 +8,11 @@ namespace TrialByFire.Tresearch.Models.Contracts
 {
     public interface ILog
     {
-        DateTime timestamp { get; }
-        string level { get; }
-        string username { get; }
-        string category { get; }
-        string description { get; }
+        public DateTime Timestamp { get; }
+        public string Level { get; }
+        public string UserHash { get; }
+        public string Category { get; }
+        public string Description { get; }
+        public string Hash { get; }
     }
 }

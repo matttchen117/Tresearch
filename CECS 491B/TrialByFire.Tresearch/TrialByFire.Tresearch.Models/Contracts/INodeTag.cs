@@ -2,8 +2,8 @@
 {
     public interface INodeTag
     {
-        public long nodeID { get; set; }
-        public string tagName { get; set; }
+        public long NodeID { get; set; }
+        public string TagName { get; set; }
 
     }
 }
