@@ -11,48 +11,49 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
     /// <summary>
-    /// Controller class for creating Nodes.
+    /// Controller class for deleting Nodes.
     /// </summary>
     [ApiController]
     [EnableCors]
-    [Route("[controler]")]
-    public class CreateNodeController : Controller, ICreateNodeController
+    [Route("[controller]")]
+    public class DeleteNodeController : Controller, IDeleteNodeController
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
-        private ICreateNodeManager _createNodeManager { get; }
-        private IMessageBank _messageBank { get; }
+        private IDeleteNodeManager _deleteNodeManager { get; }
+        private IMessageBank _messageBank { get; }  
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         /// <summary>
         /// Constructing for creating the Controller
         /// </summary>
         /// <param name="sqlDAO"></param>
         /// <param name="logService"></param>
-        /// <param name="createNodeManager"></param>
+        /// <param name="deleteNodeManager"></param>
         /// <param name="messageBank"></param>
-        public CreateNodeController(ISqlDAO sqlDAO, ILogService logService, 
-            ICreateNodeManager createNodeManager, IMessageBank messageBank)
+        public DeleteNodeController(ISqlDAO sqlDAO, ILogService logService,
+            IDeleteNodeManager deleteNodeManager, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
-            _createNodeManager = createNodeManager;
+            _deleteNodeManager = deleteNodeManager;
             _messageBank = messageBank;
         }
 
         /// <summary>
-        /// Entry point for node creation requests that forwards the given input to the CreateNodeManager for the opration to be performed.
+        /// Entry point for node delete requests that forwards the given NodeID to the DeleteNodeManager for the opration to be performed.
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="node"></param>
+        /// <param name="account"></param>
+        /// <param name="nodeID"></param>
+        /// <param name="parentID"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("createNode")]
-        public async Task<IActionResult> CreateNodeAsync(IAccount account, INode node)
+        [Route("deleteNode")]
+        public async Task<IActionResult> DeleteNodeAsync(IAccount account, long nodeID, long parentID)
         {
             try
             {
                 string[] split;
-                string result = await _createNodeManager.CreateNodeAsync(account, node, _cancellationTokenSource.Token).ConfigureAwait(false);
+                string result = await _deleteNodeManager.DeleteNodeAsync(account, nodeID, parentID, _cancellationTokenSource.Token).ConfigureAwait(false);
                 if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.createNodeSuccess).ConfigureAwait(false)))
                 {
                     split = result.Split(": ");
@@ -65,7 +66,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             {
                 return StatusCode(400, tce.Message);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(400, ex.Message);
             }

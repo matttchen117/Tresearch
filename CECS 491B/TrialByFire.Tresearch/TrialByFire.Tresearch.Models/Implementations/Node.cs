@@ -26,5 +26,15 @@ namespace TrialByFire.Tresearch.Models.Implementations
             this.visibility = visibility;
             this.accountOwner = accountOwner;
         }
+
+        public Node(Node n)
+        {
+            this.nodeID = n.nodeID;
+            this.parentNodeID = n.parentNodeID;
+            this.nodeTitle = n.nodeTitle;
+            this.summary = n.summary;
+            this.visibility = n.visibility;
+            this.accountOwner = n.accountOwner;
+        }
     }
 }

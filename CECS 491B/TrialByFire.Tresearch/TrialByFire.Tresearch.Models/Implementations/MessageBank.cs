@@ -75,6 +75,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
                 case Responses.createNodeSuccess:
                     return "200: Server: Create Node Success";
+                case Responses.deleteNodeSuccess:
+                    return "200: Server: Delete Node Success";
                 case Responses.storeLogFail:
                     return "503: Database: Failed to store the log.";
                 case Responses.badNameOrPass:
@@ -150,6 +152,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "504: Server rollback failed";
                 case Responses.createNodeFail:
                     return "503: Database: Failed to create node.";
+                case Responses.deleteNodeFail:
+                    return "503: Database: Failed to delete node.";
+                case Responses.updateNodeFail:
+                    return "503: Database: Failed to update node.";
                 case Responses.nodeAlreadyExists:
                     return "409: Database: Node Already Exists";
                 case Responses.createdNodesExists:

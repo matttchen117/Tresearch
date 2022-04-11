@@ -17,12 +17,12 @@ namespace TrialByFire.Tresearch.Managers.Implementations
     /// <summary>
     /// Manager class for enforcing business rules for creating a Node and calling the service for operation
     /// </summary>
-    public class CreateNodeManager : ICreateNodeManager
+    public class DeleteNodeManager : IDeleteNodeManager
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
         private IAuthorizationService _authorizationService { get; }
-        private ICreateNodeService _createNodeService { get; }
+        private IDeleteNodeService _deleteNodeService { get; }
         private IMessageBank _messageBank { get; }
 
         /// <summary>
@@ -31,14 +31,14 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         /// <param name="sqlDAO"></param>
         /// <param name="logService"></param>
         /// <param name="authorizationService"></param>
-        /// <param name="createNodeService"></param>
+        /// <param name="deleteNodeService"></param>
         /// <param name="messageBank"></param>
-        public CreateNodeManager(ISqlDAO sqlDAO, ILogService logService, IAuthorizationService authorizationService, ICreateNodeService createNodeService, IMessageBank messageBank)
+        public DeleteNodeManager(ISqlDAO sqlDAO, ILogService logService, IAuthorizationService authorizationService, IDeleteNodeService deleteNodeService, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
             _authorizationService = authorizationService;
-            _createNodeService = createNodeService;
+            _deleteNodeService = deleteNodeService;
             _messageBank = messageBank;
         }
 
@@ -50,10 +50,10 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         /// <param name="cancellationToken"></param>
         /// <returns>The result of the operation.</returns>
         /// <exception cref="OperationCanceledException"></exception>
-        public async Task<string> CreateNodeAsync(IAccount account, INode node, CancellationToken cancellationToken)
+        public async Task<string> DeleteNodeAsync(IAccount account, long nodeID, long parentID, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            string createResult;
+            string deleteResult;
             try
             {
                 if (Thread.CurrentPrincipal.Identity.Name != "guest")
@@ -63,17 +63,17 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                         bool verificationResult = await _authorizationService.VerifyAuthorizedAsync(account.AuthorizationLevel, account.Username, cancellationToken).ConfigureAwait(false);
                         if (verificationResult)
                         {
-                            createResult = await _createNodeService.CreateNodeAsync(account, node, cancellationToken).ConfigureAwait(false);
+                            deleteResult = await _deleteNodeService.DeleteNodeAsync(nodeID, parentID, cancellationToken).ConfigureAwait(false);
                         }
                         else
                         {
-                            createResult = await _messageBank.GetMessage(IMessageBank.Responses.notFoundOrAuthorized).ConfigureAwait(false);
+                            deleteResult = await _messageBank.GetMessage(IMessageBank.Responses.notFoundOrAuthorized);
                         }
-                        return createResult;
+                        return deleteResult;
                     }
                     else
                     {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.notFoundOrAuthorized).ConfigureAwait(false);
+                        return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
                     }
                 }
                 else
@@ -81,7 +81,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
                 }
             }
-            catch (CreateNodeFailedException cnfe)
+            catch (DeleteNodeFailedException cnfe)
             {
                 return cnfe.Message;
             }
