@@ -67,52 +67,52 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<IOTPClaim> InitializeOTPClaims()
         {
             List<IOTPClaim> otpClaims = new List<IOTPClaim>();
-            otpClaims.Add(new OTPClaim("drakat7@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("drakat7@gmail.com", "ABCdef123", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("drakat7@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("drakat7@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
             // for otp request tests
-            otpClaims.Add(new OTPClaim("aarry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("barry@gmail.com", "ABCdef123", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("carry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("darry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("earry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("farry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0), 4));
+            otpClaims.Add(new OTPClaim("aarry@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("barry@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("carry@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("darry@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("earry@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("farry@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "user", new DateTime(2022, 3, 4, 5, 6, 0), 4));
             // for authentication tests
-            otpClaims.Add(new OTPClaim("garry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("harry@gmail.com", "ABCdef123", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("iarry@gmail.com", "ABCdef123", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("jarry@gmail.com", "ABCdef123", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("karry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("larry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("marry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
-            otpClaims.Add(new OTPClaim("narry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0), 4));
-            otpClaims.Add(new OTPClaim("oarry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0), 4));
-            otpClaims.Add(new OTPClaim("parry@gmail.com", "ABCdef123", "user", new DateTime(2022, 3, 4, 5, 6, 0), 4));
+            otpClaims.Add(new OTPClaim("garry@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("harry@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("iarry@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("jarry@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "admin", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("karry@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("larry@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("marry@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "user", new DateTime(2022, 3, 4, 5, 6, 0)));
+            otpClaims.Add(new OTPClaim("narry@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "user", new DateTime(2022, 3, 4, 5, 6, 0), 4));
+            otpClaims.Add(new OTPClaim("oarry@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "user", new DateTime(2022, 3, 4, 5, 6, 0), 4));
+            otpClaims.Add(new OTPClaim("parry@gmail.com", "0AC56B336CF4649B49B2946748A4DB2686159688DDBC20FE00B7168657DE19593016A67D8982932DF0CB2C1A00AD14037778AED57AB76B53E45DB6B3A7BF29B7", "user", new DateTime(2022, 3, 4, 5, 6, 0), 4));
             return otpClaims;
         }
 
         private List<IAccount> InitializeAccounts()
         {
             List<IAccount> accounts = new List<IAccount>();
-            accounts.Add(new UserAccount("drakat7@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new UserAccount("drakat7@gmail.com", "abcDEF123", "admin", true, true));
+            accounts.Add(new UserAccount("drakat7@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "user", true, true));
+            accounts.Add(new UserAccount("drakat7@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "admin", true, true));
             // for otp request tests
-            accounts.Add(new UserAccount("aarry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new UserAccount("barry@gmail.com", "abcDEF123", "admin", true, true));
-            accounts.Add(new UserAccount("carry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new UserAccount("darry@gmail.com", "abcDEF123", "user", false, true));
-            accounts.Add(new UserAccount("earry@gmail.com", "abcDEF123", "user", false, false));
-            accounts.Add(new UserAccount("farry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new UserAccount("aarry@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "user", true, true));
+            accounts.Add(new UserAccount("barry@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "admin", true, true));
+            accounts.Add(new UserAccount("carry@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "user", true, true));
+            accounts.Add(new UserAccount("darry@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "user", false, true));
+            accounts.Add(new UserAccount("earry@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "user", false, false));
+            accounts.Add(new UserAccount("farry@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "user", true, true));
             // for authentication tests
-            accounts.Add(new UserAccount("garry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new UserAccount("harry@gmail.com", "abcDEF123", "admin", true, true));
-            accounts.Add(new UserAccount("iarry@gmail.com", "abcDEF123", "admin", true, true));
-            accounts.Add(new UserAccount("jarry@gmail.com", "abcDEF123", "admin", true, true));
-            accounts.Add(new UserAccount("karry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new UserAccount("larry@gmail.com", "abcDEF123", "user", false, true));
-            accounts.Add(new UserAccount("marry@gmail.com", "abcDEF123", "user", false, false));
-            accounts.Add(new UserAccount("narry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new UserAccount("oarry@gmail.com", "abcDEF123", "user", true, true));
-            accounts.Add(new UserAccount("parry@gmail.com", "abcDEF123", "user", true, true));
+            accounts.Add(new UserAccount("garry@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "user", true, true));
+            accounts.Add(new UserAccount("harry@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "admin", true, true));
+            accounts.Add(new UserAccount("iarry@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "admin", true, true));
+            accounts.Add(new UserAccount("jarry@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "admin", true, true));
+            accounts.Add(new UserAccount("karry@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "user", true, true));
+            accounts.Add(new UserAccount("larry@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "user", false, true));
+            accounts.Add(new UserAccount("marry@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "user", false, false));
+            accounts.Add(new UserAccount("narry@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "user", true, true));
+            accounts.Add(new UserAccount("oarry@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "user", true, true));
+            accounts.Add(new UserAccount("parry@gmail.com", "D3897E59D2710CC124BD2FA2823AF4AE997108B4D9BBF6D170281C41406D3B6662DF4AD6F0805DEC688EC588205DE07D437120F6BD0071D4C0AEE0F58621C85A", "user", true, true));
 
             /*            Viet adding new accounts
                         [InlineData("grizzly@gmail.com", "user", "success")]

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,11 +66,14 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             }
             rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
+            byte[] salt = new byte[0];
+            byte[] key = KeyDerivation.Pbkdf2(otp, salt, KeyDerivationPrf.HMACSHA512, 10000, 64);
+            string hash = Convert.ToHexString(key);
             IAuthenticationManager authenticationManager = TestProvider.GetService<IAuthenticationManager>();
             DateTime now = new DateTime(year, month, day, hour, minute, second);
 
             // Act
-            List<string> results = await authenticationManager.AuthenticateAsync(username, otp,
+            List<string> results = await authenticationManager.AuthenticateAsync(username, hash,
                 authorizationLevel, now).ConfigureAwait(false);
 
             // Assert
@@ -114,13 +118,16 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             }
             rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
+            byte[] salt = new byte[0];
+            byte[] key = KeyDerivation.Pbkdf2(otp, salt, KeyDerivationPrf.HMACSHA512, 10000, 64);
+            string hash = Convert.ToHexString(key);
             IAuthenticationManager authenticationManager = TestProvider.GetService<IAuthenticationManager>();
             DateTime now = new DateTime(year, month, day, hour, minute, second);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(
                 TimeSpan.FromSeconds(5));
 
             // Act
-            List<string> results = await authenticationManager.AuthenticateAsync(username, otp, 
+            List<string> results = await authenticationManager.AuthenticateAsync(username, hash, 
                 authorizationLevel, now, cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert

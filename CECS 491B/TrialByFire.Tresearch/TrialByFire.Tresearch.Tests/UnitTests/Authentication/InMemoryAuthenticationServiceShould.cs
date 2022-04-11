@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +38,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
         {
             // Arrange
             IAccount account = new UserAccount(username, authorizationLevel);
-            IOTPClaim otpClaim = new OTPClaim(username, otp, authorizationLevel, new DateTime(year, month, day, hour, minute, second));
+            byte[] salt = new byte[0];
+            byte[] key = KeyDerivation.Pbkdf2(otp, salt, KeyDerivationPrf.HMACSHA512, 10000, 64);
+            string hash = Convert.ToHexString(key);
+            IOTPClaim otpClaim = new OTPClaim(username, hash, authorizationLevel, new DateTime(year, month, day, hour, minute, second));
             IAuthenticationInput authenticationInput = new AuthenticationInput(account, otpClaim);
             IAuthenticationService authenticationService = TestProvider.GetService<IAuthenticationService>();
 
@@ -66,7 +70,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
         {
             // Arrange
             IAccount account = new UserAccount(username, authorizationLevel);
-            IOTPClaim otpClaim = new OTPClaim(username, otp, authorizationLevel, new DateTime(year, month, day, hour, minute, second));
+            byte[] salt = new byte[0];
+            byte[] key = KeyDerivation.Pbkdf2(otp, salt, KeyDerivationPrf.HMACSHA512, 10000, 64);
+            string hash = Convert.ToHexString(key);
+            IOTPClaim otpClaim = new OTPClaim(username, hash, authorizationLevel, new DateTime(year, month, day, hour, minute, second));
             IAuthenticationInput authenticationInput = new AuthenticationInput(account, otpClaim);
             IAuthenticationService authenticationService = TestProvider.GetService<IAuthenticationService>();
             CancellationTokenSource cancellationTokenSource =

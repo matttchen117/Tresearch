@@ -15,7 +15,5 @@ namespace TrialByFire.Tresearch.Models.Contracts
         DateTime TimeCreated { get; }
 
         int FailCount { get; set; }
-
-        public string GenerateRandomOTP();
     }
 }

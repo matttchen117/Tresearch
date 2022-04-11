@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -66,13 +67,16 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
             }
             rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
+            byte[] salt = new byte[0];
+            byte[] key = KeyDerivation.Pbkdf2(passphrase, salt, KeyDerivationPrf.HMACSHA512, 10000, 64);
+            string hash = Convert.ToHexString(key);
             IOTPRequestController otpRequestController = TestProvider.GetService<IOTPRequestController>();
             string[] expecteds = expected.Split(": ");
             ObjectResult expectedResult = new ObjectResult(expecteds[2])
             { StatusCode = Convert.ToInt32(expecteds[0]) };
 
             // Act
-            IActionResult result = await otpRequestController.RequestOTPAsync(username, passphrase, 
+            IActionResult result = await otpRequestController.RequestOTPAsync(username, hash, 
                 authorizationLevel).ConfigureAwait(false);
             var objectResult = result as ObjectResult;
 

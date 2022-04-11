@@ -27,7 +27,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private IMessageBank _messageBank { get; }
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
-            TimeSpan.FromSeconds(5));
+            /*TimeSpan.FromSeconds(5)*/);
 
         public AuthenticationManager(ISqlDAO sqlDAO, ILogService logService, 
             IAccountVerificationService accountVerificationService, 

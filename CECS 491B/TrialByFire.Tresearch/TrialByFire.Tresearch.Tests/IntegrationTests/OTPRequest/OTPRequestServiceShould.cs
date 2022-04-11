@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -37,8 +38,19 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
         {
             // Arrange
             IOTPRequestService otpRequestService = TestProvider.GetService<IOTPRequestService>();
-            IAccount account = new UserAccount(username, passphrase, authorizationLevel);
-            IOTPClaim otpClaim = new OTPClaim(account);
+            byte[] salt = new byte[0];
+            byte[] key = KeyDerivation.Pbkdf2(passphrase, salt, KeyDerivationPrf.HMACSHA512, 10000, 64);
+            string hash = Convert.ToHexString(key);
+            IAccount account = new UserAccount(username, hash, authorizationLevel);
+            string validCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+            Random random = new Random();
+            int length = 8;
+            string otp = "";
+            for (int i = 0; i < length; i++)
+            {
+                otp += validCharacters[random.Next(0, validCharacters.Length)];
+            }
+            IOTPClaim otpClaim = new OTPClaim(account, otp);
 
             // Act
             string result = await otpRequestService.RequestOTPAsync(account, otpClaim)
@@ -62,8 +74,19 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.OTPRequest
         {
             // Arrange
             IOTPRequestService otpRequestService = TestProvider.GetService<IOTPRequestService>();
-            IAccount account = new UserAccount(username, passphrase, authorizationLevel);
-            IOTPClaim otpClaim = new OTPClaim(account);
+            byte[] salt = new byte[0];
+            byte[] key = KeyDerivation.Pbkdf2(passphrase, salt, KeyDerivationPrf.HMACSHA512, 10000, 64);
+            string hash = Convert.ToHexString(key);
+            IAccount account = new UserAccount(username, hash, authorizationLevel);
+            string validCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+            Random random = new Random();
+            int length = 8;
+            string otp = "";
+            for (int i = 0; i < length; i++)
+            {
+                otp += validCharacters[random.Next(0, validCharacters.Length)];
+            }
+            IOTPClaim otpClaim = new OTPClaim(account, otp);
             CancellationTokenSource cancellationTokenSource =
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));
 

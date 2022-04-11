@@ -83,7 +83,7 @@ CREATE TABLE [dbo].UserHashTable(
  
 CREATE TABLE [dbo].OTPClaims(
 	Username VARCHAR(100),
-	OTP VARCHAR(100),
+	OTP VARCHAR(128),
 	AuthorizationLevel VARCHAR(40),
 	TimeCreated DATETIME,
 	FailCount INT,
@@ -629,22 +629,7 @@ BEGIN
 	ELSE
 		BEGIN TRAN
 			BEGIN TRY;
-				-- Insert statements for procedure here
-
-				-- 0 = Fail, 1 = success, 2 = Rollback occurred
-				IF @Destination = 'Analytic'
-					INSERT INTO AnalyticLogs(Timestamp, Level, UserHash, Category, Description, Hash) VALUES
-					(@Timestamp, @Level, @UserHash, @Category, @Description, @Hash);
-				ELSE IF @Destination = 'Archive'
-					INSERT INTO ArchiveLogs(Timestamp, Level, UserHash, Category, Description, Hash) VALUES
-					(@Timestamp, @Level, @UserHash, @Category, @Description, @Hash);			
-
-				SELECT @RowCount = @@ROWCOUNT
-
-				IF(@RowCount = 1)
-					SET @Result = 1
-				ELSE
-					SET @Result = 0
+				
 
 				COMMIT TRANSACTION
 			END TRY

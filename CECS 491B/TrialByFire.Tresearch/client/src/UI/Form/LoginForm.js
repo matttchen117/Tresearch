@@ -12,6 +12,7 @@ class LoginForm extends React.Component  {
         passphrase: '',
         otp: '',
         verified: false,
+        token: sessionStorage.getItem('authorization'),
         errorMessage: ''
     }
 
@@ -82,8 +83,13 @@ class LoginForm extends React.Component  {
         return pbkdfKey.toString('hex').toUpperCase();
     }
 
+    verifyToken = () => {
+        
+    }
+
     onSubmitHandler = (e) => {
         e.preventDefault();
+        this.verifyToken();
         axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
         // pbkdf2 uses callbacks not promises, need to wrap in a promise object
 
@@ -91,15 +97,16 @@ class LoginForm extends React.Component  {
             this.setState({errorMessage: ''})
             {this.state.verified ? 
                 axios.post('https://localhost:7010/Authentication/authenticate?username=' + this.state.username.toLowerCase() + 
-                '&otp=' + this.state.otp + '&authorizationLevel=user')
+                '&otp=' + this.hashInput(this.state.otp) + '&authorizationLevel=user')
                 .then(response => {
                         console.log(response.data);
                         console.log(response.headers['authorization']);
                         localStorage.setItem('authorization', response.headers['authorization']);
-                        window.location = '/Portal';
+                        sessionStorage.setItem('authorization', response.headers['authorization']);
+                        //window.location = '/Portal';
                 }).catch(err => {
                         console.log(err.data);
-                        sessionStorage.setItem('authorization', err.headers['authorization']);
+                        //sessionStorage.setItem('authorization', err.headers['authorization']);
                     })
                 :
                 axios.post('https://localhost:7010/OTPRequest/requestotp?username=' + this.state.username.toLowerCase() + 
@@ -112,11 +119,12 @@ class LoginForm extends React.Component  {
                         //navigate('/Login/Authentication');
                 }).catch(err => {
                     console.log(err.data)
-                    sessionStorage.setItem('authorization', err.headers['authorization']);
+                    //sessionStorage.setItem('authorization', err.headers['authorization']);
                     this.setState({verified: true}); // remvoe later once added in api key
                 })
             }
         }
+        
         this.setState({ username: ''});
         this.setState({ passphrase: ''});
         this.setState({ otp: ''});
