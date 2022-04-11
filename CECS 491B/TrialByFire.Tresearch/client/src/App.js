@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import axios, {AxiosResponse, AxiosError} from 'axios';
 import './App.css';
 
 import ConfirmationSent from './Features/Registration/ConfirmationSent';
@@ -24,6 +25,7 @@ import Error404 from "./Pages/Error404/Error404";
 class App extends React.Component {
   constructor(props){
     super(props);
+    axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
     this.state = {
       confirmationGuid: Confirm,
       inactiveLinkGuid: InactiveLink,
