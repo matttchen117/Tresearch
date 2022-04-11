@@ -3,8 +3,8 @@ using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
 {
-    public interface ICreateNodeController
+    public interface IDeleteNodeController
     {
-        public Task<IActionResult> CreateNodeAsync(IAccount account, INode node);
+        public Task<IActionResult> DeleteNodeAsync(IAccount account, long nodeID, long parentID);
     }
 }

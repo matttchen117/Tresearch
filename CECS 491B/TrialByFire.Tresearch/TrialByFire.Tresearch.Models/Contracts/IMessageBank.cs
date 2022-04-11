@@ -71,6 +71,8 @@ namespace TrialByFire.Tresearch.Models.Contracts
             databaseFail,
             rollbackFailed,
             createNodeFail,
+            deleteNodeFail,
+            updateNodeFail,
             nodeAlreadyExists,
             createdNodesExists,
             createdNodeNotExist,
@@ -89,6 +91,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             tagAlreadyExist,
             tagDoesNotExist,
             createNodeSuccess,
+            deleteNodeSuccess
         }
         public Task<string> GetMessage(Responses response);
     }

@@ -935,6 +935,59 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+        public async Task<string> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                bool nodeExists = false;
+                Node targetNode;
+                foreach(Node n in InMemoryDatabase.Nodes)
+                {
+                    if(nodeID == n.nodeID)
+                    {
+                        nodeExists = true;
+                    }
+                }
+
+                if (!nodeExists)
+                {
+                    return _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).Result;
+                }
+
+                List<Node> children = new List<Node>();
+                foreach(Node c in InMemoryDatabase.Nodes)
+                {
+                    if(c.parentNodeID == nodeID)
+                    {
+                        children.Add(c);
+                    }
+                }
+                foreach(Node n in children)
+                {
+                    n.parentNodeID = parentID;
+                }
+
+                foreach(Node n in InMemoryDatabase.Nodes)
+                {
+                    if(nodeID == n.nodeID)
+                    {
+                        InMemoryDatabase.Nodes.Remove(n);
+                    }
+                }
+                return _messageBank.GetMessage(IMessageBank.Responses.deleteNodeSuccess).Result;
+
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+
         public async Task<Tuple<INode, string>> GetNodeAsync(long nID, CancellationToken cancellationToken = default)
         {
             INode nullNode = null;
@@ -964,6 +1017,16 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 return Tuple.Create(nullNode, "500: Database: " + ex.Message);
             }
+        }
+
+        Task<string> ISqlDAO.UpdateNodeAsync(INode updatedNode, INode previousNode, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Tuple<List<INode>, string>> ISqlDAO.GetNodeChildren(long nID, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

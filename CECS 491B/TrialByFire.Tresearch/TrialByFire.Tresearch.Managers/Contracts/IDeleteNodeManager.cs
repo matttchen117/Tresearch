@@ -7,8 +7,8 @@ using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Managers.Contracts
 {
-    public interface ICreateNodeManager
+    public interface IDeleteNodeManager
     {
-        Task<string> CreateNodeAsync(IAccount account, INode node, CancellationToken cancellationToken = default);
+        Task<string> DeleteNodeAsync(IAccount account, long nodeID, long parentID, CancellationToken cancellation = default);
     }
 }

@@ -1801,25 +1801,119 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         visibility = node.visibility,
                         accountOwner = node.accountOwner
                     };
-                    var affectedRows = await connection.QueryAsync<int>(new CommandDefinition(procedure, values, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, values, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
-                    if (cancellationToken.IsCancellationRequested)
+                    if(affectedRows == 1)
                     {
-                        string rollbackResult = "Delete Node";
-                        //to do
-                        //if(rollback != "200"
-                        //return 503
-                        //else
-                        //return 500
-                        return "500";
+                        return await _messageBank.GetMessage(IMessageBank.Responses.createNodeSuccess).ConfigureAwait(false);
                     }
-
-                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    else
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.createNodeFail).ConfigureAwait(false);
+                    }
                 }
             }
             catch(OperationCanceledException)
             {
                 return _messageBank.ErrorMessages["cancellationRequested"];
+            }
+            catch(Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+
+        public async Task<string> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                int affectedRows;
+                cancellationToken.ThrowIfCancellationRequested();
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+                }
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var procedure = "[DeleteNode]";
+                    var parameters = new
+                    {
+                        NodeID = nodeID,
+                        NodeParentID = parentID
+                    };
+                    affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    if (affectedRows == 0)
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.deleteNodeSuccess).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.deleteNodeFail).ConfigureAwait(false);
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return ("500: Database: " + ex.Message);
+            }
+        }
+
+        public async Task<string> UpdateNodeAsync(INode updatedNode, INode previousNode, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var procedure = "[UpdateNode]";
+                    var values = new
+                    {
+                        UserHash = updatedNode.accountOwner,
+                        NodeID = updatedNode.nodeID,
+                        NodeParentID = updatedNode.parentNodeID,
+                        NodeTitle = updatedNode.nodeTitle,
+                        Summary = updatedNode.summary,
+                        Visibility = updatedNode.visibility
+                    };
+
+                    var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, values, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        var restoreValues = new
+                        {
+                            UserHash = previousNode.accountOwner,
+                            NodeID = previousNode.nodeID,
+                            NodeParentID = previousNode.parentNodeID,
+                            NodeTitle = previousNode.nodeTitle,
+                            Summary = previousNode.summary,
+                            Visibility = previousNode.visibility
+                        };
+                        affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, restoreValues, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                        if (affectedRows < 1)
+                            return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                        else
+                            throw new OperationCanceledException();
+                    }
+
+                    if(affectedRows < 1)
+                    {
+                        return _messageBank.GetMessage(IMessageBank.Responses.updateNodeFail).Result;
+                    }
+                    else
+                    {
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    }
+                }
+            }
+            catch(OperationCanceledException)
+            {
+                throw;
             }
             catch(Exception ex)
             {
@@ -1854,7 +1948,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     }
                     else
                     {
-                        return Tuple.Create(nullNode, _messageBank.SuccessMessages["generic"]);
+                        return Tuple.Create(node, _messageBank.SuccessMessages["generic"]);
                     }
                 }
             }
@@ -1868,16 +1962,49 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        /*public async Task<string> UpdateNode(INode node)
+        public async Task<Tuple<List<INode>, string>> GetNodeChildren(long nID, CancellationToken cancellationToken = default)
         {
-            using (var connection = new SqlConnection(_options.SqlConnectionString))
+            List<INode> childList = new List<INode>();
+            try
             {
-                var procedure = "[CreateNode]";
-                var values = new
+                using(var connection = new SqlConnection(_options.SqlConnectionString))
                 {
+                    var procedure = "dbo.{GetNodeChildren]";
+                    var parameters = new
+                    {
+                        nodeID = nID
+                    };
+                    var Nodes = await connection.QueryAsync<Node>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
+                    if(Nodes.Count() == 0)
+                    {
+                        return Tuple.Create(childList, _messageBank.ErrorMessages["nodeChildrenNotFound"]);
+                    }
+
+                    //Iterate through the list so the list of type INode takes in entries of type Node
+                    foreach(var node in Nodes)
+                    {
+                        childList.Add(node);
+                    }
+
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return Tuple.Create(childList, _messageBank.ErrorMessages["cancellationRequested"]);
+                    }
+                    else
+                    {
+                        return Tuple.Create(childList, _messageBank.SuccessMessages["generic"]);
+                    }
                 }
             }
-        }*/
+            catch (OperationCanceledException)
+            {
+                return Tuple.Create(childList, _messageBank.ErrorMessages["cancellationRequested"]);
+            }
+            catch(Exception ex)
+            {
+                return Tuple.Create(childList, "500: Database: " + ex.Message);
+            }
+        }
     }
 }

@@ -40,7 +40,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         /// <param name="cancellationToken"></param>
         /// <returns>The result of the operation.</returns>
         /// <returns>The result of the operation with any status codes if applicable</returns>
-        public async Task<string> CreateNodeAsync(string username, INode node, CancellationToken cancellationToken = default)
+        public async Task<string> CreateNodeAsync(IAccount account, INode node, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             string result;
