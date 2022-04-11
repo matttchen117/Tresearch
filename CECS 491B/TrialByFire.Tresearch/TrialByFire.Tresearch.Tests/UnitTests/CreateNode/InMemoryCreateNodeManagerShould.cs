@@ -43,9 +43,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CreateNode
             ICreateNodeManager createNodeManager = TestProvider.GetService<ICreateNodeManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             Node node = new Node(nodeID, parentID, nodeTitle, summary, visibility, accountOwner);
+            Account account = new Account(username, "jessie123", "user");
 
             //Act
-            string result = await createNodeManager.CreateNodeAsync(username, node, cancellationTokenSource.Token).ConfigureAwait(false);
+            string result = await createNodeManager.CreateNodeAsync(account, node, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
             Assert.Equal(expected, result);

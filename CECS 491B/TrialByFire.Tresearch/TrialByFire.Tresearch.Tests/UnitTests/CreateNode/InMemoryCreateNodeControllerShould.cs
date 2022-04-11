@@ -51,9 +51,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CreateNode
                 StatusCode = Convert.ToInt32(expects[0])
             };
             Node node = new Node(nodeID, parentID, nodeTitle, summary, visibility, accountOwner);
+            Account account = new Account(username, "jessie123", "user");
 
             //Act
-            IActionResult result = await createNodeController.CreateNodeAsync(username, node).ConfigureAwait(false);
+            IActionResult result = await createNodeController.CreateNodeAsync(account, node).ConfigureAwait(false);
             var objectResult = result as ObjectResult;
 
             //Assert
