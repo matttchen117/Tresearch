@@ -40,9 +40,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         {
             //Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            if (!roleIdentity.Name.Equals("guest"))
-                Thread.CurrentPrincipal = rolePrincipal;
-            
+            Thread.CurrentPrincipal = rolePrincipal;
+
+
             string[] exps = expected.Split(":");
             ObjectResult expectedResult = new ObjectResult(exps[2])
             { StatusCode = Convert.ToInt32(exps[0]) };
@@ -61,85 +61,85 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         public static IEnumerable<object[]> AddNodeTagData()
         {
             //User Authorized, Nodes already have tag
-            IRoleIdentity roleIdentity0 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
+            IRoleIdentity roleIdentity0 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
             var tagNameCase0 = "Tresearch Controller Add Tag1";
             var nodeListCase0 = new List<long> { 9019303350, 9019303351, 9019303352 };
             var resultCase0 = "200: Server: Tag added to node(s).";
 
             //User Authorized, Nodes do not contain these tags
-            IRoleIdentity roleIdentity1 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
+            IRoleIdentity roleIdentity1 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
             var tagNameCase1 = "Tresearch Controller Add Tag2";
             var nodeListCase1 = new List<long> { 9019303350, 9019303351, 9019303352 };
             var resultCase1 = "200: Server: Tag added to node(s).";
 
             //User Authorized, Node already has tag
-            IRoleIdentity roleIdentity2 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
+            IRoleIdentity roleIdentity2 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
             var tagNameCase2 = "Tresearch Controller Add Tag3";
             var nodeListCase2 = new List<long> { 9019303350 };
             var resultCase2 = "200: Server: Tag added to node(s).";
 
             //User Authorized, Node does not have tag
-            IRoleIdentity roleIdentity3 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
+            IRoleIdentity roleIdentity3 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
             var tagNameCase3 = "Tresearch Controller Add Tag4";
             var nodeListCase3 = new List<long> { 9019303350 };
             var resultCase3 = "200: Server: Tag added to node(s).";
 
             //User Authorized, No node is passed in
-            IRoleIdentity roleIdentity4 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
+            IRoleIdentity roleIdentity4 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
             var tagNameCase4 = "Tresearch Controller Add Tag4";
             var nodeListCase4 = new List<long> { };
             var resultCase4 = "404: Database: The node was not found.";
 
             //User Authorized, Tag doesn't exist
-            IRoleIdentity roleIdentity5 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
+            IRoleIdentity roleIdentity5 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
             var tagNameCase5 = "Tresearch Controller Add Tag5";
             var nodeListCase5 = new List<long> { 9019303350 };
             var resultCase5 = "404: Database: Tag not found.";
 
             //User Authorized, Some Nodes already have tag (9019303351 contains tag)
-            IRoleIdentity roleIdentity6 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
+            IRoleIdentity roleIdentity6 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
             var tagNameCase6 = "Tresearch Controller Add Tag3";
             var nodeListCase6 = new List<long> { 9019303350, 9019303351, 9019303352 };
             var resultCase6 = "200: Server: Tag added to node(s).";
 
             //User not Auhorized For All Nodes
-            IRoleIdentity roleIdentity7 = new RoleIdentity(false, "tagControllerIntegration2@tresearch.system", "user");
+            IRoleIdentity roleIdentity7 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
             var tagNameCase7 = "Tresearch Controller Add Tag3";
             var nodeListCase7 = new List<long> { 9019303350, 9019303351, 9019303352 };
             var resultCase7 = "403: Database: You are not authorized to perform this operation.";
 
             //User not Authorized for some Nodes (user owns 9019303353, 9019303354 but not 9019303350)
-            IRoleIdentity roleIdentity8 = new RoleIdentity(false, "tagControllerIntegration2@tresearch.system", "user");
+            IRoleIdentity roleIdentity8 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
             var tagNameCase8 = "Tresearch Controller Add Tag3";
             var nodeListCase8 = new List<long> { 9019303350, 9019303353, 9019303354 };
             var resultCase8 = "403: Database: You are not authorized to perform this operation.";
 
             //User not Authorized for node
-            IRoleIdentity roleIdentity9 = new RoleIdentity(false, "tagControllerIntegration2@tresearch.system", "user");
+            IRoleIdentity roleIdentity9 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
             var tagNameCase9 = "Tresearch Controller Add Tag3";
             var nodeListCase9 = new List<long> { 9019303350 };
             var resultCase9 = "403: Database: You are not authorized to perform this operation.";
 
             //User has not been authenticated
-            IRoleIdentity roleIdentity10 = new RoleIdentity(false, "guest", "guest");
+            IRoleIdentity roleIdentity10 = new RoleIdentity(true, "guest", "guest", "");
             var tagNameCase10 = "Tresearch Controller Add Tag3";
             var nodeListCase10 = new List<long> { 9019303350 };
             var resultCase10 = "401: Server: No active session found. Please login and try again.";
 
             //User is not enabled
-            IRoleIdentity roleIdentity11 = new RoleIdentity(false, "tagControllerIntegrationNotEnabled@tresearch.system", "user");
+            IRoleIdentity roleIdentity11 = new RoleIdentity(true, "tagControllerIntegrationNotEnabled@tresearch.system", "user", "3e5c76fdaaa3dbdc12ecf59f01028284632d7a5289656eede6680c582a9e71eb082dafe0fb99411e6a220f4c9b1937a7e8d9317b3a0006051265590a166043ee");
             var tagNameCase11 = "Tresearch Manager Add Tag3";
             var nodeListCase11 = new List<long> { 9019303365 };
             var resultCase11 = "401: Database: UserAccount disabled. Perform account recovery or contact system admin.";
 
             //User is not confirmed
-            IRoleIdentity roleIdentity12 = new RoleIdentity(false, "tagControllerIntegrationNotConfirmed@tresearch.system", "user");
+            IRoleIdentity roleIdentity12 = new RoleIdentity(true, "tagControllerIntegrationNotConfirmed@tresearch.system", "user", "89ff4ea1982c9a201348d5ad6522ab72dc81084199596fdc7790c670a79bf86b3312c2d521ec6b7dc73b2eaa0698e54c17dddf47ecd6ef0b1f54f1b68552ca9c");
             var tagNameCase12 = "Tresearch Controller Add Tag3";
             var nodeListCase12 = new List<long> { 9019303366 };
             var resultCase12 = "401: Database: Please confirm your account before attempting to login.";
 
             //UserAccount  does not exist
-            IRoleIdentity roleIdentity13 = new RoleIdentity(false, "tagControllerNoAccount@tresearch.system", "user");
+            IRoleIdentity roleIdentity13 = new RoleIdentity(true, "tagControllerNoAccount@tresearch.system", "user", "");
             var tagNameCase13 = "Tresearch Controller Add Tag3";
             var nodeListCase13 = new List<long> { };
             var resultCase13 = "500: Database: The UserAccount was not found.";
@@ -169,8 +169,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         {
             //Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            if (!roleIdentity.Name.Equals("guest"))
-                Thread.CurrentPrincipal = rolePrincipal;
+            Thread.CurrentPrincipal = rolePrincipal;
             ITagController tagController = TestProvider.GetService<ITagController>();
 
             string[] exps = expected.Split(":");
@@ -189,85 +188,85 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         public static IEnumerable<object[]> RemoveNodeTagData()
         {
             //User Authorized, Nodes already have tag
-            IRoleIdentity roleIdentity0 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
+            IRoleIdentity roleIdentity0 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
             var tagNameCase0 = "Tresearch Controller Delete Tag1";
             var nodeListCase0 = new List<long> { 9019303350, 9019303351, 9019303352 };
             var resultCase0 = "200: Server: Tag removed from node(s).";
 
             //User Authorized, Nodes do not contain these tags
-            IRoleIdentity roleIdentity1 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
+            IRoleIdentity roleIdentity1 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
             var tagNameCase1 = "Tresearch Controller Delete Tag2";
             var nodeListCase1 = new List<long> { 9019303350, 9019303351, 9019303352 };
             var resultCase1 = "200: Server: Tag removed from node(s).";
 
             //User Authorized, Node already has tag
-            IRoleIdentity roleIdentity2 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
+            IRoleIdentity roleIdentity2 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
             var tagNameCase2 = "Tresearch Controller Delete Tag3";
             var nodeListCase2 = new List<long> { 9019303350 };
             var resultCase2 = "200: Server: Tag removed from node(s).";
 
             //User Authorized, Node does not have tag
-            IRoleIdentity roleIdentity3 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
+            IRoleIdentity roleIdentity3 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
             var tagNameCase3 = "Tresearch Controller Delete Tag4";
             var nodeListCase3 = new List<long> { 9019303350 };
             var resultCase3 = "200: Server: Tag removed from node(s).";
 
             //User Authorized, No node is passed in
-            IRoleIdentity roleIdentity4 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
+            IRoleIdentity roleIdentity4 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
             var tagNameCase4 = "Tresearch Controller Delete Tag4";
             var nodeListCase4 = new List<long> { };
             var resultCase4 = "404: Database: The node was not found.";
 
             //User Authorized, Tag doesn't exist
-            IRoleIdentity roleIdentity5 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
+            IRoleIdentity roleIdentity5 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
             var tagNameCase5 = "Tresearch Controller Delete Tag5";
             var nodeListCase5 = new List<long> { 9019303350 };
             var resultCase5 = "200: Server: Tag removed from node(s).";
 
             //User Authorized, Some Nodes already have tag (9019303351 contains tag)
-            IRoleIdentity roleIdentity6 = new RoleIdentity(false, "tagControllerIntegration1@tresearch.system", "user");
+            IRoleIdentity roleIdentity6 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
             var tagNameCase6 = "Tresearch Controller Delete Tag3";
             var nodeListCase6 = new List<long> { 9019303350, 9019303351, 9019303352 };
             var resultCase6 = "200: Server: Tag removed from node(s).";
 
             //User not Auhorized For All Nodes
-            IRoleIdentity roleIdentity7 = new RoleIdentity(false, "tagControllerIntegration2@tresearch.system", "user");
+            IRoleIdentity roleIdentity7 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
             var tagNameCase7 = "Tresearch Controller Delete Tag3";
             var nodeListCase7 = new List<long> { 9019303350, 9019303351, 9019303352 };
             var resultCase7 = "403: Database: You are not authorized to perform this operation.";
 
             //User not Authorized for some Nodes (user owns 9019303353, 9019303354 but not 9019303350)
-            IRoleIdentity roleIdentity8 = new RoleIdentity(false, "tagControllerIntegration2@tresearch.system", "user");
+            IRoleIdentity roleIdentity8 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
             var tagNameCase8 = "Tresearch Controller Delete Tag3";
             var nodeListCase8 = new List<long> { 9019303350, 9019303353, 9019303354 };
             var resultCase8 = "403: Database: You are not authorized to perform this operation.";
 
             //User not Authorized for node
-            IRoleIdentity roleIdentity9 = new RoleIdentity(false, "tagControllerIntegration2@tresearch.system", "user");
+            IRoleIdentity roleIdentity9 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
             var tagNameCase9 = "Tresearch Controller Delete Tag3";
             var nodeListCase9 = new List<long> { 9019303350 };
             var resultCase9 = "403: Database: You are not authorized to perform this operation.";
 
             //User has not been authenticated
-            IRoleIdentity roleIdentity10 = new RoleIdentity(false, "guest", "guest");
+            IRoleIdentity roleIdentity10 = new RoleIdentity(true, "guest", "guest", "");
             var tagNameCase10 = "Tresearch Controller Delete Tag3";
             var nodeListCase10 = new List<long> { 9019303350 };
             var resultCase10 = "401: Server: No active session found. Please login and try again.";
 
             //User is not enabled
-            IRoleIdentity roleIdentity11 = new RoleIdentity(false, "tagControllerIntegrationNotEnabled@tresearch.system", "user");
+            IRoleIdentity roleIdentity11 = new RoleIdentity(true, "tagControllerIntegrationNotEnabled@tresearch.system", "user", "3e5c76fdaaa3dbdc12ecf59f01028284632d7a5289656eede6680c582a9e71eb082dafe0fb99411e6a220f4c9b1937a7e8d9317b3a0006051265590a166043ee");
             var tagNameCase11 = "Tresearch Controller Delete Tag3";
             var nodeListCase11 = new List<long> { 9019303365 };
             var resultCase11 = "401: Database: UserAccount disabled. Perform account recovery or contact system admin.";
 
             //User is not confirmed
-            IRoleIdentity roleIdentity12 = new RoleIdentity(false, "tagControllerIntegrationNotConfirmed@tresearch.system", "user");
+            IRoleIdentity roleIdentity12 = new RoleIdentity(true, "tagControllerIntegrationNotConfirmed@tresearch.system", "user", "89ff4ea1982c9a201348d5ad6522ab72dc81084199596fdc7790c670a79bf86b3312c2d521ec6b7dc73b2eaa0698e54c17dddf47ecd6ef0b1f54f1b68552ca9c");
             var tagNameCase12 = "Tresearch Controller Delete Tag3";
             var nodeListCase12 = new List<long> { 9019303366 };
             var resultCase12 = "401: Database: Please confirm your account before attempting to login.";
 
             //UserAccount  does not exist
-            IRoleIdentity roleIdentity13 = new RoleIdentity(false, "tagControllerNoAccount@tresearch.system", "user");
+            IRoleIdentity roleIdentity13 = new RoleIdentity(true, "tagControllerNoAccount@tresearch.system", "user", "");
             var tagNameCase13 = "Tresearch Controller Delete Tag3";
             var nodeListCase13 = new List<long> { };
             var resultCase13 = "500: Database: The UserAccount was not found.";
@@ -297,8 +296,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         {
             //Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            if (!roleIdentity.Name.Equals("guest"))
-                Thread.CurrentPrincipal = rolePrincipal;
+            Thread.CurrentPrincipal = rolePrincipal;
 
             string[] exps = expected.Split(":");
             ObjectResult expectedResult = new ObjectResult(exps[2])
@@ -322,7 +320,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
              *          9019303358: Tresearch Controller Get Tag1, Tresearch Controller Get Tag2, Tresearch Controller Get Tag3
              */
 
-            IRoleIdentity roleIdentity0 = new RoleIdentity(false, "tagControllerIntegration3@tresearch.system", "user");
+            IRoleIdentity roleIdentity0 = new RoleIdentity(true, "tagControllerIntegration3@tresearch.system", "user", "0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f");
             var tagListCase0 = new List<string> { "Tresearch Controller Get Tag1", "Tresearch Controller Get Tag2" };
             var nodeListCase0 = new List<long> { 9019303356, 9019303357, 9019303358 };
             var resultCase0 = "200: Server: Tag(s) retrieved.";
@@ -332,50 +330,50 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
              *          9019303359: Tresearch Controller Get Tag2
              *          9019303360: Tresearch Controller Get Tag1
              */
-            IRoleIdentity roleIdentity1 = new RoleIdentity(false, "tagControllerIntegration3@tresearch.system", "user");
+            IRoleIdentity roleIdentity1 = new RoleIdentity(true, "tagControllerIntegration3@tresearch.system", "user", "0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f");
             var tagListCase1 = new List<string> { };
             var nodeListCase1 = new List<long> { 9019303358, 9019303359, 9019303360 };
             var resultCase1 = "200: Server: Tag(s) retrieved.";
 
             //User Authorized, Grab Single Node's Tags (9019303356: Tresearch Controller Get Tag1, Tresearch Controller Get Tag2)
-            IRoleIdentity roleIdentity2 = new RoleIdentity(false, "tagControllerIntegration3@tresearch.system", "user");
+            IRoleIdentity roleIdentity2 = new RoleIdentity(true, "tagControllerIntegration3@tresearch.system", "user", "0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f");
             var tagListCase2 = new List<string> { "Tresearch Controller Get Tag1", "Tresearch Controller Get Tag2" };
             var nodeListCase2 = new List<long> { 9019303356 };
             var resultCase2 = "200: Server: Tag(s) retrieved.";
 
             //User Authorized, Node does not have tag
-            IRoleIdentity roleIdentity3 = new RoleIdentity(false, "tagControllerIntegration3@tresearch.system", "user");
+            IRoleIdentity roleIdentity3 = new RoleIdentity(true, "tagControllerIntegration3@tresearch.system", "user", "0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f");
             var tagListCase3 = new List<string> { };
             var nodeListCase3 = new List<long> { 9019303361 };
             var resultCase3 = "200: Server: Tag(s) retrieved.";
 
             //User Authorized, No node is passed in
-            IRoleIdentity roleIdentity4 = new RoleIdentity(false, "tagControllerIntegration3@tresearch.system", "user");
+            IRoleIdentity roleIdentity4 = new RoleIdentity(true, "tagControllerIntegration3@tresearch.system", "user", "0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f");
             var tagListCase4 = new List<string> { };
             var nodeListCase4 = new List<long> { };
             var resultCase4 = "404: Database: Node not found.";
 
 
             //User not Auhorized For All Nodes
-            IRoleIdentity roleIdentity5 = new RoleIdentity(false, "tagControllerIntegration2@tresearch.system", "user");
+            IRoleIdentity roleIdentity5 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
             var tagListCase5 = new List<string> { };
             var nodeListCase5 = new List<long> { 9019303350, 9019303351, 9019303352 };
             var resultCase5 = "403: Database: You are not authorized to perform this operation.";
 
             //User not Authorized for some Nodes (user owns 9019303353, 9019303354 but not 9019303350)
-            IRoleIdentity roleIdentity6 = new RoleIdentity(false, "tagControllerIntegration2@tresearch.system", "user");
+            IRoleIdentity roleIdentity6 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
             var tagListCase6 = new List<string> { };
             var nodeListCase6 = new List<long> { 9019303350, 9019303353, 9019303354 };
             var resultCase6 = "403: Database: You are not authorized to perform this operation.";
 
             //User not Authorized for node
-            IRoleIdentity roleIdentity7 = new RoleIdentity(false, "tagControllerIntegration2@tresearch.system", "user");
+            IRoleIdentity roleIdentity7 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
             var tagListCase7 = new List<string> { };
             var nodeListCase7 = new List<long> { 9019303350 };
             var resultCase7 = "403: Database: You are not authorized to perform this operation.";
 
             //User has not been authenticated
-            IRoleIdentity roleIdentity8 = new RoleIdentity(false, "guest", "guest");
+            IRoleIdentity roleIdentity8 = new RoleIdentity(true, "guest", "guest", "");
             var tagListCase8 = new List<string> { };
             var nodeListCase8 = new List<long> { 9019303350 };
             var resultCase8 = "401: Server: No active session found. Please login and try again.";
@@ -421,8 +419,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         {
             //Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            if (!roleIdentity.Name.Equals("guest"))
-                Thread.CurrentPrincipal = rolePrincipal;
+            Thread.CurrentPrincipal = rolePrincipal;
 
             string[] exps = expected.Split(":");
             ObjectResult expectedResult = new ObjectResult(exps[2])
@@ -483,8 +480,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         {
             //Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            if (!roleIdentity.Name.Equals("guest"))
-                Thread.CurrentPrincipal = rolePrincipal;
+            Thread.CurrentPrincipal = rolePrincipal;
             string[] exps = expected.Split(":");
             ObjectResult expectedResult = new ObjectResult(exps[2])
             { StatusCode = Convert.ToInt32(exps[0]) };
@@ -550,8 +546,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         {
             //Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            if (!roleIdentity.Name.Equals("guest"))
-                Thread.CurrentPrincipal = rolePrincipal;
+            Thread.CurrentPrincipal = rolePrincipal;
 
             string[] exps = expected.Split(":");
             ObjectResult expectedResult = new ObjectResult(exps[2])

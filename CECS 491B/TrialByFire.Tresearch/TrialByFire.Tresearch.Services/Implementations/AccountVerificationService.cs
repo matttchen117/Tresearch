@@ -51,14 +51,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }  
         }
 
-        public async Task<string> VerifyAccountAuthorizedNodeChangesAsync(List<long> nodeIDs, IAccount account, CancellationToken cancellationToken = default)
+        public async Task<string> VerifyAccountAuthorizedNodeChangesAsync(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default)
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 cancellationToken.ThrowIfCancellationRequested();
 
-                string result = await _sqlDAO.IsAuthorizedToMakeNodeChangesAsync(nodeIDs, account, cancellationToken);
+                string result = await _sqlDAO.IsAuthorizedToMakeNodeChangesAsync(nodeIDs, userHash, cancellationToken);
 
                 return result;
             }

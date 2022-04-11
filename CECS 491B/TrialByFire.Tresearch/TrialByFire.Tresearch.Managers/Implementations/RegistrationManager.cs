@@ -43,16 +43,11 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
 
                 //Check if user has a token already. User should not be logged in
-                if (Thread.CurrentPrincipal == null)
+                if (Thread.CurrentPrincipal.Identity.Name == "guest")
                 {
                     //Hash email Uusing pbkdf2
                     string resultHashEmail = await _registrationService.HashValueAsync(email+authorizationLevel, cancellationToken);
-
-                   
-
-                   
-                    
-
+              
                     //Create an account in UserAccount Tables
                     Tuple<int, string> resultCreateAccount = await _registrationService.CreateAccountAsync(email, passphrase, authorizationLevel, cancellationToken);
 

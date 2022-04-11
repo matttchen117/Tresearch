@@ -2192,7 +2192,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -2205,8 +2205,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         var value = new
                         {
                             NodeID = nodeId,
-                            Username = account.Username,
-                            AuthorizationLevel = account.AuthorizationLevel
+                            UserHash = userHash
                         };
                         var isAuthorized = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
@@ -2222,7 +2221,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch(Exception ex)
             {
-                return  await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                return _options.UnhandledExceptionMessage + ex.Message;
             }
         }
 

@@ -608,7 +608,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
--- =============================================
+/*-- =============================================
 -- Author:		Matthew Chen
 -- Create date: 3/29/2022
 -- Description:	Stores the otp for the User
@@ -666,7 +666,7 @@ BEGIN
 	RETURN @Result;
 END
 GO
-
+*/
 -- =============================================
 CREATE PROCEDURE GetUserHash 
 	-- Add the parameters for the stored procedure here

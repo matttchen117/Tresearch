@@ -88,7 +88,7 @@ class RegistrationForm extends React.Component  {
                         break;
                     default: this.setState({errorMessage: 'Unable to create account'});
                 }
-                console.log(err.errorMessage);
+                console.log(err);
             })
         }
     }

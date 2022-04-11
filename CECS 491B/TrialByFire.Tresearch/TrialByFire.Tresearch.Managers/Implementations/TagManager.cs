@@ -43,7 +43,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 //Check if user is authenticated
-               if(Thread.CurrentPrincipal != null)
+               if(!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                {
                     //Get user's role
                     string role = "";
@@ -53,6 +53,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                         role = _options.Admin;
                     else
                         return await _messageBank.GetMessage(IMessageBank.Responses.unknownRole);
+
+                    string userHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
 
                     //UserAccount with user's username and role
                     IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
@@ -65,7 +67,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                         return resultVerifyAccount;
 
                     //Verify if account is authorized to make changes to Nodes
-                    string resultVerifyAuthorized = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(nodeIDs, account, cancellationToken);
+                    string resultVerifyAuthorized = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(nodeIDs, userHash, cancellationToken);
 
                     //Check if account is authorized to make changes, if not return error
                     if (!resultVerifyAuthorized.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
@@ -84,7 +86,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             }
             catch(Exception ex)
             {
-                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                return _options.UnhandledExceptionMessage + ex.Message;
             }
         }
 
@@ -102,7 +104,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 //Check if the user is authenticated
-                if(Thread.CurrentPrincipal != null)
+                if(!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
                     //Get user's role
                     string role = "";
@@ -112,6 +114,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                         role = _options.Admin;
                     else
                         return await _messageBank.GetMessage(IMessageBank.Responses.unknownRole);
+
+                    string userHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
 
                     //UserAccount with user's username and role
                     IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
@@ -124,7 +128,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                         return resultVerifyAccount;
 
                     //Verify if account is authorized to make changes to Nodes
-                    string resultVerifyAuthorized = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(nodeIDs, account, cancellationToken);
+                    string resultVerifyAuthorized = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(nodeIDs, userHash, cancellationToken);
 
                     //Check if account is authorized to make changes, if not return error
                     if (!resultVerifyAuthorized.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
@@ -160,7 +164,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 //Check if the user is authenticated
-                if(Thread.CurrentPrincipal != null)
+                if(!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
                     //Get user's role
                     string role = "";
@@ -170,6 +174,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                         role = _options.Admin;
                     else
                         return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.unknownRole));
+
+                    string userHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
 
                     //UserAccount with user's username and role
                     IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
@@ -182,7 +188,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                         return Tuple.Create(new List<string>(), resultVerifyAccount);
 
                     //Verify if account is authorized to make changes to Nodes
-                    string resultVerifyAuthorized = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(nodeIDs, account, cancellationToken);
+                    string resultVerifyAuthorized = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(nodeIDs, userHash, cancellationToken);
 
                     //Check if account is authorized to make changes, if not return error
                     if (!resultVerifyAuthorized.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
@@ -220,7 +226,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 //Check if the user is authenticated
-                if (Thread.CurrentPrincipal != null)
+                if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
                     //Get user's role
                     string role = "";
@@ -272,7 +278,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 //Check if the user is authenticated
-                if (Thread.CurrentPrincipal != null)
+                if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
                     //Get user's role
                     string role = "";
@@ -322,7 +328,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (Thread.CurrentPrincipal != null)
+                if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
                     //Get user's role
                     string role = "";

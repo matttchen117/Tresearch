@@ -30,7 +30,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public Task<string> UpdateAccountToConfirmedAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> RemoveConfirmationLinkAsync(IConfirmationLink confirmationLink, CancellationToken cancellationToken = default(CancellationToken));
         public Task<Tuple<IConfirmationLink, string>> GetConfirmationLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken));
-        public Task<string> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, IAccount account, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default(CancellationToken));
 
         // Authentication
         public Task<int> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken = default);

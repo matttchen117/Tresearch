@@ -123,7 +123,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default(CancellationToken))
         {
             return "";
         }
