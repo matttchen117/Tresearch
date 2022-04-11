@@ -21,6 +21,7 @@ import InactiveLink from "./Features/Registration/InactiveLink";
 import Portal from "./Pages/Portal/Portal";
 import AdminPortal from "./Pages/AdminPortal/AdminPortal";
 import Error404 from "./Pages/Error404/Error404";
+import Settings from "./Pages/Settings/Settings";
 
 class App extends React.Component {
   constructor(props){
@@ -44,6 +45,7 @@ class App extends React.Component {
             <Route path = '*' exact = {true} element = {<Error404/>}/>
             <Route path="/" element = {<Home />}/>
             <Route path = "/Portal" element ={<Portal />}/>
+            <Route path = "/Settings" element = {<Settings/>} exact/>
 
 
             <Route path="/Login/Login" element = {<Login />}/>

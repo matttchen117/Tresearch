@@ -114,7 +114,7 @@ class LoginForm extends React.Component  {
                         console.log(response.data);
                         console.log(response.headers['authorization']);
                         this.setState({verified: true});
-                        sessionStorage.setItem('authorization', response.headers['authorization']);
+                        
                         //navigate('/Login/Authentication');
                 }).catch(err => {
                     console.log(err.data)

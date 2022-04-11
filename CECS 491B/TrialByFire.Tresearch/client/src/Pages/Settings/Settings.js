@@ -7,13 +7,13 @@ import Button from "../../UI/Button/ButtonComponent";
 
 const handleDelete = (e) => { 
     const value = e.va;
-    axios.defaults.headers.common['Authorization'] = localStorage.getItem('authorization');
+    axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
 
 
     axios.post("https://localhost:7010/AccountDeletion/DeleteAccount")
         .then((response => {
             console.log("success");
-            localStorage.removeItem('authorization');
+            sessionStorage.removeItem('authorization');
             window.location = '/';
 
             axios.post("https://localhost:7010/");
