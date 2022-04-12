@@ -26,6 +26,15 @@ namespace TrialByFire.Tresearch.Models.Implementations
             Hash = hash;
         }
 
+        public override string ToString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendFormat("Timestamp: {0}, Level: {1}, UserHash: {2}, " +
+                "Category: {3}, Description: {4}, Hash: {5}", Timestamp.ToString(), Level, UserHash, 
+                Category, Description, Hash);
+            return stringBuilder.ToString();
+        }
+
         public override bool Equals(object? obj)
         {
             if(!(obj == null))

@@ -142,7 +142,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 parameters.Add("Destination", destination);
                 parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
-                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                    commandType: CommandType.StoredProcedure))
                     .ConfigureAwait(false);
                 return parameters.Get<int>("Result");
             }
