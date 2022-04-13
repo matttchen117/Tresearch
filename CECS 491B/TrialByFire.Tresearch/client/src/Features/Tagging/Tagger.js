@@ -20,27 +20,27 @@ function Tagger() {
   
 
   const handleSelection = (e) =>{
-    
+    var value = e.value;
+    axios.post("https://localhost:7010/Tag/addTag?tagName="+value ,nodeData)
+        .then((response => {
+          refreshTagData();
+        }))
+        .catch((err => {
+            console.log(err);
+        }))
   }
 
   const handleClick = (e) => {
-    
-  }
-
-
-
-  const fetchNodeTags = () => {
     async function fetchData() {
-      await axios.post("https://localhost:7010/Tag/nodeTagList", nodeData)
+      var value = e.target.getAttribute('data-item');
+      await axios.post("https://localhost:7010/Tag/removeTag?tagName="+value, nodeData)
         .then(response => {
-          const responseData = response.data;
-          setTagData(responseData);
+            refreshTagData();
         })
         .catch(err => {
-          switch(err.response.data){
+          switch(err.response){
             case 403: {
-                setTagData(nullSearch);
-                console.log('test');
+                setTagData(nullSearch);    
             }
           }
         })
@@ -48,37 +48,31 @@ function Tagger() {
     fetchData();
   }
 
-  const fetchTagOptions = () => {
-    
-    async function fetchData() {
-        await axios.get("https://localhost:7010/Tag/taglist")
+  const refreshTagData = () => {
+    axios.post("https://localhost:7010/Tag/nodeTagList", nodeData)
+    .then(response => {
+      const responseData = response.data;
+      setTagData(responseData);
+    })
+    axios.get("https://localhost:7010/Tag/taglist", {})
         .then(response => {
           const responseData = response.data;
           const options = responseData.map(d => ({
             "value": d.tagName,
             "label": d.tagName
           }));
-          setTagOptions(options);
-        })
-    }
-    fetchData();
+          let diff = options.filter(x => !tagData.includes(x.value));
+          setTagOptions(diff);
+    })
   }
 
   const refresh  = (
-    
     useEffect(() => {
-      axios.defaults.headers.common['Authorization'] = localStorage.getItem('authorization');
-      fetchNodeTags();
-      fetchTagOptions();
-      const intervalRefresh = setInterval(() => {
-        fetchNodeTags();
-        fetchTagOptions();
-      }, 5000)
-
-      return() => {
-        clearInterval(intervalRefresh);
-      }
       
+      //fetchNodeTags();
+      //fetchTagOptions();
+      axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
+      refreshTagData(); 
     }, [])
   )
 

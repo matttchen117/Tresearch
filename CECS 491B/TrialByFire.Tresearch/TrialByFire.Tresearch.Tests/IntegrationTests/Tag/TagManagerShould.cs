@@ -400,8 +400,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         {
             //Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            if (!roleIdentity.Name.Equals("guest"))
-                Thread.CurrentPrincipal = rolePrincipal;
+            Thread.CurrentPrincipal = rolePrincipal;
             ITagManager tagManager = TestProvider.GetService<ITagManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
@@ -456,8 +455,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         {
             //Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            if (!roleIdentity.Name.Equals("guest"))
-                Thread.CurrentPrincipal = rolePrincipal;
+            Thread.CurrentPrincipal = rolePrincipal;
             ITagManager tagManager = TestProvider.GetService<ITagManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
@@ -518,8 +516,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         {
             //Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            if (!roleIdentity.Name.Equals("guest"))
-                Thread.CurrentPrincipal = rolePrincipal;
+            Thread.CurrentPrincipal = rolePrincipal;
             ITagManager tagManager = TestProvider.GetService<ITagManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 

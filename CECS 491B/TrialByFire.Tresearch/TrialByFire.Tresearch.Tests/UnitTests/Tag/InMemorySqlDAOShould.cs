@@ -64,7 +64,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             Tuple<List<ITag>, string> resultTags = await sqlDAO.GetTagsAsync(cancellationTokenSource.Token);
             string result = resultTags.Item2;
 
-            //Arrange
+            //Assert
             Assert.Equal(expected, result);
         }
         [Theory]
@@ -78,7 +78,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             //Act
             string result = await sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
 
-            //Arrange
+            //Assert
             Assert.Equal(expected, result);
         }
 
@@ -133,7 +133,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             List<string> resultTags = myResult.Item1;
 
 
-            //Arrange
+            //Assert
             Assert.Equal(expected, result);
             Assert.Equal(expectedTags, resultTags);
         }

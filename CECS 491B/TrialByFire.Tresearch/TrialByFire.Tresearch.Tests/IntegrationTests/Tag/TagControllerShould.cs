@@ -53,7 +53,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             IActionResult aResult = await tagController.AddTagToNodesAsync(nodeIDs, tagName);
             var result = aResult as ObjectResult;
 
-            //Arrange
+            //Assert
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedResult.Value, result.Value);
         }
@@ -180,7 +180,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             IActionResult aResult = await tagController.RemoveTagFromNodesAsync(nodeIDs, tagName);
             var result = aResult as ObjectResult;
 
-            //Arrange
+            //Assert
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedResult.Value, result.Value);
         }

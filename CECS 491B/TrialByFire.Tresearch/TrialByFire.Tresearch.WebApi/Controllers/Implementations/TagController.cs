@@ -32,31 +32,28 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         }
 
         /// <summary>
-        ///     Gets a string list containing all possible tags 
+        ///     Get Request for retrieving all tags and count in the tag database. User must be authenticated and authorized to retrieve list.
         /// </summary>
-        /// <returns>Status code and List of tags</returns>
+        /// <returns>Status code and List of Tags</returns>
         [HttpGet]
         [Route("taglist")]
         public async Task<IActionResult> GetTagsAsync()
         {
-            if (Thread.CurrentPrincipal != null)
+            if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
             {
                 Tuple<List<ITag>, string> result = await _tagManager.GetTagsAsync( _cancellationTokenSource.Token);
+                
                 string[] split;
                 split = result.Item2.Split(":");
 
-                string role = "";
-                if (Thread.CurrentPrincipal.IsInRole(_options.User))
-                    role = _options.User;
-                else if (Thread.CurrentPrincipal.IsInRole(_options.Admin))
-                    role = _options.Admin;
-
-                if (result.Item2.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
-                    _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, "Get Tags Succeeded");
+                if (result.Item2.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess)))
+                {
+                    //_logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, "Get Tags Succeeded");
+                }
                 else
                 {
                     Enum.TryParse(split[1], out ILogManager.Categories category);
-                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Error, category, split[2]);
+                    //_logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Error, category, split[2]);
                 }
                 return StatusCode(Convert.ToInt32(split[0]), result.Item1);
             }
@@ -66,13 +63,13 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 string[] errorSplit;
                 errorSplit = errorResult.Split(":");
                 Enum.TryParse(errorSplit[0], out ILogManager.Categories category);
-                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Error, category, errorSplit[2]);
+                //_logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Error, category, errorSplit[2]);
                 return StatusCode(Convert.ToInt32(errorSplit[0]), errorSplit[2]);
             }
         }
 
         /// <summary>
-        ///     Creates a tag in tag bank
+        ///     Creates a tag in tag bank. User must be authenticated and authorized as an administrator
         /// </summary>
         /// <param name="tagName">String tag name to add</param>
         /// <returns>Status code and string status</returns>

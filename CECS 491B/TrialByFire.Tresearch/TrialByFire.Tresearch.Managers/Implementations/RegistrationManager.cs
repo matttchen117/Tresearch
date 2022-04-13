@@ -113,44 +113,53 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         {
             try
             {
+
                 cancellationToken.ThrowIfCancellationRequested();
-                Tuple<IConfirmationLink, string> confirmationLink = await _registrationService.GetConfirmationLinkAsync(guid).ConfigureAwait(false);
-                
-                if (confirmationLink.Item2 != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
-                    return confirmationLink.Item2;
-
-                if (cancellationToken.IsCancellationRequested)
-                    throw new OperationCanceledException();
-
-                //Check if confirmation link is valid
-                if (!IsConfirmationLinkInvalid(confirmationLink.Item1))
+                if (Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
+                    Tuple<IConfirmationLink, string> confirmationLink = await _registrationService.GetConfirmationLinkAsync(guid).ConfigureAwait(false);
+
+                    if (confirmationLink.Item2 != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return confirmationLink.Item2;
+
+                    if (cancellationToken.IsCancellationRequested)
+                        throw new OperationCanceledException();
+
+                    //Check if confirmation link is valid
+                    if (!IsConfirmationLinkInvalid(confirmationLink.Item1))
+                    {
                         return _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkExpired).Result;
+                    }
+
+                    IConfirmationLink linkInfo = confirmationLink.Item1;
+                    string confirmResult = await _registrationService.ConfirmAccountAsync(linkInfo.Username, linkInfo.AuthorizationLevel, cancellationToken).ConfigureAwait(false);
+
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        //PEFORM ROLLBACK
+                    }
+
+                    if (confirmResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return confirmResult;
+
+                    string removeResult = await _registrationService.RemoveConfirmationLinkAsync(confirmationLink.Item1, cancellationToken).ConfigureAwait(false);
+
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        //Rollback confirm
+                        //Rollback removal
+                    }
+
+                    if (removeResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkRemoveFail).Result;
+                    else
+                        return confirmResult;
                 }
-
-                IConfirmationLink linkInfo = confirmationLink.Item1;
-                string confirmResult = await _registrationService.ConfirmAccountAsync(linkInfo.Username, linkInfo.AuthorizationLevel, cancellationToken).ConfigureAwait(false);
-
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    //PEFORM ROLLBACK
-                }
-
-                if (confirmResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
-                    return confirmResult;
-
-                string removeResult = await _registrationService.RemoveConfirmationLinkAsync(confirmationLink.Item1, cancellationToken).ConfigureAwait(false);
-
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    //Rollback confirm
-                    //Rollback removal
-                }
-                
-                if (removeResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
-                    return _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkRemoveFail).Result;
                 else
-                    return confirmResult;
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.alreadyAuthenticated);
+                }
+                 
             }
             catch (OperationCanceledException)
             {

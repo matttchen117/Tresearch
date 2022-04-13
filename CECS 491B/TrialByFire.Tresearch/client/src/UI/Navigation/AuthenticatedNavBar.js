@@ -1,14 +1,27 @@
-import React from "react";
+import React, { useEffect, useState} from "react";
 import logo from './logo.png';
 import { ContextMenu, ContextMenuTrigger, MenuItem, showMenu } from "react-contextmenu";
 import axios, {AxiosResponse, AxiosError} from 'axios';
-
+import jwt_decode from "jwt-decode";
 import './AuthenticatedNavBar.css';
 
+
 function AuthenticatedNavBar() {
+    const [profileData, setProfileData] = useState([]);
+
+    const checkToken = () => {
+      const token = sessionStorage.getItem('authorization');
+      const decoded = jwt_decode(token);
+      setProfileData(decoded.username[0]);
+    }
+
+    useEffect(() => {
+      checkToken();
+    }, [])
+
 
     const renderProfile = (e) => {
-      const initial = "P";  //Replace this later with initial from token
+      const initial = profileData.toString().toUpperCase();  //Replace this later with initial from token
       return initial;
     }
 
@@ -37,7 +50,7 @@ function AuthenticatedNavBar() {
             sessionStorage.removeItem('authorization');
       })
       window.location = '/';
-  }
+    }
 
     const renderMenu = (
         <div className = "nav-profile">
@@ -63,11 +76,11 @@ function AuthenticatedNavBar() {
         </nav>
     );
    
-  return (
-    <div className="authenticated-nav-bar-wrapper"> 
-        {renderNav}
-    </div>
-  );
+    return (
+      <div className="authenticated-nav-bar-wrapper"> 
+          {renderNav}
+      </div>
+    );
 }
 
 export default AuthenticatedNavBar;

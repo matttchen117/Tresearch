@@ -177,6 +177,16 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodes.Add(new Node(2022030539, 2022030533, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
             nodes.Add(new Node(2022030540, 2022030533, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
             nodes.Add(new Node(2022030541, 2022030533, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
+            nodes.Add(new Node(2072942630, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
+            nodes.Add(new Node(2072942631, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
+            nodes.Add(new Node(2072942632, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
+            nodes.Add(new Node(2072942633, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
+            nodes.Add(new Node(2072942634, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
+            nodes.Add(new Node(2072942635, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
+            nodes.Add(new Node(2072942636, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
+            nodes.Add(new Node(2072942637, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
+            nodes.Add(new Node(2072942638, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
+           
 
 
             return nodes;
@@ -205,7 +215,13 @@ namespace TrialByFire.Tresearch.Models.Implementations
             tags.Add(new Tag("Tresearch SqlDAO Delete Tag2", 0));
             tags.Add(new Tag("Tresearch SqlDAO Delete Tag3", 0));
             tags.Add(new Tag("Tresearch SqlDAO Delete Tag4", 0));
-
+            tags.Add(new Tag("Tresearch Service Add Tag1", 0));
+            tags.Add(new Tag("Tresearch Service Add Tag2", 0));
+            tags.Add(new Tag("Tresearch Service Add Tag3", 0));
+            tags.Add(new Tag("Tresearch Service Add Tag4", 0));
+            tags.Add(new Tag("Tresearch Service Create tag2"));
+            tags.Add(new Tag("Tresearch Service Delete tag1"));
+            tags.Add(new Tag("Tresearch Service Delete tag3"));
             return tags;
         }
 
@@ -246,6 +262,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodeTags.Add(new NodeTag(2022030548, "Tresearch SqlDAO Delete Tag1"));
 
             nodeTags.Add(new NodeTag(2022030536, "Tresearch SqlDAO Delete Tag4"));
+            nodeTags.Add(new NodeTag(2072942638, "Tresearch Service Delete tag3"));
 
             return nodeTags;
         }

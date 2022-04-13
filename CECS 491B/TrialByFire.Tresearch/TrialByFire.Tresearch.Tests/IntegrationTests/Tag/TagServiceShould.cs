@@ -22,10 +22,12 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 
         [Theory]
         [MemberData(nameof(AddNodeTagData))]
-        public async Task AddTagToNodeAsync(List<long> nodeIDs, string tag, string expected)
+        public async Task AddTagToNodeAsync(List<long> nodeIDs, string tag, IMessageBank.Responses response)
         {
             //Arrange
             ITagService recoveryService = TestProvider.GetService<ITagService>();
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
+            string expected = await messageBank.GetMessage(response);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
@@ -40,37 +42,37 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             //Nodes already have tag
             var tagNameCase0 = "Tresearch Service Add Tag1";
             var nodeListCase0 = new List<long> { 2072942630, 2072942631, 2072942632 };
-            var resultCase0 = "200: Server: Tag added to node(s).";
+            var resultCase0 = IMessageBank.Responses.tagAddSuccess;
 
             //Nodes do not contain these tags
             var tagNameCase1 = "Tresearch Service Add Tag2";
             var nodeListCase1 = new List<long> { 2072942630, 2072942631, 2072942632 };
-            var resultCase1 = "200: Server: Tag added to node(s).";
+            var resultCase1 = IMessageBank.Responses.tagAddSuccess;
 
             //Node already has tag
             var tagNameCase2 = "Tresearch Service Add Tag3";
             var nodeListCase2 = new List<long> { 2072942630 };
-            var resultCase2 = "200: Server: Tag added to node(s).";
-            
+            var resultCase2 = IMessageBank.Responses.tagAddSuccess;
+
             //Node does not have tag
             var tagNameCase3 = "Tresearch Service Add Tag4";
             var nodeListCase3 = new List<long> { 2072942630 };
-            var resultCase3 = "200: Server: Tag added to node(s).";
+            var resultCase3 = IMessageBank.Responses.tagAddSuccess;
 
             //No node is passed in
             var tagNameCase4 = "Tresearch Service Add Tag4";
             var nodeListCase4 = new List<long> { };
-            var resultCase4 = "404: Database: The node was not found.";
+            var resultCase4 = IMessageBank.Responses.nodeNotFound;
 
             //Tag doesn't exist
             var tagNameCase5 = "Tresearch Service Add Tag5";
             var nodeListCase5 = new List<long> { 2072942630 };
-            var resultCase5 = "404: Database: Tag not found.";
+            var resultCase5 = IMessageBank.Responses.tagNotFound;
 
             //Some Nodes already have tag (2072942630 contains tag)
             var tagNameCase6 = "Tresearch Service Add Tag3";
             var nodeListCase6 = new List<long> { 2072942630, 2072942631, 2072942632 };
-            var resultCase6 = "200: Server: Tag added to node(s).";
+            var resultCase6 = IMessageBank.Responses.tagAddSuccess;
 
             return new[]
             {
@@ -250,7 +252,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         {
             //Arrange
             ITagService tagService = TestProvider.GetService<ITagService>();
-            string expected = "200: Server: Tag(s) retrieved.";
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
+            string expected = await messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess);
 
             //Act
             Tuple<List<ITag>, string> results = await tagService.GetTagsAsync();
