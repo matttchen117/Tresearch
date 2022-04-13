@@ -4,19 +4,27 @@ import { ContextMenu, ContextMenuTrigger, MenuItem, showMenu } from "react-conte
 import axios, {AxiosResponse, AxiosError} from 'axios';
 import jwt_decode from "jwt-decode";
 import './AuthenticatedNavBar.css';
+import { useLocation } from "react-router-dom";
 
 
 function AuthenticatedNavBar() {
     const [profileData, setProfileData] = useState([]);
+    const [isHomePage, setIsHomePage] = useState(false);
 
-    const checkToken = () => {
+    const CheckToken = () => {
       const token = sessionStorage.getItem('authorization');
       const decoded = jwt_decode(token);
       setProfileData(decoded.username[0]);
+      if(window.location.pathname == "/")
+      {
+        setIsHomePage(true);
+      }
+
+      return;
     }
 
     useEffect(() => {
-      checkToken();
+      CheckToken();
     }, [])
 
 
@@ -38,17 +46,22 @@ function AuthenticatedNavBar() {
         window.location = '/Settings';
     }
 
+    const handlePortalClick = (e) => {
+      window.location = '/Portal';
+  }
+
     const handleLogoutClick = (e) => {
       e.preventDefault();
       axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
       axios.post('https://localhost:7010/Logout/logout', {})
       .then(response => {
           console.log(response.data);
-          sessionStorage.removeItem('authorization');
+          
       }).catch(err => {
             console.log(err.data);
-            sessionStorage.removeItem('authorization');
+            
       })
+      sessionStorage.removeItem('authorization');
       window.location = '/';
     }
 
@@ -60,6 +73,7 @@ function AuthenticatedNavBar() {
               </div>
             </ContextMenuTrigger>
             <ContextMenu id = "contextmenu" className = "nav-context-menu">
+              {isHomePage ? <MenuItem onClick={handlePortalClick}>Portal</MenuItem> : null }
               <MenuItem onClick={handleSettingsClick}>Settings</MenuItem>
               <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
             </ContextMenu>

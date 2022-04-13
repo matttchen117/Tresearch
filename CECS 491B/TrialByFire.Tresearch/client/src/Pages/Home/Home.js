@@ -6,6 +6,8 @@ import NavigationBar from "../../UI/Navigation/NavigationBar";
 import Popup from "../../UI/Popup/Popup";
 import './Home.css';
 import Recover from "../../Features/Recover/Recover";
+import NavBar from "../../UI/Navigation/NavBar";
+
 
 function Home() {
     
@@ -19,7 +21,7 @@ function Home() {
    
   return (
     <div className="Home"> 
-        {<NavigationBar/>}
+        {<NavBar/>}
         <div className="home-content-container">
             {renderHeader}
         </div>

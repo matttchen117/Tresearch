@@ -1,0 +1,15 @@
+.tree-context-container{
+    
+}
+
+
+.tree-container {
+    max-width: 500px;
+    height: 750px;
+}
+
+
+.node__root > circle{
+    fill: green;
+    r: 20;
+}
