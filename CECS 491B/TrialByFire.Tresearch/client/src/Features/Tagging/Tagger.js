@@ -6,7 +6,7 @@ import { useParams} from "react-router-dom";
 import Tag from "../../UI/Tag/Tag";
 import "./Tagger.css";
 
-function Tagger() {
+function Tagger(nodes) {
   // Holds array of tags that node currently has tagged
   const [tagData, setTagData] = useState([]);
   //Holds array of tags user can add to their current node (does not inlcude tags in tagData)
@@ -15,13 +15,12 @@ function Tagger() {
   const nullSearch = useState([]);  
 
   //Array of nodes this views context
-  const nodeData = [1];
 
-  
+  const nodeD = nodes.nodes;
 
   const handleSelection = (e) =>{
     var value = e.value;
-    axios.post("https://localhost:7010/Tag/addTag?tagName="+value ,nodeData)
+    axios.post("https://localhost:7010/Tag/addTag?tagName="+value ,nodeD)
         .then((response => {
           refreshTagData();
         }))
@@ -33,7 +32,7 @@ function Tagger() {
   const handleClick = (e) => {
     async function fetchData() {
       var value = e.target.getAttribute('data-item');
-      await axios.post("https://localhost:7010/Tag/removeTag?tagName="+value, nodeData)
+      await axios.post("https://localhost:7010/Tag/removeTag?tagName="+value, nodeD)
         .then(response => {
             refreshTagData();
         })
@@ -49,7 +48,7 @@ function Tagger() {
   }
 
   const refreshTagData = () => {
-    axios.post("https://localhost:7010/Tag/nodeTagList", nodeData)
+    axios.post("https://localhost:7010/Tag/nodeTagList", nodeD)
     .then(response => {
       const responseData = response.data;
       setTagData(responseData);
@@ -68,10 +67,8 @@ function Tagger() {
 
   const refresh  = (
     useEffect(() => {
-      
-      //fetchNodeTags();
-      //fetchTagOptions();
       axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
+     
       refreshTagData(); 
     }, [])
   )

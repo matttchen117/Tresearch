@@ -4,23 +4,34 @@ import TreeView from "../../UI/Components/Tree/TreeView";
 import './Portal.css';
 
 function Portal() {
+  
+
+
   const nodes = {
     name: 'Tree 1',
-    visibility: true,
+    attributes: {
+      nodeID: 1
+    },
     children: [
         {
           name: 'Tree 2',
-          visibility: false,
+          attributes: {
+            nodeID: 2
+          },
           children: [
             {
               name: 'Tree 4',
-              visibility: false
+              attributes: {
+                nodeID: 4
+              }
             }
           ]
         },
         {
           name: 'Tree 3',
-          visibility: true
+          attributes: {
+            nodeID: 3
+          }
         }
     ]
   }

@@ -1,15 +1,17 @@
-.tree-context-container{
-    
-}
 
 
 .tree-container {
-    max-width: 500px;
+    width: 100%;
     height: 750px;
 }
 
+.base {
+    z-index: 1;
+    width: 100%;
+    height: 750px;
+}
 
-.node__root > circle{
-    fill: green;
-    r: 20;
+.treetaggerOpen {
+    z-index: -3;
+    width: 250px;
 }
