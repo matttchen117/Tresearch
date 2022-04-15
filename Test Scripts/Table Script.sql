@@ -94,13 +94,14 @@ CREATE TABLE [dbo].OTPClaims(
 );
 
 CREATE TABLE [dbo].Nodes(
-	UserHash VARCHAR(128),
-	NodeID BIGINT PRIMARY KEY,
-	NodeParentID BIGINT,
-	NodeTitle VARCHAR(100),
-	Summary VARCHAR(750),
-	Visibility BIT,
-	CONSTRAINT node_owner_fk FOREIGN KEY(UserHash) REFERENCES UserHashTable(UserHash)
+    UserHash VARCHAR(128),
+    NodeID BIGINT Identity(1,1) PRIMARY KEY,
+    NodeParentID BIGINT,
+    NodeTitle VARCHAR(100),
+    Summary VARCHAR(750),
+    Visibility BIT,
+    Deleted BIT,
+    CONSTRAINT node_owner_fk FOREIGN KEY(UserHash) REFERENCES UserHashTable(UserHash)
 );
 
 CREATE TABLE [dbo].Tags(
