@@ -67,24 +67,24 @@ if (System.IO.Directory.Exists(targetFolder))
     {
         DateTime timestamp = DateTime.UtcNow;
         string level = "Server";
-        string username = "System";
+        string userHash = "System";
         string category = "Error";
         string description = ex.Message;
         StringBuilder builder = new StringBuilder();
-        builder.AppendFormat("{0} {1} {2} {3} {4}", timestamp.ToString(), level, username, category,
+        builder.AppendFormat("{0} {1} {2} {3} {4}", timestamp.ToString(), level, userHash, category,
             description);
         string payload = builder.ToString();
         byte[] salt = new byte[0];
         byte[] key = KeyDerivation.Pbkdf2(payload, salt, KeyDerivationPrf.HMACSHA512, 10000, 64);
         string hash = Convert.ToHexString(key);
-        ILog log = new Log(timestamp, level, username, category, description, hash);
+        ILog log = new Log(timestamp, level, userHash, category, description, hash);
         using (var connection = new SqlConnection(settings.SqlConnectionString))
         {
             var procedure = "[StoreLog]";
             var parameters = new DynamicParameters();
             parameters.Add("Timestamp", log.Timestamp);
             parameters.Add("Level", log.Level);
-            parameters.Add("Username", log.Username);
+            parameters.Add("Userhash", log.UserHash);
             parameters.Add("Category", log.Category);
             parameters.Add("Description", log.Description);
             parameters.Add("Hash", log.Hash);

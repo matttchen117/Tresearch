@@ -20,6 +20,34 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = messageBank;
             _options = options.Value;
         }
+
+        public async Task<IResponse<IList<Node>>> SearchForNodeAsync(ISearchInput searchInput)
+        {
+            try
+            {
+                searchInput.CancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var procedure = "[SearchNodes]";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("Search", searchInput.Search);
+                    var nodes = await connection.QueryAsync<Node, NodeTag, NodeRating, Node>(procedure, (node, tag, rating) =>
+                    {
+                        node.Tags.Add(tag);
+                        node.Rating = rating.Rating;
+                        return node;
+                    },
+                    parameters,
+                    commandType: CommandType.StoredProcedure,
+                    splitOn: "TagName");
+                    return new SearchResponse<IList<Node>>("", nodes.ToList(), 200, true);
+                }
+            }catch(Exception ex)
+            {
+                return new SearchResponse<IList<Node>>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 400, false);
+            }
+        }
         public async Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -2245,12 +2273,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var procedure = "[CreateNode]";
                     var values = new
                     {
-                        nodeID = node.nodeID,
-                        parentNodeId = node.parentNodeID,
-                        nodeTitle = node.nodeTitle,
-                        summary = node.summary,
-                        visibility = node.visibility,
-                        accountOwner = node.accountOwner
+                        nodeID = node.NodeID,
+                        parentNodeId = node.ParentNodeID,
+                        nodeTitle = node.NodeTitle,
+                        summary = node.Summary,
+                        visibility = node.Visibility,
+                        userHash = node.UserHash
                     };
                     var affectedRows = await connection.QueryAsync<int>(new CommandDefinition(procedure, values, cancellationToken: cancellationToken)).ConfigureAwait(false);
 

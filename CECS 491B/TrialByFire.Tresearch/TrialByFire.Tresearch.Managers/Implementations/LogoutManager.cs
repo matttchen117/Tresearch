@@ -17,18 +17,14 @@ namespace TrialByFire.Tresearch.Managers.Implementations
     //     appropriate services for the operation.
     public class LogoutManager : ILogoutManager
     {
-        private ISqlDAO _sqlDAO { get; }
-        private ILogService _logService { get; }
         private IMessageBank _messageBank { get; }
         private BuildSettingsOptions _options { get; }
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
             TimeSpan.FromSeconds(5));
 
-        public LogoutManager(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> options)
+        public LogoutManager(IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> options)
         {
-            _sqlDAO = sqlDAO;
-            _logService = logService;
             _messageBank = messageBank;
             _options = options.Value;
         }

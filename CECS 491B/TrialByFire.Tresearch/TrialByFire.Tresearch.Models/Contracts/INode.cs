@@ -4,16 +4,22 @@ namespace TrialByFire.Tresearch.Models.Contracts
 {
     public interface INode
     {
-        long nodeID { get; set; }
+        public string UserHash { get; set; }
+        public long NodeID { get; set; }
 
-        long parentNodeID { get; set; }
+        public long ParentNodeID { get; set; }
 
-        string nodeTitle { get; set; }
+        public string NodeTitle { get; set; }
 
-        string summary { get; set; }
+        public string Summary { get; set; }
+        public DateTime TimeModified { get; set; }
 
-        bool visibility { get; set; }
+        public bool Visibility { get; set; }
+        public bool Deleted { get; set; }
 
-        string accountOwner { get; set; }
+        public bool ExactMatch { get; set; }
+        public List<INodeTag> Tags { get; set; }
+        public double TagScore { get; set; }
+        public int Rating { get; set; }
     }
 }

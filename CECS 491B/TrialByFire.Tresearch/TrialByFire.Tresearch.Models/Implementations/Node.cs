@@ -5,26 +5,34 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class Node : INode
     {
-        public long nodeID { get; set; }
+        public string UserHash { get; set; }
+        public long NodeID { get; set; }
+        public long ParentNodeID { get; set; }
+        public string NodeTitle { get; set; }
+        public string Summary { get; set; }
+        public DateTime TimeModified { get; set; }
+        public bool Visibility { get; set; }
+        public bool Deleted { get; set; }
+        public bool ExactMatch { get; set; }
+        public List<INodeTag> Tags { get; set; }
+        public double TagScore { get; set; }
+        public int Rating { get; set; }
 
-        public long parentNodeID { get; set; }
-
-        public string nodeTitle { get; set; }
-
-        public string summary { get; set; }
-
-        public bool visibility { get; set; }
-
-        public string accountOwner { get; set; }
-
-        public Node(long nodeID, long parentNodeID, string nodeTitle, string summary, bool visibility, string accountOwner)
+        public Node(string userHash, long nodeID, long parentNodeID, string nodeTitle, string summary, DateTime timeModified, 
+            bool visibility, bool deleted)
         {
-            this.nodeID = nodeID;
-            this.parentNodeID = parentNodeID;
-            this.nodeTitle = nodeTitle;
-            this.summary = summary;
-            this.visibility = visibility;
-            this.accountOwner = accountOwner;
+            UserHash = userHash;
+            NodeID = nodeID;
+            ParentNodeID = parentNodeID;
+            NodeTitle = nodeTitle;
+            Summary = summary;
+            TimeModified = timeModified;
+            Visibility = visibility;
+            Deleted = deleted;
+            ExactMatch = false;
+            Tags = new List<INodeTag>();
+            TagScore = 0;
+            Rating = 0;
         }
     }
 }

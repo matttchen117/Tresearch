@@ -10,8 +10,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public NodeTag(long nodeID, string tagName)
         {
-            this.NodeID = nodeID;
-            this.TagName = tagName;
+            NodeID = nodeID;
+            TagName = tagName;
         }
     }
 }
