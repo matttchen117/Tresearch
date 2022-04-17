@@ -99,6 +99,7 @@ CREATE TABLE [dbo].Nodes(
     NodeParentID BIGINT,
     NodeTitle VARCHAR(100),
     Summary VARCHAR(750),
+	TimeModified DATETIME,
     Visibility BIT,
     Deleted BIT,
     CONSTRAINT node_owner_fk FOREIGN KEY(UserHash) REFERENCES UserHashTable(UserHash)
