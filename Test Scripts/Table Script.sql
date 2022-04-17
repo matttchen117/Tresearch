@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS DailyLogins
 DROP TABLE IF EXISTS NodesCreated
 DROP TABLE IF EXISTS ViewsWebPages
 DROP TABLE IF EXISTS TopSearches
-DROP TABLE IF EXISTS UserRatings
+DROP TABLE IF EXISTS NodeRatings
 DROP TABLE IF EXISTS NodeTags
 DROP TABLE IF EXISTS Tags
 DROP TABLE IF EXISTS Nodes
@@ -118,7 +118,7 @@ CREATE TABLE [dbo].NodeTags(
 	CONSTRAINT node_id_fk FOREIGN KEY (NodeID) REFERENCES Nodes(NodeID)
 );
 
-CREATE TABLE [dbo].UserRatings(
+CREATE TABLE [dbo].NodeRatings(
 	UserHash VARCHAR(128),
 	NodeID BIGINT,
 	Rating INT,
@@ -1175,13 +1175,13 @@ CREATE PROCEDURE [dbo].[RateNode]
 )
 as
 BEGIN
-	IF EXISTS (SELECT * FROM UserRatings WHERE UserHash = @UserHash AND NodeID = @NodeID)
+	IF EXISTS (SELECT * FROM NodeRatings WHERE UserHash = @UserHash AND NodeID = @NodeID)
 		BEGIN
-			UPDATE UserRatings SET Rating = @Rating WHERE UserHash = @UserHash AND NodeID = @NodeID;
+			UPDATE NodeRatings SET Rating = @Rating WHERE UserHash = @UserHash AND NodeID = @NodeID;
 		END
 	ELSE
 		BEGIN
-			INSERT UserRatings(UserHash, NodeID, Rating) VALUES (@UserHash, @NodeID, @Rating);
+			INSERT NodeRatings(UserHash, NodeID, Rating) VALUES (@UserHash, @NodeID, @Rating);
 		END
 END
 
