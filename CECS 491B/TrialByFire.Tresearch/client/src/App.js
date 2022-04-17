@@ -22,6 +22,7 @@ import Portal from "./Pages/Portal/Portal";
 import AdminPortal from "./Pages/AdminPortal/AdminPortal";
 import Error404 from "./Pages/Error404/Error404";
 import Settings from "./Pages/Settings/Settings";
+import FAQ from "./Pages/FAQ/FAQ";
 
 class App extends React.Component {
   constructor(props){
@@ -46,7 +47,7 @@ class App extends React.Component {
             <Route path="/" element = {<Home />}/>
             <Route path = "/Portal" element ={<Portal />}/>
             <Route path = "/Settings" element = {<Settings/>} exact/>
-
+            <Route path = "/FAQ" element ={<FAQ />}/>
 
             <Route path="/Login/Login" element = {<Login />}/>
             <Route path="/Logout/Logout" element = {<Logout />}/>

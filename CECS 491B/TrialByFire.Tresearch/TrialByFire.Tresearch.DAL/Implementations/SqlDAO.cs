@@ -1027,6 +1027,43 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+        public async Task<string> DeleteAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var parameters = new { Username = account.Username, AuthorizationLevel = account.AuthorizationLevel };
+                    var procedure = "dbo.[DeleteAccountStoredProcedure]";
+                    int affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+                    }
+                    if (affectedRows == 0)
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false);
+                    }
+                }
+
+            }
+            catch (OperationCanceledException)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return ("500: Database " + ex.Message);
+            }
+        }
+
+
         public async Task<int> VerifyAccountAsync(IAccount account,
             CancellationToken cancellationToken = default)
         {
@@ -2372,7 +2409,120 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     case 547:   //Adding rating violates foreign key constraint (AKA NO ACCOUNT)
                         return _messageBank.GetMessage(IMessageBank.Responses.userRateFail).Result;
                     default:
-                        return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                        return  _options.UnhandledExceptionMessage + ex.Message;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback already handled
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+            }
+            catch (Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+            }
+        }
+
+        public async Task<Tuple<List<double>, string>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                //Throw Cancellation Exception if token requests cancellation
+                cancellationToken.ThrowIfCancellationRequested();
+                // Establish connection to database
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Open connection
+                    await connection.OpenAsync();
+                    List<double> ratings = new List<double>();
+                    foreach (var nodeId in nodeIDs)
+                    {
+                        var procedure = "dbo.[GetNodeRating]";
+                        var parameters = new { NodeID = nodeId };
+
+                        var result = await connection.ExecuteScalarAsync<double>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                        
+                        ratings.Add(result);
+                    }
+                    
+                    //Execute command
+                    
+
+                    //Tag has been added, return success
+                    return Tuple.Create(ratings, await _messageBank.GetMessage(IMessageBank.Responses.getRateSuccess));
+                }
+            }
+            catch (SqlException ex)
+            {
+                //Check sql exception
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail));
+                    default:
+                        return Tuple.Create(new List<double>(), _options.UnhandledExceptionMessage + ex.Message);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback already handled
+                return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(new List<double>(), _options.UnhandledExceptionMessage + ex.Message);
+            }
+        }
+
+        public async Task<string> UpdateAccountAsync(IAccount account, IAccount updatedAccount, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                //Throw Cancellation Exception if token requests cancellation
+                cancellationToken.ThrowIfCancellationRequested();
+                // Establish connection to database
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Open connection
+                    await connection.OpenAsync();
+                    var procedure = "dbo.[UpdateAccount]";
+                    var parameters = new
+                    {
+                        Username = account.Username,
+                        AuthorizationRole = account.AuthorizationLevel,
+                        UpdatedUsername = account.Username,
+                        UpdatedAuthorizationLevel = account.AuthorizationLevel,
+                        UpdatedPassphrase = account.Passphrase,
+                        UpdatedAccountStatus = account.AccountStatus,
+                        UpdatedConfirmed = account.Confirmed
+                    };
+                    //Execute command
+                    var executed = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    //Check if cancellation token requests cancellation
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        //Perform rollback
+                        string rollbackResults = await UpdateAccountAsync(updatedAccount, account);
+                        if (rollbackResults.Equals(await _messageBank.GetMessage(IMessageBank.Responses.accountUpdateSuccess)))
+                            return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                        else
+                            return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
+                    }
+                    //Tag has been added, return success
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountUpdateSuccess);
+                }
+            }
+            catch (SqlException ex)
+            {
+                //Check sql exception
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
+                    default:
+                        return _options.UnhandledExceptionMessage + ex.Message;
                 }
             }
             catch (OperationCanceledException)

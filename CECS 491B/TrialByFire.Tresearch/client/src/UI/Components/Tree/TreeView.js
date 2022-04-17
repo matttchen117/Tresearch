@@ -1,15 +1,18 @@
 import React, { useState } from "react";
-import { TreeEditor } from 'react-d3-tree-editor';
+import { TreeEditor, treeRenderedCallback } from 'react-d3-tree-editor';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
 import Tagger from "../../../Features/Tagging/Tagger";
 import Popup from "../../Popup/Popup";
+import TagPopup from "../../Popup/TagPopup";
 
 import "./TreeView.css";
+import LoginPopup from "../../Popup/LoginPopup";
 
 class TreeView extends React.Component{
     constructor(props) {
         super(props);
         this.token = sessionStorage.getItem('authorization');
+        this.treeRef = null;
         this.treeData = props.nodes;
         this.treeConfig = {
             margin: {
@@ -73,18 +76,39 @@ class TreeView extends React.Component{
     ];
     }
 
+    
+
 
     render() {
-    
+
+        document.addEventListener('click', (e) => {
+
+            if(e.shiftKey) {
+                console.log("SHIFT CLICK");
+            }
+            
+        });
+
+        const treeRenderedCallback = (e) => {
+            this.treeRef.expandAllElemenets();
+        }
+
+        const  ToggleTagger = () => {
+            this.setState({
+                isTaggerOpen: false
+            })
+        }
+
         const renderTree = (
             <div className = "tree-portal-container">
                 <div className= {`${this.state.isTaggerOpen ? "taggerOpen" : "base"}`}>
-                <TreeEditor 
-                        treeData = {this.treeData}
-                        treeConfig = {this.treeConfig}
-                        getContextMenu={this.getContextMenu}
-                />
-            </div>
+                    <TreeEditor 
+                            treeData = {this.treeData}
+                            treeConfig = {this.treeConfig}
+                            getContextMenu={this.getContextMenu}
+                            onRef = {ref => (this.treeRef = ref)}
+                    />
+                </div>
             </div>
         );
     
@@ -94,7 +118,7 @@ class TreeView extends React.Component{
                     {renderTree}
                 </div>
                 <div className = "tree-tagger-wrapper">
-                    {this.state.isTaggerOpen ? <Popup content = {<Tagger nodes = {this.state.nodeSelect}/>}/> : null}
+                    {this.state.isTaggerOpen ? <Popup content = {<TagPopup onClick = {ToggleTagger} nodes = {this.state.nodeSelect}/>}/> : null}
                 </div>
             </div>
         );

@@ -56,6 +56,8 @@ namespace TrialByFire.Tresearch.Models.Contracts
             //Rating
             userRateSuccess,
             userRateFail,
+            getRateSuccess,
+            getRateFail,
 
             jwtValidationSuccess,
             jwtValidationFail,
@@ -63,6 +65,11 @@ namespace TrialByFire.Tresearch.Models.Contracts
             refreshSessionSuccess,
             refreshSessionFail,
             refreshSessionNotAllowed,
+
+            accountUpdateSuccess,
+            accountUpdateFail,
+            accountEnableSuccess,
+            accountDisableSuccess,
 
             badNameOrPass,
             badEmail,

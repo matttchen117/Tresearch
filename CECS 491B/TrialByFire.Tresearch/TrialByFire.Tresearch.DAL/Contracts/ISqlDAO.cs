@@ -44,7 +44,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         // Delete account
         public Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken));
-
+        public Task<string> DeleteAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken));
 
         // Get admins
         public Task<string> GetAmountOfAdminsAsync(CancellationToken cancellationToken = default(CancellationToken));
@@ -107,6 +107,21 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         //Rating
         public Task<string> RateNodeAsync(string userhash, long nodeID, int rating, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<List<double>, string>> GetNodeRatingAsync(List<long> nodeID, CancellationToken cancellationToken = default(CancellationToken));
+
+
+        /**
+         *  User Management
+         *      Create Account
+         *      Update Account
+         *      Delete Account
+         *      Disable Account
+         *      Enable Account
+         */
+
+        public Task<string> UpdateAccountAsync(IAccount account, IAccount updatedAccount, CancellationToken cancellationToken = default(CancellationToken));
+
+        
 
         public Task<string> CreateNodeAsync(INode node, CancellationToken cancellationToken = default);
         public Task<Tuple<INode, string>> GetNodeAsync(long nID, CancellationToken cancellationToken = default);

@@ -108,8 +108,13 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
                 case Responses.userRateSuccess:
                     return "200: Server: User rating added.";
+                case Responses.getRateSuccess:
+                    return "200: Server: Rating retrieved.";
                 case Responses.userRateFail:
                     return "502: Server: Unable rate node.";
+                case Responses.getRateFail:
+                    return "502: Server: Unable to get rating data.";
+
 
                 case Responses.createNodeSuccess:
                     return "200: Server: Create Node Success";
@@ -125,6 +130,15 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "400: Data: Refresh Session Failed: ";
                 case Responses.refreshSessionNotAllowed:
                     return "400: Server: Refresh Session Failed: User is not logged in.";
+
+                case Responses.accountUpdateSuccess:
+                    return "200: Server: Account updated.";
+                case Responses.accountEnableSuccess:
+                    return "200: Server: Account enabled.";
+                case Responses.accountDisableSuccess:
+                    return "200: Server: Account disabled.";
+                case Responses.accountUpdateFail:
+                    return "502: Server: Unable to update account.";
 
                 case Responses.storeLogFail:
                     return "503: Database: Failed to store the log.";

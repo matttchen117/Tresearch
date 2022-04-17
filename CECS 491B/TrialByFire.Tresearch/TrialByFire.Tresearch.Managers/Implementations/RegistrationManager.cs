@@ -99,7 +99,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             catch (OperationCanceledException)
             {
                 //Rollback taken care of 
-                throw;
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
             }
 
             catch(Exception ex)

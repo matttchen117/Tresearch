@@ -14,7 +14,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
     public class TagManager : ITagManager
     {
         private IAccountVerificationService _accountVerificationService { get; set; }       //Use to verify account exists, enabled and confirmed. Checks if account is authorized to make changes 
-        private ISqlDAO _sqlDAO { get; set; }                                               
+        private ISqlDAO _sqlDAO { get; set; }                                                  
         private ILogService _logService { get; set; }
         private IMessageBank _messageBank { get; set; }                                     //Used to send status codes
         private ITagService _tagService { get; set; }                                       //Performs business logic
@@ -81,6 +81,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 }
                 else
                 {
+                    //User is not authenticated
                     return await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated);
                 }
             }

@@ -3,9 +3,10 @@ import jwt_decode from "jwt-decode";
 
 import logo from './logo.png';
 import RegistrationPopup from "../Popup/RegistrationPopup";
-import Login from "../../Features/Login/Login";
+import LoginForm from "../Popup/LoginPopup";
 import Popup from "../../UI/Popup/Popup";
 import './NavigationBar.css';
+import LoginPopup from "../Popup/LoginPopup";
 
 function NavigationBar() {
     const [isSignUpOpen, setIsSignUpOpen] = useState(false);
@@ -40,7 +41,7 @@ function NavigationBar() {
     <div className="Home"> 
         {renderNav}
         {isSignUpOpen && <Popup content = {<RegistrationPopup onClick = {NavToggleSignUp}/> } />}
-        {isSignInOpen && <Popup content = {<Login/> } handleClose = {NavToggleSignIn}/>}
+        {isSignInOpen && <Popup content = {<LoginPopup onClick = {NavToggleSignIn}/> } />}
     </div>
   );
 }
