@@ -53,17 +53,26 @@ $ npm run start
 ### Features
 --------------------------------
 #### Tagging
-- Add or remove from a bank of tags to organize and categorize nodes. 
-- Search tags using an autocomplete drop-down search bar
-- Administrators can create and delete tags from word bank
+- ##### Description
+  - Add or remove from a bank of tags to organize and categorize nodes. 
+  - Search tags using an autocomplete drop-down search bar
+  - Administrators can create and delete tags from word bank
+- #### Design
+  - [Low Level Design](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams)
 
 ### Built With
 --------------------------------
+#### Programming Languages
+- C#
+- CSS/HTML
+- Javascript
+- SQL
 #### Back-End
 - [7ZIP](https://www.7-zip.org/) - Open source compression library
 - [Azure Cloud Hosting](https://azure.microsoft.com/en-us/services/cloud-services/#pricing) - Cloud host for WebAPI and Front-End Client.
 - [Azure Sql Database](https://azure.microsoft.com/en-us/products/azure-sql/database/) - Azure persistent data store
-- [.NET Frmaework](https://dotnet.microsoft.com/en-us/learn/dotnet/what-is-dotnet) - Backend framework
+- [Dapper](https://github.com/DapperLib/Dapper) - Object relational mapping library
+- [.NET 6.0](https://dotnet.microsoft.com/en-us/learn/dotnet/what-is-dotnet) - Backend framework
 - [SendGrid API](https://sendgrid.com/) - Email API used to send confirmation and recovery links.
 - [xUnit](https://xunit.net/) - Testing tool for .NET Framework
 #### Front-End
@@ -72,7 +81,19 @@ $ npm run start
 - [PBKDF2](https://www.npmjs.com/package/pbkdf2) - Library proviiding PBKDF2 hashing algorithm.
 - [React.js](https://reactjs.org/) - Javascript library used for building user interfaces
 - [react-contextmenu](https://www.npmjs.com/package/react-contextmenu) - React context menu component
-- [react-router-dom](https://v5.reactrouter.com/web/guides/quick-start)- React routing library with DOM aware components
+- [react-router-dom](https://v5.reactrouter.com/web/guides/quick-start) - React routing library with DOM aware components
+- [react-select](https://react-select.com/home) - multiselect, dropdown, autocomplete search input 
+#### IDE
+- VS Code 
+- Visual Studio 2022
+#### Documentation Technologies
+- [Diagrams.net](https://www.diagrams.net/) - Used to create low level design documents
+- [Draw.chat](https://draw.chat/) - Used to create visuals for decision trees
+- [Github](https://github.com/) - Version control system managing documents and code
+#### Communication Technologies
+- [Discord](https://discord.com/) - Meeting and messaging service for group communication.
+- [Microsoft Outlook](https://outlook.live.com/owa/) - Communication between instructor and group.
+
 ### FAQ
 --------------------------------
 #### Tagging
@@ -83,7 +104,7 @@ $ npm run start
   - Right click on node and select "Edit Tags" in the context menu. Select tag from search bar. 
 - Adding tag to multiple nodes
   - Shift and left click on all the nodes to tag and then right click on your final node. Select edit tags in the context menu. Select tag from search bar
-  - The tags displayed are shared tags among the groups of nodes selected. Any changes made will affect all nodes
+  - The tags displayed are shared tags among the groups of nodes selected. Any changes made will affect all nodes selected.
 - Searching for a tag
   - Click on the search bar and search for the tag or scroll through the list of tags available
   - Search bar will show autocomplete tags

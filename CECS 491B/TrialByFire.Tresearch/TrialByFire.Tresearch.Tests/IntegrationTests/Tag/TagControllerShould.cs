@@ -27,7 +27,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         public static TagControllerDatabaseFixture fixture { get; set; }    // Access to the fixture instance (this is where data to database is initialized and  disposed)
 
         private static List<long> nodeids = new List<long>();               // Holds the ID of Nodes (need to have since nodes are dynamically created (NodeID is Identity)
-        private static List<long> NodeIDs
+        private static List<long> NodeIDs                                   // Getter and setter for static list of node ids
         {
             get { return nodeids; }
             set { nodeids = value; }
@@ -35,7 +35,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 
         public TagControllerShould(TagControllerDatabaseFixture fixture) : base(new string[] { })
         {
-            TagControllerShould.fixture = fixture;
+            TagControllerShould.fixture = fixture;                                                  
             NodeIDs = fixture.nodeIDs;
             TestServices.AddScoped<ITagService, TagService>();
             TestServices.AddScoped<IAccountVerificationService, AccountVerificationService>();
