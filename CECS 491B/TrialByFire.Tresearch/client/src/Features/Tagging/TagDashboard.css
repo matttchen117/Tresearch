@@ -18,14 +18,20 @@
     background: #f3f3f3;
 }
 
+.tag-dashboard-table-container table {
+    width: 100%;
+}
+
 .tag-dashboard-table tbody {
     display: block;
-    max-height: 650px;
+    max-height: 500px;
     overflow-y: auto;
     overflow-x: hidden;
     width: 100%;
     margin-right: 20px;
+    
 }
+
 
 ::-webkit-scrollbar {
     width: 0;    
@@ -41,8 +47,8 @@
 
 .tag-dashboard-table td {
     font-size: 20px;
-    text-align: right;
-    
+    text-align: left;
+    width: 100%;
 }
 
 

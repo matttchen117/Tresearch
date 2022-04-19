@@ -8,7 +8,7 @@ using TrialByFire.Tresearch.Services.Contracts;
 
 namespace TrialByFire.Tresearch.Managers.Implementations
 {
-    public class UserManagementManager
+    public class UserManagementManager: IUserManagementManager
     {
         private BuildSettingsOptions _options { get; }
         private ISqlDAO _sqlDAO { get; set; }

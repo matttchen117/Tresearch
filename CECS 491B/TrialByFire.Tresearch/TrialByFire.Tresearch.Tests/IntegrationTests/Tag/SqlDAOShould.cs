@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Dapper;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
+using System.Data;
 using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 using Xunit;
@@ -14,11 +16,20 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
     /// </summary>
     public class SqlDAOShould : TestBaseClass, IClassFixture<TagSqlDatabaseFixture>
     {
-        TagSqlDatabaseFixture fixture;                                                                   
-        public SqlDAOShould(TagSqlDatabaseFixture fixture) : base(new string[] { })
+        TagSqlDatabaseFixture fixture;
+
+        private static List<long> nodeids = new List<long>();
+        public static List<long> NodeIDs
         {
-            this.fixture = fixture;                                     //Runs database startup script ONCE before tests. Runs database cleanup ONCE after tests.
-            TestProvider = TestServices.BuildServiceProvider();         //For Dependency Injection
+            get { return nodeids; }
+            set { nodeids = value; }
+        }
+
+        public SqlDAOShould(TagSqlDatabaseFixture fix) : base(new string[] { })
+        {
+            this.fixture = fix;                                     //Runs database startup script ONCE before tests. Runs database cleanup ONCE after tests.
+            NodeIDs = fix.nodeIDs;
+            TestProvider = TestServices.BuildServiceProvider();         //For Dependency Injection   
         }
 
         /**
@@ -35,21 +46,92 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
          *  Case 5: Tagging node. Node does not exist.
          *      Result: "404: Database: The node was not found."
          */
-        [Theory]
-        [MemberData(nameof(AddTagData))]
-        public async Task AddTagAsync(List<long> nodeIDs, string tagName, IMessageBank.Responses response)
+
+        [Fact]
+        public async Task AddTagAsync()
         {
             //Arrange
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            string expected = await messageBank.GetMessage(response);
+
+            /**
+             *  Case 0: Nodes exist and already contain tag 
+             *      NodeIDs:                    2022030533, 2022030534, 2022030535
+             *      Tag Name:                   Tresearch SqlDAO Add Tag1 
+             *      
+             *      Result:                     "200: Server: Tag added to node(s)."
+             */
+            List<long> case0 = new List<long> { NodeIDs[0], NodeIDs[1], NodeIDs[2] };
+            string tagCase00 = "Tresearch SqlDAO Add Tag1";
+
+            /**
+             *  Case 1: Tagging node. Nodes exist and DO NOT contain tag 
+             *      NodeIDs:                    2022030533, 2022030534, 2022030535
+             *      Tag Name:                   Tresearch SqlDAO Add Tag2 
+             *      
+             *      Result:                     "200: Server: Tag added to node(s)."
+             */
+            List<long> case1 = new List<long> { NodeIDs[0], NodeIDs[1], NodeIDs[2] };
+            string tagCase01 = "Tresearch SqlDAO Add Tag2";
+
+
+            /**
+             *  Case 2: Tagging node. Node exist and does not contain tag 
+             *      NodeIDs:                    2022030533
+             *      Tag Name:                   Tresearch SqlDAO Add Tag3
+             *      
+             *      Result:                     "200: Server: Tag added to node(s)."
+             */
+            List<long> case2 = new List<long> { NodeIDs[0] };
+            string tagCase02 = "Tresearch SqlDAO Add Tag3";
+
+
+            /**
+             *  Case 3: Tagging node. Node exist and contains tag 
+             *      NodeIDs:                    2022030533
+             *      Tag Name:                   Tresearch SqlDAO Add Tag4
+             *      
+             *      Result:                     "200: Server: Tag added to node(s)."
+             */
+            List<long> case3 = new List<long> { NodeIDs[0] };
+            string tagCase03 = "Tresearch SqlDAO Add Tag4";
+
+            /**
+             *  Case 4: Tagging node. Node exist but tag doesn't exist in database
+             *      NodeIDs:                    2022030533
+             *      Tag Name:                   Tresearch SqlDAO Add Tag5
+             *      
+             *      Result:                     "404: Database: Tag not found."
+             */
+            List<long> case4 = new List<long> { NodeIDs[0] };
+            string tagCase04 = "Tresearch SqlDAO Add Tag5";
+
+            /**
+            *  Case 5: Tagging node. Node does not exist
+            *      NodeIDs:                    node id that doesn't exist
+            *      Tag Name:                   Tresearch SqlDAO Add Tag5
+            *      
+            *      Result:                     "404: Database: The node was not found."
+            */
+            List<long> case5 = new List<long> { -1 };
+            string tagCase05 = "Tresearch SqlDAO Add Tag5";
 
             //Act
-            string result = await sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
+            string resultCase0 = await sqlDAO.AddTagAsync(case0, tagCase00, cancellationTokenSource.Token);
+            string resultCase1 = await sqlDAO.AddTagAsync(case1, tagCase01, cancellationTokenSource.Token);
+            string resultCase2 = await sqlDAO.AddTagAsync(case2, tagCase02, cancellationTokenSource.Token);
+            string resultCase3 = await sqlDAO.AddTagAsync(case3, tagCase03, cancellationTokenSource.Token);
+            string resultCase4 = await sqlDAO.AddTagAsync(case4, tagCase04, cancellationTokenSource.Token);
+            string resultCase5 = await sqlDAO.AddTagAsync(case5, tagCase05, cancellationTokenSource.Token);
 
             //Assert
-            Assert.Equal(expected, result);
+            Assert.Equal(await messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess), resultCase0);
+            Assert.Equal(await messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess), resultCase1);
+            Assert.Equal(await messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess), resultCase2);
+            Assert.Equal(await messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess), resultCase3);
+            Assert.Equal(await messageBank.GetMessage(IMessageBank.Responses.tagNotFound), resultCase4);
+            Assert.Equal(await messageBank.GetMessage(IMessageBank.Responses.tagNotFound), resultCase5);
         }
 
         /**
@@ -110,26 +192,93 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
          *  Case 4: No nodes passed in
          *      Result: "200: Server: Tag(s) retrieved."
          */
-        [Theory]
-        [MemberData(nameof(GetNodeTagData))]
-        public async Task GetNodeTagsAsync(List<long> nodeIDs, IMessageBank.Responses response, List<string> expectedTags)
+
+
+        [Fact]
+        public async Task GetNodeTagsAsync()
         {
             //Arrange
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            string expected = await messageBank.GetMessage(response);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
-            //Act
-            Tuple<List<string>, string> myResult = await sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationTokenSource.Token);
-            string result = myResult.Item2;
-            List<string> resultTags = myResult.Item1;
+            /**
+            *  Case 0:Nodes share common tags
+            *      NodeIDs:                     [2022030539, 2022030540, 2022030541]
+            *                                   2022030539: "Tresearch SqlDAO Get Tag1", "Tresearch SqlDAO Get Tag2", "Tresearch SqlDAO Get Tag3"
+            *                                   2022030540: "Tresearch SqlDAO Get Tag1", "Tresearch SqlDAO Get Tag2" 
+            *                                   2022030541: "Tresearch SqlDAO Get Tag1", "Tresearch SqlDAO Get Tag2"
+            *      
+            *      Result:                     "200: Server: Tag(s) retrieved."
+            */
+            List<long> case0 = new List<long>() { NodeIDs[7], NodeIDs[8], NodeIDs[9] };
+            List<string> tags0 = new List<string>() { "Tresearch SqlDAO Get Tag1", "Tresearch SqlDAO Get Tag2" };
+            string expected0 = await messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess);
 
+            /**
+            *  Case 1:Nodes do not share common tags
+            *      NodeIDs:                     [2022030539, 2022030540, 2022030541]
+            *      
+            *      Result:                     "200: Server: Tag(s) retrieved."
+            */
+            List<long> case1 = new List<long>() { NodeIDs[7], NodeIDs[8], NodeIDs[9], NodeIDs[10]};
+            List<string> tags1 = new List<string>() {  };
+            string expected1 = await messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess);
+
+            /**
+            *  Case 2: Node contains tags
+            *      NodeIDs:                     [2022030543]
+            *      
+            *      Result:                     "200: Server: Tag(s) retrieved."
+            */
+            List<long> case2 = new List<long>() { NodeIDs[7] };
+            List<string> tags2 = new List<string> { "Tresearch SqlDAO Get Tag1", "Tresearch SqlDAO Get Tag2", "Tresearch SqlDAO Get Tag3" };
+            string expected2 = await messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess);
+
+            /**
+            *  Case 3: Node contains no tags
+            *      NodeIDs:                     [2022030543]
+            *      
+            *      Result:                     "200: Server: Tag(s) retrieved."
+            */
+            List<long> case3 = new List<long>() { NodeIDs[6] };
+            List<string> tags3 = new List<string> { };
+            string expected3 = await messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess);
+
+            /**
+           *  Case 4: No node passed in
+           *      NodeIDs:                     []
+           *      
+           *      Result:                     "200: Server: Tag(s) retrieved."
+           */
+            List<long> case4 = new List<long>() { };
+            List<string> tags4 = new List<string> { };
+            string expected4 = await messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess);
+
+            //Act
+            Tuple<List<string>, string> result0 = await sqlDAO.GetNodeTagsAsync(case0, cancellationTokenSource.Token);
+            Tuple<List<string>, string> result1 = await sqlDAO.GetNodeTagsAsync(case1, cancellationTokenSource.Token);
+            Tuple<List<string>, string> result2 = await sqlDAO.GetNodeTagsAsync(case2, cancellationTokenSource.Token);
+            Tuple<List<string>, string> result3 = await sqlDAO.GetNodeTagsAsync(case3, cancellationTokenSource.Token);
+            Tuple<List<string>, string> result4 = await sqlDAO.GetNodeTagsAsync(case4, cancellationTokenSource.Token);
 
             //Assert
-            Assert.Equal(expected, result);
-            Assert.Equal(expectedTags, resultTags);
+            Assert.Equal(expected0, result0.Item2);
+            Assert.Equal(tags0, result0.Item1);
+            
+            Assert.Equal(expected1, result1.Item2);
+            Assert.Equal(tags1, result1.Item1);
+            
+            Assert.Equal(expected2, result2.Item2);
+            Assert.Equal(tags2, result2.Item1);
+
+            Assert.Equal(expected3, result3.Item2);
+            Assert.Equal(tags3, result3.Item1);
+
+            Assert.Equal(expected4, result4.Item2);
+            Assert.Equal(tags4, result4.Item1);
         }
+
 
         [Fact]
         public async Task GetTagsAsync()
@@ -159,102 +308,31 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         *  Case 3: Remove tag from node. No node passed in.
         *      Result: "200: Server: Tag removed from node(s)."
         */
-        [Theory]
-        [MemberData(nameof(RemoveTagData))]
-        public async Task RemoveTagAsync(List<long> nodeIDs, string tagName, IMessageBank.Responses response)
+        [Fact]
+        public async Task RemoveTagAsync()
         {
             //Arrange
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            string expected = await messageBank.GetMessage(response);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            string success = await messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess);
+
+            /**
+            *  Case 0: Remove tag from node. Nodes exist and contain tags.  
+            *      Tag Name:                   Tresearch SqlDAO Delete Tag1
+            *      NodeIDs:                     2022030536, 2022030537, 2022030538
+            *      
+            *      Result:                     "200: Server: Tag removed from node(s)."
+            */
+            List<long> case0 = new List<long> { NodeIDs[3], NodeIDs[4], NodeIDs[5] };
+            string tagCase0  = "Tresearch SqlDAO Delete Tag1";
+            string expected0 = success;
 
             //Act
-            string result = await sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
+            string result0 = await sqlDAO.RemoveTagAsync(case0, tagCase0, cancellationTokenSource.Token);
 
             //Arrange
-            Assert.Equal(expected, result);
-        }
-
-
-        public static IEnumerable<object[]> AddTagData()
-        {
-            /**
-             *  Case 0: Nodes exist and already contain tag 
-             *      NodeIDs:                    2022030533, 2022030534, 2022030535
-             *      Tag Name:                   Tresearch SqlDAO Add Tag1 
-             *      
-             *      Result:                     "200: Server: Tag added to node(s)."
-             */
-            var tagNameCase0 = "Tresearch SqlDAO Add Tag1";
-            var nodeListCase0 = new List<long> { 2022030533, 2022030534, 2022030535 };
-            var resultCase0 = IMessageBank.Responses.tagAddSuccess;
-
-
-            /**
-             *  Case 1: Tagging node. Nodes exist and DO NOT contain tag 
-             *      NodeIDs:                    2022030533, 2022030534, 2022030535
-             *      Tag Name:                   Tresearch SqlDAO Add Tag2 
-             *      
-             *      Result:                     "200: Server: Tag added to node(s)."
-             */
-            var tagNameCase1 = "Tresearch SqlDAO Add Tag2";
-            var nodeListCase1 = new List<long> { 2022030533, 2022030534, 2022030535 };
-            var resultCase1 = IMessageBank.Responses.tagAddSuccess;
-
-            /**
-             *  Case 2: Tagging node. Node exist and does not contain tag 
-             *      NodeIDs:                    2022030533
-             *      Tag Name:                   Tresearch SqlDAO Add Tag3
-             *      
-             *      Result:                     "200: Server: Tag added to node(s)."
-             */
-            var tagNameCase2 = "Tresearch SqlDAO Add Tag3";
-            var nodeListCase2 = new List<long> { 2022030533 };
-            var resultCase2 = IMessageBank.Responses.tagAddSuccess;
-
-            /**
-             *  Case 3: Tagging node. Node exist and contains tag 
-             *      NodeIDs:                    2022030533
-             *      Tag Name:                   Tresearch SqlDAO Add Tag4
-             *      
-             *      Result:                     "200: Server: Tag added to node(s)."
-             */
-            var tagNameCase3 = "Tresearch SqlDAO Add Tag4";
-            var nodeListCase3 = new List<long> { 2022030533 };
-            var resultCase3 = IMessageBank.Responses.tagAddSuccess;
-
-            /**
-             *  Case 4: Tagging node. Node exist but tag doesn't exist in database
-             *      NodeIDs:                    2022030533
-             *      Tag Name:                   Tresearch SqlDAO Add Tag5
-             *      
-             *      Result:                     "404: Database: Tag not found."
-             */
-            var tagNameCase4 = "Tresearch SqlDAO Add Tag5";
-            var nodeListCase4 = new List<long> { 2022030533 };
-            var resultCase4 = IMessageBank.Responses.tagNotFound;
-
-            /**
-            *  Case 5: Tagging node. Node does not exist
-            *      NodeIDs:                    2022030532
-            *      Tag Name:                   Tresearch SqlDAO Add Tag5
-            *      
-            *      Result:                     "404: Database: The node was not found."
-            */
-            var tagNameCase5 = "Tresearch SqlDAO Add Tag5";
-            var nodeListCase5 = new List<long> { 2022030532 };
-            var resultCase5 = IMessageBank.Responses.tagNotFound;
-
-            return new[]
-            {
-                new object[] { nodeListCase0, tagNameCase0, resultCase0 },
-                new object[] { nodeListCase1, tagNameCase1, resultCase1 },
-                new object[] { nodeListCase2, tagNameCase2, resultCase2 },
-                new object[] { nodeListCase3, tagNameCase3, resultCase3 },
-                new object[] { nodeListCase4, tagNameCase4, resultCase4 },
-                new object[] { nodeListCase5, tagNameCase5, resultCase5 }
-            };
+            Assert.Equal(expected0, result0);
         }
 
         public static IEnumerable<object[]> CreateTagData()
@@ -313,141 +391,31 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
                 new object[] { tagNameCase0, resultCase0 },
                 new object[] { tagNameCase1, resultCase1 }
             };
-        }
-
-        public static IEnumerable<object[]> RemoveTagData()
-        {
-            /**
-            *  Case 0: Remove tag from node. Nodes exist and contain tags.  
-            *      Tag Name:                   Tresearch SqlDAO Delete Tag1
-            *      NodeIDs:                     2022030536, 2022030537, 2022030538
-            *      
-            *      Result:                     "200: Server: Tag removed from node(s)."
-            */
-            var tagNameCase0 = "Tresearch SqlDAO Delete Tag1";
-            var nodeListCase0 = new List<long> { 2022030536, 2022030537, 2022030538 };
-            var resultCase0 = IMessageBank.Responses.tagRemoveSuccess;
-
-            /**
-            *  Case 1: Remove tag from node. Nodes exist but nodes do not contain tags.  
-            *      Tag Name:                   Tresearch SqlDAO Delete Tag1
-            *      NodeIDs:                     2022030536, 2022030537, 2022030538
-            *      
-            *      Result:                     "200: Server: Tag removed from node(s)."
-            */
-            var tagNameCase1 = "Tresearch SqlDAO Delete Tag2";
-            var nodeListCase1 = new List<long> { 2022030536, 2022030537, 2022030538 };
-            var resultCase1 = IMessageBank.Responses.tagRemoveSuccess;
-
-            /**
-            *  Case 2: Remove tag from node. Node exist but doesn't contain tag 
-            *      Tag Name:                   Tresearch SqlDAO Delete Tag3
-            *      NodeIDs:                    2022030536
-            *      
-            *      Result:                     "200: Server: Tag removed from node(s)."
-            */
-            var tagNameCase2 = "Tresearch SqlDAO Delete Tag3";
-            var nodeListCase2 = new List<long> { 2022030536 };
-            var resultCase2 = IMessageBank.Responses.tagRemoveSuccess;
-
-            /**
-            *  Case 3: Remove tag from node. No node passed in 
-            *      Tag Name:                   Tresearch SqlDAO Delete Tag3
-            *      NodeIDs:                    
-            *      
-            *      Result:                     "200: Server: Tag removed from node(s)."
-            */
-            var tagNameCase3 = "Tresearch SqlDAO Delete Tag4";
-            var nodeListCase3 = new List<long> { };
-            var resultCase3 = IMessageBank.Responses.tagRemoveSuccess;
-
-            return new[]
-            {
-                new object[] { nodeListCase0, tagNameCase0, resultCase0 },
-                new object[] { nodeListCase1, tagNameCase1, resultCase1 },
-                new object[] { nodeListCase2, tagNameCase2, resultCase2 },
-                new object[] { nodeListCase3, tagNameCase3, resultCase3 }
-            };
-        }
-
-        public static IEnumerable<object[]> GetNodeTagData()
-        {
-            /**
-            *  Case 0:Nodes share common tags
-            *      NodeIDs:                     [2022030539, 2022030540, 2022030541]
-            *                                   2022030539: "Tresearch SqlDAO Get Tag1", "Tresearch SqlDAO Get Tag2", "Tresearch SqlDAO Get Tag3"
-            *                                   2022030540: "Tresearch SqlDAO Get Tag1", "Tresearch SqlDAO Get Tag2" 
-            *                                   2022030541: "Tresearch SqlDAO Get Tag1", "Tresearch SqlDAO Get Tag2"
-            *      
-            *      Result:                     "200: Server: Tag(s) retrieved."
-            */
-            var nodeListCase0 = new List<long> { 2022030539, 2022030540, 2022030541 };
-            var expectedCase0 = IMessageBank.Responses.tagGetSuccess;
-            var expectedTags0 = new List<string> { "Tresearch SqlDAO Get Tag1", "Tresearch SqlDAO Get Tag2" };
-
-           /**
-           *  Case 1:Nodes do not share common tags
-           *      NodeIDs:                     [2022030539, 2022030540, 2022030541]
-           *      
-           *      Result:                     "200: Server: Tag(s) retrieved."
-           */
-            var nodeListCase1 = new List<long> { 2022030539, 2022030540, 2022030541, 2022030542 };
-            var expectedCase1 = IMessageBank.Responses.tagGetSuccess;
-            var expectedTags1 = new List<string> { };
-
-            /**
-            *  Case 2: Node contains tags
-            *      NodeIDs:                     [2022030543]
-            *      
-            *      Result:                     "200: Server: Tag(s) retrieved."
-            */
-            var nodeListCase2 = new List<long> { 2022030539 };
-            var expectedCase2 = IMessageBank.Responses.tagGetSuccess; ;
-            var expectedTags2 = new List<string> { "Tresearch SqlDAO Get Tag1", "Tresearch SqlDAO Get Tag2", "Tresearch SqlDAO Get Tag3" };
-
-            /**
-            *  Case 3: Node contains no tags
-            *      NodeIDs:                     [2022030543]
-            *      
-            *      Result:                     "200: Server: Tag(s) retrieved."
-            */
-            var nodeListCase3 = new List<long> { 2022030543 };
-            var expectedCase3 = IMessageBank.Responses.tagGetSuccess;
-            var expectedTags3 = new List<string> { };
-
-            /**
-            *  Case 4: No node passed in
-            *      NodeIDs:                     []
-            *      
-            *      Result:                     "200: Server: Tag(s) retrieved."
-            */
-            var nodeListCase4 = new List<long> {  };
-            var expectedCase4 = IMessageBank.Responses.tagGetSuccess;
-            var expectedTags4 = new List<string> { };
-
-            return new[]
-            {
-                new object[] { nodeListCase0, expectedCase0, expectedTags0 },
-                new object[] { nodeListCase1, expectedCase1, expectedTags1},
-                new object[] { nodeListCase2, expectedCase2, expectedTags2 },
-                new object[] { nodeListCase3, expectedCase3, expectedTags3 },
-                new object[] { nodeListCase4, expectedCase4, expectedTags4 }
-            };
-        }
+        }       
     }
 
+    /// <summary>
+    /// Fixture to run database setup and cleanup ONCE before and after all SqlDAO tests
+    /// </summary>
     public class TagSqlDatabaseFixture : TestBaseClass, IDisposable
     {
+        /// <summary>
+        /// List of nodeIDs dynamically created
+        /// </summary>
+        public List<long> nodeIDs { get; set; }
         public TagSqlDatabaseFixture() : base(new string[] { })
         {
             TestProvider = TestServices.BuildServiceProvider();
             IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
             BuildSettingsOptions optionsValue = options.Value;
 
+            //cleanup script location
             string script = File.ReadAllText("../../../IntegrationTests/Tag/SetupAndCleanup/DAOIntegrationSetup.sql");
 
+            //Read in commands
             IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
+            // Setup database with cases
             using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
             {
                 connection.Open();
@@ -455,6 +423,15 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
                     if (!string.IsNullOrWhiteSpace(command.Trim()))
                         using (var com = new SqlCommand(command, connection))
                             com.ExecuteNonQuery();
+            }
+
+            // Initialize list of nodes. 
+            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
+            {
+                connection.Open();
+                var procedure = "dbo.[DAOIntegrationTagInitializeProcedure]";                        // Name of store procedure
+                var value = new { };                                                                 // Parameters of stored procedure
+                nodeIDs = connection.Query<long>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure)).ToList();
             }
         }
 

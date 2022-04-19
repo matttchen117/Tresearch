@@ -8,32 +8,36 @@ function Portal() {
 
 
   const nodes = {
-    name: 'Tree 1',
+    name: 'Cooking with thumbs',
     attributes: {
-      nodeID: 1
+      nodeID: 1809
     },
     children: [
         {
-          name: 'Tree 2',
+          name: 'Pretzal Supremacy',
           attributes: {
-            nodeID: 2
+            nodeID: 1810
           },
           children: [
             {
-              name: 'Tree 4',
+              name: 'Fishing for wheels',
               attributes: {
-                nodeID: 4
+                nodeID: 1811
               }
             }
           ]
         },
         {
-          name: 'Tree 3',
+          name: 'CS',
           attributes: {
-            nodeID: 3
+            nodeID: 1812
           }
         }
-    ]
+    ],
+    name: 'TEST',
+    attributes: {
+      nodeID: 1813
+    }
   }
 
   return (

@@ -7,7 +7,7 @@ import "./TagDashboard.css";
 import Button from "../../UI/Button/ButtonComponent";
 
 function TagDashboard() {
-    const [data, setData] = useState([]);
+    const [tagData, setTagData] = useState([]);
 
     const [createData, setCreateData] = useState('');
     
@@ -21,9 +21,6 @@ function TagDashboard() {
     //Axios doesn't allow certain special characters. This will encode
     const  handleEncoded = (e) => {
         var parsedData = e.toString();
-        if(parsedData.includes(' ')){
-            parsedData = parsedData.replaceAll(' ', '%20');
-        }
         if(parsedData.includes('!')){
             parsedData = parsedData.replaceAll('!', '%21');
         }
@@ -48,10 +45,11 @@ function TagDashboard() {
     const handleClick = (e) => {
         var value = e.target.getAttribute('data-item');
         var parsedData = handleEncoded(value)
+        console.log(parsedData);
         axios.post("https://localhost:7010/Tag/deleteTag?tagName=" + parsedData)
         .then((response => {
             fetchTableData();
-            
+            console.log("TEST");
         }))
         .catch((err => {
             console.log(err);
@@ -67,7 +65,7 @@ function TagDashboard() {
         async function fetchData() {
             const request = await axios.get("https://localhost:7010/Tag/taglist")
             .then((response => {
-                setData(response);
+                setTagData(response.data);
             }))
             .catch((err => {
                 switch(err.response.status){
@@ -92,7 +90,6 @@ function TagDashboard() {
     }
 
     const checkToken = () => {
-        const token = localStorage.getItem('authorization');
         
     }
 
@@ -156,11 +153,11 @@ function TagDashboard() {
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map(item =>{
+                    {tagData.map(item =>{
                         return(
                             <tr key={item.tagName} className = "row-tag-table">                          
-                                        <td className = "table-item-name" data-item = {item.tagName} ><span className = "delete-icon-tag-table" data-item = {item.tagName} onClick = {handleClick}> &#10006;&emsp;</span>{item.tagName}</td>
-                                        <td data-item = {item.tagName} >{item.tagCount}</td>
+                                        <td className = "tag-table-name" data-item = {item.tagName} ><span className = "delete-icon-tag-table" data-item = {item.tagName} onClick = {handleClick}> &#10006;&emsp;</span>{item.tagName}</td>
+                                        <td className = "tag-table-count" data-item = {item.tagName} >{item.tagCount}</td>
                             </tr>
                         );
                     })}

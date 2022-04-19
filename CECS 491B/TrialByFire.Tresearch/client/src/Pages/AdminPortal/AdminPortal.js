@@ -12,7 +12,7 @@ function AdminPortal() {
                     <a href="/Admin/TagDashboard" className = "side-menu-link">Usage Analysis Dashboard</a>
                 </li>
                 <li className = "side-menu-item">
-                    <a href="/Admin/TagDashboard" className = "side-menu-link">User Management</a>
+                    <a href="/Admin/UserManagement" className = "side-menu-link">User Management</a>
                 </li>
                 <li className = "side-menu-item">
                     <a href="/Settings" className = "side-menu-link">Settings</a>

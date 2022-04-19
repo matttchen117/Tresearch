@@ -5,6 +5,7 @@ using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 
@@ -31,15 +32,14 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _options = options.Value;
         }
 
-        [HttpGet]
-        [Route("createAccount")]
-        public async Task<IActionResult> CreateAccountAsync(IAccount account)
+        [HttpPost("createAccount")]
+        public async Task<IActionResult> CreateAccountAsync(string username, string passphrase, string authorizationLevel)
         {
             try
             {
                 if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
-                    string result = await _userManagementManager.CreateAccountAsync(account, _cancellationTokenSource.Token);
+                    string result = await _userManagementManager.CreateAccountAsync(new UserAccount(username, passphrase, authorizationLevel, true, false), _cancellationTokenSource.Token);
                     string[] split;
                     split = result.Split(":");
 
@@ -75,15 +75,14 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             }    
         }
 
-        [HttpGet]
-        [Route("updateAccount")]
-        public async Task<IActionResult> UpdateAccountAsync(IAccount account, IAccount updatedAccount)
+        [HttpPost("updateAccount")]
+        public async Task<IActionResult> UpdateAccountAsync(List<IAccount> accounts)
         {
             try
             {
                 if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
-                    string result = await _userManagementManager.UpdateAccountAsync(account, updatedAccount, _cancellationTokenSource.Token);
+                    string result = await _userManagementManager.UpdateAccountAsync(accounts[0], accounts[1], _cancellationTokenSource.Token);
                     string[] split;
                     split = result.Split(":");
 
@@ -119,8 +118,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             }
         }
 
-        [HttpGet]
-        [Route("deleteAccount")]
+        [HttpPost("deleteAccount")]
         public async Task<IActionResult> DeleteAccountAsync(IAccount account)
         {
             try
@@ -163,8 +161,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             }
         }
 
-        [HttpGet]
-        [Route("enableAccount")]
+        [HttpPost("enableAccount")]
         public async Task<IActionResult> EnableAccountAsync(IAccount account)
         {
             try
@@ -207,8 +204,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             }
         }
 
-        [HttpGet]
-        [Route("disableAccount")]
+        [HttpPost("disableAccount")]
         public async Task<IActionResult> DisableAccountAsync(IAccount account)
         {
             try

@@ -1,18 +1,23 @@
-DELETE NodeTags WHere NodeID = 2072942630;
-DELETE NodeTags WHere NodeID = 2072942631;
-DELETE NodeTags WHere NodeID = 2072942632;
-DELETE NodeTags WHere NodeID = 2072942633;
-DELETE NodeTags WHere NodeID = 2072942634;
-DELETE NodeTags WHere NodeID = 2072942635;
-DELETE NodeTags WHere NodeID = 2072942636;
-DELETE NodeTags WHere NodeID = 2072942637;
-DELETE NodeTags WHere NodeID = 2072942638;
-DELETE NodeTags WHere NodeID = 2072942639;
-DELETE NodeTags WHere NodeID = 2072942640;
-DELETE NodeTags WHere NodeID = 2072942641;
-DELETE NodeTags WHere NodeID = 2072942642;
-DELETE NodeTags WHere NodeID = 2072942643;
-
+DELETE NodeTags WHERE TagName = 'Tresearch Service Create tag1';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Create tag2';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Add Tag1';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Add Tag2';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Add Tag3';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Add Tag4';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Add Tag5';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Delete Tag1';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Delete Tag2';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Delete Tag3';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Delete Tag4';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Delete Tag5';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Get Tag1';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Get Tag2';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Get Tag3';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Get Tag4';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Get Tag5';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Remove Me tag1';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Remove Me tag2';
+DELETE NodeTags WHERE TagName = 'Tresearch Service Remove Me tag3';
 
 DELETE Tags WHERE TagName = 'Tresearch Service Create tag1';
 DELETE Tags WHERE TagName = 'Tresearch Service Create tag2';
@@ -47,3 +52,4 @@ DELETE Accounts WHERE Username = 'tresearchTagServiceShould1@tresearch.system';
 DELETE Accounts WHERE Username = 'tresearchTagServiceShould2@tresearch.system';
 DELETE Accounts WHERE Username = 'tresearchTagServiceShould3@tresearch.system';
 
+DROP PROCEDURE IF EXISTS ServiceIntegrationTagInitializeProcedure;
