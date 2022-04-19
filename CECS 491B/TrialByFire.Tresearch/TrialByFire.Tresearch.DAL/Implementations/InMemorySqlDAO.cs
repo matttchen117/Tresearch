@@ -195,9 +195,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     }
                     for (int j = 0; j < InMemoryDatabase.Nodes.Count; j++)
                     {
-                        if (InMemoryDatabase.Nodes[j].accountOwner.Equals(accountName))
+                        if (InMemoryDatabase.Nodes[j].UserHash.Equals(accountName))
                         {
-                            if (InMemoryDatabase.NodeTags[j].NodeID.Equals(InMemoryDatabase.Nodes[j].nodeID))
+                            if (InMemoryDatabase.NodeTags[j].NodeID.Equals(InMemoryDatabase.Nodes[j].NodeID))
                             {
                                 InMemoryDatabase.NodeTags.RemoveAt(j);
                             }
@@ -1078,7 +1078,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 bool nodeExists = false;
                 foreach(var n in InMemoryDatabase.Nodes)
                 {
-                    if(node.nodeID == n.nodeID)
+                    if(node.NodeID == n.NodeID)
                     {
                         nodeExists = true;
                     }
@@ -1115,7 +1115,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
                 Node node;
                 foreach(Node n in InMemoryDatabase.Nodes){
-                    if (nID.Equals(n.nodeID))
+                    if (nID.Equals(n.NodeID))
                     {
                         INode temp;
                         temp = n;

@@ -2282,12 +2282,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var procedure = "[CreateNode]";
                     var values = new
                     {
-                        nodeID = node.nodeID,
-                        parentNodeId = node.parentNodeID,
-                        nodeTitle = node.nodeTitle,
-                        summary = node.summary,
-                        visibility = node.visibility,
-                        accountOwner = node.accountOwner
+                        nodeID = node.NodeID,
+                        parentNodeId = node.ParentNodeID,
+                        nodeTitle = node.NodeID,
+                        summary = node.Summary,
+                        visibility = node.Visibility,
+                        userHash = node.UserHash
                     };
                     var affectedRows = await connection.QueryAsync<int>(new CommandDefinition(procedure, values, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
