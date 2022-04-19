@@ -259,9 +259,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     }
                     for (int j = 0; j < InMemoryDatabase.Nodes.Count; j++)
                     {
-                        if (InMemoryDatabase.Nodes[j].accountOwner.Equals(accountName))
+                        if (InMemoryDatabase.Nodes[j].UserHash.Equals(accountName))
                         {
-                            if (InMemoryDatabase.NodeTags[j].NodeID.Equals(InMemoryDatabase.Nodes[j].nodeID))
+                            if (InMemoryDatabase.NodeTags[j].NodeID.Equals(InMemoryDatabase.Nodes[j].NodeID))
                             {
                                 InMemoryDatabase.NodeTags.RemoveAt(j);
                             }
@@ -1147,28 +1147,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public async Task<Tuple<List<double>, string>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             List<double> ratings = new List<double>();
-            foreach (var nodeID in nodeIDs)
-            {
-                if (InMemoryDatabase.Nodes.Contains(new Node(nodeID, -1, null, null, false, null)))
-                {
-                    double sum = 0.0;
-                    int count = 0;
-                    for (int i = 0; i < InMemoryDatabase.Ratings.Count(); i++)
-                    {
-                        if (InMemoryDatabase.Ratings[i].NodeID == nodeID)
-                        {
-                            count++;
-                            sum += InMemoryDatabase.Ratings[i].UserRating;
-                        }
-                    }
-                    double average = sum / count;
-                    ratings.Add(average);
-                }
-                else
-                {
-                    return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound));
-                }
-            }
+            
             return Tuple.Create(ratings, await _messageBank.GetMessage(IMessageBank.Responses.getRateSuccess));
         }
 

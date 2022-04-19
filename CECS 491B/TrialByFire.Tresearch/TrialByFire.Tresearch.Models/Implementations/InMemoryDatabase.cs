@@ -149,7 +149,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<INode> InitializeNodes()
         {
             List<INode> nodes = new List<INode>();
-            /*
+            /**
             nodes.Add(new Node(69420, 69419, "Cooking", "Concepts of Preparing Food", true, "jessie@gmail.com"));
             nodes.Add(new Node(100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com"));
             nodes.Add(new Node(100001, 100002, "Title 2", "Summary 2", false, "larry@gmail.com"));
@@ -188,7 +188,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodes.Add(new Node(2072942637, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
             nodes.Add(new Node(2072942638, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
 
-
+            */
 
             return nodes;
         }

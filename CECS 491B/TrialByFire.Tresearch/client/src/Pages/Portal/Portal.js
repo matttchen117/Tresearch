@@ -8,19 +8,19 @@ function Portal() {
 
 
   const nodes = {
-    name: 'Cooking with thumbs',
+    name: 'Computer Programming',
     attributes: {
       nodeID: 1809
     },
     children: [
         {
-          name: 'Pretzal Supremacy',
+          name: 'Intro to HTML/CSS',
           attributes: {
             nodeID: 1810
           },
           children: [
             {
-              name: 'Fishing for wheels',
+              name: 'Intro to SQL',
               attributes: {
                 nodeID: 1811
               }
@@ -28,16 +28,12 @@ function Portal() {
           ]
         },
         {
-          name: 'CS',
+          name: 'Intro to Javascript',
           attributes: {
             nodeID: 1812
           }
         }
-    ],
-    name: 'TEST',
-    attributes: {
-      nodeID: 1813
-    }
+    ]
   }
 
   return (

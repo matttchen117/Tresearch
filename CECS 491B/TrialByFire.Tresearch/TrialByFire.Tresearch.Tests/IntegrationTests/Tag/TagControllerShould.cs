@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Dapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System.Data;
 using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 using TrialByFire.Tresearch.Managers.Contracts;
@@ -22,10 +24,19 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
     /// </summary>
     public class TagControllerShould: TestBaseClass, IClassFixture<TagControllerDatabaseFixture>
     {
-        TagControllerDatabaseFixture fixture;           // Access to the fixture instance (this is where data to database is initialized and  disposed)
+        public static TagControllerDatabaseFixture fixture { get; set; }    // Access to the fixture instance (this is where data to database is initialized and  disposed)
+
+        private static List<long> nodeids = new List<long>();               // Holds the ID of Nodes (need to have since nodes are dynamically created (NodeID is Identity)
+        private static List<long> NodeIDs
+        {
+            get { return nodeids; }
+            set { nodeids = value; }
+        }
+
         public TagControllerShould(TagControllerDatabaseFixture fixture) : base(new string[] { })
         {
-            this.fixture = fixture;
+            TagControllerShould.fixture = fixture;
+            NodeIDs = fixture.nodeIDs;
             TestServices.AddScoped<ITagService, TagService>();
             TestServices.AddScoped<IAccountVerificationService, AccountVerificationService>();
             TestServices.AddScoped<ITagManager, TagManager>();
@@ -34,23 +45,51 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             TestProvider = TestServices.BuildServiceProvider();
         }
 
+
+        /**
+         *  Case 0: Tag nodes. User is Authenticated and Authorized. Nodes exist and already contain tag. 
+         *      Status code: 200 Value: Tag added to node(s).
+         *  Case 1: Tag nodes. User is Authenticated and Authorized. Nodes exist and do not contain tag.
+         *      Status code: 200 Value: Tag added to node(s).
+         *  Case 2: Tag nodes. User is Authenticated and Authorized. Node exists and contains tag
+         *      Status code: 200 Value: Tag added to node(s).
+         *  Case 3: Tag nodes. User is Authenticated and Authorized. Node exists and does not contain tag
+         *      Status code: 200 Value: Tag added to node(s).
+         *  Case 4: Tag nodes. User is Authenticated. No node passed in
+         *      Status code: 404 Value: The node was not found.
+         *  Case 5: Tag nodes. User is Authenticated and Authorized. Node exists but tag doesn't exist
+         *     Status code: 404 Value: The tag was not found.
+         *  Case 6: Tagging node. Some nodes already contain tag.
+         *      Status code: 200 Value: Tag added to node(s).
+         *  Case 7: Tag nodes. User is authenticated but not authorized to make changes to ALL nodes.
+         *      Status code: 403 Value: You are not authorized to perform this operation.
+         *  Case 8: Tag nodes. User is authenticatd but not authorized to make changes to SOME nodes.    
+         *      Status code: 403 Value: You are not authorized to perform this operation.
+         *  Case 9: Tag nodes. User is authenticatd but not authorized to make changes to node.
+         *      Status code: 403 Value: You are not authorized to perform this operation.
+         *  Case 10: Tag nodes. User is not authenticated
+         *      Status code: 401 Value: No active session found. Please login and try again.
+         *  Case 11: Tag nodes. User is not enabled
+         *      Status code: 401 Value: UserAccount disabled. Perform account recovery or contact system admin.
+         *  Case 12: Tag nodes. Account does not exist
+         *      Status code: 404 Value: Account not found.
+         */
         [Theory]
         [MemberData(nameof(AddNodeTagData))]
-        public async Task AddTagToNodeAsync(IRoleIdentity roleIdentity, List<long> nodeIDs, string tagName, string expected)
+        public async Task AddTagToNodeAsync(IRoleIdentity roleIdentity, List<int> index, string tagName, IMessageBank.Responses response)
         {
             //Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
-
-
+            ITagController tagController = TestProvider.GetService<ITagController>();
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
+            string expected = await messageBank.GetMessage(response);
             string[] exps = expected.Split(":");
             ObjectResult expectedResult = new ObjectResult(exps[2])
             { StatusCode = Convert.ToInt32(exps[0]) };
 
-            ITagController tagController = TestProvider.GetService<ITagController>();
-
             //Act
-            IActionResult aResult = await tagController.AddTagToNodesAsync(nodeIDs, tagName);
+            IActionResult aResult = await tagController.AddTagToNodesAsync(GetNodes(index), tagName);
             var result = aResult as ObjectResult;
 
             //Assert
@@ -58,126 +97,51 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             Assert.Equal(expectedResult.Value, result.Value);
         }
 
-        public static IEnumerable<object[]> AddNodeTagData()
-        {
-            //User Authorized, Nodes already have tag
-            IRoleIdentity roleIdentity0 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-            var tagNameCase0 = "Tresearch Controller Add Tag1";
-            var nodeListCase0 = new List<long> { 9019303350, 9019303351, 9019303352 };
-            var resultCase0 = "200: Server: Tag added to node(s).";
 
-            //User Authorized, Nodes do not contain these tags
-            IRoleIdentity roleIdentity1 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-            var tagNameCase1 = "Tresearch Controller Add Tag2";
-            var nodeListCase1 = new List<long> { 9019303350, 9019303351, 9019303352 };
-            var resultCase1 = "200: Server: Tag added to node(s).";
-
-            //User Authorized, Node already has tag
-            IRoleIdentity roleIdentity2 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-            var tagNameCase2 = "Tresearch Controller Add Tag3";
-            var nodeListCase2 = new List<long> { 9019303350 };
-            var resultCase2 = "200: Server: Tag added to node(s).";
-
-            //User Authorized, Node does not have tag
-            IRoleIdentity roleIdentity3 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-            var tagNameCase3 = "Tresearch Controller Add Tag4";
-            var nodeListCase3 = new List<long> { 9019303350 };
-            var resultCase3 = "200: Server: Tag added to node(s).";
-
-            //User Authorized, No node is passed in
-            IRoleIdentity roleIdentity4 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-            var tagNameCase4 = "Tresearch Controller Add Tag4";
-            var nodeListCase4 = new List<long> { };
-            var resultCase4 = "404: Database: The node was not found.";
-
-            //User Authorized, Tag doesn't exist
-            IRoleIdentity roleIdentity5 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-            var tagNameCase5 = "Tresearch Controller Add Tag5";
-            var nodeListCase5 = new List<long> { 9019303350 };
-            var resultCase5 = "404: Database: Tag not found.";
-
-            //User Authorized, Some Nodes already have tag (9019303351 contains tag)
-            IRoleIdentity roleIdentity6 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-            var tagNameCase6 = "Tresearch Controller Add Tag3";
-            var nodeListCase6 = new List<long> { 9019303350, 9019303351, 9019303352 };
-            var resultCase6 = "200: Server: Tag added to node(s).";
-
-            //User not Auhorized For All Nodes
-            IRoleIdentity roleIdentity7 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
-            var tagNameCase7 = "Tresearch Controller Add Tag3";
-            var nodeListCase7 = new List<long> { 9019303350, 9019303351, 9019303352 };
-            var resultCase7 = "403: Database: You are not authorized to perform this operation.";
-
-            //User not Authorized for some Nodes (user owns 9019303353, 9019303354 but not 9019303350)
-            IRoleIdentity roleIdentity8 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
-            var tagNameCase8 = "Tresearch Controller Add Tag3";
-            var nodeListCase8 = new List<long> { 9019303350, 9019303353, 9019303354 };
-            var resultCase8 = "403: Database: You are not authorized to perform this operation.";
-
-            //User not Authorized for node
-            IRoleIdentity roleIdentity9 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
-            var tagNameCase9 = "Tresearch Controller Add Tag3";
-            var nodeListCase9 = new List<long> { 9019303350 };
-            var resultCase9 = "403: Database: You are not authorized to perform this operation.";
-
-            //User has not been authenticated
-            IRoleIdentity roleIdentity10 = new RoleIdentity(true, "guest", "guest", "");
-            var tagNameCase10 = "Tresearch Controller Add Tag3";
-            var nodeListCase10 = new List<long> { 9019303350 };
-            var resultCase10 = "401: Server: No active session found. Please login and try again.";
-
-            //User is not enabled
-            IRoleIdentity roleIdentity11 = new RoleIdentity(true, "tagControllerIntegrationNotEnabled@tresearch.system", "user", "3e5c76fdaaa3dbdc12ecf59f01028284632d7a5289656eede6680c582a9e71eb082dafe0fb99411e6a220f4c9b1937a7e8d9317b3a0006051265590a166043ee");
-            var tagNameCase11 = "Tresearch Manager Add Tag3";
-            var nodeListCase11 = new List<long> { 9019303365 };
-            var resultCase11 = "401: Database: UserAccount disabled. Perform account recovery or contact system admin.";
-
-            //User is not confirmed
-            IRoleIdentity roleIdentity12 = new RoleIdentity(true, "tagControllerIntegrationNotConfirmed@tresearch.system", "user", "89ff4ea1982c9a201348d5ad6522ab72dc81084199596fdc7790c670a79bf86b3312c2d521ec6b7dc73b2eaa0698e54c17dddf47ecd6ef0b1f54f1b68552ca9c");
-            var tagNameCase12 = "Tresearch Controller Add Tag3";
-            var nodeListCase12 = new List<long> { 9019303366 };
-            var resultCase12 = "401: Database: Please confirm your account before attempting to login.";
-
-            //UserAccount  does not exist
-            IRoleIdentity roleIdentity13 = new RoleIdentity(true, "tagControllerNoAccount@tresearch.system", "user", "");
-            var tagNameCase13 = "Tresearch Controller Add Tag3";
-            var nodeListCase13 = new List<long> { };
-            var resultCase13 = "500: Database: The UserAccount was not found.";
-
-            return new[]
-            {
-                new object[] { roleIdentity0, nodeListCase0, tagNameCase0, resultCase0 },
-                new object[] { roleIdentity1, nodeListCase1, tagNameCase1, resultCase1 },
-                new object[] { roleIdentity2, nodeListCase2, tagNameCase2, resultCase2 },
-                new object[] { roleIdentity3, nodeListCase3, tagNameCase3, resultCase3 },
-                new object[] { roleIdentity4, nodeListCase4, tagNameCase4, resultCase4 },
-                new object[] { roleIdentity5, nodeListCase5, tagNameCase5, resultCase5 },
-                new object[] { roleIdentity6, nodeListCase6, tagNameCase6, resultCase6 },
-                new object[] { roleIdentity7, nodeListCase7, tagNameCase7, resultCase7 },
-                new object[] { roleIdentity8, nodeListCase8, tagNameCase8, resultCase8 },
-                new object[] { roleIdentity9, nodeListCase9, tagNameCase9, resultCase9 },
-                new object[] { roleIdentity10, nodeListCase10, tagNameCase10, resultCase10 },
-                new object[] { roleIdentity11, nodeListCase11, tagNameCase11, resultCase11 },
-                new object[] { roleIdentity12, nodeListCase12, tagNameCase12, resultCase12 },
-                new object[] { roleIdentity13, nodeListCase13, tagNameCase13, resultCase13 }
-            };
-        }
-
+        /**
+         *  Case 0: Remove nodes tags. User is Authenticated and Authorized. Nodes exist and already contain tag. 
+         *      Status code: 200 Value: Tag removed from node(s).
+         *  Case 1: Remove nodes tags. User is Authenticated and Authorized. Nodes exist and do not contain tag.
+         *      Status code: 200 Value: Tag removed from node(s).
+         *  Case 2: Remove nodes tags. User is Authenticated and Authorized. Node exists and contains tag
+         *      Status code: 200 Value: Tag removed from node(s).
+         *  Case 3: Remove nodes tags. User is Authenticated and Authorized. Node exists and does not contain tag
+         *      Status code: 200 Value: Tag removed from node(s).
+         *  Case 4: Remove nodes tags. User is Authenticated. No node passed in
+         *      Status code: 404 Value: The node was not found.
+         *  Case 5: Remove nodes tags. User is Authenticated and Authorized. Node exists but tag doesn't exist
+         *     Status code: 200 Value:Tag removed from node(s).
+         *  Case 6: Remove nodes tags. Some nodes already contain tag.
+         *      Status code: 200 Value: Tag removed from node(s).
+         *  Case 7: Remove nodes tags. User is authenticated but not authorized to make changes to ALL nodes.
+         *      Status code: 403 Value: You are not authorized to perform this operation.
+         *  Case 8: Remove nodes tags. User is authenticatd but not authorized to make changes to SOME nodes.    
+         *      Status code: 403 Value: You are not authorized to perform this operation.
+         *  Case 9: Remove nodes tags. User is authenticatd but not authorized to make changes to node.
+         *      Status code: 403 Value: You are not authorized to perform this operation.
+         *  Case 10: Remove nodes tags. User is not authenticated
+         *      Status code: 401 Value: No active session found. Please login and try again.
+         *  Case 11: Remove nodes tags. User is not enabled
+         *      Status code: 401 Value: UserAccount disabled. Perform account recovery or contact system admin.
+         *  Case 12: Remove nodes tags. Account does not exist
+         *      Status code: 404 Value: Account not found.
+         */
         [Theory]
         [MemberData(nameof(RemoveNodeTagData))]
-        public async Task RemoveNodTagData(IRoleIdentity roleIdentity, List<long> nodeIDs, string tagName, string expected)
+        public async Task RemoveNodTagData(IRoleIdentity roleIdentity, List<int> index, string tagName, IMessageBank.Responses response)
         {
             //Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
             ITagController tagController = TestProvider.GetService<ITagController>();
-
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
+            string expected = await messageBank.GetMessage(response);
             string[] exps = expected.Split(":");
             ObjectResult expectedResult = new ObjectResult(exps[2])
             { StatusCode = Convert.ToInt32(exps[0]) };
 
             //Act
-            IActionResult aResult = await tagController.RemoveTagFromNodesAsync(nodeIDs, tagName);
+            IActionResult aResult = await tagController.RemoveTagFromNodesAsync(GetNodes(index), tagName);
             var result = aResult as ObjectResult;
 
             //Assert
@@ -185,119 +149,17 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             Assert.Equal(expectedResult.Value, result.Value);
         }
 
-        public static IEnumerable<object[]> RemoveNodeTagData()
-        {
-            //User Authorized, Nodes already have tag
-            IRoleIdentity roleIdentity0 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-            var tagNameCase0 = "Tresearch Controller Delete Tag1";
-            var nodeListCase0 = new List<long> { 9019303350, 9019303351, 9019303352 };
-            var resultCase0 = "200: Server: Tag removed from node(s).";
-
-            //User Authorized, Nodes do not contain these tags
-            IRoleIdentity roleIdentity1 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-            var tagNameCase1 = "Tresearch Controller Delete Tag2";
-            var nodeListCase1 = new List<long> { 9019303350, 9019303351, 9019303352 };
-            var resultCase1 = "200: Server: Tag removed from node(s).";
-
-            //User Authorized, Node already has tag
-            IRoleIdentity roleIdentity2 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-            var tagNameCase2 = "Tresearch Controller Delete Tag3";
-            var nodeListCase2 = new List<long> { 9019303350 };
-            var resultCase2 = "200: Server: Tag removed from node(s).";
-
-            //User Authorized, Node does not have tag
-            IRoleIdentity roleIdentity3 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-            var tagNameCase3 = "Tresearch Controller Delete Tag4";
-            var nodeListCase3 = new List<long> { 9019303350 };
-            var resultCase3 = "200: Server: Tag removed from node(s).";
-
-            //User Authorized, No node is passed in
-            IRoleIdentity roleIdentity4 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-            var tagNameCase4 = "Tresearch Controller Delete Tag4";
-            var nodeListCase4 = new List<long> { };
-            var resultCase4 = "404: Database: The node was not found.";
-
-            //User Authorized, Tag doesn't exist
-            IRoleIdentity roleIdentity5 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-            var tagNameCase5 = "Tresearch Controller Delete Tag5";
-            var nodeListCase5 = new List<long> { 9019303350 };
-            var resultCase5 = "200: Server: Tag removed from node(s).";
-
-            //User Authorized, Some Nodes already have tag (9019303351 contains tag)
-            IRoleIdentity roleIdentity6 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-            var tagNameCase6 = "Tresearch Controller Delete Tag3";
-            var nodeListCase6 = new List<long> { 9019303350, 9019303351, 9019303352 };
-            var resultCase6 = "200: Server: Tag removed from node(s).";
-
-            //User not Auhorized For All Nodes
-            IRoleIdentity roleIdentity7 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
-            var tagNameCase7 = "Tresearch Controller Delete Tag3";
-            var nodeListCase7 = new List<long> { 9019303350, 9019303351, 9019303352 };
-            var resultCase7 = "403: Database: You are not authorized to perform this operation.";
-
-            //User not Authorized for some Nodes (user owns 9019303353, 9019303354 but not 9019303350)
-            IRoleIdentity roleIdentity8 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
-            var tagNameCase8 = "Tresearch Controller Delete Tag3";
-            var nodeListCase8 = new List<long> { 9019303350, 9019303353, 9019303354 };
-            var resultCase8 = "403: Database: You are not authorized to perform this operation.";
-
-            //User not Authorized for node
-            IRoleIdentity roleIdentity9 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
-            var tagNameCase9 = "Tresearch Controller Delete Tag3";
-            var nodeListCase9 = new List<long> { 9019303350 };
-            var resultCase9 = "403: Database: You are not authorized to perform this operation.";
-
-            //User has not been authenticated
-            IRoleIdentity roleIdentity10 = new RoleIdentity(true, "guest", "guest", "");
-            var tagNameCase10 = "Tresearch Controller Delete Tag3";
-            var nodeListCase10 = new List<long> { 9019303350 };
-            var resultCase10 = "401: Server: No active session found. Please login and try again.";
-
-            //User is not enabled
-            IRoleIdentity roleIdentity11 = new RoleIdentity(true, "tagControllerIntegrationNotEnabled@tresearch.system", "user", "3e5c76fdaaa3dbdc12ecf59f01028284632d7a5289656eede6680c582a9e71eb082dafe0fb99411e6a220f4c9b1937a7e8d9317b3a0006051265590a166043ee");
-            var tagNameCase11 = "Tresearch Controller Delete Tag3";
-            var nodeListCase11 = new List<long> { 9019303365 };
-            var resultCase11 = "401: Database: UserAccount disabled. Perform account recovery or contact system admin.";
-
-            //User is not confirmed
-            IRoleIdentity roleIdentity12 = new RoleIdentity(true, "tagControllerIntegrationNotConfirmed@tresearch.system", "user", "89ff4ea1982c9a201348d5ad6522ab72dc81084199596fdc7790c670a79bf86b3312c2d521ec6b7dc73b2eaa0698e54c17dddf47ecd6ef0b1f54f1b68552ca9c");
-            var tagNameCase12 = "Tresearch Controller Delete Tag3";
-            var nodeListCase12 = new List<long> { 9019303366 };
-            var resultCase12 = "401: Database: Please confirm your account before attempting to login.";
-
-            //UserAccount  does not exist
-            IRoleIdentity roleIdentity13 = new RoleIdentity(true, "tagControllerNoAccount@tresearch.system", "user", "");
-            var tagNameCase13 = "Tresearch Controller Delete Tag3";
-            var nodeListCase13 = new List<long> { };
-            var resultCase13 = "500: Database: The UserAccount was not found.";
-
-            return new[]
-            {
-                new object[] { roleIdentity0, nodeListCase0, tagNameCase0, resultCase0 },
-                new object[] { roleIdentity1, nodeListCase1, tagNameCase1, resultCase1 },
-                new object[] { roleIdentity2, nodeListCase2, tagNameCase2, resultCase2 },
-                new object[] { roleIdentity3, nodeListCase3, tagNameCase3, resultCase3 },
-                new object[] { roleIdentity4, nodeListCase4, tagNameCase4, resultCase4 },
-                new object[] { roleIdentity5, nodeListCase5, tagNameCase5, resultCase5 },
-                new object[] { roleIdentity6, nodeListCase6, tagNameCase6, resultCase6 },
-                new object[] { roleIdentity7, nodeListCase7, tagNameCase7, resultCase7 },
-                new object[] { roleIdentity8, nodeListCase8, tagNameCase8, resultCase8 },
-                new object[] { roleIdentity9, nodeListCase9, tagNameCase9, resultCase9 },
-                new object[] { roleIdentity10, nodeListCase10, tagNameCase10, resultCase10 },
-                new object[] { roleIdentity11, nodeListCase11, tagNameCase11, resultCase11 },
-                new object[] { roleIdentity12, nodeListCase12, tagNameCase12, resultCase12 },
-                new object[] { roleIdentity13, nodeListCase13, tagNameCase13, resultCase13 }
-            };
-        }
+        
 
         [Theory]
         [MemberData(nameof(GetNodeTagData))]
-        public async Task GetNodeTagsAsync(IRoleIdentity roleIdentity, List<long> nodeIDs, List<string> expectedTags, string expected)
+        public async Task GetNodeTagsAsync(IRoleIdentity roleIdentity, List<int> index, List<string> expectedTags, IMessageBank.Responses response)
         {
             //Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
-
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
+            string expected = await messageBank.GetMessage(response);
             string[] exps = expected.Split(":");
             ObjectResult expectedResult = new ObjectResult(exps[2])
             { StatusCode = Convert.ToInt32(exps[0]) };
@@ -305,7 +167,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             ITagController tagController = TestProvider.GetService<ITagController>();
 
             //Act
-            IActionResult results = await tagController.GetNodeTagsAsync(nodeIDs);
+            IActionResult results = await tagController.GetNodeTagsAsync(GetNodes(index));
             var result = results as ObjectResult;
 
             //Arrange
@@ -322,8 +184,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 
             IRoleIdentity roleIdentity0 = new RoleIdentity(true, "tagControllerIntegration3@tresearch.system", "user", "0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f");
             var tagListCase0 = new List<string> { "Tresearch Controller Get Tag1", "Tresearch Controller Get Tag2" };
-            var nodeListCase0 = new List<long> { 9019303356, 9019303357, 9019303358 };
-            var resultCase0 = "200: Server: Tag(s) retrieved.";
+            var nodeListCase0 = new List<int> { 6, 7, 8 };
+            var resultCase0 = IMessageBank.Responses.tagGetSuccess;
 
             /*User Authorized, Nodes do not contain shared tags
              *          9019303358: Tresearch Controller Get Tag1, Tresearch Controller Get Tag2, Tresearch Controller Get Tag3
@@ -332,69 +194,69 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
              */
             IRoleIdentity roleIdentity1 = new RoleIdentity(true, "tagControllerIntegration3@tresearch.system", "user", "0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f");
             var tagListCase1 = new List<string> { };
-            var nodeListCase1 = new List<long> { 9019303358, 9019303359, 9019303360 };
-            var resultCase1 = "200: Server: Tag(s) retrieved.";
+            var nodeListCase1 = new List<int> { 8, 9, 10 };
+            var resultCase1 = IMessageBank.Responses.tagGetSuccess;
 
             //User Authorized, Grab Single Node's Tags (9019303356: Tresearch Controller Get Tag1, Tresearch Controller Get Tag2)
             IRoleIdentity roleIdentity2 = new RoleIdentity(true, "tagControllerIntegration3@tresearch.system", "user", "0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f");
             var tagListCase2 = new List<string> { "Tresearch Controller Get Tag1", "Tresearch Controller Get Tag2" };
-            var nodeListCase2 = new List<long> { 9019303356 };
-            var resultCase2 = "200: Server: Tag(s) retrieved.";
+            var nodeListCase2 = new List<int> { 6 };
+            var resultCase2 = IMessageBank.Responses.tagGetSuccess;
 
-            //User Authorized, Node does not have tag
+            //User Authorized, Node exists but does not have tag
             IRoleIdentity roleIdentity3 = new RoleIdentity(true, "tagControllerIntegration3@tresearch.system", "user", "0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f");
             var tagListCase3 = new List<string> { };
-            var nodeListCase3 = new List<long> { 9019303361 };
-            var resultCase3 = "200: Server: Tag(s) retrieved.";
+            var nodeListCase3 = new List<int> { 11 };
+            var resultCase3 = IMessageBank.Responses.tagGetSuccess;
 
             //User Authorized, No node is passed in
             IRoleIdentity roleIdentity4 = new RoleIdentity(true, "tagControllerIntegration3@tresearch.system", "user", "0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f");
             var tagListCase4 = new List<string> { };
-            var nodeListCase4 = new List<long> { };
-            var resultCase4 = "404: Database: Node not found.";
+            var nodeListCase4 = new List<int> { };
+            var resultCase4 = IMessageBank.Responses.nodeNotFound;
 
 
             //User not Auhorized For All Nodes
             IRoleIdentity roleIdentity5 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
             var tagListCase5 = new List<string> { };
-            var nodeListCase5 = new List<long> { 9019303350, 9019303351, 9019303352 };
-            var resultCase5 = "403: Database: You are not authorized to perform this operation.";
+            var nodeListCase5 = new List<int> { 0, 1, 2 };
+            var resultCase5 = IMessageBank.Responses.notAuthorized;
 
             //User not Authorized for some Nodes (user owns 9019303353, 9019303354 but not 9019303350)
             IRoleIdentity roleIdentity6 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
             var tagListCase6 = new List<string> { };
-            var nodeListCase6 = new List<long> { 9019303350, 9019303353, 9019303354 };
-            var resultCase6 = "403: Database: You are not authorized to perform this operation.";
+            var nodeListCase6 = new List<int> { 0, 3, 4 };
+            var resultCase6 = IMessageBank.Responses.notAuthorized;
 
             //User not Authorized for node
             IRoleIdentity roleIdentity7 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
             var tagListCase7 = new List<string> { };
-            var nodeListCase7 = new List<long> { 9019303350 };
-            var resultCase7 = "403: Database: You are not authorized to perform this operation.";
+            var nodeListCase7 = new List<int> { 0 };
+            var resultCase7 = IMessageBank.Responses.notAuthorized;
 
             //User has not been authenticated
             IRoleIdentity roleIdentity8 = new RoleIdentity(true, "guest", "guest", "");
             var tagListCase8 = new List<string> { };
-            var nodeListCase8 = new List<long> { 9019303350 };
-            var resultCase8 = "401: Server: No active session found. Please login and try again.";
+            var nodeListCase8 = new List<int> { 0 };
+            var resultCase8 = IMessageBank.Responses.notAuthenticated;
 
             //User is not enabled
             IRoleIdentity roleIdentity9 = new RoleIdentity(false, "tagControllerIntegrationNotEnabled@tresearch.system", "user");
             var tagListCase9 = new List<string> { };
-            var nodeListCase9 = new List<long> { 9019303365 };
-            var resultCase9 = "401: Database: UserAccount disabled. Perform account recovery or contact system admin.";
+            var nodeListCase9 = new List<int> { 0 };
+            var resultCase9 = IMessageBank.Responses.notEnabled;
 
             //User is not confirmed
             IRoleIdentity roleIdentity10 = new RoleIdentity(false, "tagControllerIntegrationNotConfirmed@tresearch.system", "user");
             var tagListCase10 = new List<string> { };
-            var nodeListCase10 = new List<long> { 9019303366 };
-            var resultCase10 = "401: Database: Please confirm your account before attempting to login.";
+            var nodeListCase10 = new List<int> { 6 };
+            var resultCase10 = IMessageBank.Responses.notConfirmed;
 
             //UserAccount  does not exist
             IRoleIdentity roleIdentity11 = new RoleIdentity(false, "tagControllerNoAccount@tresearch.system", "user");
             var tagListCase11 = new List<string> { };
-            var nodeListCase11 = new List<long> { };
-            var resultCase11 = "500: Database: The UserAccount was not found.";
+            var nodeListCase11 = new List<int> { };
+            var resultCase11 = IMessageBank.Responses.accountNotFound;
 
             return new[]
             {
@@ -562,6 +424,420 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
         }
 
+        public static IEnumerable<object[]> AddNodeTagData()
+        {
+            /**
+             *  Case 0: Tag nodes. User is Authenticated and Authorized. Nodes exist and already contain tag.
+             *      Account:                    tagControllerIntegration1@tresearch.system
+             *      NodeIDs:                    xxxx0, xxxx1, xxxx2
+             *      Tag Name:                   Tresearch Manager Add Tag1 
+             *      
+             *      Result:                     "200: Server: Tag added to node(s)."
+             */
+            IRoleIdentity roleIdentity0 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
+            var tagNameCase0 = "Tresearch Controller Add Tag1";
+            var nodeListCase0 = new List<int> { 0, 1, 2 };
+            var resultCase0 = IMessageBank.Responses.tagAddSuccess;
+
+            /**
+             *  Case 1: Tag nodes. User is Authenticated and Authorized. Nodes exist and do not contain tag.
+             *      Account:                    tagControllerIntegration1@tresearch.system
+             *      NodeIDs:                    xxxx0, xxxx1, xxxx2
+             *      Tag Name:                   Tresearch Manager Add Tag2 
+             *      
+             *      Result:                     "200: Server: Tag added to node(s)."
+             */
+            IRoleIdentity roleIdentity1 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
+            var tagNameCase1 = "Tresearch Controller Add Tag2";
+            var nodeListCase1 = new List<int> { 0, 1, 2 };
+            var resultCase1 = IMessageBank.Responses.tagAddSuccess;
+
+            /**
+             *  Case 2: Tag nodes. User is Authenticated and Authorized. Node exists and contains tag
+             *      Account:                    tagControllerIntegration1@tresearch.system
+             *      NodeIDs:                    xxxx0
+             *      Tag Name:                   Tresearch Manager Add Tag3 
+             *      
+             *      Result:                     "200: Server: Tag added to node(s)."
+             */
+            IRoleIdentity roleIdentity2 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
+            var tagNameCase2 = "Tresearch Controller Add Tag3";
+            var nodeListCase2 = new List<int> { 0 };
+            var resultCase2 = IMessageBank.Responses.tagAddSuccess;
+
+            /**
+             *  Case 3: Tag nodes. User is Authenticated and Authorized. Node exists and does not contain tag
+             *      Account:                    tagControllerIntegration1@tresearch.system
+             *      NodeIDs:                    xxxx0
+             *      Tag Name:                   Tresearch Manager Add Tag4 
+             *      
+             *      Result:                     "200: Server: Tag added to node(s)."
+             */
+            IRoleIdentity roleIdentity3 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
+            var tagNameCase3 = "Tresearch Controller Add Tag4";
+            var nodeListCase3 = new List<int> { 0 };
+            var resultCase3 = IMessageBank.Responses.tagAddSuccess;
+
+            /**
+             *  Case 4: Tag nodes. User is Authenticated. No node passed in
+             *      Account:                    tagControllerIntegration1@tresearch.system
+             *      NodeIDs:                    
+             *      Tag Name:                   Tresearch Manager Add Tag4 
+             *      
+             *      Result:                     "404: Database: The node was not found."
+             */
+            IRoleIdentity roleIdentity4 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
+            var tagNameCase4 = "Tresearch Controller Add Tag4";
+            var nodeListCase4 = new List<int> { };
+            var resultCase4 = IMessageBank.Responses.nodeNotFound;
+
+            /**
+              *  Case 5: Tag nodes. User is Authenticated and Authorized. Node exists but tag doesn't exist
+              *      Account:                    tagControllerIntegration1@tresearch.system
+              *      NodeIDs:                    xxxx0
+              *      Tag Name:                   Tresearch Manager Add Tag5 
+              *      
+              *      Result:                     "404: Database: Tag not found."
+              */
+            IRoleIdentity roleIdentity5 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
+            var tagNameCase5 = "Tresearch Controller Add Tag5";
+            var nodeListCase5 = new List<int> { 0 };
+            var resultCase5 = IMessageBank.Responses.tagNotFound;
+
+            /**
+             *  Case 6: Tag nodes. User is Authenticated and Authorized. Some nodes already have tag 
+             *      Account:                    tagControllerIntegration1@tresearch.system
+             *      NodeIDs:                    xxxx0, xxxx1, xxx2 (xxxx1 contains tag alredy)
+             *      Tag Name:                   Tresearch Manager Add Tag2 
+             *      
+             *      Result:                     "200: Server: Tag added to node(s)."
+             */
+            IRoleIdentity roleIdentity6 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
+            var tagNameCase6 = "Tresearch Controller Add Tag3";
+            var nodeListCase6 = new List<int> { 0, 1, 2 };
+            var resultCase6 = IMessageBank.Responses.tagAddSuccess;
+
+            /**
+             *  Case 7: Tag nodes. User is authenticated but not authorized to make changes to ALL nodes.
+             *      Account:                    tagControllerIntegration2@tresearch.system (not authorized to make changes to all three nodes)
+             *      NodeIDs:                    xxxx0, xxxx1, xxx2 
+             *      Tag Name:                   Tresearch Manager Add Tag3 
+             *      
+             *      Result:                     403: Database: You are not authorized to perform this operation.
+             */
+            IRoleIdentity roleIdentity7 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
+            var tagNameCase7 = "Tresearch Controller Add Tag3";
+            var nodeListCase7 = new List<int> { 0, 1, 2 };
+            var resultCase7 = IMessageBank.Responses.notAuthorized;
+
+            /**
+              *  Case 8: Tag nodes. User is authenticatd but not authorized to make changes to SOME nodes.
+              *      Account:                    tagControllerIntegration2@tresearch.system
+              *      NodeIDs:                    xxxx0, xxxx3, xxx4      
+              *                                  xxxx0 : Not authorized
+              *                                  xxxx3 : Authorized
+              *                                  xxxx4 : Authorized
+              *                                  
+              *      Tag Name:                   Tresearch Manager Add Tag3 
+              *      
+              *      Result:                     403: Database: You are not authorized to perform this operation.
+              */
+            IRoleIdentity roleIdentity8 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
+            var tagNameCase8 = "Tresearch Controller Add Tag3";
+            var nodeListCase8 = new List<int> { 0, 3, 4 };
+            var resultCase8 = IMessageBank.Responses.notAuthorized;
+
+            /**
+             *  Case 9: Tag nodes. User is authenticatd but not authorized to make changes to node.
+             *      Account:                    tagControllerIntegration2@tresearch.system
+             *      NodeIDs:                    xxxx0     
+             *                                  xxxx0 : Not authorized
+             *                                  
+             *      Tag Name:                   Tresearch Manager Add Tag3 
+             *      
+             *      Result:                     403: Database: You are not authorized to perform this operation.
+             */
+            IRoleIdentity roleIdentity9 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
+            var tagNameCase9 = "Tresearch Controller Add Tag3";
+            var nodeListCase9 = new List<int> { 0 };
+            var resultCase9 = IMessageBank.Responses.notAuthorized;
+
+            /**
+            *  Case 10: Tag nodes. User is not authenticated
+            *      Account:         
+            *      NodeIDs:                    xxxx0     
+            *                                  xxxx0 : Not authorized
+            *                                  
+            *      Tag Name:                   Tresearch Manager Add Tag3 
+            *      
+            *      Result:                     401: Server: No active session found. Please login and try again.
+            */
+            IRoleIdentity roleIdentity10 = new RoleIdentity(true, "guest", "guest", "");
+            var tagNameCase10 = "Tresearch Controller Add Tag3";
+            var nodeListCase10 = new List<int> { 0 };
+            var resultCase10 = IMessageBank.Responses.notAuthenticated;
+
+            /**
+             *  Case 11: Tag nodes. User is not enabled
+             *      Account:                    tagControllerIntegrationNotEnabled@tresearch.system
+             *      NodeIDs:                    xxxx0     
+             *                                  xxxx0 : Not authorized since disabled
+             *                                  
+             *      Tag Name:                   Tresearch Manager Add Tag3 
+             *      
+             *      Result:                     401: Database: UserAccount disabled. Perform account recovery or contact system admin.
+             */
+            IRoleIdentity roleIdentity11 = new RoleIdentity(true, "tagControllerIntegrationNotEnabled@tresearch.system", "user", "3e5c76fdaaa3dbdc12ecf59f01028284632d7a5289656eede6680c582a9e71eb082dafe0fb99411e6a220f4c9b1937a7e8d9317b3a0006051265590a166043ee");
+            var tagNameCase11 = "Tresearch Manager Add Tag3";
+            var nodeListCase11 = new List<int> { 0 };
+            var resultCase11 = IMessageBank.Responses.notEnabled;
+
+            /**
+             *  Case 12: Tag nodes. Account not confirmed.
+             *      NodeIDs:                    xxxx0     
+             *                                  xxxx0 : Not authorized
+             *                                  
+             *      Tag Name:                   Tresearch Manager Add Tag3 
+             *      
+             *      Result:                     401: Database: Account not confirmed.
+             */
+            IRoleIdentity roleIdentity12 = new RoleIdentity(true, "tagControllerIntegrationNotConfirmed@tresearch.system", "user", "89ff4ea1982c9a201348d5ad6522ab72dc81084199596fdc7790c670a79bf86b3312c2d521ec6b7dc73b2eaa0698e54c17dddf47ecd6ef0b1f54f1b68552ca9c");
+            var tagNameCase12 = "Tresearch Controller Add Tag3";
+            var nodeListCase12 = new List<int> { 0 };
+            var resultCase12 = IMessageBank.Responses.notConfirmed;
+
+            /**
+             *  Case 13: Tag nodes. Account does not exist
+             *      NodeIDs:                    xxxx0     
+             *                                  xxxx0 : Not authorized
+             *                                  
+             *      Tag Name:                   Tresearch Manager Add Tag3 
+             *      
+             *      Result:                     401: Database: UserAccount disabled. Perform account recovery or contact system admin.
+             */
+            IRoleIdentity roleIdentity13 = new RoleIdentity(true, "tagControllerNoAccount@tresearch.system", "user", "");
+            var tagNameCase13 = "Tresearch Controller Add Tag3";
+            var nodeListCase13 = new List<int> { 0 };
+            var resultCase13 = IMessageBank.Responses.accountNotFound;
+
+            return new[]
+            {
+                new object[] { roleIdentity0, nodeListCase0, tagNameCase0, resultCase0 },
+                new object[] { roleIdentity1, nodeListCase1, tagNameCase1, resultCase1 },
+                new object[] { roleIdentity2, nodeListCase2, tagNameCase2, resultCase2 },
+                new object[] { roleIdentity3, nodeListCase3, tagNameCase3, resultCase3 },
+                new object[] { roleIdentity4, nodeListCase4, tagNameCase4, resultCase4 },
+                new object[] { roleIdentity5, nodeListCase5, tagNameCase5, resultCase5 },
+                new object[] { roleIdentity6, nodeListCase6, tagNameCase6, resultCase6 },
+                new object[] { roleIdentity7, nodeListCase7, tagNameCase7, resultCase7 },
+                new object[] { roleIdentity8, nodeListCase8, tagNameCase8, resultCase8 },
+                new object[] { roleIdentity9, nodeListCase9, tagNameCase9, resultCase9 },
+                new object[] { roleIdentity10, nodeListCase10, tagNameCase10, resultCase10 },
+                new object[] { roleIdentity11, nodeListCase11, tagNameCase11, resultCase11 },
+                new object[] { roleIdentity12, nodeListCase12, tagNameCase12, resultCase12 },
+                new object[] { roleIdentity13, nodeListCase13, tagNameCase13, resultCase13 }
+            };
+        }
+
+        public static IEnumerable<object[]> RemoveNodeTagData()
+        {
+            /**
+             *  Case 0: Remove nodes tags. User is Authenticated and Authorized. Nodes exist and already contain tag. 
+             *      NodeIDs:                    xxxx0, xxxx1, xxxx2
+             *      Tag Name:                   Tresearch Manager Delete Tag1 
+             *      
+             *      Result:                     200: Server: Tag removed from node(s).
+             */
+            IRoleIdentity roleIdentity0 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
+            var tagNameCase0 = "Tresearch Controller Delete Tag1";
+            var nodeListCase0 = new List<int> { 0, 1, 2 };
+            var resultCase0 = IMessageBank.Responses.tagRemoveSuccess;
+
+            /**
+             *  Case 1: Remove nodes tags. User is Authenticated and Authorized. Nodes exist and do not contain tag. 
+             *      NodeIDs:                    xxxx0, xxxx1, xxxx2
+             *      Tag Name:                   Tresearch Manager Delete Tag2 
+             *      
+             *      Result:                     200: Server: Tag removed from node(s).
+             */
+            IRoleIdentity roleIdentity1 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
+            var tagNameCase1 = "Tresearch Controller Delete Tag2";
+            var nodeListCase1 = new List<int> { 0, 1, 2 };
+            var resultCase1 = IMessageBank.Responses.tagRemoveSuccess;
+
+            /**
+             *  Case 2: Remove nodes tags. User is Authenticated and Authorized. Node exists and contains tag
+             *      NodeIDs:                    xxxx0
+             *      Tag Name:                   Tresearch Manager Delete Tag3 
+             *      
+             *      Result:                     200: Server: Tag removed from node(s).
+             */
+            IRoleIdentity roleIdentity2 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
+            var tagNameCase2 = "Tresearch Controller Delete Tag3";
+            var nodeListCase2 = new List<int> { 0 };
+            var resultCase2 = IMessageBank.Responses.tagRemoveSuccess;
+
+            /**
+            *  Case 3: Remove nodes tags. User is Authenticated and Authorized. Node exists and does not contain tag
+            *      NodeIDs:                    xxxx0
+            *      Tag Name:                   Tresearch Manager Delete Tag4 
+            *      
+            *      Result:                     200: Server: Tag removed from node(s).
+            */
+            IRoleIdentity roleIdentity3 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
+            var tagNameCase3 = "Tresearch Controller Delete Tag4";
+            var nodeListCase3 = new List<int> { 0 };
+            var resultCase3 = IMessageBank.Responses.tagRemoveSuccess;
+
+            /**
+            *  Case 4: Remove nodes tags. No node passed in
+            *      NodeIDs:                    
+            *      Tag Name:                   Tresearch Service Delete Tag4
+            *      
+            *      Result:                     404: Database: The node was not found.
+            */
+            IRoleIdentity roleIdentity4 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
+            var tagNameCase4 = "Tresearch Controller Delete Tag4";
+            var nodeListCase4 = new List<int> { };
+            var resultCase4 = IMessageBank.Responses.nodeNotFound;
+
+            /**
+             *  Case 5: Remove nodes tags. User is Authenticated and Authorized. Node exists but tag doesn't exist
+             *      NodeIDs:                    xxxx0
+             *      Tag Name:                   Tresearch Manager Delete Tag5 
+             *      
+             *      Result:                     200: Server: Tag removed from node(s).
+             */
+            IRoleIdentity roleIdentity5 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
+            var tagNameCase5 = "Tresearch Controller Delete Tag5";
+            var nodeListCase5 = new List<int> { 0 };
+            var resultCase5 = IMessageBank.Responses.tagRemoveSuccess;
+
+            /**
+             *  Case 6: Remove nodes tags. User is Authenticated and Authorized. Some nodes already have tag 
+             *      NodeIDs:                    xxxx0, xxxx1, xxx2 (xxxx1 contains tag alredy)
+             *      Tag Name:                   Tresearch Manager Delete Tag2 
+             *      
+             *      Result:                     200: Server: Tag removed from node(s).
+             */
+            IRoleIdentity roleIdentity6 = new RoleIdentity(true, "tagControllerIntegration1@tresearch.system", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
+            var tagNameCase6 = "Tresearch Controller Delete Tag3";
+            var nodeListCase6 = new List<int> { 0, 1, 2 };
+            var resultCase6 = IMessageBank.Responses.tagRemoveSuccess;
+
+            /**
+             *  Case 7: Remove nodes tags. User is authenticated but not authorized to make changes to ALL nodes.
+             *      NodeIDs:                    xxxx0, xxxx1, xxx2 
+             *      Tag Name:                   Tresearch Manager Delete Tag3 
+             *      
+             *      Result:                     403: Database: You are not authorized to perform this operation.
+             */
+            IRoleIdentity roleIdentity7 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
+            var tagNameCase7 = "Tresearch Controller Delete Tag3";
+            var nodeListCase7 = new List<int> { 0, 1, 2 };
+            var resultCase7 = IMessageBank.Responses.notAuthorized;
+
+            /**
+             *  Case 8: Remove nodes tags. User is authenticatd but not authorized to make changes to SOME nodes.
+             *      NodeIDs:                    xxxx0, xxxx3, xxx4      
+             *                                  xxxx0 : Not authorized
+             *                                  xxxx3 : Authorized
+             *                                  xxxx4 : Authorized
+             *                                  
+             *      Tag Name:                   Tresearch Delete Delete Tag3 
+             *      
+             *      Result:                     403: Database: You are not authorized to perform this operation.
+             */
+            IRoleIdentity roleIdentity8 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
+            var tagNameCase8 = "Tresearch Controller Delete Tag3";
+            var nodeListCase8 = new List<int> { 0, 3, 4 };
+            var resultCase8 = IMessageBank.Responses.notAuthorized;
+
+            /**
+             *  Case 9: Remove nodes tags. User is authenticatd but not authorized to make changes to node.
+             *      NodeIDs:                    xxxx0     
+             *                                  xxxx0 : Not authorized
+             *                                  
+             *      Tag Name:                   Tresearch Manager Delete Tag3 
+             *      
+             *      Result:                     403: Database: You are not authorized to perform this operation.
+             */
+            IRoleIdentity roleIdentity9 = new RoleIdentity(true, "tagControllerIntegration2@tresearch.system", "user", "20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb");
+            var tagNameCase9 = "Tresearch Controller Delete Tag3";
+            var nodeListCase9 = new List<int> { 0 };
+            var resultCase9 = IMessageBank.Responses.notAuthorized;
+
+            /**
+              *  Case 10: Remove nodes tags. User is not authenticated
+              *      NodeIDs:                    xxxx0     
+              *                                  
+              *      Tag Name:                   Tresearch Manager Delete Tag3 
+              *      
+              *      Result:                     401: Server: No active session found. Please login and try again.
+              */
+            IRoleIdentity roleIdentity10 = new RoleIdentity(true, "guest", "guest", "");
+            var tagNameCase10 = "Tresearch Controller Delete Tag3";
+            var nodeListCase10 = new List<int> { 0 };
+            var resultCase10 = IMessageBank.Responses.notAuthenticated;
+
+            /**
+            *  Case 11: Remove nodes tags. User is not enabled
+            *      NodeIDs:                    xxxx0     
+            *                                  
+            *      Tag Name:                   Tresearch Manager Delete Tag3 
+            *      
+            *      Result:                     401: Database: UserAccount disabled. Perform account recovery or contact system admin.
+            */
+            IRoleIdentity roleIdentity11 = new RoleIdentity(true, "tagControllerIntegrationNotEnabled@tresearch.system", "user", "3e5c76fdaaa3dbdc12ecf59f01028284632d7a5289656eede6680c582a9e71eb082dafe0fb99411e6a220f4c9b1937a7e8d9317b3a0006051265590a166043ee");
+            var tagNameCase11 = "Tresearch Controller Delete Tag3";
+            var nodeListCase11 = new List<int> { 0 };
+            var resultCase11 = IMessageBank.Responses.notEnabled;
+
+            /**
+             *  Case 12: Tag nodes. Account not confirmed
+             *      NodeIDs:                    xxxx0     
+             *                                  
+             *      Tag Name:                   Tresearch Manager Delete Tag3 
+             *      
+             *      Result:                     401: Database: Please confirm your account before attempting to login.
+             */
+            IRoleIdentity roleIdentity12 = new RoleIdentity(true, "tagControllerIntegrationNotConfirmed@tresearch.system", "user", "89ff4ea1982c9a201348d5ad6522ab72dc81084199596fdc7790c670a79bf86b3312c2d521ec6b7dc73b2eaa0698e54c17dddf47ecd6ef0b1f54f1b68552ca9c");
+            var tagNameCase12 = "Tresearch Controller Delete Tag3";
+            var nodeListCase12 = new List<int> { 0 };
+            var resultCase12 = IMessageBank.Responses.notConfirmed;
+
+            /**
+             *  Case 13: Tag nodes. Account does not exist
+             *      NodeIDs:                    xxxx0     
+             *                                  
+             *      Tag Name:                   Tresearch Manager Delete Tag3 
+             *      
+             *      Result:                     404: Database: The UserAccount not found.
+             */
+            IRoleIdentity roleIdentity13 = new RoleIdentity(true, "tagControllerNoAccount@tresearch.system", "user", "");
+            var tagNameCase13 = "Tresearch Controller Delete Tag3";
+            var nodeListCase13 = new List<int> { };
+            var resultCase13 = IMessageBank.Responses.accountNotFound;
+
+            return new[]
+            {
+                new object[] { roleIdentity0, nodeListCase0, tagNameCase0, resultCase0 },
+                new object[] { roleIdentity1, nodeListCase1, tagNameCase1, resultCase1 },
+                new object[] { roleIdentity2, nodeListCase2, tagNameCase2, resultCase2 },
+                new object[] { roleIdentity3, nodeListCase3, tagNameCase3, resultCase3 },
+                new object[] { roleIdentity4, nodeListCase4, tagNameCase4, resultCase4 },
+                new object[] { roleIdentity5, nodeListCase5, tagNameCase5, resultCase5 },
+                new object[] { roleIdentity6, nodeListCase6, tagNameCase6, resultCase6 },
+                new object[] { roleIdentity7, nodeListCase7, tagNameCase7, resultCase7 },
+                new object[] { roleIdentity8, nodeListCase8, tagNameCase8, resultCase8 },
+                new object[] { roleIdentity9, nodeListCase9, tagNameCase9, resultCase9 },
+                new object[] { roleIdentity10, nodeListCase10, tagNameCase10, resultCase10 },
+                new object[] { roleIdentity11, nodeListCase11, tagNameCase11, resultCase11 },
+                new object[] { roleIdentity12, nodeListCase12, tagNameCase12, resultCase12 },
+                new object[] { roleIdentity13, nodeListCase13, tagNameCase13, resultCase13 }
+            };
+        }
+
         public static IEnumerable<object[]> GetTagData()
         {
             //User is Authenticated and Authorized 
@@ -603,6 +879,20 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
                 new object[] { roleIdentity6, resultCase6 }
             };
         }
+
+        /// <summary>
+        /// Retrieves list of nodeids matching indices.
+        /// </summary>
+        /// <param name="indexes">Indices of return nodeIDs</param>
+        /// <returns></returns>
+        public List<long> GetNodes(List<int> indexes)
+        {
+            List<long> ids = new List<long>();
+            foreach (int index in indexes)
+                ids.Add(NodeIDs[index]);
+            return ids;
+        }
+
     }
 
     /// <summary>
@@ -611,6 +901,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
     /// </summary>
     public class TagControllerDatabaseFixture : TestBaseClass, IDisposable
     {
+        public List<long> nodeIDs { get; set; }
         public TagControllerDatabaseFixture() : base(new string[] { })
         {
             TestProvider = TestServices.BuildServiceProvider();
@@ -628,6 +919,15 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
                     if (!string.IsNullOrWhiteSpace(command.Trim()))
                         using (var com = new SqlCommand(command, connection))
                             com.ExecuteNonQuery();
+            }
+
+            // Initialize list of nodes. 
+            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
+            {
+                connection.Open();
+                var procedure = "dbo.[ControllerIntegrationTagInitializeProcedure]";                        // Name of store procedure
+                var value = new { };                                                                 // Parameters of stored procedure
+                nodeIDs = connection.Query<long>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure)).ToList();
             }
         }
 

@@ -135,7 +135,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             var resultCase4 = IMessageBank.Responses.nodeNotFound;
 
             /**
-             *  Case 5: Tag nodes. User is Authenticated and Authorized. No exists but tag doesn't exist
+             *  Case 5: Tag nodes. User is Authenticated and Authorized. Node exists but tag doesn't exist
              *      NodeIDs:                    xxxx0
              *      Tag Name:                   Tresearch Manager Add Tag5 
              *      
@@ -151,7 +151,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
              *      NodeIDs:                    xxxx0, xxxx1, xxx2 (xxxx1 contains tag alredy)
              *      Tag Name:                   Tresearch Manager Add Tag2 
              *      
-             *      Result:                     "404: Database: Tag not found."
+             *      Result:                     "200: Server: Tag added to node(s)."
              */
             IRoleIdentity roleIdentity6 = new RoleIdentity(true, "tagManagerIntegration1@tresearch.system", "user", "d9e22e6b5668fe3bc85246df7aee535f65cc3fdcd95d468993136da4a35e2f4ac1052c667064368236a0f6a120771aa6f6e332d73215df7339a727e1d32cd648");
             var tagNameCase6 = "Tresearch Manager Add Tag3";
@@ -235,7 +235,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
              *                                  
              *      Tag Name:                   Tresearch Manager Add Tag3 
              *      
-             *      Result:                     401: Database: UserAccount disabled. Perform account recovery or contact system admin.
+             *      Result:                     404: Database: Account not found.
              */
             IRoleIdentity roleIdentity12 = new RoleIdentity(false, "tagManagerNoAccount@tresearch.system", "user", "A129733b11ce19340d78c79468ac3723632faede195ee8a78864afdd9a08cc6841feefee84b21a4f48c6e59d182c061b03439fed15f2c8ba8a5022ce1bcaffd3");
             var tagNameCase12 = "Tresearch Manager Add Tag3";

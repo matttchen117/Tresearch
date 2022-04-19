@@ -1,11 +1,5 @@
 import React, { useCallback, useState, useEffect } from "react";
-import logo from './logo.png';
 import front from './header.png';
-import Register from "../../Features/Registration/Registration.js";
-import NavigationBar from "../../UI/Navigation/NavigationBar";
-import Popup from "../../UI/Popup/Popup";
-import './Home.css';
-import Recover from "../../Features/Recover/Recover";
 import NavBar from "../../UI/Navigation/NavBar";
 
 

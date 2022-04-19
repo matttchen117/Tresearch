@@ -30,7 +30,8 @@ function NavigationBar() {
         <nav className = "navbar-container">
            <ul className = "nav-links">
                 <li className="logo"><a href="/" ><img src = {logo} alt = "Tresearch Logo"/></a></li>
-                <li className="sec">About</li>
+                <li className="sec-link"><a href="/Features" >Features</a></li>
+                <li className="sec-link"><a href="/FAQ" >FAQ</a></li>
                 <li className="sec"><span onClick={NavToggleSignUp}>Sign up</span></li>
                 <li className="sec"><span onClick={NavToggleSignIn}>Sign In</span></li>
             </ul>
