@@ -9,6 +9,7 @@
   - [Tagging](#tagging)
 - [Built With](#built-with)
 - [FAQ](#faq)
+  - [Tagging](#tagging-1)
 ### What is Tresearch?
 --------------------------------
 Tresearch is an interactive mind mapping tool for documenting users' learning journey.  Users can create their own knowledge tree(s) to document what they are currently learning and have learned throughout their life. Knowledge trees are made up of nodes that consist of a title,  description/summary, and optional tag. Branches that come off of nodes point to nodes that utilize or require knowledge from the previous node. Users can view any other user's public knowledge trees to see what they are learning or have learned and how. If a user finds another user’s tree or a portion of their tree to be particularly useful or helpful, they can rate a particular node or section of the tree and they can also copy that section over to their own tree. Users can add additional information to their public profiles such as what they are currently learning, and where they are working/what they currently do or have done. Users can utilize a search function in order to find people whose trees contain a certain topic or keyword/phrase, and can also utilize a filter to narrow searches by users who are learning said topic, are using said topic (i.e. in their work or otherwise), by rating, and by tags.
@@ -38,7 +39,7 @@ $ git clone https://github.com/Drakat7/Tresearch
 # Navigate to web api
 $ cd "CECS 491B"\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi
 
-# Navigaate to front end client
+# Navigate to front end client
 $ cd "CECS 491B"\TrialByFire.Tresearch\client
 
 # Install dependencies
@@ -74,3 +75,18 @@ $ npm run start
 - [react-router-dom](https://v5.reactrouter.com/web/guides/quick-start)- React routing library with DOM aware components
 ### FAQ
 --------------------------------
+#### Tagging
+- What are tags?
+  - Tags provide a visual description of your node. 
+  - Tags are useful when categorizing nodes as well as allows others to find your nodes easier.
+- How do I add a tag to a node?
+  - Create a tag by right clicking the node you wish to tag, then select edit tags in the context menu. Select a tag from the search bar.
+- How do I add tags to multiple nodes?
+  - Enter shift and left click on all the nodes you wish to tag, then right click on your final node. Select edit tags in the context menu. 
+  - The tags displayed are shared tags among the groups of nodes selected. Any changes made will affect all nodes. Select a tag from the search bar.
+- How do I search for a tag?
+  - Click on the search bar and search for the tag or scroll through the list of tags available
+- How do I delete a tag?
+  - Click on the tag you wish to delete.
+- How do I return to my tree?
+  - Left click on the exit button located on the top right corner of your browser.
