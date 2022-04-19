@@ -77,16 +77,19 @@ $ npm run start
 --------------------------------
 #### Tagging
 - What are tags?
-  - Tags provide a visual description of your node. 
-  - Tags are useful when categorizing nodes as well as allows others to find your nodes easier.
-- How do I add a tag to a node?
-  - Create a tag by right clicking the node you wish to tag, then select edit tags in the context menu. Select a tag from the search bar.
-- How do I add tags to multiple nodes?
-  - Enter shift and left click on all the nodes you wish to tag, then right click on your final node. Select edit tags in the context menu. 
-  - The tags displayed are shared tags among the groups of nodes selected. Any changes made will affect all nodes. Select a tag from the search bar.
-- How do I search for a tag?
+  - Tags provide a visual description of a node. 
+  - Tags are useful when categorizing nodes as well as allows users to find public nodes easier.
+- Adding a node tag
+  - Right click on node and select "Edit Tags" in the context menu. Select tag from search bar. 
+- Adding tag to multiple nodes
+  - Shift and left click on all the nodes to tag and then right click on your final node. Select edit tags in the context menu. Select tag from search bar
+  - The tags displayed are shared tags among the groups of nodes selected. Any changes made will affect all nodes
+- Searching for a tag
   - Click on the search bar and search for the tag or scroll through the list of tags available
-- How do I delete a tag?
-  - Click on the tag you wish to delete.
-- How do I return to my tree?
-  - Left click on the exit button located on the top right corner of your browser.
+  - Search bar will show autocomplete tags
+- Remove a tag from node(s)
+  - Click on the tag.
+- Adding a tag to the tag bank
+  - As an administrator, navigate to the tag dashboard. Enter the tag name in the input field and click "Add Tag".
+- Deleting a tag from the tag bank
+  - As an administrator, navigate to to the tag dashboard. Find the tag in the tag table and click the delete button located next to the name.
