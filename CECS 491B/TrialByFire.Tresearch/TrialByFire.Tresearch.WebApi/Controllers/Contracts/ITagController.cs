@@ -8,7 +8,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
     public interface ITagController
     {
         /// <summary>
-        ///     Gets a string list containing all possible tags 
+        ///     Retrives a list of all possible tags in bank
         /// </summary>
         /// <returns>Status code and List of tags</returns>
         public Task<IActionResult> GetTagsAsync();

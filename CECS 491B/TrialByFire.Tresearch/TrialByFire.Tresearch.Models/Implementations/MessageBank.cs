@@ -104,6 +104,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "409: Database: The tag already exists.";
                 case Responses.tagRetrievalFail:
                     return "502: Server: Unable to get tag data.";
+                case Responses.tagCountInvalid:
+                    return "422: Server: Invalid tag count.";
 
 
                 case Responses.userRateSuccess:
