@@ -14,6 +14,14 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             TestProvider = TestServices.BuildServiceProvider();
         }
 
+
+        /// <summary>
+        ///     Tests user creating tag in tag bank
+        /// </summary>
+        /// <param name="tagName">Tag name</param>
+        /// <param name="count">Number of nodes tagged</param>
+        /// <param name="response">Enumerated Response based on case</param>
+        /// <returns></returns>
         [Theory]
         [MemberData(nameof(CreateTagData))]
         public async Task CreateTagAsync(string tagName, int count, IMessageBank.Responses response)
@@ -31,17 +39,20 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             Assert.Equal(expected, result);
         }
 
+        /// <summary>
+        ///     Tests user deleting tag from tag bank
+        /// </summary>
+        /// <param name="tagName">Tag name</param>
+        /// <param name="response">Cancellation Token</param>
+        /// <returns></returns>
         [Theory]
-        //Success: Tag removed from database
-        [InlineData("Tresearch SqlDAO Delete Me Tag", "200: Server: Tag removed from tag bank.")]
-        //Success: Tag was not in database
-        [InlineData("Tresearch This Tag Doesnt exist", "200: Server: Tag removed from tag bank.")]
-        //Success: Tag removed from database (there were nodes that has this tagged)
-        [InlineData("Tresearch SqlDAO Delete Me Tag1", "200: Server: Tag removed from tag bank.")]
-        public async Task DeleteTagAsync(string tagName,  string expected)
+        [MemberData(nameof(DeleteTagData))]
+        public async Task DeleteTagAsync(string tagName,  IMessageBank.Responses response)
         {
             //Arrange
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
+            string expected = await messageBank.GetMessage(response);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
@@ -147,14 +158,104 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             var cntCase0 = 0;
             var expCase0 = IMessageBank.Responses.tagCreateSuccess;
 
+
+            /**
+             *  Case 1: Create tag.  Tag already exists in database
+             *      Tag Name: Tresearch SqlDAO This Tag Exists Already
+             */
             var tagCase1 = "Tresearch SqlDAO This Tag Exists Already";
             var cntCase1 = 0;
-            var expCase1 = IMessageBank.Responses.tagAlreadyExist;
+            var expCase1 = IMessageBank.Responses.tagDuplicate;
 
+            /**
+             *  Case 2: Create tag.  Tag name is null
+             *      Tag Name: 
+             */
+            string tagCase2 = null;
+            var cntCase2 = 0;
+            var expCase2 = IMessageBank.Responses.tagNameInvalid;
+
+            /**
+            *  Case 3: Create tag.  Tag name is empty
+            *      Tag Name: 
+            */
+            var tagCase3 = "";
+            var cntCase3 = 0;
+            var expCase3 = IMessageBank.Responses.tagNameInvalid;
+
+            /**
+            *  Case 4: Create tag.  Tag count is negative
+            *      Tag Name: Tresearch SqlDAO Add
+            */
+            var tagCase4 = "Tresearch SqlDAO Add1";
+            int? cntCase4 = -1;
+            var expCase4 = IMessageBank.Responses.tagCountInvalid;
+
+            /**
+            *  Case 5: Create tag.  Tag count is not zero
+            *      Tag Name: Tresearch SqlDAO Add
+            */
+            var tagCase5 = "Tresearch SqlDAO Add2";
+            var cntCase5 = 20;
+            var expCase5 = IMessageBank.Responses.tagCreateSuccess;
 
             return new[]
             {
-                new object[] { tagCase0, cntCase0, expCase0 }
+                new object[] { tagCase0, cntCase0, expCase0 },
+                new object[] { tagCase1, cntCase1, expCase1 },
+                new object[] { tagCase2, cntCase2, expCase2 },
+                new object[] { tagCase3, cntCase3, expCase3 },
+                new object[] { tagCase4, cntCase4, expCase4 },
+                new object[] { tagCase5, cntCase5, expCase5 }
+            };
+        }
+
+        public static IEnumerable<object[]> DeleteTagData()
+        {
+            
+            /**
+             *  Case 0: Delete tag.  Tag does not exist in database
+             *      Tag Name: Tresearch This Tag Doesnt exist
+             */
+            var tagCase0 = "Tresearch This Tag Doesnt exist";
+            var expCase0 = IMessageBank.Responses.tagDeleteSuccess;
+
+
+            /**
+             *  Case 1: Delete tag.  Tag already exists in database
+             *      Tag Name: Tresearch SqlDAO Delete Me Tag
+             */
+            var tagCase1 = "Tresearch SqlDAO Delete Me Tag";
+            var expCase1 = IMessageBank.Responses.tagDeleteSuccess;
+
+            /**
+             *  Case 2: Delete tag.  Tag name is null
+             *      Tag Name: 
+             */
+            string tagCase2 = null;
+            var expCase2 = IMessageBank.Responses.tagNameInvalid;
+
+            /**
+            *  Case 3: Delete tag.  Tag name is empty
+            *      Tag Name: 
+            */
+            var tagCase3 = "";
+            var expCase3 = IMessageBank.Responses.tagNameInvalid;
+
+            /**
+            *  Case 4: Delete tag.  Nodes contain tag.
+            *      Tag Name: Tresearch SqlDAO Delete Me Tag1
+            */
+            var tagCase4 = "Tresearch SqlDAO Delete Me Tag1";
+            var expCase4 = IMessageBank.Responses.tagDeleteSuccess;
+
+            return new[]
+            {
+                new object[] { tagCase0, expCase0 },
+                new object[] { tagCase1, expCase1 },
+                new object[] { tagCase2, expCase2 },
+                new object[] { tagCase3, expCase3 },
+                new object[] { tagCase4, expCase4 }
             };
         }
         public static IEnumerable<object[]> GetNodeTagData()

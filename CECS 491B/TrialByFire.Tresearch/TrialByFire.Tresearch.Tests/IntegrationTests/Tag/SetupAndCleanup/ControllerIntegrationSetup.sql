@@ -45,12 +45,12 @@ DELETE FROM Tags WHERE TagName = 'Tresearch Controller Tag Exist';
 DELETE FROM Tags WHERE TagName = 'Tresearch Controller REMOVE Tag Exist';
 DELETE FROM Tags WHERE TagName = 'Tresearch Controller REMOVE Exist and Tagged';
 
-DELETE FROM UserHashTable WHERE UserHash = '09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5';
-DELETE FROM UserHashTable WHERE UserHash = '20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb';
-DELETE FROM UserHashTable WHERE UserHash = '3e5c76fdaaa3dbdc12ecf59f01028284632d7a5289656eede6680c582a9e71eb082dafe0fb99411e6a220f4c9b1937a7e8d9317b3a0006051265590a166043ee';
-DELETE FROM UserHashTable WHERE UserHash = '89ff4ea1982c9a201348d5ad6522ab72dc81084199596fdc7790c670a79bf86b3312c2d521ec6b7dc73b2eaa0698e54c17dddf47ecd6ef0b1f54f1b68552ca9c';
-DELETE FROM UserHashTable WHERE UserHash = 'e85986ed95080a27feb37943a125a4a5bb6ceaca81842e1ddd97c28556da5e1ff1e02b08f3f0001510671688176141d5646779d1e5b11432fbe647dc9f6c36ff';
-DELETE FROM UserHashTable WHERE UserHash = '0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f';
+UPDATE  UserHashTable SET UserID = null WHERE UserHash = '09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5';
+UPDATE  UserHashTable SET UserID = null WHERE UserHash = '20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb';
+UPDATE  UserHashTable SET UserID = null WHERE UserHash = '3e5c76fdaaa3dbdc12ecf59f01028284632d7a5289656eede6680c582a9e71eb082dafe0fb99411e6a220f4c9b1937a7e8d9317b3a0006051265590a166043ee';
+UPDATE  UserHashTable SET UserID = null WHERE UserHash = '89ff4ea1982c9a201348d5ad6522ab72dc81084199596fdc7790c670a79bf86b3312c2d521ec6b7dc73b2eaa0698e54c17dddf47ecd6ef0b1f54f1b68552ca9c';
+UPDATE  UserHashTable SET UserID = null WHERE UserHash = 'e85986ed95080a27feb37943a125a4a5bb6ceaca81842e1ddd97c28556da5e1ff1e02b08f3f0001510671688176141d5646779d1e5b11432fbe647dc9f6c36ff';
+UPDATE  UserHashTable SET UserID = null WHERE UserHash = '0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f';
 
 DELETE FROM Accounts WHERE Username = 'tagControllerIntegration1@tresearch.system';
 DELETE FROM Accounts WHERE Username = 'tagControllerIntegration2@tresearch.system';
@@ -69,24 +69,19 @@ Insert Accounts(Username, Passphrase, AuthorizationLevel, AccountStatus, Confirm
 			('tagControllerIntegrationAdmin1@tresearch.system', 'cb118e46dbebd6b9033c9fd02376dc7cb715f81ea33010612594e3c8989ef2fd42ef59c64e7205659d2a7a48021f4246fcfd920fa93f9bc32f342088c42d3e3f', 'admin', 1, 1),
 			('tagControllerIntegration3@tresearch.system', 'cb118e46dbebd6b9033c9fd02376dc7cb715f81ea33010612594e3c8989ef2fd42ef59c64e7205659d2a7a48021f4246fcfd920fa93f9bc32f342088c42d3e3f', 'user', 1, 1);
 
-INSERT UserHashTable(UserID, UserHash)
-	SELECT Accounts.UserID, '09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5'
-		FROM Accounts WHERE Username = 'tagControllerIntegration1@tresearch.system';
-INSERT UserHashTable(UserID, UserHash)
-	SELECT Accounts.UserID, '20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb'
-		FROM Accounts WHERE Username = 'tagControllerIntegration2@tresearch.system';
-INSERT UserHashTable(UserID, UserHash)
-	SELECT Accounts.UserID, '3e5c76fdaaa3dbdc12ecf59f01028284632d7a5289656eede6680c582a9e71eb082dafe0fb99411e6a220f4c9b1937a7e8d9317b3a0006051265590a166043ee'
-		FROM Accounts WHERE Username = 'tagControllerIntegrationNotEnabled@tresearch.system';
-INSERT UserHashTable(UserID, UserHash)
-	SELECT Accounts.UserID, '89ff4ea1982c9a201348d5ad6522ab72dc81084199596fdc7790c670a79bf86b3312c2d521ec6b7dc73b2eaa0698e54c17dddf47ecd6ef0b1f54f1b68552ca9c'
-		FROM Accounts WHERE Username = 'tagControllerIntegrationNotConfirmed@tresearch.system';
-INSERT UserHashTable(UserID, UserHash)
-	SELECT Accounts.UserID, 'e85986ed95080a27feb37943a125a4a5bb6ceaca81842e1ddd97c28556da5e1ff1e02b08f3f0001510671688176141d5646779d1e5b11432fbe647dc9f6c36ff'
-		FROM Accounts WHERE Username = 'tagControllerIntegrationAdmin1@tresearch.system';
-INSERT UserHashTable(UserID, UserHash)
-	SELECT Accounts.UserID, '0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f'
-		FROM Accounts WHERE Username = 'tagControllerIntegration3@tresearch.system';
+DECLARE @User1 INT = (SELECT UserID from Accounts Where Username = 'tagControllerIntegration1@tresearch.system');
+DECLARE @User2 INT = (SELECT UserID from Accounts Where Username = 'tagControllerIntegration2@tresearch.system');
+DECLARE @User3 INT = (SELECT UserID from Accounts Where Username = 'tagControllerIntegrationNotEnabled@tresearch.system');
+DECLARE @User4 INT = (SELECT UserID from Accounts Where Username = 'tagControllerIntegrationNotConfirmed@tresearch.system');
+DECLARE @User5 INT = (SELECT UserID from Accounts Where Username = 'tagControllerIntegrationAdmin1@tresearch.system');
+DECLARE @User6 INT = (SELECT UserID from Accounts Where Username = 'tagControllerIntegration3@tresearch.system');
+
+EXEC CreateUserHash @User1, '09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5';
+EXEC CreateUserHash @User2, '20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb';
+EXEC CreateUserHash @User3, '3e5c76fdaaa3dbdc12ecf59f01028284632d7a5289656eede6680c582a9e71eb082dafe0fb99411e6a220f4c9b1937a7e8d9317b3a0006051265590a166043ee';
+EXEC CreateUserHash @User4, '89ff4ea1982c9a201348d5ad6522ab72dc81084199596fdc7790c670a79bf86b3312c2d521ec6b7dc73b2eaa0698e54c17dddf47ecd6ef0b1f54f1b68552ca9c';
+EXEC CreateUserHash @User5, 'e85986ed95080a27feb37943a125a4a5bb6ceaca81842e1ddd97c28556da5e1ff1e02b08f3f0001510671688176141d5646779d1e5b11432fbe647dc9f6c36ff';
+EXEC CreateUserHash @User6, '0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f';
 
 INSERT Nodes(UserHash, NodeTitle, Summary, Visibility) VALUES 
 	('09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5', 'CECS 491A', 'Extremely hard class at CSULB', 0),
@@ -118,8 +113,6 @@ DECLARE @node10 BIGINT = (SELECT NodeID FROM Nodes where UserHash = '0e6ed0cb983
 DECLARE @node11 BIGINT = (SELECT NodeID FROM Nodes where UserHash = '0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f' AND  NodeTitle = 'Augustus Caeser');
 DECLARE @node12 BIGINT = (SELECT NodeID FROM Nodes where UserHash = '0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f' AND  NodeTitle = 'Mark Antony');
 DECLARE @node13 BIGINT = (SELECT NodeID FROM Nodes where UserHash = '0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f' AND  NodeTitle = 'Octavian');
-
-
 
 INSERT Tags (TagName, TagCount) VALUES
 	('Tresearch Controller Add Tag1', 0),

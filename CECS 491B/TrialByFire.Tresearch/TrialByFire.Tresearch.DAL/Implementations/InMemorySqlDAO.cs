@@ -1030,13 +1030,45 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return Tuple.Create(new List<string>(), "200");
         }
 
+        /// <summary>
+        ///     Creates a tag in in memory tag bank
+        /// </summary>
+        /// <param name="tagName">Tag name</param>
+        /// <param name="count">Number of nodes tagged</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status code</returns>
         public async Task<string> CreateTagAsync(string tagName, int count,CancellationToken cancellationToken = default(CancellationToken))
         {
-            ITag tag = new Tag(tagName, count);
-            if (InMemoryDatabase.Tags.Contains(tag))
-                return await _messageBank.GetMessage(IMessageBank.Responses.tagDuplicate);
-            InMemoryDatabase.Tags.Add(tag);
-            return await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess);
+
+            try
+            {
+                // Throw if cancellation is requested
+                cancellationToken.ThrowIfCancellationRequested();
+
+                //Check input
+                if (tagName == null || tagName.Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+
+                // Check tag count
+                if (count < 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid);
+
+                ITag tag = new Tag(tagName, count);
+
+                // Check if tag already exists in tag bank
+                if (InMemoryDatabase.Tags.Contains(tag))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagDuplicate);
+               
+                // Add Tag to In Memory Bank
+                InMemoryDatabase.Tags.Add(tag);
+
+                return await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess);
+
+            }
+            catch (Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+            }    
         }
 
         public async Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
@@ -1050,15 +1082,41 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return Tuple.Create(new List<string>(), "200");
         }
 
+        /// <summary>
+        ///  Deletes tag from in memory tag bank
+        /// </summary>
+        /// <param name="tagName">Tag name</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status code</returns>
         public async Task<string> DeleteTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            ITag tag = new Tag(tagName);
-            for (int i = 0; i < InMemoryDatabase.NodeTags.Count(); i++)
-                if (InMemoryDatabase.NodeTags[i].TagName.Equals(tagName))
-                    InMemoryDatabase.NodeTags.RemoveAt(i);
-            if (InMemoryDatabase.Tags.Contains(tag))
-                InMemoryDatabase.Tags.Remove(tag);
-            return await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess);
+            try
+            {
+                // Throw if cancellation is requested
+                cancellationToken.ThrowIfCancellationRequested();
+                
+                // Check input
+                if (tagName == null || tagName.Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+
+                ITag tag = new Tag(tagName);
+
+                // Remove tag from nodes
+                for (int i = 0; i < InMemoryDatabase.NodeTags.Count(); i++)
+                    if (InMemoryDatabase.NodeTags[i].TagName.Equals(tagName))
+                        InMemoryDatabase.NodeTags.RemoveAt(i);
+
+                // Remove tag from bank
+                if (InMemoryDatabase.Tags.Contains(tag))
+                    InMemoryDatabase.Tags.Remove(tag);
+
+                return await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess);
+
+            }
+            catch (Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+            }        
         }
 
         public async Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))

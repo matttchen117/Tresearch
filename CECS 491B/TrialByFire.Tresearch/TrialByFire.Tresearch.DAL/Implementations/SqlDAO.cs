@@ -2036,14 +2036,25 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         ///         Creaes a tag in bank with a count of tags
         /// </summary>
         /// <param name="tagName">Tag</param>
-        /// <param name="count"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="count">Number of nodes tagged</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status result</returns>
         public async Task<string> CreateTagAsync(string tagName, int count, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
+                // Throw if cancellation is requested
                 cancellationToken.ThrowIfCancellationRequested();
+
+                //Check tag input
+                if (tagName == null || tagName.Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+
+                // Check tag count
+                if (count < 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid);
+                
+
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     await connection.OpenAsync();
@@ -2109,7 +2120,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             try
             {
+                // Throw if cancellation requested
                 cancellationToken.ThrowIfCancellationRequested();
+
+                // Check input
+                if (tagName == null || tagName.Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+
+
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     await connection.OpenAsync();
@@ -2122,17 +2140,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     };
                     //Execute command, returns count of tags
                     int count = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        //Rollback
-                        string resultRollback = await CreateTagAsync( tagName, 0);
-                        //Check if rollback successful
-                        if (resultRollback.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess)))
-                            return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
-                        else
-                            return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
-                    }
                     //Tag deleted, return success
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess);
                 }

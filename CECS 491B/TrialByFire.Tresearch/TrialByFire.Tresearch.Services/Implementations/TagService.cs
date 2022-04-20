@@ -39,11 +39,11 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
-                // Check if tag is null
-                if(tagName != null)
+                // Check if tag is null or empty
+                if(tagName != null || tagName.Equals(""))
                 {
                     //Check if list contains more than one node
-                    if (nodeIDs.Count > 0)
+                    if (nodeIDs == null || nodeIDs.Count > 0)
                     {
                         //Add Tag to Node
                         string result = await _sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationToken).ConfigureAwait(false);
@@ -87,11 +87,11 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
-                // Check if tag is null
-                if(tagName != null)
+                // Check if tag is null or empty
+                if(tagName != null || tagName.Equals(""))
                 {
                     //Check if list contains at least one node
-                    if (nodeIDs.Count > 0)
+                    if (nodeIDs == null || nodeIDs.Count > 0)
                     {
                         //Remove tag from node(s)
                         string result = await _sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationToken).ConfigureAwait(false);
@@ -99,13 +99,13 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     }
                     else
                     {
-                        // No node passed in
+                        // list is null or no node passed in
                         return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
                     }
                 }
                 else
                 {
-                    // Tag is null
+                    // Tag is null or empty
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
                 }
                     
@@ -136,7 +136,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Check if list contains at least one node
-                if (nodeIDs.Count > 0)
+                if (nodeIDs == null || nodeIDs.Count > 0)
                 {
                     // Retrieve lsit of tags from database
                     Tuple<List<string>, string> result = await _sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationToken).ConfigureAwait(false);
