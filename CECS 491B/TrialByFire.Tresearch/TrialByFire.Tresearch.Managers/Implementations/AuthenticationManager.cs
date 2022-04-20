@@ -20,8 +20,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
     //     appropriate services for the operation.
     public class AuthenticationManager : IAuthenticationManager
     {
-        private ISqlDAO _sqlDAO { get; }
-        private ILogService _logService { get; }
         private IAccountVerificationService _accountVerificationService { get; }
         private IAuthenticationService _authenticationService { get; }
         private IMessageBank _messageBank { get; }
@@ -29,12 +27,9 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
             TimeSpan.FromSeconds(5));
 
-        public AuthenticationManager(ISqlDAO sqlDAO, ILogService logService, 
-            IAccountVerificationService accountVerificationService, 
+        public AuthenticationManager(IAccountVerificationService accountVerificationService, 
             IAuthenticationService authenticationService, IMessageBank messageBank)
         {
-            _sqlDAO = sqlDAO;
-            _logService = logService;
             _accountVerificationService = accountVerificationService;
             _authenticationService = authenticationService;
             _messageBank = messageBank;

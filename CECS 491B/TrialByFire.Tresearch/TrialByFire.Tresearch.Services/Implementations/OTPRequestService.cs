@@ -16,12 +16,10 @@ namespace TrialByFire.Tresearch.Services.Implementations
     public class OTPRequestService : IOTPRequestService
     {
         private ISqlDAO _sqlDAO { get; }
-        private ILogService _logService { get; }
         private IMessageBank _messageBank { get; }
-        public OTPRequestService(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank)
+        public OTPRequestService(ISqlDAO sqlDAO, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
-            _logService = logService;
             _messageBank = messageBank;
         }
 

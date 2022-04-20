@@ -20,6 +20,34 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = messageBank;
             _options = options.Value;
         }
+
+        public async Task<IResponse<IList<Node>>> SearchForNodeAsync(ISearchInput searchInput)
+        {
+            try
+            {
+                searchInput.CancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var procedure = "[SearchNodes]";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("Search", searchInput.Search);
+                    var nodes = await connection.QueryAsync<Node, NodeTag, NodeRating, Node>(procedure, (node, tag, rating) =>
+                    {
+                        node.Tags.Add(tag);
+                        node.Rating = rating.Rating;
+                        return node;
+                    },
+                    parameters,
+                    commandType: CommandType.StoredProcedure,
+                    splitOn: "TagName");
+                    return new SearchResponse<IList<Node>>("", nodes.ToList(), 200, true);
+                }
+            }catch(Exception ex)
+            {
+                return new SearchResponse<IList<Node>>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 400, false);
+            }
+        }
         public async Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -35,7 +63,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Check if cancellation is requested ... remove user identity from hash table
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        
+
                     }
 
                     return await _messageBank.GetMessage(IMessageBank.Responses.generic);
@@ -79,7 +107,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Check if cancellation is requested ... remove user identity from hash table
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        
+
                     }
 
                     return await _messageBank.GetMessage(IMessageBank.Responses.generic);
@@ -91,7 +119,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     case 2627:
                         return await _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated);
-                    case 547:   
+                    case 547:
                         return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
                     default:
                         return "500: Database: " + ex.Message;
@@ -107,7 +135,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
-        
+
         public async Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -142,7 +170,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 parameters.Add("Destination", destination);
                 parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
-                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                    commandType: CommandType.StoredProcedure))
                     .ConfigureAwait(false);
                 return parameters.Get<int>("Result");
             }
@@ -827,12 +855,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var procedure = "dbo.[CreateOTP]";
                     var value = new
                     {
-                        Username = username, 
+                        Username = username,
                         AuthorizationLevel = authorizationLevel,
                         FailCount = failCount
                     };
                     var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    
+
                     if (affectedRows == 1)
                         return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
                     else
@@ -849,9 +877,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Adding otp violates foreign key constraint (AKA account doesn't exist in bank)
                     case 547:
                         return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
-                    case 2627: 
+                    case 2627:
                         return _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated).Result;
-                    default: 
+                    default:
                         return _options.UnhandledExceptionMessage + ex.Message;
                 }
             }
@@ -896,7 +924,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     case 2627:
                         return Tuple.Create(-1, await _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated));
-                    default: 
+                    default:
                         return Tuple.Create(-1, await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) +  ex.Message);
                 }
             }
@@ -941,11 +969,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                     var procedure = "dbo.[GetAmountOfAdmins]";
                     affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    
+
                     Console.WriteLine(affectedRows);
                     //changed up logic for affectedRows, if there is more than 1 row
                     //then this should be valid.
-                    
+
                     if (affectedRows > 1)
                     {
                         return await _messageBank.GetMessage(IMessageBank.Responses.getAdminsSuccess).ConfigureAwait(false);
@@ -991,7 +1019,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             string userName = Thread.CurrentPrincipal.Identity.Name;
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();                                                      
+                cancellationToken.ThrowIfCancellationRequested();
 
                 if (cancellationToken.IsCancellationRequested)
                 {
@@ -1767,7 +1795,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
         /// <summary>
         ///     AddTagAsync(nodeIDs, tagName)
-        ///         Adds a tag to list of node(s) passed in. 
+        ///         Adds a tag to list of node(s) passed in.
         /// </summary>
         /// <param name="nodeIDs">List of node IDs to add tag</param>
         /// <param name="tagName">String tag name</param>
@@ -1821,9 +1849,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     case -1:
                         return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
                     //Adding tag to node violates foreign key constraint (AKA tag doesn't exist in bank)
-                    case 547:   
+                    case 547:
                         return _messageBank.GetMessage(IMessageBank.Responses.tagNotFound).Result;
-                    default: 
+                    default:
                         return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
                 }
             }
@@ -1893,7 +1921,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Unable to connect to database
                     case -1:
                         return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
-                    default: 
+                    default:
                         return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
                 }
             }
@@ -1917,7 +1945,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// <returns>List of tags and string status</returns>
         public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
-           
+
             try
             {
                 //Throw Cancellation Exception if token requests cancellation
@@ -1927,9 +1955,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //Open connection to database
                     await connection.OpenAsync();
-                    
+
                     List<string> tags = new List<string>();         //List of tags that all node(s) share in common
-                    
+
                     //Iterate through each node to get list of tags for each node then intersec
                     foreach (var nodeId in nodeIDs)
                     {
@@ -1968,7 +1996,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Unable to connect to database
                     case -1:
                         return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail));
-                    default: 
+                    default:
                         return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
                 }
             }
@@ -2079,9 +2107,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     case -1:
                         return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
                     //Adding tag violates primary key constraint (AKA tag already exists in database)
-                    case 2627: 
+                    case 2627:
                         return await _messageBank.GetMessage(IMessageBank.Responses.tagDuplicate);
-                    default: 
+                    default:
                         return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
                 }
             }
@@ -2142,7 +2170,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Unable to connect to database
                     case -1:
                         return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
-                    default: 
+                    default:
                         return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
                 }
             }
@@ -2165,7 +2193,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// <returns>List of tags and sting status</returns>
         public async Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-           
+
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -2190,7 +2218,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Unable to connect to database
                     case -1:
                         return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail));
-                    default: 
+                    default:
                         return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
                 }
             }
@@ -2284,7 +2312,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     {
                         nodeID = node.NodeID,
                         parentNodeId = node.ParentNodeID,
-                        nodeTitle = node.NodeID,
+                        nodeTitle = node.NodeTitle,
                         summary = node.Summary,
                         visibility = node.Visibility,
                         userHash = node.UserHash
@@ -2392,7 +2420,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     if (cancellationToken.IsCancellationRequested)
                     {
                         //Perform rollback
-                        
+
                     }
                     //Tag has been added, return success
                     return await _messageBank.GetMessage(IMessageBank.Responses.userRateSuccess);
@@ -2441,12 +2469,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         var parameters = new { NodeID = nodeId };
 
                         var result = await connection.ExecuteScalarAsync<double>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                        
+
                         ratings.Add(result);
                     }
-                    
+
                     //Execute command
-                    
+
 
                     //Tag has been added, return success
                     return Tuple.Create(ratings, await _messageBank.GetMessage(IMessageBank.Responses.getRateSuccess));

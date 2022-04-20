@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using System.Security.Claims;
+using System.Web.Http.Results;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Models;
@@ -19,17 +20,15 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
     [Route("[controller]")]
     public class AuthenticationController : Controller, IAuthenticationController
     {
-        private ISqlDAO _sqlDAO { get; }
         private ILogManager _logManager { get; }
         private IAuthenticationManager _authenticationManager { get; }
         private IMessageBank _messageBank { get; }
 
         private BuildSettingsOptions _buildSettingsOptions { get; }
 
-        public AuthenticationController(ISqlDAO sqlDAO, ILogManager logManager, 
+        public AuthenticationController(ILogManager logManager, 
             IAuthenticationManager authenticationManager, IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> buildSettingsOptions)
         {
-            _sqlDAO = sqlDAO;
             _logManager = logManager;
             _authenticationManager = authenticationManager;
             _messageBank = messageBank;
@@ -59,6 +58,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             string result;
             try
             {
+                // Manager needs to check for guest and no token
+                // need to pass in token
                 List<string> results = await _authenticationManager.AuthenticateAsync(username, otp, authorizationLevel,
                     DateTime.Now.ToUniversalTime()).ConfigureAwait(false);
                 result = results[0];
@@ -72,32 +73,43 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                     }
                     HttpContext.Response.Headers.Add(_buildSettingsOptions.AccessControlHeaderName, _buildSettingsOptions.JWTHeaderName);
                     HttpContext.Response.Headers.Add(_buildSettingsOptions.JWTHeaderName, results[1]);
-                    _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
+                    await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
                         category: ILogManager.Categories.Server, 
                         await _messageBank.GetMessage(IMessageBank.Responses.authenticationSuccess).ConfigureAwait(false));
                     return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                 }
+                // REST - following http convention, always return proper status code
+                // Return proper object (Ok objects for success, badrequest, internal server, or status code for fails
+
+                // If fire and forget method, no way to test
+                // No unit tests, just integration
+                // always have await for async, regardless of being fire and forget
                 if (Enum.TryParse(split[1], out ILogManager.Categories category))
                 {
-                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                    await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
                     category, split[2]);
                 }
                 else
                 {
-                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                    await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
                     category: ILogManager.Categories.Server, split[2] + ": Bad category passed back.");
                 }
+                // 500 - server error, nothing user did caused error,  
+                // 400 - user caused error, 
+                //These contain headers, status code does not
+                //return new BadRequestResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) }; // 400 errors
+                //return new InternalServerErrorResult() // 500 errors
                 return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
             catch (OperationCanceledException tce)
             {
-                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
                     category: ILogManager.Categories.Server, await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + tce.Message);
                 return StatusCode(400, tce.Message);
             }
             catch (Exception ex)
             {
-                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level:
+                await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level:
                     ILogManager.Levels.Error,
                     category: ILogManager.Categories.Server, await
                     _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false)
@@ -127,7 +139,9 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                     }
                     Response.Headers.Add(_buildSettingsOptions.AccessControlHeaderName, _buildSettingsOptions.JWTHeaderName);
                     Response.Headers.Add(_buildSettingsOptions.JWTHeaderName, results[1]);
-                    _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
+                    // Enums good if possibilities are limited
+                    // status codes
+                    await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
                         category: ILogManager.Categories.Server,
                         await _messageBank.GetMessage(IMessageBank.Responses.authenticationSuccess).ConfigureAwait(false));
                     return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
@@ -139,20 +153,20 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 }
                 else
                 {
-                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                    await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
                     category: ILogManager.Categories.Server, split[2] + ": Bad category passed back.");
                 }
                 return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
             catch (OperationCanceledException tce)
             {
-                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
                     category: ILogManager.Categories.Server, await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + tce.Message);
                 return StatusCode(400, tce.Message);
             }
             catch (Exception ex)
             {
-                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: 
+                await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: 
                     ILogManager.Levels.Error,
                     category: ILogManager.Categories.Server, await 
                     _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) 

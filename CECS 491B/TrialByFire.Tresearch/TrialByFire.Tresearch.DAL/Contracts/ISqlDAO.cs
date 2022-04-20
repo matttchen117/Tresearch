@@ -10,6 +10,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 {
     public interface ISqlDAO
     {
+        public Task<IResponse<IList<Node>>> SearchForNodeAsync(ISearchInput searchInput); 
         public Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> CreateUserHashAsync(int ID, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default);

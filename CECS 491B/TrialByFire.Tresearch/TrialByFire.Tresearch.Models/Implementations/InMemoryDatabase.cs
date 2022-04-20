@@ -18,7 +18,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public IList<INode> Nodes { get; set; }
         public IList<ITag> Tags { get; set; }
         public IList<INodeTag> NodeTags { get; set; }
-        public IList<IRating> Ratings { get; set; }
+        public IList<INodeRating> Ratings { get; set; }
         /*        public IList<ITreeHistory> TreeHistories { get; set; }
                 public IList<IWebPageKPI> WebPageKPIs { get; set; }
                 public IList<IDailyRegistrationKPI> DailyRegistrationKPIs { get; set; }*/
@@ -149,7 +149,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
         private List<INode> InitializeNodes()
         {
             List<INode> nodes = new List<INode>();
-            /**
+            /*
             nodes.Add(new Node(69420, 69419, "Cooking", "Concepts of Preparing Food", true, "jessie@gmail.com"));
             nodes.Add(new Node(100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com"));
             nodes.Add(new Node(100001, 100002, "Title 2", "Summary 2", false, "larry@gmail.com"));
@@ -178,16 +178,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodes.Add(new Node(2022030539, 2022030533, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
             nodes.Add(new Node(2022030540, 2022030533, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
             nodes.Add(new Node(2022030541, 2022030533, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
-            nodes.Add(new Node(2072942630, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
-            nodes.Add(new Node(2072942631, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
-            nodes.Add(new Node(2072942632, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
-            nodes.Add(new Node(2072942633, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
-            nodes.Add(new Node(2072942634, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
-            nodes.Add(new Node(2072942635, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
-            nodes.Add(new Node(2072942636, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
-            nodes.Add(new Node(2072942637, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
-            nodes.Add(new Node(2072942638, 2072942630, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
-
             */
 
             return nodes;
@@ -268,18 +258,18 @@ namespace TrialByFire.Tresearch.Models.Implementations
             return nodeTags;
         }
 
-        private List<IRating> InitializeUserRatings()
+        private List<INodeRating> InitializeUserRatings()
         {
-            List<IRating> userRatings = new List<IRating>();
-            userRatings.Add(new Rating("larry@gmail.com", 200000, 4));
-            userRatings.Add(new Rating("larry@gmail.com", 200001, 5));
-            userRatings.Add(new Rating("larry@gmail.com", 200002, 5));
-            userRatings.Add(new Rating("larry@gmail.com", 200003, 5));
+            List<INodeRating> userRatings = new List<INodeRating>();
+            userRatings.Add(new NodeRating("larry@gmail.com", 200000, 4));
+            userRatings.Add(new NodeRating("larry@gmail.com", 200001, 5));
+            userRatings.Add(new NodeRating("larry@gmail.com", 200002, 5));
+            userRatings.Add(new NodeRating("larry@gmail.com", 200003, 5));
 
-            userRatings.Add(new Rating("billy@gmail.com", 100000, 4));
-            userRatings.Add(new Rating("billy@gmail.com", 100001, 5));
-            userRatings.Add(new Rating("billy@gmail.com", 100002, 5));
-            userRatings.Add(new Rating("billy@gmail.com", 100003, 5));
+            userRatings.Add(new NodeRating("billy@gmail.com", 100000, 4));
+            userRatings.Add(new NodeRating("billy@gmail.com", 100001, 5));
+            userRatings.Add(new NodeRating("billy@gmail.com", 100002, 5));
+            userRatings.Add(new NodeRating("billy@gmail.com", 100003, 5));
 
             return userRatings;
         }

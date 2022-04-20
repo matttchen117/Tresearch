@@ -85,6 +85,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "200: Server: Log success.";
                 case Responses.logFail:
                     return "503: Server: Log failed.";
+                case Responses.logTimeExceeded:
+                    return "503: Datastore: Logging exceeded time: ";
                 case Responses.logRollback:
                     return "400: Database: Log rollback occurred.";
 

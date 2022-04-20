@@ -22,8 +22,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
     //     appropriate services for the operation.
     public class OTPRequestManager : IOTPRequestManager
     {
-        private ISqlDAO _sqlDAO { get; }
-        private ILogManager _logManager { get; }
         private IOTPRequestService _otpRequestService { get; }
         private IAccountVerificationService _accountVerificationService { get; }
         private IMessageBank _messageBank { get; }
@@ -32,12 +30,10 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
             TimeSpan.FromSeconds(5));
 
-        public OTPRequestManager(ISqlDAO sqlDAO, ILogManager logManager, IOTPRequestService otpRequestService, 
+        public OTPRequestManager(IOTPRequestService otpRequestService, 
             IAccountVerificationService accountVerificationService, IMessageBank messageBank, 
             IMailService mailService, IOptionsSnapshot<BuildSettingsOptions> options)
         {
-            _sqlDAO = sqlDAO;
-            _logManager = logManager;
             _otpRequestService = otpRequestService;
             _accountVerificationService = accountVerificationService;
             _messageBank = messageBank;
@@ -102,8 +98,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                                 result = await _mailService.SendOTPAsync(account.Username, otp,
                                     otp, otp, _cancellationTokenSource.Token).ConfigureAwait(false);
                                 // FOR TESTING ONLY
-                                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
-                                 category: ILogManager.Categories.Server, otp);
+                                /*_logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
+                                 category: ILogManager.Categories.Server, otp);*/
                             }
                         }
                     }
