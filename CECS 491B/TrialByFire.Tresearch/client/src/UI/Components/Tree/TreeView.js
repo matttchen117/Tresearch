@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Tree from "react-d3-tree";
-import Tagger from "../../../Features/Tagging/Tagger";
 import Popup from "../../Popup/Popup";
 import TagPopup from "../../Popup/TagPopup";
 import "./TreeView.css";
@@ -12,8 +11,6 @@ class TreeView extends React.Component{
 
         this.treeData = props.nodes;
 
-        this.treeDimensions = this.treeCon
-
         this.treeConfiguration = {
             orientation: 'vertical',
             totalNodeCount: 4,
@@ -21,13 +18,16 @@ class TreeView extends React.Component{
             translate: {
                 x: window.innerWidth/2,
                 y: window.innerHeight/6
+            },
+            nodeSize: {
+                x: 200,
+                y: 200
             }
         }
 
         this.menuContextConfiguration = {
             hideOnLeave: true
         }
-
 
         this.state = {
             isTaggerOpen: false,
@@ -57,7 +57,6 @@ class TreeView extends React.Component{
         document.addEventListener('contextmenu', (e) => {
             e.preventDefault();
         });
-        console.log(this.treeData);
     }
 
     componentWillUnmount() {
@@ -80,7 +79,6 @@ class TreeView extends React.Component{
     EditNodes = (e) => {
         e.stopPropagation();
         this.setState( { isTaggerOpen: true, isShown: false,  x: e.pageX, y: e.pageY})
-        console.log(this.state.nodeSelect);
     }
 
      render() {
@@ -96,12 +94,11 @@ class TreeView extends React.Component{
             e.stopPropagation();
             if(this.state.shiftDown){
                 var currentState = this.state.shiftCollection;
-                console.log(currentState)
                 if(!currentState.includes(nodeData.attributes.nodeID)){
                     this.setState({shiftCollection: [...currentState, nodeData.attributes.nodeID]})
-                    console.log(this.shiftCollection);
                 }
                 else{
+                    this.setState({ shiftCollection: []});
                     // Up to you but may want to navigate to view node
                 }
             } 
@@ -116,12 +113,6 @@ class TreeView extends React.Component{
             this.setState( { isShown: false, x: e.pageX, y: e.pageYm, nodeSelect: [], shiftCollection: []})
         }
 
-        const attributes = {
-            'data-count': 0,
-            className: 'example-multiple-targets well'
-        };
-        
-
         const renderNodeWithCustomEvents = ({
             nodeDatum
         }) => (
@@ -134,11 +125,6 @@ class TreeView extends React.Component{
             
         );
 
-        var test = 'Cooking with thumbs';
-        var test2 = 'Pretzal Supremacy';
-
-        const nodeSize = { x: 200, y: 200 };
-
         const renderTree = (
             <div className = "tree-portal-container">
                 <div className= {`${this.state.isTaggerOpen ? "taggerOpen" : "base"}`} onClick = {resetShiftCollection} >
@@ -148,7 +134,7 @@ class TreeView extends React.Component{
                             collapsible = {this.treeConfiguration.collapsible} 
                             translate = {this.treeConfiguration.translate}
                             renderCustomNodeElement = {(nodeInfo) => renderNodeWithCustomEvents({...nodeInfo})}
-                            nodeSize = {nodeSize}
+                            nodeSize = {this.treeConfiguration.nodeSize}
                     />
                     {this.state.isShown && (
                         <div style={{ top: this.state.y, left: this.state.x}}  className="tag-context-menu" >

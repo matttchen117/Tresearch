@@ -106,6 +106,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "502: Server: Unable to get tag data.";
                 case Responses.tagCountInvalid:
                     return "422: Server: Invalid tag count.";
+                case Responses.tagNameInvalid:
+                    return "422: Server: Invalid tag name.";
 
 
                 case Responses.userRateSuccess:

@@ -142,7 +142,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 parameters.Add("Destination", destination);
                 parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
-                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                    commandType: CommandType.StoredProcedure))
                     .ConfigureAwait(false);
                 return parameters.Get<int>("Result");
             }
@@ -1796,6 +1796,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         };
                         //Execute command
                         var executed = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                        
                     }
                     //Check if cancellation token requests cancellation
                     if (cancellationToken.IsCancellationRequested)
@@ -1808,6 +1809,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         else
                             return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
                     }
+
                     //Tag has been added, return success
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess);
                 }

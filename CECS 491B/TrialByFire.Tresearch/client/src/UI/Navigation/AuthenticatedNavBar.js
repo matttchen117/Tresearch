@@ -1,10 +1,9 @@
 import React, { useEffect, useState} from "react";
 import logo from './logo.png';
 import { ContextMenu, ContextMenuTrigger, MenuItem, showMenu } from "react-contextmenu";
-import axios, {AxiosResponse, AxiosError} from 'axios';
+import axios from 'axios';
 import jwt_decode from "jwt-decode";
 import './AuthenticatedNavBar.css';
-import { useLocation } from "react-router-dom";
 
 
 function AuthenticatedNavBar() {
@@ -15,7 +14,7 @@ function AuthenticatedNavBar() {
       const token = sessionStorage.getItem('authorization');
       const decoded = jwt_decode(token);
       setProfileData(decoded.username[0]);
-      if(window.location.pathname == "/")
+      if(window.location.pathname === "/")
       {
         setIsHomePage(true);
       }
@@ -53,7 +52,7 @@ function AuthenticatedNavBar() {
     const handleLogoutClick = (e) => {
       e.preventDefault();
       axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
-      axios.post('https://localhost:7010/Logout/logout', {})
+      axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net//Logout/logout', {})
       .then(response => {
           console.log(response.data);
           
@@ -80,11 +79,10 @@ function AuthenticatedNavBar() {
         </div>
     );
     
-
     const renderNav = (
         <nav className = "authenticated-navbar-container">
            <ul className = "nav-links">
-                <li className="logo"><a href="/Portal" ><img src = {logo} alt = "Tresearch Logo"/></a></li>
+                <li className="logo"><a href="/" ><img src = {logo} alt = "Tresearch Logo"/></a></li>
                 <li className="profile-container"><span>{renderMenu}</span></li>
             </ul>
         </nav>

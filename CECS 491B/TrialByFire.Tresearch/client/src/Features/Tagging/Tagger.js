@@ -1,13 +1,13 @@
 import axios from "axios";
-import React, {useState, useEffect } from "react";
+import React from "react";
 import Select, { createFilter } from 'react-select';
-import { useParams} from "react-router-dom";
 import Tag from "../../UI/Tag/Tag";
 import "./Tagger.css";
 
 class Tagger extends React.PureComponent{
   constructor(props) {
     super(props);
+
     this.token = sessionStorage.getItem('authorization');
 
     this.state = {
@@ -20,12 +20,12 @@ class Tagger extends React.PureComponent{
   }
 
   GetTagData = async () => {
-    await axios.post("https://localhost:7010/Tag/nodeTagList", this.state.nodes)
+    await axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net//Tag/nodeTagList", this.state.nodes)
     .then(response => {
       const responseData = Object.values(response.data);
       this.setState( {tagData: responseData});
 
-      axios.get("https://localhost:7010/Tag/taglist", {})
+      axios.get("https://trialbyfiretresearchwebapi.azurewebsites.net//Tag/taglist", {})
         .then(response => {
           const responseData = Object.values(response.data);
           
@@ -51,11 +51,11 @@ class Tagger extends React.PureComponent{
 
   handleSelection = (e) => {
     var value = e.value;
-    axios.post("https://localhost:7010/Tag/addTag?tagName="+value ,this.state.nodes)
+    axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net//Tag/addTag?tagName="+value ,this.state.nodes)
         .then((response => {
           this.setState( previousState => ({
             tagData: [...previousState.tagData, value],
-            tagOptions: previousState.tagOptions.filter(item => item.value != value ), 
+            tagOptions: previousState.tagOptions.filter(item => item.value !== value ), 
         }));
         }))
         .catch((err => {
@@ -70,17 +70,16 @@ class Tagger extends React.PureComponent{
 
   handleClick = (e) => {
     var value = e.target.getAttribute('data-item');
-    axios.post("https://localhost:7010/Tag/removeTag?tagName="+value, this.state.nodes)
+    axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net//Tag/removeTag?tagName="+value, this.state.nodes)
         .then(response => {
             this.setState( previousState => ({
-                tagData: previousState.tagData.filter(item => item != value ), 
+                tagData: previousState.tagData.filter(item => item !== value ), 
                 tagOptions: [...previousState.tagOptions, {"value": value, "label": value}],
             }));
             this.handleSearchRefresh();
         })
   }
   
-
   render() {
     const renderTags = (
       <div className="tagger-container">

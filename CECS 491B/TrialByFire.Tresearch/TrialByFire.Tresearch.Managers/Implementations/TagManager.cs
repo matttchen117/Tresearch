@@ -14,16 +14,12 @@ namespace TrialByFire.Tresearch.Managers.Implementations
     public class TagManager : ITagManager
     {
         private IAccountVerificationService _accountVerificationService { get; set; }       //Use to verify account exists, enabled and confirmed. Checks if account is authorized to make changes 
-        private ISqlDAO _sqlDAO { get; set; }                                                  
-        private ILogService _logService { get; set; }
         private IMessageBank _messageBank { get; set; }                                     //Used to send status codes
         private ITagService _tagService { get; set; }                                       //Performs business logic
         private BuildSettingsOptions _options { get; }                                      //Holds webapi key and connection string
-        public TagManager(IAccountVerificationService accountVerificationService, ISqlDAO sqlDAO, ILogService logService, IMessageBank messagebank,ITagService tagService, IOptions<BuildSettingsOptions> options)
+        public TagManager(IAccountVerificationService accountVerificationService, IMessageBank messagebank, ITagService tagService, IOptions<BuildSettingsOptions> options)
         {
             _accountVerificationService = accountVerificationService; 
-            _sqlDAO = sqlDAO;
-            _logService = logService;
             _messageBank = messagebank;
             _tagService = tagService;
             _options = options.Value;
@@ -87,7 +83,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             }
             catch(Exception ex)
             {
-                return _options.UnhandledExceptionMessage + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
 

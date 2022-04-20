@@ -11,7 +11,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
 
     /// <summary>
-    /// Controller to perform node tag add/removal and tag bank create/delete
+    ///     Controller to perform node tag add/removal and tag bank create/delete
     /// </summary>
     [ApiController]
     [EnableCors]
@@ -20,19 +20,14 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
     {
         // User tree data updated within 5 seconds, as per BRD
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        private ISqlDAO _sqlDAO { get; set; }
         private ILogManager _logManager { get; set; }
         private IMessageBank _messageBank { get; set; }
         private ITagManager _tagManager { get; set; }
-        private BuildSettingsOptions _options { get; }
-
-        public TagController(ISqlDAO sqlDAO, ILogManager logManager, IMessageBank messageBank, ITagManager tagManager, IOptionsSnapshot<BuildSettingsOptions> options)
+        public TagController(ILogManager logManager, IMessageBank messageBank, ITagManager tagManager)
         {
-            _sqlDAO = sqlDAO;
             _logManager = logManager;
             _messageBank = messageBank;
             _tagManager = tagManager;
-            _options = options.Value;
         }
 
         /// <summary>
@@ -43,32 +38,44 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         [Route("taglist")]
         public async Task<IActionResult> GetTagsAsync()
         {
-            if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
+            try
             {
-                Tuple<List<ITag>, string> result = await _tagManager.GetTagsAsync( _cancellationTokenSource.Token);
-                
+                // Retrieve tags from tag bank
+                Tuple<List<ITag>, string> result = await _tagManager.GetTagsAsync(_cancellationTokenSource.Token).ConfigureAwait(false);
+
+                // Split string for logging
                 string[] split;
                 split = result.Item2.Split(":");
-
-                if (result.Item2.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess)))
+                if (result.Item2.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess).ConfigureAwait(false)))
                 {
-                    //_logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, "Get Tags Succeeded");
+                    // Successfully retrieved tags => store success log
+                    await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
+                    return new OkObjectResult(result.Item1);
                 }
                 else
                 {
+                    // Tags were not successfully retrieved => store error log
                     Enum.TryParse(split[1], out ILogManager.Categories category);
-                    //_logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Error, category, split[2]);
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
+                    return StatusCode(Convert.ToInt32(split[0]), result.Item1);
                 }
-                return StatusCode(Convert.ToInt32(split[0]), result.Item1);
-            }
-            else
+            } 
+            catch(OperationCanceledException ex)
             {
-                string errorResult = await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated);
-                string[] errorSplit;
-                errorSplit = errorResult.Split(":");
-                Enum.TryParse(errorSplit[0], out ILogManager.Categories category);
-                //_logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Error, category, errorSplit[2]);
-                return StatusCode(Convert.ToInt32(errorSplit[0]), errorSplit[2]);
+                string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + ex.Message;
+                string[] split;
+                split = errorMessage.Split(":");
+                Enum.TryParse(split[1], out ILogManager.Categories category);
+                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
+            }
+            catch(Exception ex)
+            {
+                string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                string[] split;
+                split = errorMessage.Split(":");
+                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
+                return new BadRequestObjectResult(split[2]);
             }
         }
 
@@ -82,18 +89,40 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
+                // Create tag in bank
                 string result = await _tagManager.CreateTagAsync(tagName, _cancellationTokenSource.Token);
+                
+                // Split result for logging
                 string[] split;
                 split = result.Split(":");
-                return StatusCode(Convert.ToInt32(split[0]), split[2]);
+                if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess)))
+                {
+                    await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]);
+                    return new OkObjectResult(split[2]);
+                }
+                else
+                {
+                    Enum.TryParse(split[1], out ILogManager.Categories category);
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]);
+                    return StatusCode(Convert.ToInt32(split[0]), split[2]);
+                }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
-                return StatusCode(408, "Request time out");
+                string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + ex.Message;
+                string[] split;
+                split = errorMessage.Split(":");
+                Enum.TryParse(split[1], out ILogManager.Categories category);
+                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                string[] split;
+                split = errorMessage.Split(":");
+                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
+                return new BadRequestObjectResult(split[2]);
             }
         }
 
@@ -107,18 +136,40 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
+                // Delete Tag from tag bank
                 string result = await _tagManager.RemoveTagAsync(tagName, _cancellationTokenSource.Token);
+
+                // Split result for logging
                 string[] split;
                 split = result.Split(":");
-                return StatusCode(Convert.ToInt32(split[0]), split[2]);
+                if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess)))
+                {
+                    await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]);
+                    return new OkObjectResult(split[2]);
+                }
+                else
+                {
+                    Enum.TryParse(split[1], out ILogManager.Categories category);
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]);
+                    return StatusCode(Convert.ToInt32(split[0]), split[2]);
+                }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
-                return StatusCode(408, "Request time out");
+                string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + ex.Message;
+                string[] split;
+                split = errorMessage.Split(":");
+                Enum.TryParse(split[1], out ILogManager.Categories category);
+                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                string[] split;
+                split = errorMessage.Split(":");
+                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
+                return new BadRequestObjectResult(split[2]);
             }
         }
 
@@ -132,18 +183,40 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
+                // Retrieve node tags
                 Tuple<List<string>, string> result = await _tagManager.GetNodeTagsAsync(nodeIDs,_cancellationTokenSource.Token);
+
+                // Split result for logging
                 string[] split;
                 split = result.Item2.Split(":");
-                return StatusCode(Convert.ToInt32(split[0]), result.Item1);
+                if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess)))
+                {
+                    await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]);
+                    return new OkObjectResult(result.Item1);
+                }
+                else
+                {
+                    Enum.TryParse(split[1], out ILogManager.Categories category);
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]);
+                    return StatusCode(Convert.ToInt32(split[0]), result.Item1);
+                }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
-                return StatusCode(408, "Request time out");
+                string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + ex.Message;
+                string[] split;
+                split = errorMessage.Split(":");
+                Enum.TryParse(split[1], out ILogManager.Categories category);
+                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                string[] split;
+                split = errorMessage.Split(":");
+                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
+                return new BadRequestObjectResult(split[2]);
             }
         }
 
@@ -162,11 +235,34 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 string result = await _tagManager.AddTagToNodesAsync(nodeIDs,tagName, _cancellationTokenSource.Token);
                 string[] split;
                 split = result.Split(":");
+                if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess)))
+                {
+                    await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]);
+                    return new OkObjectResult(split[2]);
+                }
+                else
+                {
+                    Enum.TryParse(split[1], out ILogManager.Categories category);
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]);
+                    return StatusCode(Convert.ToInt32(split[0]), split[2]);
+                }
+            }
+            catch (OperationCanceledException ex)
+            {
+                string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + ex.Message;
+                string[] split;
+                split = errorMessage.Split(":");
+                Enum.TryParse(split[1], out ILogManager.Categories category);
+                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
                 return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                string[] split;
+                split = errorMessage.Split(":");
+                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
+                return new BadRequestObjectResult(split[2]);
             }
         }
 
@@ -184,15 +280,34 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 string result = await _tagManager.RemoveTagFromNodesAsync(nodeIDs, tagName, _cancellationTokenSource.Token);
                 string[] split;
                 split = result.Split(":");
-                return StatusCode(Convert.ToInt32(split[0]), split[2]);
+                if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess)))
+                {
+                    await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]);
+                    return new OkObjectResult(split[2]);
+                }
+                else
+                {
+                    Enum.TryParse(split[1], out ILogManager.Categories category);
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]);
+                    return StatusCode(Convert.ToInt32(split[0]), split[2]);
+                }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
-                return StatusCode(408, "Request time out");
+                string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + ex.Message;
+                string[] split;
+                split = errorMessage.Split(":");
+                Enum.TryParse(split[1], out ILogManager.Categories category);
+                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                string[] split;
+                split = errorMessage.Split(":");
+                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
+                return new BadRequestObjectResult(split[2]);
             }
         }
     }

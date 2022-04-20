@@ -14,7 +14,8 @@ function TagDashboard() {
 
     const [alertData, setAlertData] = useState(
         {
-            message: ''
+            message: '',
+            isError: false
         }
     )
 
@@ -44,9 +45,9 @@ function TagDashboard() {
 
     const handleClick = (e) => {
         var value = e.target.getAttribute('data-item');
-        var parsedData = handleEncoded(value)
+        var parsedData = handleEncoded(value);
         console.log(parsedData);
-        axios.post("https://localhost:7010/Tag/deleteTag?tagName=" + parsedData)
+        axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net//Tag/deleteTag?tagName=" + parsedData)
         .then((response => {
             fetchTableData();
             console.log("TEST");
@@ -63,24 +64,24 @@ function TagDashboard() {
      
     const fetchTableData = () => {
         async function fetchData() {
-            const request = await axios.get("https://localhost:7010/Tag/taglist")
+            await axios.get("https://trialbyfiretresearchwebapi.azurewebsites.net//Tag/taglist")
             .then((response => {
                 setTagData(response.data);
+                
             }))
             .catch((err => {
                 switch(err.response.status){
-                    case 401: {
+                    case 401: 
                             console.log("Not Authorized");
                             localStorage.removeItem('authorization');
                             window.location.assign(window.location.origin);
                             window.location = '/';
-                    }
                         break;
-                    case 503: {
+                    case 503: 
                             console.log("Database offline");
-                            
-                    }
                         break;
+                    default: 
+                        console.log("UH OH");
                 }
             }))
             
@@ -100,7 +101,7 @@ function TagDashboard() {
         const interval = setInterval(() => {
             checkToken();
             fetchTableData();   
-        }, 5000);
+        }, 10000);
         return () => clearInterval(interval);
     }, [])
 
@@ -112,7 +113,7 @@ function TagDashboard() {
 
         console.log(parsedData);
 
-        axios.post("https://localhost:7010/Tag/createTag?tagName=" + parsedData)
+        axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net//Tag/createTag?tagName=" + parsedData)
         .then((response => {
             setCreateData('');
             setAlertData({message: 'Added'});
@@ -126,17 +127,15 @@ function TagDashboard() {
             switch(err.response.status){
                 case 409: setAlertData({message: 'Tag already exists'});
                     break;
-                case 401: {
+                case 401: 
                         console.log("Not Authorized");
                         localStorage.removeItem('authorization');
                         window.location.assign(window.location.origin);
                         window.location = '/';
-                }
                     break;
-                case 503: {
+                case 503: 
                         console.log("Database offline");
                         setAlertData({message: 'Database offline'});
-                }
                     break;
                 default: 
                     setAlertData({message: 'Unable to create tag'});

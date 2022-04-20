@@ -10,7 +10,7 @@ const handleDelete = (e) => {
     axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
 
 
-    axios.post("https://localhost:7010/AccountDeletion/DeleteAccount")
+    axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net//AccountDeletion/DeleteAccount")
         .then((response => {
             console.log("success");
             sessionStorage.removeItem('authorization');
