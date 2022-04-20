@@ -53,7 +53,6 @@ namespace TrialByFire.Tresearch.Models.Contracts
             tagRetrievalFail,
             tagDuplicate,
             tagNotFound,
-            tagCountInvalid,
 
             //Rating
             userRateSuccess,

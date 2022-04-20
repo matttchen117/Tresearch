@@ -35,7 +35,8 @@ namespace TrialByFire.Tresearch.Services.Implementations
         }
 
         /// <summary>
-        ///      Adds a tag to node. Must have at least one node.
+        ///     AddTagToNodeAsync(nodeIDs, tagName)
+        ///         Adds a tag to node.  
         /// </summary>
         /// <param name="nodeIDs">List of nodes' ids to add tag</param>
         /// <param name="tagName">String tag to add to nodes</param>
@@ -68,7 +69,8 @@ namespace TrialByFire.Tresearch.Services.Implementations
         }
 
         /// <summary>
-        ///     Removes tag from nodes passed in. Must have at least one node
+        ///     RemoveTagFromNodesAsync(nodeIDs, tagName)
+        ///         Removes tag from nodes passed in. Checks if list has at least one node.
         /// </summary>
         /// <param name="nodeIDs">List of nodes</param>
         /// <param name="tagName">String tag name</param>
@@ -102,12 +104,6 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        /// <summary>
-        ///     Retrieves all tags shared by node(s). If list contains single node, all tags are returned. 
-        /// </summary>
-        /// <param name="nodeIDs"> List of node IDs</param>
-        /// <param name="cancellationToken">Cancellation Token</param>
-        /// <returns>List of all tags shared by node(s).</returns>
         public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             List<string> tags = new List<string>();
@@ -127,7 +123,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch (OperationCanceledException)
             {
-                return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+                throw;
             }
             catch (Exception ex)
             {
@@ -135,30 +131,40 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        /// <summary>
-        ///  Creates a tag in tag bank.
-        /// </summary>
-        /// <param name="tagName">String tag name</param>
-        /// <param name="count">count of nodes tagged</param>
-        /// <param name="cancellationToken">Cancellation Token</param>
-        /// <returns></returns>
+        public async Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (nodeIDs.Count > 0)
+                {
+                    Tuple<List<string>, string> result = await _sqlDAO.GetNodeTagsDescAsync(nodeIDs, cancellationToken);
+                    if (cancellationToken.IsCancellationRequested)
+                        throw new OperationCanceledException();
+                    return result;
+                }
+                else
+                    return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound));
+            }
+            catch (OperationCanceledException)
+            {
+                return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
+            }
+        }
+
         public async Task<string> CreateTagAsync(string tagName, int count, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
-                // Check if the count is negative (not possible)
-                if(count >= 0)
-                {
-                    //Check if cancellation token requests cancellation
-                    cancellationToken.ThrowIfCancellationRequested();
-                    //Create tag in bank
-                    string result = await _sqlDAO.CreateTagAsync(tagName, count, cancellationToken);
-                    return result;
-                }
-                else
-                {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid);
-                }
+                //Check if cancellation token requests cancellation
+                cancellationToken.ThrowIfCancellationRequested();
+                //Create tag in bank
+                string result = await _sqlDAO.CreateTagAsync(tagName, count, cancellationToken);
+                return result;
             }
             catch (OperationCanceledException)
             {

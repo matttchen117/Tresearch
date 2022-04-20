@@ -15,13 +15,14 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
         }
 
         [Theory]
-        [MemberData(nameof(CreateTagData))]
-        public async Task CreateTagAsync(string tagName, int count, IMessageBank.Responses response)
+        //Success: Tag Added to database
+        [InlineData("Tresearch SqlDAO test tag1", 0, "200: Server: Tag created in tag bank.")]
+        //Fail: Tag already exists in database
+        [InlineData("Tresearch SqlDAO This Tag Exists Already", 0, "409: Database: The tag already exists.")]
+        public async Task CreateTagAsync(string tagName, int count, string expected)
         {
             //Arrange
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
-            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            string expected = await messageBank.GetMessage(response);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
@@ -137,26 +138,6 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             Assert.Equal(expectedTags, resultTags);
         }
 
-        public static IEnumerable<object[]> CreateTagData()
-        {
-            /**
-             *  Case 0: Create tag.  Tag does not exist in database
-             *      Tag Name: 
-             */
-            var tagCase0 = "Tresearch SqlDAO test tag1";
-            var cntCase0 = 0;
-            var expCase0 = IMessageBank.Responses.tagCreateSuccess;
-
-            var tagCase1 = "Tresearch SqlDAO This Tag Exists Already";
-            var cntCase1 = 0;
-            var expCase1 = IMessageBank.Responses.tagAlreadyExist;
-
-
-            return new[]
-            {
-                new object[] { tagCase0, cntCase0, expCase0 }
-            };
-        }
         public static IEnumerable<object[]> GetNodeTagData()
         {
             /**Nodes contain shared tags

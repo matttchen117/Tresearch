@@ -9,10 +9,6 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
-
-    /// <summary>
-    /// Controller to perform node tag add/removal and tag bank create/delete
-    /// </summary>
     [ApiController]
     [EnableCors]
     [Route("[Controller]")]
