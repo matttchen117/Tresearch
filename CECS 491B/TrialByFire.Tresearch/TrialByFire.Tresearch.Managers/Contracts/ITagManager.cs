@@ -15,6 +15,7 @@ namespace TrialByFire.Tresearch.Managers.Contracts
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>String status code</returns>
         public Task<string> AddTagToNodesAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken));
+        
         /// <summary>
         /// Removes a tag from a list of node(s).
         /// </summary>
@@ -23,6 +24,7 @@ namespace TrialByFire.Tresearch.Managers.Contracts
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>String status code</returns>
         public Task<string> RemoveTagFromNodesAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken));
+        
         /// <summary>
         /// Retrieves a list of shared node tag(s) from a list of node(s)
         /// </summary>
@@ -30,6 +32,7 @@ namespace TrialByFire.Tresearch.Managers.Contracts
         /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns>List of tags and string status code</returns>
         public Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken));
+        
         /// <summary>
         /// Creates a tag in tag word bank
         /// </summary>
@@ -37,6 +40,7 @@ namespace TrialByFire.Tresearch.Managers.Contracts
         /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns>String status code</returns>
         public Task<string> CreateTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken));
+        
         /// <summary>
         /// Removes a tag from tag word bank
         /// </summary>
@@ -44,6 +48,7 @@ namespace TrialByFire.Tresearch.Managers.Contracts
         /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns>String status code</returns>
         public Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken));
+       
         /// <summary>
         /// Retrieves a list of all tags in word bank
         /// </summary>

@@ -9,7 +9,7 @@ using TrialByFire.Tresearch.Services.Contracts;
 namespace TrialByFire.Tresearch.Managers.Implementations
 {
     /// <summary>
-    ///     Manages the  creation and deletion of tags from word bank as well as adding and removing tags from nodes. Handles delegation of services.
+    ///     Manages the creation and deletion of tags from word bank as well as adding and removing tags from nodes. Handles delegation of services.
     /// </summary>
     public class TagManager : ITagManager
     {
@@ -26,10 +26,9 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         }
 
         /// <summary>
-        ///     AddTagToNodesAsync(nodeIDs, tagName)
-        ///         Adds a tag to a list of nodes. UserAccount is checked if valid and is authorized to make changes to nodes.
+        ///     Adds a tag to a list of nodes. UserAccount is checked if valid and is authorized to make changes to nodes.
         /// </summary>
-        /// <param name="nodeIDs">List of nodes' ids to add tag</param>
+        /// <param name="nodeIDs">List of nodes' id(s)</param>
         /// <param name="tagName">String tag to add to nodes</param>
         /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns>String status code</returns>
@@ -38,8 +37,16 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if tag name is null, empty string or all space
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                // Check if node list is null or empty
+                if (nodeIDs == null || nodeIDs.Count() <= 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);              
+
                 //Check if user is authenticated
-               if(!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
+                if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                {
                     //Get user's role
                     string role = "";

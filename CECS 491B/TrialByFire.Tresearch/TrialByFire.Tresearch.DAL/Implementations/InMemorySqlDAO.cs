@@ -125,7 +125,41 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public async Task<string> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return "";
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if node exists
+                foreach (long nodeID in nodeIDs)
+                {
+                    bool isValid = false;
+                    int count = -1;
+                    foreach(Node node in InMemoryDatabase.Nodes)
+                    {
+                        if (node.NodeID == nodeID)
+                        {
+                            isValid = true;
+                            count = InMemoryDatabase.Nodes.IndexOf(node);
+                            if (!node.UserHash.Equals(userHash))
+                                return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized);
+                        }  
+                    }
+
+                    if(!isValid)
+                        return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+                }
+
+                return await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false);
+
+            }
+            catch(OperationCanceledException ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false) + ex.Message;
+            }
+            catch (Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+            }
         }
         public async Task<int> StoreOTPAsync(IAccount account, IOTPClaim otpClaim,
             CancellationToken cancellationToken = default)
@@ -961,20 +995,59 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return -1;
         }
 
+        /// <summary>
+        ///     Adds tag to list of node(s)
+        /// </summary>
+        /// <param name="nodeIDs">List of node IDs</param>
+        /// <param name="tagName">Tag name</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status result</returns>
         public async Task<string> AddTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (!InMemoryDatabase.Tags.Contains(new Tag(tagName, 0)))
-                return await _messageBank.GetMessage(IMessageBank.Responses.tagDoesNotExist);
-            for(int i = 0; i  < nodeIDs.Count; i++)
+            try
             {
-                INodeTag nodeTag = new NodeTag(nodeIDs[i], tagName);
-                if (!InMemoryDatabase.NodeTags.Contains(nodeTag))
-                    InMemoryDatabase.NodeTags.Add(nodeTag);
-            }
+                cancellationToken.ThrowIfCancellationRequested();
 
-            return await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess);
+                // Check if tag is null or empty
+                if (tagName == null || tagName.Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+
+                // Check if node list is null or empty
+                if (nodeIDs == null || nodeIDs.Count() <= 0 )
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound);
+
+                // Check if tag exists
+                if (!InMemoryDatabase.Tags.Contains(new Tag(tagName, 0)))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagDoesNotExist);
+
+                // Add tag to nodes
+                for (int i = 0; i  < nodeIDs.Count; i++)
+                {
+                    INodeTag nodeTag = new NodeTag(nodeIDs[i], tagName);
+                    if (!InMemoryDatabase.NodeTags.Contains(nodeTag))
+                        InMemoryDatabase.NodeTags.Add(nodeTag);
+                }
+
+                return await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess);
+            }
+            catch(OperationCanceledException ex)
+            {
+                // Rollback handled
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+            }
+            catch (Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+            }        
         }
 
+        /// <summary>
+        ///     Removes a tag from list of node(s)
+        /// </summary>
+        /// <param name="nodeIDs">List of node IDs</param>
+        /// <param name="tagName">Tag name</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status result</returns>
         public async Task<string> RemoveTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             for (int i = 0; i  < nodeIDs.Count; i++)
@@ -987,12 +1060,27 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return await _messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess);
         }
 
+        /// <summary>
+        ///     Retrieves a list of shared tags from a list of node(s) in in memory database. List with single node will return all tags.
+        /// </summary>
+        /// <param name="nodeIDs">List of node ID(s)</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>List of tags and string status result</returns>
         public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
+
+
                 List<string> tags = new List<string>();
+
+                // Check tag count
+                if (nodeIDs == null ||nodeIDs.Count() <= 0)
+                    return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound));
+
+
+                
                 for (int i = 0; i < nodeIDs.Count; i++)
                 {
 
@@ -1025,18 +1113,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return Tuple.Create(new List<string>(), "200");
-        }
-
         /// <summary>
         ///     Creates a tag in in memory tag bank
         /// </summary>
         /// <param name="tagName">Tag name</param>
         /// <param name="count">Number of nodes tagged</param>
         /// <param name="cancellationToken">Cancellation Token</param>
-        /// <returns>String status code</returns>
+        /// <returns>String status result</returns>
         public async Task<string> CreateTagAsync(string tagName, int count,CancellationToken cancellationToken = default(CancellationToken))
         {
 
@@ -1071,16 +1154,17 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }    
         }
 
+        /// <summary>
+        ///     Retrieves list of tags from tag bank
+        /// </summary>
+        /// <param name="cancellationToken">Cnacellation Token</param>
+        /// <returns>List of tags and string status result</returns>
         public async Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             List<ITag> tags = InMemoryDatabase.Tags.AsList<ITag>();
             return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess));
         }
 
-        public async Task<Tuple<List<string>, string>> GetTagsDescAsync(CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return Tuple.Create(new List<string>(), "200");
-        }
 
         /// <summary>
         ///  Deletes tag from in memory tag bank

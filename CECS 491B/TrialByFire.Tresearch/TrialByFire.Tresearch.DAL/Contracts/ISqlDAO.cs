@@ -153,13 +153,54 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration);
 
+        /// <summary>
+        ///     Adds tag to list of node(s)
+        /// </summary>
+        /// <param name="nodeIDs">List of node IDs</param>
+        /// <param name="tagName">Tag name</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status result</returns>
         public Task<string> AddTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        ///     Removes tag from list of node(s)
+        /// </summary>
+        /// <param name="nodeIDs">List of node IDs</param>
+        /// <param name="tagName">Tag name</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status result</returns>
         public Task<string> RemoveTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        ///  Retrieves list of shared tags from a list of node(s). List with single node will return all tags.
+        /// </summary>
+        /// <param name="nodeIDs">List of node ID(s)</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>List of tags and string status result</returns>
         public Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken));
-        public Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        ///     Creates a tag in tag bank
+        /// </summary>
+        /// <param name="tagName">Tag name</param>
+        /// <param name="count">Number of nodes tagged</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status result</returns>
         public Task<string> CreateTagAsync(string tagName, int count, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        ///     Deletes a tag from tag bank
+        /// </summary>
+        /// <param name="tagName">Tag name</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status result</returns>
         public Task<string> DeleteTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        ///     Retrieves list of tags from tag bank
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>List of tags and string status result</returns>
         public Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken));
-        public Task<Tuple<List<string>, string>> GetTagsDescAsync(CancellationToken cancellationToken = default(CancellationToken));
     }
 }

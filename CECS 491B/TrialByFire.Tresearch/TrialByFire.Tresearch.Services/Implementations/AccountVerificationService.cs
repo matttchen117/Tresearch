@@ -56,7 +56,6 @@ namespace TrialByFire.Tresearch.Services.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                cancellationToken.ThrowIfCancellationRequested();
 
                 string result = await _sqlDAO.IsAuthorizedToMakeNodeChangesAsync(nodeIDs, userHash, cancellationToken);
 

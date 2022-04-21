@@ -89,9 +89,13 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
-                // Create tag in bank
-                string result = await _tagManager.CreateTagAsync(tagName, _cancellationTokenSource.Token);
-                
+                string result;
+                //Check tag input
+                if (tagName == null || tagName.Equals(""))
+                    result = await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                else
+                    result = await _tagManager.CreateTagAsync(tagName, _cancellationTokenSource.Token).ConfigureAwait(false);
+
                 // Split result for logging
                 string[] split;
                 split = result.Split(":");
@@ -136,8 +140,12 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
-                // Delete Tag from tag bank
-                string result = await _tagManager.RemoveTagAsync(tagName, _cancellationTokenSource.Token);
+                string result;
+                //Check tag input
+                if (tagName == null || tagName.Equals(""))
+                    result = await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                else
+                    result = await _tagManager.RemoveTagAsync(tagName, _cancellationTokenSource.Token).ConfigureAwait(false);
 
                 // Split result for logging
                 string[] split;
@@ -183,8 +191,11 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
-                // Retrieve node tags
-                Tuple<List<string>, string> result = await _tagManager.GetNodeTagsAsync(nodeIDs,_cancellationTokenSource.Token);
+                Tuple<List<string>, string> result;
+                if (nodeIDs == null || nodeIDs.Count() <= 0)
+                    result =  Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false));
+                else
+                    result = await _tagManager.GetNodeTagsAsync(nodeIDs, _cancellationTokenSource.Token);
 
                 // Split result for logging
                 string[] split;
@@ -232,7 +243,15 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
-                string result = await _tagManager.AddTagToNodesAsync(nodeIDs,tagName, _cancellationTokenSource.Token);
+                string result;
+                // Check if tag name is null, empty string or all space
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    result = await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                else if (nodeIDs == null || nodeIDs.Count() <= 0)
+                    result = await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+                else
+                    result = await _tagManager.AddTagToNodesAsync(nodeIDs,tagName, _cancellationTokenSource.Token);
+                
                 string[] split;
                 split = result.Split(":");
                 if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess)))
@@ -277,7 +296,15 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
-                string result = await _tagManager.RemoveTagFromNodesAsync(nodeIDs, tagName, _cancellationTokenSource.Token);
+                string result;
+                // Check if tag name is null, empty string or all space
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    result = await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                else if (nodeIDs == null || nodeIDs.Count() <= 0)
+                    result = await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+                else
+                    result = await _tagManager.RemoveTagFromNodesAsync(nodeIDs, tagName, _cancellationTokenSource.Token);
+
                 string[] split;
                 split = result.Split(":");
                 if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess)))

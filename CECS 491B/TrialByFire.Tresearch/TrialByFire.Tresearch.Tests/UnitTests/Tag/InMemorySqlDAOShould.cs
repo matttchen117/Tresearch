@@ -6,8 +6,14 @@ using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
 {
+    /// <summary>
+    /// In memory tag database unit test class
+    /// </summary>
     public class InMemorySqlDAOShould: TestBaseClass
     {
+        /// <summary>
+        /// In memory database unit test class constructor
+        /// </summary>
         public InMemorySqlDAOShould() : base(new string[] { })
         {
             TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
@@ -20,7 +26,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
         /// </summary>
         /// <param name="tagName">Tag name</param>
         /// <param name="count">Number of nodes tagged</param>
-        /// <param name="response">Enumerated Response based on case</param>
+        /// <param name="response">Expected enumerated response based on case</param>
         /// <returns></returns>
         [Theory]
         [MemberData(nameof(CreateTagData))]
@@ -43,7 +49,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
         ///     Tests user deleting tag from tag bank
         /// </summary>
         /// <param name="tagName">Tag name</param>
-        /// <param name="response">Cancellation Token</param>
+        /// <param name="response">Expected enumerated response based on case</param>
         /// <returns></returns>
         [Theory]
         [MemberData(nameof(DeleteTagData))]
@@ -62,12 +68,18 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             Assert.Equal(expected, result);
         }
 
-        [Fact]
-        public async Task GetTagsAsync()
+        /// <summary>
+        ///     Test users retrieving tags from tag bank
+        /// </summary>
+        /// <returns></returns>
+        [Theory]
+        [InlineData(IMessageBank.Responses.tagGetSuccess)]
+        public async Task GetTagsAsync(IMessageBank.Responses response)
         {
             //Arrange
-            string expected = "200: Server: Tag(s) retrieved.";
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
+            string expected = await messageBank.GetMessage(response);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
@@ -77,12 +89,23 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             //Assert
             Assert.Equal(expected, result);
         }
+
+
+        /// <summary>
+        ///     Tests users adding tag to list of node(s)
+        /// </summary>
+        /// <param name="nodeIDs">List of node IDs</param>
+        /// <param name="tagName">Tag name</param>
+        /// <param name="response">Expected enumerated response based on case</param>
+        /// <returns></returns>
         [Theory]
         [MemberData(nameof(AddTagData))]
-        public async Task AddTagToNodes(List<long> nodeIDs, string tagName, string expected)
+        public async Task AddTagToNodes(List<long> nodeIDs, string tagName, IMessageBank.Responses response)
         {
             //Arrange
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
+            string expected = await messageBank.GetMessage(response);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
@@ -92,50 +115,23 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             Assert.Equal(expected, result);
         }
 
-        public static IEnumerable<object[]> AddTagData()
-        {
-            //nodes already have tag
-            var tagNameCase0 = "Tresearch SqlDAO Add Tag1";
-            var nodeListCase0 = new List<long> { 2022030533, 2022030534, 2022030535 };
-            var resultCase0 = "200: Server: Tag added to node(s).";
 
-            //nodes do not contain these tags already
-            var tagNameCase1 = "Tresearch SqlDAO Add Tag2";
-            var nodeListCase1 = new List<long> { 2022030533, 2022030534, 2022030535 };
-            var resultCase1 = "200: Server: Tag added to node(s).";
-
-            // node doesn't already contain tag
-            var tagNameCase2 = "Tresearch SqlDAO Add Tag3";
-            var nodeListCase2 = new List<long> { 2022030533 };
-            var resultCase2 = "200: Server: Tag added to node(s).";
-
-            //Node already has tag
-            var tagNameCase3 = "Tresearch SqlDAO Add Tag4";
-            var nodeListCase3 = new List<long> { 2022030533 };
-            var resultCase3 = "200: Server: Tag added to node(s).";
-
-            //Tag doesn't exist
-            var tagNameCase4 = "Tresearch SqlDAO Add Tag5";
-            var nodeListCase4 = new List<long> { 2022030533 };
-            var resultCase4 = "404: Database: Tag not found.";
-
-            return new[]
-            {
-                new object[] { nodeListCase0, tagNameCase0, resultCase0 },
-                new object[] { nodeListCase1, tagNameCase1, resultCase1 },
-                new object[] { nodeListCase2, tagNameCase2, resultCase2 },
-                new object[] { nodeListCase3, tagNameCase3, resultCase3 },
-                new object[] { nodeListCase4, tagNameCase4, resultCase4 }
-            };
-        }
-
+        /// <summary>
+        ///     Tests user retrieving list of shared tags from list of nodes
+        /// </summary>
+        /// <param name="nodeIDs">List of node ID(s)</param>
+        /// <param name="response">Expected enumerated response based on case</param>
+        /// <param name="expectedTags">List of shared  tag(s)</param>
+        /// <returns></returns>
         [Theory]
         [MemberData(nameof(GetNodeTagData))]
-        public async Task GetNodeTagsAsync(List<long> nodeIDs, string expected, List<string> expectedTags)
+        public async Task GetNodeTagsAsync(List<long> nodeIDs, IMessageBank.Responses response, List<string> expectedTags)
         {
             //Arrange
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            string expected = await messageBank.GetMessage(response);
 
             //Act
             Tuple<List<string>, string> myResult = await sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationTokenSource.Token);
@@ -258,35 +254,103 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
                 new object[] { tagCase4, expCase4 }
             };
         }
+
+        /// <summary>
+        ///     Test data to add tag to nodes.
+        ///     <br>Case 0: Add tag to nodes. All nodes already contain tag</br>
+        ///     <br>Case 1: Add tag to nodes. All nodes do not contain tag</br>
+        ///     <br>Case 2: Add tag to node. Node does not contain tag.</br>
+        ///     <br>Case 3: Add tag to node. Node contains tag.</br>
+        ///     <br>Case 4: Add tag to node. Tag does not exist.</br>
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<object[]> AddTagData()
+        {
+            /**
+            *  Case 0: Add tag to nodes.  All nodes already contain tag
+            *      Tag Name:        Tresearch SqlDAO Add Tag1
+            *      Node IDs:        [2022030533, 2022030534, 2022030535]    
+            */
+            var tagNameCase0 = "Tresearch SqlDAO Add Tag1";
+            var nodeListCase0 = new List<long> { 2022030533, 2022030534, 2022030535 };
+            var resultCase0 = IMessageBank.Responses.tagAddSuccess;
+
+            /**
+            *  Case 1: Add tag to nodes.  All nodes do not contain tag
+            *      Tag Name:        Tresearch SqlDAO Add Tag2
+            *      Node IDs:        [2022030533, 2022030534, 2022030535]    
+            */
+            var tagNameCase1 = "Tresearch SqlDAO Add Tag2";
+            var nodeListCase1 = new List<long> { 2022030533, 2022030534, 2022030535 };
+            var resultCase1 = IMessageBank.Responses.tagAddSuccess;
+
+
+            /**
+            *  Case 2: Add tag to node. Node does not contain tag.
+            *      Tag Name:        Tresearch SqlDAO Add Tag3
+            *      Node IDs:        [2022030533]    
+            */
+            var tagNameCase2 = "Tresearch SqlDAO Add Tag3";
+            var nodeListCase2 = new List<long> { 2022030533 };
+            var resultCase2 = IMessageBank.Responses.tagAddSuccess;
+
+
+            /**
+            *  Case 3: Add tag to node. Node contains tag.
+            *      Tag Name:        Tresearch SqlDAO Add Tag4
+            *      Node IDs:        [2022030533]    
+            */
+            var tagNameCase3 = "Tresearch SqlDAO Add Tag4";
+            var nodeListCase3 = new List<long> { 2022030533 };
+            var resultCase3 = IMessageBank.Responses.tagAddSuccess;
+
+            /**
+            *  Case 4: Add tag to node. Tag does not exist.
+            *      Tag Name:        Tresearch SqlDAO Add Tag5
+            *      Node IDs:        [2022030533]    
+            */
+            var tagNameCase4 = "Tresearch SqlDAO Add Tag5";
+            var nodeListCase4 = new List<long> { 2022030533 };
+            var resultCase4 = IMessageBank.Responses.tagNotFound;
+
+            return new[]
+            {
+                new object[] { nodeListCase0, tagNameCase0, resultCase0 },
+                new object[] { nodeListCase1, tagNameCase1, resultCase1 },
+                new object[] { nodeListCase2, tagNameCase2, resultCase2 },
+                new object[] { nodeListCase3, tagNameCase3, resultCase3 },
+                new object[] { nodeListCase4, tagNameCase4, resultCase4 }
+            };
+        }
         public static IEnumerable<object[]> GetNodeTagData()
         {
             /**Nodes contain shared tags
              *      
              */
             var nodeListCase0 = new List<long> { 2022030539, 2022030540, 2022030541 };
-            string expectedCase0 = "200: Server: Tag(s) retrieved.";
+            var expectedCase0 = IMessageBank.Responses.tagGetSuccess;
             var expectedTags0 = new List<string> { "Tresearch SqlDAO Get Tag1", "Tresearch SqlDAO Get Tag2" };
 
             /**Nodes contain no shared tags
              * 
              */
             var nodeListCase1 = new List<long> { 2022030539, 2022030540, 2022030541, 2022030542 };
-            string expectedCase1 = "200: Server: Tag(s) retrieved.";
+            var expectedCase1 = IMessageBank.Responses.tagGetSuccess;
             var expectedTags1 = new List<string> { };
 
             //Node has tags
             var nodeListCase2 = new List<long> { 2022030539 };
-            string expectedCase2 = "200: Server: Tag(s) retrieved.";
+            var expectedCase2 = IMessageBank.Responses.tagGetSuccess;
             var expectedTags2 = new List<string> { "Tresearch SqlDAO Get Tag1", "Tresearch SqlDAO Get Tag2", "Tresearch SqlDAO Get Tag3" };
 
             //Node contains no tags
             var nodeListCase3 = new List<long> { 2022030543 };
-            string expectedCase3 = "200: Server: Tag(s) retrieved.";
+            var expectedCase3 = IMessageBank.Responses.tagGetSuccess;
             var expectedTags3 = new List<string> { };
 
             //No nodes passed in
             var nodeListCase4 = new List<long> { };
-            string expectedCase4 = "200: Server: Tag(s) retrieved.";
+            var expectedCase4 = IMessageBank.Responses.nodeNotFound;
             var expectedTags4 = new List<string> { };
 
             return new[]

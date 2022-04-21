@@ -15,6 +15,6 @@ namespace TrialByFire.Tresearch.Models.Contracts
         public bool ExactMatch { get; set; }
         public List<INodeTag> Tags { get; set; }
         public double TagScore { get; set; }
-        public int Rating { get; set; }
+        public double RatingScore { get; set; }
     }
 }

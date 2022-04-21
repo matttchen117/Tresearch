@@ -1766,19 +1766,27 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
         /// <summary>
-        ///     AddTagAsync(nodeIDs, tagName)
         ///         Adds a tag to list of node(s) passed in. 
         /// </summary>
-        /// <param name="nodeIDs">List of node IDs to add tag</param>
+        /// <param name="nodeIDs">List of node IDs</param>
         /// <param name="tagName">String tag name</param>
         /// <param name="cancellationToken">Cancellation Token</param>
-        /// <returns>String status</returns>
+        /// <returns>String status result</returns>
         public async Task<string> AddTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 //Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if tag is null or empty
+                if (tagName == null || tagName.Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+
+                // Check if node list is null or empty
+                if (nodeIDs == null || nodeIDs.Count() <= 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound);
+
                 // Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
@@ -1841,13 +1849,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
         /// <summary>
-        ///     RemoveTagAsync(nodeIDs, tagName)
         ///         Removes tag from list of nodes
         /// </summary>
         /// <param name="nodeIDs">List of node IDs</param>
         /// <param name="tagName">String tag name</param>
         /// <param name="cancellationToken">Cancellation Token</param>
-        /// <returns>String status</returns>
+        /// <returns>String status result</returns>
         public async Task<string> RemoveTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -1911,12 +1918,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
         /// <summary>
-        ///     GetNodeTagsAsync(nodeIDs)
-        ///         Gets list of tags that a list of node(s) share in common. If only one nod is passed in, all tags are returned
+        ///     Retreives a list of shared tags from a list of node(s). List with single node will return all tags.
         /// </summary>
         /// <param name="nodeIDs">List of node IDs</param>
         /// <param name="cancellationToken">Cancellation Token</param>
-        /// <returns>List of tags and string status</returns>
+        /// <returns>List of tags and string status result</returns>
         public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
            
@@ -1985,57 +1991,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            List<string> tags = new List<string>();
-            try
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                using (var connection = new SqlConnection(_options.SqlConnectionString))
-                {
-                    await connection.OpenAsync();
-                    foreach (var nodeId in nodeIDs)
-                    {
-
-                        var procedure = "dbo.[GetNodeTagsDesc]";
-                        var value = new
-                        {
-                            NodeID = nodeId
-                        };
-                        List<string> results = new List<string>(await connection.QueryAsync<string>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
-                        if (nodeId == nodeIDs.First())
-                        {
-                            tags = results;
-                        }
-                        tags = tags.Intersect(results).ToList();
-                    }
-
-                    return Tuple.Create(tags, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
-                }
-            }
-            catch (SqlException ex)
-            {
-                switch (ex.Number)
-                {
-                    default: return Tuple.Create(tags, "500: Database: " + ex.Message);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                // Rollback handled
-                throw;
-            }
-            catch (Exception ex)
-            {
-                return Tuple.Create(tags, "500: Database: " + ex.Message);
-            }
-        }
-
         /// <summary>
-        ///     CreateTagAsync(tagName, count)
-        ///         Creaes a tag in bank with a count of tags
+        ///      Creaes a tag in bank with a count of tags
         /// </summary>
-        /// <param name="tagName">Tag</param>
+        /// <param name="tagName">Tag name</param>
         /// <param name="count">Number of nodes tagged</param>
         /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns>String status result</returns>
@@ -2115,7 +2074,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// </summary>
         /// <param name="tagName">String tag to delete from bank</param>
         /// <param name="cancellationToken">Cancellation Token</param>
-        /// <returns>String status</returns>
+        /// <returns>String status result</returns>
         public async Task<string> DeleteTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -2171,7 +2130,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         ///         Returns a list of tags in tag bank
         /// </summary>
         /// <param name="cancellationToken">Cancellation  Token</param>
-        /// <returns>List of tags and sting status</returns>
+        /// <returns>List of tags and string status result</returns>
         public async Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
            
@@ -2211,41 +2170,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             catch (Exception ex)
             {
                 return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
-            }
-        }
-
-        public async Task<Tuple<List<string>, string>> GetTagsDescAsync(CancellationToken cancellationToken = default(CancellationToken))
-        {
-            List<string> tags = null;
-            try
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                using (var connection = new SqlConnection(_options.SqlConnectionString))
-                {
-                    await connection.OpenAsync();
-                    var procedure = "dbo.[GetTagsDesc]";
-                    var value = new { };
-                    List<string> results = new List<string>(await connection.QueryAsync<string>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
-
-
-                    return Tuple.Create(results, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
-                }
-            }
-            catch (SqlException ex)
-            {
-                switch (ex.Number)
-                {
-                    default: return Tuple.Create(tags, "500: Database: " + ex.Message);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                // Rollback handled
-                throw;
-            }
-            catch (Exception ex)
-            {
-                return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
             }
         }
 
