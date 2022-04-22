@@ -253,7 +253,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
            */
             List<long> case4 = new List<long>() { };
             List<string> tags4 = new List<string> { };
-            string expected4 = await messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess);
+            string expected4 = await messageBank.GetMessage(IMessageBank.Responses.nodeNotFound);
 
             //Act
             Tuple<List<string>, string> result0 = await sqlDAO.GetNodeTagsAsync(case0, cancellationTokenSource.Token);

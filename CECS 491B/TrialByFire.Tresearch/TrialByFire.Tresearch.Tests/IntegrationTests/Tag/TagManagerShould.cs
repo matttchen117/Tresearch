@@ -360,7 +360,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             //UserAccount  does not exist
             IRoleIdentity roleIdentity13 = new RoleIdentity(true, "tagManagerNoAccount@tresearch.system", "user", "");
             var tagNameCase13 = "Tresearch Manager Delete Tag3";
-            var nodeListCase13 = new List<int> { };
+            var nodeListCase13 = new List<int> { 0 };
             var resultCase13 = IMessageBank.Responses.accountNotFound;
 
             return new[]
@@ -486,7 +486,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             //UserAccount  does not exist
             IRoleIdentity roleIdentity11 = new RoleIdentity(true, "tagManagerNoAccount@tresearch.system", "user", "");
             var tagListCase11 = new List<string> { };
-            var nodeListCase11 = new List<int> { };
+            var nodeListCase11 = new List<int> { 0 };
             var resultCase11 = IMessageBank.Responses.accountNotFound;
 
             return new[]
