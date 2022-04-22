@@ -144,6 +144,24 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             Assert.Equal(expectedTags, resultTags);
         }
 
+        [Theory]
+        [MemberData(nameof(RemoveTagData))]
+        public async Task RemoveNodeTagAsync(List<long> nodeIDs, string tagName, IMessageBank.Responses response)
+        {
+            //Arrange
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
+            ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            string expected = await messageBank.GetMessage(response);
+
+            //Act
+            string result = await sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
+
+            //Arrange
+            Assert.Equal(expected, result);
+        }
+
+
         public static IEnumerable<object[]> CreateTagData()
         {
             /**
@@ -363,42 +381,28 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             };
         }
 
-        [Theory]
-        [MemberData(nameof(RemoveTagData))]
-        public async Task RemoveNodeTagAsync(List<long> nodeIDs, string tagName, string expected)
-        {
-            //Arrange
-            ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-
-            //Act
-            string result = await sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
-
-            //Arrange
-            Assert.Equal(expected, result);
-        }
-
+        
         public static IEnumerable<object[]> RemoveTagData()
         {
             //nodes already have tag
             var tagNameCase0 = "Tresearch SqlDAO Delete Tag1";
             var nodeListCase0 = new List<long> { 2022030536, 2022030537, 2022030538 };
-            var resultCase0 = "200: Server: Tag removed from node(s).";
+            var resultCase0 = IMessageBank.Responses.tagRemoveSuccess;
 
             //nodes do not contain these tags already
             var tagNameCase1 = "Tresearch SqlDAO Delete Tag2";
             var nodeListCase1 = new List<long> { 2022030536, 2022030537, 2022030538 };
-            var resultCase1 = "200: Server: Tag removed from node(s).";
+            var resultCase1 = IMessageBank.Responses.tagRemoveSuccess;
 
             // node doesn't already contain tag
             var tagNameCase2 = "Tresearch SqlDAO Delete Tag3";
             var nodeListCase2 = new List<long> { 2022030536 };
-            var resultCase2 = "200: Server: Tag removed from node(s).";
+            var resultCase2 = IMessageBank.Responses.tagRemoveSuccess;
 
             //Node already has tag
             var tagNameCase3 = "Tresearch SqlDAO Delete Tag4";
             var nodeListCase3 = new List<long> { };
-            var resultCase3 = "200: Server: Tag removed from node(s).";
+            var resultCase3 = IMessageBank.Responses.nodeNotFound;
 
             return new[]
             {

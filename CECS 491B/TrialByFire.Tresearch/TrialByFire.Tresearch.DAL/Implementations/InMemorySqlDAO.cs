@@ -1009,7 +1009,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Check if tag is null or empty
-                if (tagName == null || tagName.Equals(""))
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
 
                 // Check if node list is null or empty
@@ -1024,6 +1024,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 for (int i = 0; i  < nodeIDs.Count; i++)
                 {
                     INodeTag nodeTag = new NodeTag(nodeIDs[i], tagName);
+
                     if (!InMemoryDatabase.NodeTags.Contains(nodeTag))
                         InMemoryDatabase.NodeTags.Add(nodeTag);
                 }
@@ -1050,6 +1051,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// <returns>String status result</returns>
         public async Task<string> RemoveTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
+            // Check if tag name is null, empty string or all space
+            if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+            // Check if node list is null or empty
+            if (nodeIDs == null || nodeIDs.Count() <= 0)
+                return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+
             for (int i = 0; i  < nodeIDs.Count; i++)
             {
                 INodeTag nodeTag = new NodeTag(nodeIDs[i], tagName);
@@ -1079,8 +1087,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 if (nodeIDs == null ||nodeIDs.Count() <= 0)
                     return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound));
 
-
-                
                 for (int i = 0; i < nodeIDs.Count; i++)
                 {
 
@@ -1129,7 +1135,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
 
                 //Check input
-                if (tagName == null || tagName.Equals(""))
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
 
                 // Check tag count
@@ -1180,7 +1186,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
                 
                 // Check input
-                if (tagName == null || tagName.Equals(""))
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
 
                 ITag tag = new Tag(tagName);

@@ -179,6 +179,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 
             //Arrange
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
+            Assert.Equal(expectedTags, result.Value);
         }
 
         /// <summary>

@@ -40,27 +40,16 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Check if tag is null or empty
-                if(tagName != null || tagName.Equals(""))
-                {
-                    //Check if list contains more than one node
-                    if (nodeIDs == null || nodeIDs.Count > 0)
-                    {
-                        //Add Tag to Node
-                        string result = await _sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationToken).ConfigureAwait(false);
-                        return result;
-                    }
-                    else
-                    {
-                        // No nodes passed in.
-                        return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
-                    }
-                }
-                else
-                {
-                    // tag is null
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
-                }
-                   
+                //Check if list contains more than one node
+                if (nodeIDs == null || nodeIDs.Count <= 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+
+                string result = await _sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationToken).ConfigureAwait(false);
+                
+                return result;
+
             }
             catch (OperationCanceledException)
             {
@@ -88,27 +77,15 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Check if tag is null or empty
-                if(tagName != null || tagName.Equals(""))
-                {
-                    //Check if list contains at least one node
-                    if (nodeIDs == null || nodeIDs.Count > 0)
-                    {
-                        //Remove tag from node(s)
-                        string result = await _sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationToken).ConfigureAwait(false);
-                        return result;
-                    }
-                    else
-                    {
-                        // list is null or no node passed in
-                        return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
-                    }
-                }
-                else
-                {
-                    // Tag is null or empty
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
-                }
-                    
+                //Check if list contains more than one node
+                if (nodeIDs == null || nodeIDs.Count <= 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+
+                string result = await _sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationToken).ConfigureAwait(false);
+                return result;
+
             }
             catch (OperationCanceledException)
             {
@@ -135,19 +112,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
-                // Check if list contains at least one node
-                if (nodeIDs == null || nodeIDs.Count > 0)
-                {
-                    // Retrieve lsit of tags from database
-                    Tuple<List<string>, string> result = await _sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationToken).ConfigureAwait(false);
-                    return result;
-                }
-                else
-                {
-                    // No nodes passed in
-                    return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false));
-                }
-                    
+                //Check if list contains more than one node
+                if (nodeIDs == null || nodeIDs.Count <= 0)
+                    return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false));
+
+                Tuple<List<string>, string> result = await _sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationToken).ConfigureAwait(false);
+                
+                return result;
+
             }
             catch (OperationCanceledException)
             {
@@ -173,28 +145,18 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
-                
-                // Check if tag is null
-                if(tagName != null)
-                {
-                    // Check if the count is negative (not possible)
-                    if (count >= 0)
-                    {
-                        //Create tag in bank
-                        string result = await _sqlDAO.CreateTagAsync(tagName, count, cancellationToken).ConfigureAwait(false);
-                        return result;
-                    }
-                    else
-                    {
-                        // Invalid count (negative)
-                        return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid).ConfigureAwait(false);
-                    }
-                }
-                else
-                {
-                    // Tag name is null
+
+                // Check if tag is null or empty
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
-                }
+
+                // Validate count (must be greater or eaqual to 0)
+                if(count < 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid).ConfigureAwait(false);
+
+                string result = await _sqlDAO.CreateTagAsync(tagName, count, cancellationToken).ConfigureAwait(false);
+                return result;
+                
                 
             }
             catch (OperationCanceledException)
@@ -220,6 +182,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
+
                 Tuple<List<ITag>, string> result = await _sqlDAO.GetTagsAsync(cancellationToken).ConfigureAwait(false);
                 return result;
             }
@@ -246,17 +209,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
-                // Check if the tag name is null
-                if(tagName != null)
-                {
-                    string result = await _sqlDAO.DeleteTagAsync(tagName, cancellationToken).ConfigureAwait(false);
-                    return result;
-                }
-                else
-                {
-                    // tag name is null
+                // Check if tag is null or empty
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
-                }      
+
+                // Delete tag
+                string result = await _sqlDAO.DeleteTagAsync(tagName, cancellationToken).ConfigureAwait(false);
+
+                return result;
             }
             catch (OperationCanceledException)
             {

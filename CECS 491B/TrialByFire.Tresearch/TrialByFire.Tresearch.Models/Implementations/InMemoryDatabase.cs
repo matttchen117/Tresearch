@@ -154,6 +154,19 @@ namespace TrialByFire.Tresearch.Models.Implementations
             accounts.Add(new UserAccount("tagManagerIntegration3@tresearch.system", "myPassphrase", "user", true, true));
             accounts.Add(new UserAccount("tagManagerIntegrationAdmin1@tresearch.system", "myPassphrase", "admin", true, true));
 
+            /*
+             * Initialize accounts for InMemoryTagControllerShould
+             */
+            accounts.Add(new UserAccount("tagControllerIntegration1@tresearch.system", "myPassphrase", "user", true, true));
+            accounts.Add(new UserAccount("tagControllerIntegration2@tresearch.system", "myPassphrase", "user", true, true));
+            accounts.Add(new UserAccount("tagControllerIntegrationNotEnabled@tresearch.system", "myPassphrase", "user", false, true));
+            accounts.Add(new UserAccount("tagControllerIntegrationNotConfirmed@tresearch.system", "myPassphrase", "user", true, false));
+            accounts.Add(new UserAccount("tagControllerIntegration3@tresearch.system", "myPassphrase", "user", true, true));
+            accounts.Add(new UserAccount("tagControllerIntegrationAdmin1@tresearch.system", "myPassphrase", "admin", true, true));
+
+
+
+
             return accounts;
         }
 
@@ -214,6 +227,24 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodes.Add(new Node("571510127f69c2e3dee263541e8551d8339dc1d98c4b253b5feb5202b41d420dd55c172818feeb5fd7bf85c067c5af142cb930fac9d776b644428adb4b9c4f7b", 8019303360, 8019303360, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
             nodes.Add(new Node("571510127f69c2e3dee263541e8551d8339dc1d98c4b253b5feb5202b41d420dd55c172818feeb5fd7bf85c067c5af142cb930fac9d776b644428adb4b9c4f7b", 8019303361, 8019303361, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
 
+            nodes.Add(new Node("09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5", 9019303350, 9019303350, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5", 9019303351, 9019303351, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5", 9019303352, 9019303352, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+
+
+            nodes.Add(new Node("20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb", 9019303353, 9019303353, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb", 9019303354, 9019303353, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+
+
+            nodes.Add(new Node("0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f", 9019303356, 9019303356, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f", 9019303357, 9019303357, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f", 9019303358, 9019303358, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f", 9019303359, 9019303359, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f", 9019303361, 9019303361, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f", 9019303360, 9019303360, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+
+
+
             return nodes;
         }
 
@@ -265,6 +296,26 @@ namespace TrialByFire.Tresearch.Models.Implementations
             tags.Add(new Tag("Tresearch Manager Tag Exist"));
 
             tags.Add(new Tag("Tresearch Manager REMOVE Tag Exist"));
+
+
+            /*
+             * Initialize Tags for InMemoryTagControllerShould
+             */
+            tags.Add(new Tag("Tresearch Controller Add Tag1", 0));
+            tags.Add(new Tag("Tresearch Controller Add Tag2", 0));
+            tags.Add(new Tag("Tresearch Controller Add Tag3", 0));
+            tags.Add(new Tag("Tresearch Controller Add Tag4", 0));
+            tags.Add(new Tag("Tresearch Controller Tag Exist", 0));
+            tags.Add(new Tag("Tresearch Controller REMOVE Tag Exist", 0));
+            tags.Add(new Tag("Tresearch Controller REMOVE Exist and Tagged", 1));
+            tags.Add(new Tag("Tresearch Controller Get Tag1", 0));
+            tags.Add(new Tag("Tresearch Controller Get Tag2", 0));
+            tags.Add(new Tag("Tresearch Controller Get Tag3", 0));
+            tags.Add(new Tag("Tresearch Controller Get Tag4", 0));
+            tags.Add(new Tag("Tresearch Controller Delete Tag1", 0));
+            tags.Add(new Tag("Tresearch Controller Delete Tag2", 0));
+            tags.Add(new Tag("Tresearch Controller Delete Tag3", 0));
+            tags.Add(new Tag("Tresearch Controller Delete Tag4", 0));
 
             return tags;
         }
@@ -341,6 +392,43 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodeTags.Add(new NodeTag(8019303358, "Tresearch Manager Get Tag3"));
 
             nodeTags.Add(new NodeTag(8019303360, "Tresearch Manager Get Tag1"));
+
+
+            nodeTags.Add(new NodeTag(9019303350, "Tresearch Controller Add Tag1"));
+            nodeTags.Add(new NodeTag(9019303351, "Tresearch Controller Add Tag1"));
+            nodeTags.Add(new NodeTag(9019303352, "Tresearch Controller Add Tag1"));
+
+            // Case 2: In memory tag manager should
+            nodeTags.Add(new NodeTag(9019303350, "Tresearch Controller Add Tag3"));
+
+            // Case 6: In memory tag manager should
+            nodeTags.Add(new NodeTag(9019303351, "Tresearch Controller Add Tag3"));
+
+            nodeTags.Add(new NodeTag(55, "Tresearch Controller REMOVE Exist and Tagged"));
+
+            nodeTags.Add(new NodeTag(9019303356, "Tresearch Controller Get Tag1"));
+            nodeTags.Add(new NodeTag(9019303356, "Tresearch Controller Get Tag2"));
+
+            nodeTags.Add(new NodeTag(9019303357, "Tresearch Controller Get Tag1"));
+            nodeTags.Add(new NodeTag(9019303357, "Tresearch Controller Get Tag2"));
+
+            nodeTags.Add(new NodeTag(9019303358, "Tresearch Controller Get Tag1"));
+            nodeTags.Add(new NodeTag(9019303358, "Tresearch Controller Get Tag2"));
+            nodeTags.Add(new NodeTag(9019303358, "Tresearch Controller Get Tag3"));
+            nodeTags.Add(new NodeTag(9019303359, "Tresearch Controller Get Tag2"));
+            nodeTags.Add(new NodeTag(9019303360, "Tresearch Controller Get Tag1"));
+
+            // Case 0: In memory tag manager should
+            nodeTags.Add(new NodeTag(9019303350, "Tresearch Controller Delete Tag1"));
+            nodeTags.Add(new NodeTag(9019303351, "Tresearch Controller Delete Tag1"));
+            nodeTags.Add(new NodeTag(9019303352, "Tresearch Controller Delete Tag1"));
+
+            // Case 2: In memory tag manager should
+            nodeTags.Add(new NodeTag(9019303350, "Tresearch Controller Delete Tag3"));
+
+            // Case 6: In memory tag manager should
+            nodeTags.Add(new NodeTag(9019303351, "Tresearch Controller DELETE Tag3"));
+
 
             return nodeTags;
         }

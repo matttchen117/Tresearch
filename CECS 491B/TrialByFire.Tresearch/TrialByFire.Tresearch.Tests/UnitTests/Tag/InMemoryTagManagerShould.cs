@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿
+using Microsoft.Extensions.DependencyInjection;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
@@ -33,7 +34,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
-            
+
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
@@ -429,7 +430,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             //UserAccount  does not exist
             IRoleIdentity roleIdentity13 = new RoleIdentity(true, "tagManagerNoAccount@tresearch.system", "user", "");
             var tagNameCase13 = "Tresearch Manager Delete Tag3";
-            var nodeListCase13 = new List<long> { };
+            var nodeListCase13 = new List<long> { 8019303366 };
             var resultCase13 = IMessageBank.Responses.accountNotFound;
 
             return new[]
@@ -532,7 +533,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             //UserAccount  does not exist
             IRoleIdentity roleIdentity11 = new RoleIdentity(true, "tagManagerNoAccount@tresearch.system", "user", "");
             var tagListCase11 = new List<string> { };
-            var nodeListCase11 = new List<long> { };
+            var nodeListCase11 = new List<long> { 8019303366 };
             var resultCase11 = IMessageBank.Responses.accountNotFound;
 
             return new[]

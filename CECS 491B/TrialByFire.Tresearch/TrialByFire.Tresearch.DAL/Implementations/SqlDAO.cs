@@ -1780,7 +1780,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Check if tag is null or empty
-                if (tagName == null || tagName.Equals(""))
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
 
                 // Check if node list is null or empty
@@ -1861,6 +1861,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 //Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if tag name is null, empty string or all space
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                // Check if node list is null or empty
+                if (nodeIDs == null || nodeIDs.Count() <= 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+
                 //Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
@@ -1930,6 +1938,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 //Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
+                
+                // Check if node list is null or empty
+                if (nodeIDs == null || nodeIDs.Count() <= 0)
+                    return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false));
+
                 //Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
@@ -2006,7 +2019,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
 
                 //Check tag input
-                if (tagName == null || tagName.Equals(""))
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
 
                 // Check tag count
@@ -2083,9 +2096,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Check input
-                if (tagName == null || tagName.Equals(""))
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
-
 
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
@@ -2253,6 +2265,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             INode? nullNode = null;
             try
             {
+
+
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var procedure = "dbo.[GetNode]";

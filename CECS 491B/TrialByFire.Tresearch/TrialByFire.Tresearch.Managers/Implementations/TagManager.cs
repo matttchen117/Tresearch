@@ -46,7 +46,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);              
 
                 //Check if user is authenticated
-                if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
+                if (Thread.CurrentPrincipal != null && !Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                {
                     //Get user's role
                     string role = "";
@@ -106,9 +106,18 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         {
             try
             {
+
                 cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if tag name is null, empty string or all space
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                // Check if node list is null or empty
+                if (nodeIDs == null || nodeIDs.Count() <= 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+
                 //Check if the user is authenticated
-                if(!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
+                if (Thread.CurrentPrincipal != null && !Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
                     //Get user's role
                     string role = "";
@@ -167,8 +176,13 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if node list is null or empty
+                if (nodeIDs == null || nodeIDs.Count() <= 0)
+                    return Tuple.Create(new List<string>() , await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false));
+
                 //Check if the user is authenticated
-                if(!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
+                if (Thread.CurrentPrincipal != null && !Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
                     //Get user's role
                     string role = "";
@@ -229,8 +243,13 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if tag name is null, empty string or all space
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+
                 //Check if the user is authenticated
-                if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
+                if (Thread.CurrentPrincipal != null && !Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
                     //Get user's role
                     string role = "";
@@ -281,8 +300,13 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if tag name is null, empty string or all space
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+
                 //Check if the user is authenticated
-                if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
+                if (Thread.CurrentPrincipal != null && !Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
                     //Get user's role
                     string role = "";
@@ -332,11 +356,13 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
+
+                // Check if the user has known role and is authenticated
+                if (Thread.CurrentPrincipal != null && !Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
                     //Get user's role
                     string role = "";
-                    if (Thread.CurrentPrincipal.IsInRole(_options.User))
+                    if (Thread.CurrentPrincipal != null && Thread.CurrentPrincipal.IsInRole(_options.User))
                         role = _options.User;
                     else if (Thread.CurrentPrincipal.IsInRole(_options.Admin))
                         role = _options.Admin;
@@ -349,7 +375,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     //Verify if account is enabled and confirmed
                     string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken);
 
-                    //Check if account is enabled and confirme, if not return error
+                    //Check if account is enabled and confirmed result, if not return error
                     if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
                         return Tuple.Create(new List<ITag>(), resultVerifyAccount);
 
