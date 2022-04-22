@@ -6,6 +6,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
 {
     public interface INodeSearchController
     {
-        public Task<ActionResult<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput);
+        public Task<ActionResult<IEnumerable<Node>>> SearchForNodeAsync(string search, IEnumerable<string> tags, bool filterByRating,
+            bool filterByTime);
     }
 }

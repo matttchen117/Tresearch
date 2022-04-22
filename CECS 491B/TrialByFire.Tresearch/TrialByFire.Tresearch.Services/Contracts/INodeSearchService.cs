@@ -10,6 +10,6 @@ namespace TrialByFire.Tresearch.Services.Contracts
 {
     public interface INodeSearchService
     {
-        public Task<IResponse<IList<Node>>> SearchForNodeAsync(ISearchInput searchInput);
+        public Task<IResponse<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput);
     }
 }

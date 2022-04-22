@@ -21,7 +21,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _options = options.Value;
         }
 
-        public async Task<IResponse<IList<Node>>> SearchForNodeAsync(ISearchInput searchInput)
+        public async Task<IResponse<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput)
         {
             try
             {
@@ -31,21 +31,32 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var procedure = "[SearchNodes]";
                     var parameters = new DynamicParameters();
                     parameters.Add("Search", searchInput.Search);
-                    var nodes = await connection.QueryAsync<Node, NodeTag, NodeRating, Node>(procedure, (node, tag, rating) =>
+                    var nodes = await connection.QueryAsync<Node, NodeTag, int, Node>(procedure, (node, tag, rating) =>
                     {
-                        node.Tags.Add(tag);
-                        node.Rating = rating.Rating;
+                        if(!(tag is null))
+                        {
+                            tag.NodeID = node.NodeID;
+                            node.Tags.Add(tag);
+                        } 
+                        node.RatingScore = rating;
                         return node;
                     },
                     parameters,
                     commandType: CommandType.StoredProcedure,
-                    splitOn: "TagName");
-                    return new SearchResponse<IList<Node>>("", nodes.ToList(), 200, true);
+                    splitOn: "TagName, Rating");
+                    var results = nodes.GroupBy(n => n.NodeID).ToList().Select(g =>
+                    {
+                        var groupedNode = g.FirstOrDefault();
+                        // these are addings the nulls
+                        groupedNode.Tags = g.Select(n => n.Tags.SingleOrDefault()).Where(nt => nt != null).ToList();
+                        return groupedNode;
+                    }).ToList();
+                    return new SearchResponse<IEnumerable<Node>>("", results, 200, true);
                 }
             }catch(Exception ex)
             {
-                return new SearchResponse<IList<Node>>(await _messageBank.GetMessage(
-                    IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 400, false);
+                return new SearchResponse<IEnumerable<Node>>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
             }
         }
         public async Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))

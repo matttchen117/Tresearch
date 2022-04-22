@@ -50,7 +50,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
             {
                 StatusCode = Convert.ToInt32(expects[0])
             };
-            Node node = new Node(nodeID, parentID, nodeTitle, summary, visibility, accountOwner);
+            Node node = new Node(accountOwner, nodeID, parentID, nodeTitle, summary, DateTime.UtcNow, visibility, false);
 
             //Act
             IActionResult result = await createNodeController.CreateNodeAsync(username, node).ConfigureAwait(false);

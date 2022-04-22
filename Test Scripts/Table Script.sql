@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS DailyLogins
 DROP TABLE IF EXISTS NodesCreated
 DROP TABLE IF EXISTS ViewsWebPages
 DROP TABLE IF EXISTS TopSearches
-DROP TABLE IF EXISTS UserRatings
+DROP TABLE IF EXISTS NodeRatings
 DROP TABLE IF EXISTS NodeTags
 DROP TABLE IF EXISTS Tags
 DROP TABLE IF EXISTS Nodes
@@ -63,10 +63,8 @@ DROP PROCEDURE IF EXISTS GetUserHash
 DROP PROCEDURE IF EXISTS SearchNodes
 DROP PROCEDURE IF EXISTS RefreshSession
 
-DROP TYPE IF EXISTS SearchTagList
-
 CREATE TABLE [dbo].Accounts(
-	UserID INT IDENTITY(1,1),
+	UserID INT IDENTITY(1,1) NOT NULL,
     Username VARCHAR(100),
     Passphrase VARCHAR(128),
     AuthorizationLevel VARCHAR(40),
@@ -77,7 +75,7 @@ CREATE TABLE [dbo].Accounts(
 );
 
 CREATE TABLE [dbo].UserHashTable(
-	UserID INT,
+	UserID INT NULL,
 	UserHash VARCHAR(128),
 	CONSTRAINT user_hashtable_fk FOREIGN KEY (UserID) REFERENCES Accounts(UserID),
 	CONSTRAINT user_hashtable_pk PRIMARY KEY(UserHash)
@@ -94,6 +92,8 @@ CREATE TABLE [dbo].OTPClaims(
 	CONSTRAINT otp_claims_pk PRIMARY KEY(Username, AuthorizationLevel)
 );
 
+-- In order to not allow duplicate titled nodes per user, PK needs to be UserHash + NodeTitle
+-- Parent will be determined by the same thing
 CREATE TABLE [dbo].Nodes(
     UserHash VARCHAR(128),
     NodeID BIGINT Identity(1,1) PRIMARY KEY,
@@ -103,7 +103,9 @@ CREATE TABLE [dbo].Nodes(
 	TimeModified DATETIME,
     Visibility BIT,
     Deleted BIT,
-    CONSTRAINT node_owner_fk FOREIGN KEY(UserHash) REFERENCES UserHashTable(UserHash)
+    CONSTRAINT node_owner_fk FOREIGN KEY(UserHash) REFERENCES UserHashTable(UserHash),
+	CONSTRAINT nodes_parent_fk FOREIGN KEY(NodeID) REFERENCES Nodes(NodeID),
+	UNIQUE (UserHash, NodeTitle)
 );
 
 CREATE TABLE [dbo].Tags(
@@ -115,11 +117,11 @@ CREATE TABLE [dbo].NodeTags(
     TagName VARCHAR(100),
     NodeID BIGINT,
 	CONSTRAINT tag_name_fk FOREIGN KEY (TagName) REFERENCES Tags(TagName),
-	CONSTRAINT node_tags_pk PRIMARY KEY(NodeID, TagName),
-	CONSTRAINT node_id_fk FOREIGN KEY (NodeID) REFERENCES Nodes(NodeID)
+	CONSTRAINT node_id_fk FOREIGN KEY (NodeID) REFERENCES Nodes(NodeID),
+	CONSTRAINT node_tags_pk PRIMARY KEY(NodeID, TagName)
 );
 
-CREATE TABLE [dbo].UserRatings(
+CREATE TABLE [dbo].NodeRatings(
 	UserHash VARCHAR(128),
 	NodeID BIGINT,
 	Rating INT,
@@ -606,17 +608,6 @@ BEGIN
 END
 GO
 
-CREATE TYPE SearchNodeList AS TABLE
-(
-	UserHash VARCHAR(128),
-	NodeID BIGINT PRIMARY KEY,
-	NodeParentID BIGINT,
-	NodeTitle VARCHAR(100),
-	Summary VARCHAR(750),
-	Visibility BIT
-);
-GO
-
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -628,15 +619,14 @@ GO
 -- ============================================= 
 CREATE PROCEDURE SearchNodes 
 	-- Add the parameters for the stored procedure here
-	@Search VARCHAR(100), -- match NodeTitle length
-	@Result int OUTPUT
+	@Search VARCHAR(100) -- match NodeTitle length
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-	IF EXISTS (SELECT * FROM Searches WHERE Search = @Search)
+	IF EXISTS (SELECT * FROM Searches WHERE UPPER(Search) = UPPER(@Search) OR LOWER(Search) = LOWER(@Search))
 		BEGIN
 			UPDATE Searches SET Times = Times+1;
 		END
@@ -645,9 +635,10 @@ BEGIN
 			INSERT INTO Searches(Search, Times) VALUES (@Search, 1)
 		END
 	
-	SELECT Nodes.UserHash, Nodes.NodeID, NodeTitle, TagName, Rating 
-		FROM (Nodes INNER JOIN NodeTags ON Nodes.NodeID = NodeTags.NodeID) INNER JOIN UserRatings ON Nodes.UserHash = UserRatings.UserHash AND Nodes.NodeID = UserRatings.NodeID
-		WHERE NodeTitle LIKE ('%' + @Search + '%') AND Visibility = 1 AND Deleted = 0
+	SELECT Nodes.UserHash, Nodes.NodeID, NodeTitle, TimeModified, TagName, COALESCE(SUM(Rating),0) AS Rating
+		FROM (Nodes LEFT JOIN NodeTags ON Nodes.NodeID = NodeTags.NodeID) LEFT JOIN NodeRatings ON Nodes.NodeID = NodeRatings.NodeID
+		WHERE (UPPER(NodeTitle) LIKE ('%' + UPPER(@Search) + '%') OR LOWER(NodeTitle) LIKE ('%' + LOWER(@Search) + '%')) AND Visibility = 1 AND Deleted = 0
+		GROUP BY Nodes.UserHash, Nodes.NodeID, NodeTitle, TimeModified, TagName
 	-- right now just seeing if word is in title at all (exact match, is a word in it, is a substring of a word in it)
 	-- can pass in a List, where the list is made of up the individual words of the searched phrase, keeping it simple for now, in future should optimize with this but take out filler words
 	-- (the, and, etc.)
@@ -1178,13 +1169,13 @@ CREATE PROCEDURE [dbo].[RateNode]
 )
 as
 BEGIN
-	IF EXISTS (SELECT * FROM UserRatings WHERE UserHash = @UserHash AND NodeID = @NodeID)
+	IF EXISTS (SELECT * FROM NodeRatings WHERE UserHash = @UserHash AND NodeID = @NodeID)
 		BEGIN
-			UPDATE UserRatings SET Rating = @Rating WHERE UserHash = @UserHash AND NodeID = @NodeID;
+			UPDATE NodeRatings SET Rating = @Rating WHERE UserHash = @UserHash AND NodeID = @NodeID;
 		END
 	ELSE
 		BEGIN
-			INSERT UserRatings(UserHash, NodeID, Rating) VALUES (@UserHash, @NodeID, @Rating);
+			INSERT NodeRatings(UserHash, NodeID, Rating) VALUES (@UserHash, @NodeID, @Rating);
 		END
 END
 

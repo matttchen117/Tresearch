@@ -42,7 +42,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
             }
             ICreateNodeManager createNodeManager = TestProvider.GetService<ICreateNodeManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            Node node = new Node(nodeID, parentID, nodeTitle, summary, visibility, accountOwner);
+            Node node = new Node(accountOwner, nodeID, parentID, nodeTitle, summary, DateTime.UtcNow, visibility, false);
 
             //Act
             string result = await createNodeManager.CreateNodeAsync(username, node, cancellationTokenSource.Token).ConfigureAwait(false);

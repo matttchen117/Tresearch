@@ -45,6 +45,9 @@ namespace TrialByFire.Tresearch.Models.Contracts
             logTimeExceeded,
             logRollback,
 
+            nodeSearchSuccess,
+
+
             tagAddSuccess,
             tagRemoveSuccess,
             tagCreateSuccess,

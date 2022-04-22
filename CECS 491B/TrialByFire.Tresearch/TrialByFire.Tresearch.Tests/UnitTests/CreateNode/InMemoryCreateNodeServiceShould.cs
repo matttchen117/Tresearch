@@ -35,7 +35,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CreateNode
             //Arrange
             ICreateNodeService createNodeService = TestProvider.GetRequiredService<ICreateNodeService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            Node node = new Node(nodeID, parentID, nodeTitle, summary, visibility, accountOwner);
+            Node node = new Node(accountOwner, nodeID, parentID, nodeTitle, summary, DateTime.UtcNow, visibility, false);
 
             //Act
             string result = await createNodeService.CreateNodeAsync(username, node, cancellationTokenSource.Token).ConfigureAwait(false);

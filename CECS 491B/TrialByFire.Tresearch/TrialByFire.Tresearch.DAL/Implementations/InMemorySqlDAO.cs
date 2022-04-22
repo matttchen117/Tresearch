@@ -20,23 +20,28 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = new MessageBank();
         }
 
-        public async Task<IResponse<IList<Node>>> SearchForNodeAsync(ISearchInput searchInput)
+        public async Task<IResponse<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput)
         {
             try
             {
-                List<Node> nodes = new List<Node>();
+                IList<Node> nodes = new List<Node>();
                 foreach(Node n in InMemoryDatabase.Nodes)
                 {
-                    if(n.NodeTitle.Contains(searchInput.Search))
+                    if(n.Visibility != false && n.Deleted != true)
                     {
-                        nodes.Add(n);
+                        if (n.NodeTitle.Contains(searchInput.Search, StringComparison.OrdinalIgnoreCase))
+                        {
+                            n.Tags = InMemoryDatabase.NodeTags.Where(nt => nt.NodeID == n.NodeID).ToList();
+                            n.RatingScore = InMemoryDatabase.NodeRatings.Where(nr => nr.NodeID == n.NodeID).Sum(nr => nr.Rating);
+                            nodes.Add(n);
+                        }
                     }
                 }
-                return new SearchResponse<IList<Node>>("", nodes, 200, true);
+                return new SearchResponse<IEnumerable<Node>>("", nodes, 200, true);
             }
             catch (Exception ex)
             {
-                return new SearchResponse<IList<Node>>(await _messageBank.GetMessage(
+                return new SearchResponse<IEnumerable<Node>>(await _messageBank.GetMessage(
                     IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 400, false);
             }
         }
@@ -225,11 +230,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             InMemoryDatabase.Nodes.RemoveAt(j);
                         }
                     }
-                    for (int j = 0; j < InMemoryDatabase.Ratings.Count; j++)
+                    for (int j = 0; j < InMemoryDatabase.NodeRatings.Count; j++)
                     {
-                        if (InMemoryDatabase.Ratings[j].UserHash.Equals(accountName))
+                        if (InMemoryDatabase.NodeRatings[j].UserHash.Equals(accountName))
                         {
-                            InMemoryDatabase.Ratings.RemoveAt(j);
+                            InMemoryDatabase.NodeRatings.RemoveAt(j);
                         }
                     }
                     for (int j = 0; j < InMemoryDatabase.ConfirmationLinks.Count; j++)
@@ -1096,7 +1101,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public async Task<string> RateNodeAsync(string userHash, long nodeID, int rating, CancellationToken cancellationToken = default(CancellationToken))
         {
-            InMemoryDatabase.Ratings.Add(new NodeRating(userHash, nodeID, rating));
+            InMemoryDatabase.NodeRatings.Add(new NodeRating(userHash, nodeID, rating));
             return await _messageBank.GetMessage(IMessageBank.Responses.userRateSuccess);
         }
 

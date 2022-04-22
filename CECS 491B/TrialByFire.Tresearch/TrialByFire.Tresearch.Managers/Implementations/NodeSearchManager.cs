@@ -23,16 +23,43 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _nodeSearchService = nodeSearchService;
         }
 
-        public async Task<IResponse<IList<Node>>> SearchForNodeAsync(ISearchInput searchInput)
+        public async Task<IResponse<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput)
         {
             try
             {
                 searchInput.CancellationToken.ThrowIfCancellationRequested();
                 // filter search
-                return await _nodeSearchService.SearchForNodeAsync(searchInput).ConfigureAwait(false);
-            }catch(Exception ex)
+                IResponse<IEnumerable<Node>> response = await _nodeSearchService.SearchForNodeAsync(searchInput).ConfigureAwait(false);
+
+                if (searchInput.RatingHighToLow && searchInput.TimeNewToOld)
+                {
+                    response.Data = response.Data.OrderByDescending(nt => nt.TimeModified)
+                             .ThenByDescending(nt => nt.RatingScore)
+                             .ThenByDescending(nt => nt.ExactMatch)
+                             .ThenByDescending(nt => nt.TagScore).ToList();
+                }
+                else if (searchInput.TimeNewToOld)
+                {
+                    response.Data = response.Data.OrderByDescending(nt => nt.TimeModified)
+                             .ThenByDescending(nt => nt.ExactMatch)
+                             .ThenByDescending(nt => nt.TagScore).ToList();
+                }
+                else if (searchInput.RatingHighToLow)
+                {
+                    response.Data = response.Data.OrderByDescending(nt => nt.RatingScore)
+                             .ThenByDescending(nt => nt.ExactMatch)
+                             .ThenByDescending(nt => nt.TagScore).ToList();
+                }
+                else
+                {
+                    response.Data = response.Data.OrderByDescending(nt => nt.ExactMatch)
+                             .ThenByDescending(nt => nt.TagScore).ToList();
+                }
+                return response;
+            }
+            catch(Exception ex)
             {
-                return new SearchResponse<IList<Node>>(await _messageBank.GetMessage(
+                return new SearchResponse<IEnumerable<Node>>(await _messageBank.GetMessage(
                     IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 400, false);
             }
         }

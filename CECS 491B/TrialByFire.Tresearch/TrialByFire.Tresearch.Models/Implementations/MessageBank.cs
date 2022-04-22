@@ -33,7 +33,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.generic:
                     return "200: Server: success";
                 case Responses.unhandledException:
-                    return "600: Server: Unhandled Exception: ";
+                    return "500: Server: Unhandled Exception: {0}, Operation: {1}";
                 case Responses.operationCancelled:
                     return "400: Server: Operation Cancelled Exception: ";
 
@@ -89,6 +89,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "503: Datastore: Logging exceeded time: ";
                 case Responses.logRollback:
                     return "400: Database: Log rollback occurred.";
+                case Responses.nodeSearchSuccess:
+                    return "200: Server: Node search success. Search: {0}, Tags: {1}, FilterByRating: {2}, FilterByTime: {3}";
 
                 case Responses.tagAddSuccess:
                     return "200: Server: Tag added to node(s).";

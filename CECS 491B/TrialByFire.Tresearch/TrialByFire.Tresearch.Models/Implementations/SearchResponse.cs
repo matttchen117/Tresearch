@@ -13,14 +13,26 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public T? Data { get; set; }
         public int StatusCode { get; set; }
         public bool IsSuccess { get; set; }
-        public int ExactMatches { get; set; }
         public SearchResponse(string errorMessage, T data, int statusCode, bool isSuccess)
         {
             ErrorMessage = errorMessage;
             Data = data;
             StatusCode = statusCode;
             IsSuccess = isSuccess;
-            ExactMatches = 0;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if(!(obj == null))
+            {
+                if(obj is SearchResponse<T>)
+                {
+                    SearchResponse<T> response = (SearchResponse<T>)obj;
+                    return ErrorMessage.Equals(response.ErrorMessage) && (Data != null) ? Data.Equals(response.Data) : true
+                        && StatusCode == response.StatusCode && IsSuccess == response.IsSuccess;
+                }
+            }
+            return false;
         }
     }
 }

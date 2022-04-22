@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
+using System.Text;
 using System.Web.Http.Results;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Models.Contracts;
@@ -7,6 +9,9 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
+    [ApiController]
+    [EnableCors]
+    [Route("[controller]")]
     public class NodeSearchController : ControllerBase, INodeSearchController
     {
         private ILogManager _logManager;
@@ -20,30 +25,47 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _messageBank = messageBank;
         }
 
-        public async Task<ActionResult<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput)
+        [HttpGet]
+        [Route("search")]
+        public async Task<ActionResult<IEnumerable<Node>>> SearchForNodeAsync(string search, [FromQuery]IEnumerable<string> tags, bool filterByRating, 
+            bool filterByTime)
         {
+            StringBuilder stringBuilder = new StringBuilder();
             try
             {
-                IResponse<IList<Node>> response = await _nodeSearchManager.SearchForNodeAsync(searchInput).ConfigureAwait(false);
+                ISearchInput searchInput = new SearchInput(search, tags, filterByRating, filterByTime);
+                IResponse<IEnumerable<Node>> response = await _nodeSearchManager.SearchForNodeAsync(searchInput).ConfigureAwait(false);
                 if(response.IsSuccess && response.StatusCode == 200 && response.ErrorMessage.Equals(""))
                 {
-                    return new OkObjectResult(response.Data);
+                    stringBuilder.AppendFormat(await _messageBank.GetMessage(IMessageBank.Responses.nodeSearchSuccess).ConfigureAwait(false), search,
+                        string.Join(",", tags), filterByRating, filterByTime);
+                    await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Info, ILogManager.Categories.Server,
+                        stringBuilder.ToString());
+                    return response.Data.ToList();
                 }
                 else if (response.StatusCode >= 500)
                 {
+                    stringBuilder.AppendFormat(response.ErrorMessage, search, string.Join(",", tags), filterByRating, filterByTime);
+                    await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server,
+                        stringBuilder.ToString());
                     return StatusCode(response.StatusCode, response.ErrorMessage);
                 }
                 else
                 {
+                    stringBuilder.AppendFormat(response.ErrorMessage, search, string.Join(",", tags), filterByRating, filterByTime);
+                    await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Data,
+                        stringBuilder.ToString());
                     return new BadRequestObjectResult(response.ErrorMessage) { StatusCode = response.StatusCode };
                 }
             }
             catch(Exception ex)
             {
-                string message = await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
-                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server,
-                    message);
-                return new BadRequestObjectResult(message);
+                stringBuilder.AppendFormat(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false),
+                    ex.Message, stringBuilder.AppendFormat("Search: {0}, Tags: {1}, FilterByRating: {2}, FilterByTime: {3}", 
+                    search, string.Join(",", tags), filterByRating, filterByTime).ToString());
+                await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server,
+                    stringBuilder.ToString());
+                return BadRequest();
             }
         }
     }
