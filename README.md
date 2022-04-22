@@ -58,7 +58,13 @@ $ npm run start
   - Search tags using an autocomplete drop-down search bar
   - Administrators can create and delete tags from word bank
 - #### Design
-  - [Low Level Design](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams)
+  - [Sequence Diagrams](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams)
+    - [Add Tag To Node](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams/Add%20Node%20Tag)
+    - [Create Tag](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams/Create%20Tag)
+    - [Delete Tag](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams/Delete%20Tag)
+    - [Get Node Tags](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams/Get%20Node%20Tags) 
+    - [Get Tags](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams/Get%20Tags)
+    - [Remove Tag From Node](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams/Remove%20Node%20Tag)
 
 ### Built With
 --------------------------------
