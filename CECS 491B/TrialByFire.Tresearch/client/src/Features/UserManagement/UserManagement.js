@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, {useState, useEffect } from "react";
+import React, {useState } from "react";
 import AuthenticatedNavBar from "../../UI/Navigation/AuthenticatedNavBar";
 
 
@@ -7,9 +7,6 @@ import "./UserManagement.css";
 import Button from "../../UI/Button/ButtonComponent";
 
 function UserManagement() {
-    const [createData, setCreateData] = useState('');
-    
-
     const [alertData, setAlertData] = useState(
         {
             message: ''

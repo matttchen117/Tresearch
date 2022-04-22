@@ -1,7 +1,5 @@
-import React, { useState } from "react";
-import {useNavigate} from 'react-router-dom';
-import axios, {AxiosResponse, AxiosError} from 'axios';
-import pbkdf2 from "pbkdf2/lib/sync";
+import React from "react";
+import axios from 'axios';
 
 import "./AdminLogin.css";
 import Button from "../../UI/Button/ButtonComponent";
@@ -99,8 +97,6 @@ class AdminLogin extends React.Component  {
                 axios.post('https://localhost:7010/Authentication/authenticate?username=' + this.state.username.toLowerCase() + 
                 '&otp=' + this.hashInput(this.state.otp) + '&authorizationLevel=admin')
                 .then(response => {
-                        console.log(response.data);
-                        console.log(response.headers['authorization']);
                         sessionStorage.setItem('authorization', response.headers['authorization']);
                         window.location = '/Admin/Dashboard';
                 }).catch(err => {
@@ -111,8 +107,6 @@ class AdminLogin extends React.Component  {
                 axios.post('https://localhost:7010/OTPRequest/requestotp?username=' + this.state.username.toLowerCase() + 
                 '&passphrase=' + this.hashInput(this.state.passphrase) + '&authorizationLevel=admin')
                 .then(response => {
-                        console.log(response.data);
-                        console.log(response.headers['authorization']);
                         this.setState({verified: true});
                         
                         //navigate('/Login/Authentication');

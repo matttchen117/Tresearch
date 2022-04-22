@@ -8,17 +8,16 @@ import './AuthenticatedNavBar.css';
 
 function AuthenticatedNavBar() {
     const [profileData, setProfileData] = useState([]);
-    const [isHomePage, setIsHomePage] = useState(false);
+    const [isNotPortal, setIsNotPortal] = useState(false);
 
     const CheckToken = () => {
       const token = sessionStorage.getItem('authorization');
       const decoded = jwt_decode(token);
       setProfileData(decoded.username[0]);
-      if(window.location.pathname === "/")
+      if(window.location.pathname !== "/Portal")
       {
-        setIsHomePage(true);
+        setIsNotPortal(true);
       }
-
       return;
     }
 
@@ -47,7 +46,11 @@ function AuthenticatedNavBar() {
 
     const handlePortalClick = (e) => {
       window.location = '/Portal';
-  }
+    }
+
+    const handleFAQClick = (e) => {
+      window.location = '/FAQ';
+    }
 
     const handleLogoutClick = (e) => {
       e.preventDefault();
@@ -72,7 +75,8 @@ function AuthenticatedNavBar() {
               </div>
             </ContextMenuTrigger>
             <ContextMenu id = "contextmenu" className = "nav-context-menu">
-              {isHomePage ? <MenuItem onClick={handlePortalClick}>Portal</MenuItem> : null }
+              {isNotPortal ? <MenuItem onClick={handlePortalClick}>Portal</MenuItem> : null }
+              <MenuItem onClick = {handleFAQClick}>FAQ</MenuItem>
               <MenuItem onClick={handleSettingsClick}>Settings</MenuItem>
               <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
             </ContextMenu>

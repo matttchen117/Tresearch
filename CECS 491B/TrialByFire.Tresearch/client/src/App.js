@@ -25,6 +25,7 @@ import AdminLogin from "./Pages/AdminLogin/AdminLogin";
 import Error404 from "./Pages/Error404/Error404";
 import Settings from "./Pages/Settings/Settings";
 import FAQ from "./Pages/FAQ/FAQ";
+import Features from "./Pages/Features/Features";
 
 class App extends React.Component {
   constructor(props){
@@ -49,6 +50,7 @@ class App extends React.Component {
             <Route path="/" element = {<Home />}/>
             <Route path = "/Portal" element ={<Portal />}/>
             <Route path = "/Settings" element = {<Settings/>} exact/>
+            <Route path = "/Features" element = {<Features/>}/>
             <Route path = "/FAQ" element ={<FAQ />}/>
 
             <Route path="/Login/Login" element = {<Login />}/>

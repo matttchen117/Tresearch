@@ -1,28 +1,26 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React from "react";
 import NavBar from "../../UI/Navigation/NavBar";
 import TreeView from "../../UI/Components/Tree/TreeView";
 import './Portal.css';
 
 function Portal() {
   
-
-
-  const nodes = {
+   const nodes = {
     name: 'Computer Programming',
     attributes: {
-      nodeID: 1809
+      nodeID: 2
     },
     children: [
         {
           name: 'Intro to HTML/CSS',
           attributes: {
-            nodeID: 1810
+            nodeID: 3
           },
           children: [
             {
               name: 'Intro to SQL',
               attributes: {
-                nodeID: 1811
+                nodeID: 5
               }
             }
           ]
@@ -30,7 +28,7 @@ function Portal() {
         {
           name: 'Intro to Javascript',
           attributes: {
-            nodeID: 1812
+            nodeID: 4
           }
         }
     ]
