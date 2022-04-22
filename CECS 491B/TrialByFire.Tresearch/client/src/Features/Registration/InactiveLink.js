@@ -12,7 +12,7 @@ class InactiveLink extends React.Component {
             const { confirmationGuid } = useParams();
             console.log(confirmationGuid);
             if(confirmationGuid != null){
-                axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net//Registration/resend?'+confirmationGuid)
+                axios.post('https://localhost:7010/Registration/resend?'+confirmationGuid)
                 .then(res => {
                     window.location = '/Register/AccountConfirmed';
                     return res;

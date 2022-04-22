@@ -1,17 +1,17 @@
 import axios from "axios";
 import React, {useState, useEffect } from "react";
-import AuthenticatedNavBar from "../../UI/Navigation/AuthenticatedNavBar";
-
+import NavBar from "../../UI/Navigation/NavBar";
+import Button from "../../UI/Button/ButtonComponent";
+import jwt_decode from "jwt-decode";
 
 import "./TagDashboard.css";
-import Button from "../../UI/Button/ButtonComponent";
+
 
 function TagDashboard() {
     const [tagData, setTagData] = useState([]);
 
     const [createData, setCreateData] = useState('');
     
-
     const [alertData, setAlertData] = useState(
         {
             message: '',
@@ -47,7 +47,7 @@ function TagDashboard() {
         var value = e.target.getAttribute('data-item');
         var parsedData = handleEncoded(value);
         console.log(parsedData);
-        axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net//Tag/deleteTag?tagName=" + parsedData)
+        axios.post("https://localhost:7010/Tag/deleteTag?tagName=" + parsedData)
         .then((response => {
             fetchTableData();
             console.log("TEST");
@@ -64,18 +64,16 @@ function TagDashboard() {
      
     const fetchTableData = () => {
         async function fetchData() {
-            await axios.get("https://trialbyfiretresearchwebapi.azurewebsites.net//Tag/taglist")
+            await axios.get("https://localhost:7010/Tag/taglist")
             .then((response => {
-                setTagData(response.data);
-                
+                setTagData(response.data); 
             }))
             .catch((err => {
                 switch(err.response.status){
-                    case 401: 
-                            console.log("Not Authorized");
+                    case 401:                             
                             localStorage.removeItem('authorization');
-                            window.location.assign(window.location.origin);
-                            window.location = '/';
+                            //window.location.assign(window.location.origin);
+                            //window.location = '/';
                         break;
                     case 503: 
                             console.log("Database offline");
@@ -83,21 +81,29 @@ function TagDashboard() {
                     default: 
                         console.log("UH OH");
                 }
-            }))
-            
-            
+            }))                  
         }
         fetchData();
     }
 
     const checkToken = () => {
+        var token = sessionStorage.getItem('authorization');
+        if(token){
+            var decoded = jwt_decode(token);
+            var tokenExpiration = decoded.tokenExpiration;
+            var now = Date.now;
+        }else{
+            localStorage.removeItem('authorization');
+            window.location.assign(window.location.origin);
+            window.location = '/';
+        }
         
     }
 
     useEffect(() => {
         checkToken();
         fetchTableData();
-        //Refresh after every 5 seconds
+        //Refresh after every 10 seconds
         const interval = setInterval(() => {
             checkToken();
             fetchTableData();   
@@ -108,12 +114,7 @@ function TagDashboard() {
     const createTag = (e) => {
         e.preventDefault();
         var parsedData = handleEncoded(createData);
-        
-       
-
-        console.log(parsedData);
-
-        axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net//Tag/createTag?tagName=" + parsedData)
+        axios.post("https://localhost:7010/Tag/createTag?tagName=" + parsedData)
         .then((response => {
             setCreateData('');
             setAlertData({message: 'Added'});
@@ -185,11 +186,10 @@ function TagDashboard() {
         </div>
     );
 
-    return (
-        
+    return (       
         <div className="tag-dashboard-wrapper">
             <div className = "tag-dashboard-nav-wrapper">
-                {<AuthenticatedNavBar/>}
+                {<NavBar/>}
             </div>
             <div className = "tag-dashboard-back-wrapper">
                 {renderBack}

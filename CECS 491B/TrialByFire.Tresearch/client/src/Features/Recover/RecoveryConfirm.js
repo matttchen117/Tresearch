@@ -8,7 +8,7 @@ class RecoveryConfirm extends React.Component {
         function GetGuid() {
             const { recoveryConfirm } = useParams();
             if(recoveryConfirm != null){
-                axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net//Recovery/recover?'+recoveryConfirm)
+                axios.post('https://localhost:7010/Recovery/recover?'+recoveryConfirm)
                 .then(res => {
                     window.location = '/Recover/AccountEnabled';
                     return res;

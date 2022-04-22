@@ -20,12 +20,12 @@ class Tagger extends React.PureComponent{
   }
 
   GetTagData = async () => {
-    await axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net//Tag/nodeTagList", this.state.nodes)
+    await axios.post("https://localhost:7010/Tag/nodeTagList", this.state.nodes)
     .then(response => {
       const responseData = Object.values(response.data);
       this.setState( {tagData: responseData});
 
-      axios.get("https://trialbyfiretresearchwebapi.azurewebsites.net//Tag/taglist", {})
+      axios.get("https://localhost:7010/Tag/taglist", {})
         .then(response => {
           const responseData = Object.values(response.data);
           
@@ -51,7 +51,7 @@ class Tagger extends React.PureComponent{
 
   handleSelection = (e) => {
     var value = e.value;
-    axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net//Tag/addTag?tagName="+value ,this.state.nodes)
+    axios.post("https://localhost:7010/Tag/addTag?tagName="+value ,this.state.nodes)
         .then((response => {
           this.setState( previousState => ({
             tagData: [...previousState.tagData, value],
@@ -70,7 +70,7 @@ class Tagger extends React.PureComponent{
 
   handleClick = (e) => {
     var value = e.target.getAttribute('data-item');
-    axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net//Tag/removeTag?tagName="+value, this.state.nodes)
+    axios.post("https://localhost:7010/Tag/removeTag?tagName="+value, this.state.nodes)
         .then(response => {
             this.setState( previousState => ({
                 tagData: previousState.tagData.filter(item => item !== value ), 
