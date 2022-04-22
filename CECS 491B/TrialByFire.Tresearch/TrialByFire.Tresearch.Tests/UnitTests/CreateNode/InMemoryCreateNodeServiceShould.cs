@@ -27,15 +27,15 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CreateNode
         }
 
         [Theory]
-        [InlineData("jessie@gmail.com", 69420, 69419, "Cooking", "Concepts of Preparing Food", true, "jessie@gmail.com", "200: Server: success")]
+        [InlineData("jessie@gmail.com", 69422, 69420, "Sauteeing ", "Preparing food on a stove", true, "jessie@gmail.com", "200: Server: success")]
         [InlineData("larry@gmail.com", 100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com", "409: Database: Node Already Exists")]
         public async Task CreateTheNode(string username, long nodeID, long parentID, string nodeTitle, string summary, bool visibility,
             string accountOwner, string expected)
         {
             //Arrange
-            ICreateNodeService createNodeService = TestProvider.GetRequiredService<ICreateNodeService>();
+            ICreateNodeService createNodeService = TestProvider.GetService<ICreateNodeService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            Node node = new Node(nodeID, parentID, nodeTitle, summary, visibility, accountOwner);
+            Node node = new Node(nodeID, parentID, nodeTitle, summary, visibility, false, accountOwner);
             Account account = new Account(username, "jessie123", "user");
             //Act
             string result = await createNodeService.CreateNodeAsync(account, node, cancellationTokenSource.Token).ConfigureAwait(false);

@@ -77,6 +77,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "200: Server: Create Node Success";
                 case Responses.deleteNodeSuccess:
                     return "200: Server: Delete Node Success";
+                case Responses.getNodesSuccess:
+                    return "200: Server: Get Nodes Success";
                 case Responses.storeLogFail:
                     return "503: Database: Failed to store the log.";
                 case Responses.badNameOrPass:
@@ -105,7 +107,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "404: Database: Account not found or not authorized to perform the " +
                 "operation.";
                 case Responses.nodeNotFound:
-                    return "404: Database: The node was not found.";
+                    return "504: Database: The node was not found.";
                 case Responses.tagDoesNotExist:
                     return "404: Database: Tag not found.";
                 case Responses.recoveryLinkNotFound:

@@ -58,7 +58,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             {
                 if (Thread.CurrentPrincipal.Identity.Name != "guest")
                 {
-                    if (account.Username == Thread.CurrentPrincipal.Identity.Name)
+                    if (account.Username == Thread.CurrentPrincipal.Identity.Name && account.AuthorizationLevel != "guest")
                     {
                         bool verificationResult = await _authorizationService.VerifyAuthorizedAsync(account.AuthorizationLevel, account.Username, cancellationToken).ConfigureAwait(false);
                         if (verificationResult)
@@ -67,13 +67,13 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                         }
                         else
                         {
-                            createResult = await _messageBank.GetMessage(IMessageBank.Responses.notFoundOrAuthorized).ConfigureAwait(false);
+                            createResult = await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
                         }
                         return createResult;
                     }
                     else
                     {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.notFoundOrAuthorized).ConfigureAwait(false);
+                        return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
                     }
                 }
                 else

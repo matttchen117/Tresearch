@@ -1,4 +1,4 @@
-﻿/*using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -18,24 +18,23 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.UnitTests.CreateNode
+namespace TrialByFire.Tresearch.Tests.IntegrationTests.DeleteNode
 {
-    public class InMemoryCreateNodeControllerShould : TestBaseClass
+    public class DeleteNodeControllerShould : TestBaseClass
     {
-        public InMemoryCreateNodeControllerShould() : base(new string[] { })
+        public DeleteNodeControllerShould() : base(new string[] { })
         {
-            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
-            TestServices.AddScoped<ICreateNodeService, CreateNodeService>();
-            TestServices.AddScoped<ICreateNodeManager, CreateNodeManager>();
-            TestServices.AddScoped<ICreateNodeController, CreateNodeController>();
+            TestServices.AddScoped<IDeleteNodeService, DeleteNodeService>();
+            TestServices.AddScoped<IDeleteNodeManager, DeleteNodeManager>();
+            TestServices.AddScoped<IDeleteNodeController, DeleteNodeController>();
             TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
-        [InlineData("jessie@gmail.com", 69422, 69420, "Sauteeing ", "Preparing food on a stove", true, "jessie@gmail.com", "jessie@gmail.com", "user", "200: Server: success")]
-        [InlineData("larry@gmail.com", 100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com", "larry@gmail.com", "guest", "403: Database: You are not authorized to perform this operation.")]
-        public async Task CreateTheNode(string username, long nodeID, long parentID, string nodeTitle, string summary, bool visibility,
-            string accountOwner, string currentIdentity, string currentRole, string expected)
+        [InlineData("jessie@gmail.com", 69420, 69419, "jessie@gmail.com", "user", "200: Server: Delete Node Success")]
+        [InlineData("viet@gmail.com", 69420, 69419, "jessie@gmail.com", "user", "403: Database: You are not authorized to perform this operation.")]
+        [InlineData("jessie@gmail.com", 80085, 80084, "jessie@gmail.com", "user", "504: Database: The node was not found.")]
+        public async Task DeleteTheNode(string username, long nodeID, long parentID, string currentIdentity, string currentRole, string expected)
         {
             //Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(true, currentIdentity, currentRole);
@@ -44,17 +43,16 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CreateNode
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }
-            ICreateNodeController createNodeController = TestProvider.GetService<ICreateNodeController>();
+            IDeleteNodeController deleteNodeController = TestProvider.GetService<IDeleteNodeController>();
             string[] expects = expected.Split(": ");
             ObjectResult expectedResult = new ObjectResult(expects[2])
             {
                 StatusCode = Convert.ToInt32(expects[0])
             };
-            Node node = new Node(nodeID, parentID, nodeTitle, summary, visibility, false, accountOwner);
             Account account = new Account(username, "jessie123", "user");
 
             //Act
-            IActionResult result = await createNodeController.CreateNodeAsync(account, node).ConfigureAwait(false);
+            IActionResult result = await deleteNodeController.DeleteNodeAsync(account, nodeID, parentID).ConfigureAwait(false);
             var objectResult = result as ObjectResult;
 
             //Assert
@@ -63,5 +61,3 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CreateNode
         }
     }
 }
-
-*/

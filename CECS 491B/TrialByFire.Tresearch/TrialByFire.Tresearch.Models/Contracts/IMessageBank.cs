@@ -91,7 +91,8 @@ namespace TrialByFire.Tresearch.Models.Contracts
             tagAlreadyExist,
             tagDoesNotExist,
             createNodeSuccess,
-            deleteNodeSuccess
+            deleteNodeSuccess,
+            getNodesSuccess
         }
         public Task<string> GetMessage(Responses response);
     }

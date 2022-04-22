@@ -31,6 +31,7 @@ builder.Services.AddScoped<IUADService, UADService>();
 builder.Services.AddScoped<IValidationService, ValidationService>();
 builder.Services.AddScoped<ILogoutService, LogoutService>();
 builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddScoped<ITreeManagementService, TreeManagementService>();
 // Managers
 builder.Services.AddScoped<IAccountDeletionManager, AccountDeletionManager>();
 builder.Services.AddScoped<IAuthenticationManager, AuthenticationManager>();
@@ -40,6 +41,7 @@ builder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
 builder.Services.AddScoped<ILogoutManager, LogoutManager>();
 builder.Services.AddScoped<ITagManager, TagManager>();
 builder.Services.AddScoped<IUADManager, UADManager>();  
+builder.Services.AddScoped<ITreeManagementManager, TreeManagementManager>();
 // Unnecessary, only here temporarily for successful build
 
 builder.Services.AddControllers();

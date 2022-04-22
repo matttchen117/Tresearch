@@ -67,7 +67,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                         }
                         else
                         {
-                            deleteResult = await _messageBank.GetMessage(IMessageBank.Responses.notFoundOrAuthorized);
+                            deleteResult = await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
                         }
                         return deleteResult;
                     }

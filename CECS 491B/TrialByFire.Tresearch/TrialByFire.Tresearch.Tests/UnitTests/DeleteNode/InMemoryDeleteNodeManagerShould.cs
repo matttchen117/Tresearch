@@ -15,35 +15,35 @@ using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Services.Implementations;
 using Xunit;
 
-namespace TrialByFire.Tresearch.Tests.UnitTests.CreateNode
+namespace TrialByFire.Tresearch.Tests.UnitTests.DeleteNode
 {
-    public class InMemoryCreateNodeManagerShould : TestBaseClass
+    public class InMemoryDeleteNodeManagerShould : TestBaseClass
     {
-        public InMemoryCreateNodeManagerShould() : base(new string[] { })
+        public InMemoryDeleteNodeManagerShould() : base(new string[] { })
         {
             TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
-            TestServices.AddScoped<ICreateNodeService, CreateNodeService>();
-            TestServices.AddScoped<ICreateNodeManager, CreateNodeManager>();
+            TestServices.AddScoped<IDeleteNodeService, DeleteNodeService>();
+            TestServices.AddScoped<IDeleteNodeManager, DeleteNodeManager>();
             TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
-        [InlineData("jessie@gmail.com", 69422, 69420, "Sauteeing ", "Preparing food on a stove", true, "jessie@gmail.com", "jessie@gmail.com", "user", "200: Server: success")]
-        [InlineData("larry@gmail.com", 100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com", "larry@gmail.com", "guest", "403: Database: You are not authorized to perform this operation.")]
-        public async Task CreateTheNode(string username, long nodeID, long parentID, string nodeTitle, string summary, bool visibility,
-            string accountOwner, string currentIdentity, string currentRole, string expected)
+        [InlineData("jessie@gmail.com", 69420, 69419, "jessie@gmail.com", "user", "200: Server: Delete Node Success")]
+        [InlineData("viet@gmail.com", 69420, 69419, "jessie@gmail.com", "user", "403: Database: You are not authorized to perform this operation.")]
+        [InlineData("jessie@gmail.com", 80085, 80084, "jessie@gmail.com", "user", "504: Database: The node was not found.")]
+        public async Task DeleteTheNode(string username, long nodeID, long parentID, string currentIdentity, 
+            string currentRole, string expected)
         {
             //Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(true, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
-            ICreateNodeManager createNodeManager = TestProvider.GetService<ICreateNodeManager>();
+            IDeleteNodeManager deleteNodeManager = TestProvider.GetService<IDeleteNodeManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            Node node = new Node(nodeID, parentID, nodeTitle, summary, visibility, false, accountOwner);
             Account account = new Account(username, "jessie123", "user");
 
             //Act
-            string result = await createNodeManager.CreateNodeAsync(account, node, cancellationTokenSource.Token).ConfigureAwait(false);
+            string result = await deleteNodeManager.DeleteNodeAsync(account, nodeID, parentID, cancellationTokenSource.Token);
 
             //Assert
             Assert.Equal(expected, result);

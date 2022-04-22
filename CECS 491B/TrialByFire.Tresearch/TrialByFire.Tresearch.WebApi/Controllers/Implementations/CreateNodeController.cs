@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿/*using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using TrialByFire.Tresearch.DAL.Contracts;
@@ -15,7 +15,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
     /// </summary>
     [ApiController]
     [EnableCors]
-    [Route("[controler]")]
+    [Route("[controller]")]
     public class CreateNodeController : Controller, ICreateNodeController
     {
         private ISqlDAO _sqlDAO { get; }
@@ -72,3 +72,4 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         }
     }
 }
+*/

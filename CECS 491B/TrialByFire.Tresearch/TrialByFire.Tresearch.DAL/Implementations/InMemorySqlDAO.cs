@@ -158,7 +158,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return 0;
         }
 
-
+        //TODO Rearrange for UserHash
         public string DeleteAccount()
         {
             bool accountExists = false;
@@ -188,7 +188,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     }
                     for (int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
                     {
-                        if (InMemoryDatabase.Nodes[i].accountOwner.Equals(accountName))
+                        if (InMemoryDatabase.Nodes[i].UserHash.Equals(accountName))
                         {
                             InMemoryDatabase.Nodes.RemoveAt(i);
                         }
@@ -906,7 +906,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 bool nodeExists = false;
                 foreach (var n in InMemoryDatabase.Nodes)
                 {
-                    if (node.nodeID == n.nodeID)
+                    if (node.NodeID == n.
+                        NodeID)
                     {
                         nodeExists = true;
                     }
@@ -944,7 +945,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 Node targetNode;
                 foreach (Node n in InMemoryDatabase.Nodes)
                 {
-                    if (nodeID == n.nodeID)
+                    if (nodeID == n.NodeID)
                     {
                         nodeExists = true;
                     }
@@ -958,21 +959,21 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 List<Node> children = new List<Node>();
                 foreach (Node c in InMemoryDatabase.Nodes)
                 {
-                    if (c.parentNodeID == nodeID)
+                    if (c.NodeParentID == nodeID)
                     {
                         children.Add(c);
                     }
                 }
                 foreach (Node n in children)
                 {
-                    n.parentNodeID = parentID;
+                    n.NodeParentID = parentID;
                 }
 
                 foreach (Node n in InMemoryDatabase.Nodes)
                 {
-                    if (nodeID == n.nodeID)
+                    if (nodeID == n.NodeID)
                     {
-                        InMemoryDatabase.Nodes.Remove(n);
+                        n.Deleted = true;
                     }
                 }
                 return _messageBank.GetMessage(IMessageBank.Responses.deleteNodeSuccess).Result;
@@ -997,7 +998,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 Node node;
                 foreach (Node n in InMemoryDatabase.Nodes)
                 {
-                    if (nID.Equals(n.nodeID))
+                    if (nID.Equals(n.NodeID))
                     {
                         INode temp;
                         temp = n;
@@ -1026,6 +1027,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
         Task<Tuple<List<INode>, string>> ISqlDAO.GetNodeChildren(long nID, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Tuple<List<INode>, string>> GetNodesAsync(string userHash, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

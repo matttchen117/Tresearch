@@ -46,8 +46,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
             string result;
             try
             {
+                //node.accountOwner = (Thread.CurrentPrincipal.Identity as RoleIdentity).UserHash;
                 result = await _sqlDAO.CreateNodeAsync(node, cancellationToken).ConfigureAwait(false);
-                if (cancellationToken.IsCancellationRequested && result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
+                /*if (cancellationToken.IsCancellationRequested && result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
                 {
                     string rollbackResult = "Delete Node Success";
                     if (rollbackResult != "Delete Node Success")
@@ -58,7 +59,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     {
                         throw new OperationCanceledException();
                     }
-                }
+                }*/
                 return result;
             }
             catch (OperationCanceledException ece)
