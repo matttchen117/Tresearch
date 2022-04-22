@@ -1,7 +1,8 @@
 import axios from "axios";
-import React from "react";
+import React, { useState } from "react";
 import Select, { createFilter } from 'react-select';
 import Tag from "../../UI/Tag/Tag";
+import jwt_decode from "jwt-decode";  
 import "./Tagger.css";
 
 class Tagger extends React.PureComponent{
@@ -13,11 +14,13 @@ class Tagger extends React.PureComponent{
 
     // State of this class
     this.state = {
-      tagData: [],
+      tagData: [],    
       tags: [], 
       tagOptions: [],
       nodes: props.nodes,
-      nullSearch: null
+      nullSearch: null,
+      isConnected: true,
+      errorMessage: ''
     }
   }
 
@@ -78,46 +81,97 @@ class Tagger extends React.PureComponent{
           }
         }))
     })
+    .catch((err => {
+
+    }))
   }
 
+  // Handle change in internet connection (display message as per BRD) 
+  handleStatus = () => {
+    const conStatus = navigator.onLine ? 'online' : 'offline';
+    this.setState({conStatus: conStatus});
+    if(conStatus == 'offline')
+        this.setState({errorMessage: 'Internet Connection Lost. Your changes will not be saved.'});
+    else{
+      this.GetTagData();
+      this.setState({errorMessage: ''});
+    }
+  }
+
+  // Check JWT Token
+  checkToken = () => {
+    const token = sessionStorage.getItem('authorization');
+    if(token){
+        // Token exists, decode and check credentials
+        const decoded = jwt_decode(token);
+        const tokenExpiration = decoded.tokenExpiration;
+        const now = new Date();
+
+        // Check if expired
+        if(now.getTime() > tokenExpiration * 1000){
+            localStorage.removeItem('authorization');
+            window.location.assign(window.location.origin);
+            window.location = '/';
+        }
+    }else{
+        // Token doesn't exist or not valid
+        localStorage.removeItem('authorization');
+        window.location.assign(window.location.origin);
+        window.location = '/';
+    }
+}
+
   componentDidMount() {
-    this.GetTagData();          // Get initial tag data
+    this.checkToken();
+    this.GetTagData();                                          // Retrieve tag data
+    this.handleStatus();                                        // Handle internet status
+    window.addEventListener('online', this.handleStatus );      // Listen for internet online (refresh)
+    window.addEventListener('offline', this.handleStatus);      // Listen for internet offline
   }
 
   componentWillUnmount() {
-    this.setState( { tagData: [], tags: [], tagOptions: []})
+    this.setState( { tagData: [], tags: [], tagOptions: []})    // Reset state
+    window.removeEventListener('online', this.handleStatus );   // Remove listener
+    window.removeEventListener('offline', this.handleStatus );  // Remove listener
   }
 
   // Handle Add
   handleSelection = (e) => {
+    // Check Token
+    this.checkToken();
+
     var value = e.value;
 
     // Set token header when sending post
     axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
 
     // Add tag from node(s)
-    axios.post("https://localhost:7010/Tag/addTag?tagName="+value ,this.state.nodes)
+    axios.post("https://localhost:7010/Tag/addTag?tagName="+this.handleEncoded(value) ,this.state.nodes)
         .then((response => {
           this.setState( previousState => ({
             // Add tags to list of node tags
             tagData: [...previousState.tagData, value],
             // Filter tag out of list
             tagOptions: previousState.tagOptions.filter(item => item.value !== value ), 
-          }));
-        
+          }));        
         }))
         .catch((err => {
-            console.log(err);
+            
         }))
   }
 
-  handleSearchRefresh = (e_ => {
+  
+  handleSearchRefresh = (e) => {
     let diff = this.state.tags.filter(x => !this.state.tagData.includes(x.value));
     this.setState( {tagOptions: diff});
-  })
+  }
 
   // Handle tag remove
   handleClick = (e) => {
+
+    // Check Token
+    this.checkToken();
+
     // Retrieve value of tag to remove
     var value = e.target.getAttribute('data-item');
 
@@ -125,7 +179,7 @@ class Tagger extends React.PureComponent{
     axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
 
     // Delete tag from node(s)
-    axios.post("https://localhost:7010/Tag/removeTag?tagName="+value, this.state.nodes)
+    axios.post("https://localhost:7010/Tag/removeTag?tagName="+this.handleEncoded(value), this.state.nodes)
         .then(response => {
             this.setState( previousState => ({
                 tagData: previousState.tagData.filter(item => item !== value ), 
@@ -134,6 +188,29 @@ class Tagger extends React.PureComponent{
             this.handleSearchRefresh();
         })
   }
+
+  handleEncoded = (e) => {
+    var parsedData = e.toString();
+    if(parsedData.includes('!')){
+        parsedData = parsedData.replaceAll('!', '%21');
+    }
+    if(parsedData.includes('#')){
+        parsedData = parsedData.replaceAll('#', '%23');
+    }
+    if(parsedData.includes('$')){
+        parsedData = parsedData.replaceAll('$', '%24');
+    }
+
+    // DO NOT DO % SHOULD NOT BE REPLACED
+    
+    if(parsedData.includes('&')){
+        parsedData = parsedData.replaceAll('&', '%26');
+    }
+    if(parsedData.includes('+')){
+        parsedData = parsedData.replaceAll('+', '%2B');
+    }
+    return parsedData;
+}
   
   render() {
     // Render node tags
@@ -141,7 +218,7 @@ class Tagger extends React.PureComponent{
       <div className="tagger-container">
           <p>Tags:</p>
           <ul>
-            {this.state.tagData.map(item => 
+            {this.state.tagData.sort().map(item => 
                 <span key={item} onClick = { this.handleClick } ><Tag name = {item}/></span>
               )}
           </ul>
@@ -155,14 +232,16 @@ class Tagger extends React.PureComponent{
           options = {this.state.tagOptions}  
           onChange = {this.handleSelection} 
           value = {this.state.nullSearch} 
-          filterOption = {createFilter( {ignoreAccents: false})}
-          
+          filterOption = {createFilter( {ignoreAccents: false})} 
         />
       </div>
     )
 
     return(
       <div className="tagger-wrapper">
+          <div className = "tagger-status-wrapper">
+              {this.state.errorMessage}
+          </div>
           <div className = "tagger-table-wrapper">
               {renderTags}
           </div>

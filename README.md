@@ -10,6 +10,7 @@
 - [Built With](#built-with)
 - [FAQ](#faq)
   - [Tagging](#tagging-1)
+- [User Manual](#user-manual)
 ### What is Tresearch?
 --------------------------------
 Tresearch is an interactive mind mapping tool for documenting users' learning journey.  Users can create their own knowledge tree(s) to document what they are currently learning and have learned throughout their life. Knowledge trees are made up of nodes that consist of a title,  description/summary, and optional tag. Branches that come off of nodes point to nodes that utilize or require knowledge from the previous node. Users can view any other user's public knowledge trees to see what they are learning or have learned and how. If a user finds another user’s tree or a portion of their tree to be particularly useful or helpful, they can rate a particular node or section of the tree and they can also copy that section over to their own tree. Users can add additional information to their public profiles such as what they are currently learning, and where they are working/what they currently do or have done. Users can utilize a search function in order to find people whose trees contain a certain topic or keyword/phrase, and can also utilize a filter to narrow searches by users who are learning said topic, are using said topic (i.e. in their work or otherwise), by rating, and by tags.
@@ -58,14 +59,24 @@ $ npm run start
   - Search tags using an autocomplete drop-down search bar
   - Administrators can create and delete tags from word bank
 - #### Design
-  - [Sequence Diagrams](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams)
+  - [Business Requirement Documnet](https://github.com/Drakat7/Tresearch/blob/pammy/Documents/BRD.pdf)
+    - Scope
+      - Adding and Removing tags from one or more nodes that are owned by the user simultaneously
+    - Non-Functional Requirements
+      - User tree data updated within 5 seconds
+      - User tree page visually udpated within 5 seconds
+      - Feature will be accessible 90% of the time
+      - Text is a minimum of 16 pixels
+      - Errors and Success Logged
+      - Feature is only visibale and users by Authenticated and Authorized users on tree page
+  - [Low Level Design](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams)
     - [Add Tag To Node](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams/Add%20Node%20Tag)
     - [Create Tag](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams/Create%20Tag)
     - [Delete Tag](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams/Delete%20Tag)
     - [Get Node Tags](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams/Get%20Node%20Tags) 
     - [Get Tags](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams/Get%20Tags)
     - [Remove Tag From Node](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams/Remove%20Node%20Tag)
-
+  - [Test Plan](https://github.com/Drakat7/Tresearch/blob/main/Documents/Test%20Plan.pdf)
 ### Built With
 --------------------------------
 #### Programming Languages
@@ -120,3 +131,7 @@ $ npm run start
   - As an administrator, navigate to the tag dashboard. Enter the tag name in the input field and click "Add Tag".
 - Deleting a tag from the tag bank
   - As an administrator, navigate to to the tag dashboard. Find the tag in the tag table and click the delete button located next to the name.
+
+### User Manual
+--------------------------------
+#### Tagging

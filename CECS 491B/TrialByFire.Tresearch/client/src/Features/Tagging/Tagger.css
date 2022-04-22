@@ -15,3 +15,7 @@
 .tagger-searchBar-container{
     margin: 40px;
 }
+
+.tagger-status-wrapper {
+    color: red;
+}
