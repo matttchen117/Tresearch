@@ -17,5 +17,18 @@ namespace TrialByFire.Tresearch.Models.Implementations
             GUIDLink = uniqueIdentifier;
             TimeCreated = timeCreated;
         }
+
+        public override bool Equals(object? obj)
+        {
+            if (!(obj == null))
+            {
+                if (obj is IConfirmationLink)
+                {
+                    IConfirmationLink link = (IConfirmationLink)obj;
+                    return (Username.Equals(link.Username)  && AuthorizationLevel.Equals(link.AuthorizationLevel));
+                }
+            }
+            return false;
+        } 
     }
 }

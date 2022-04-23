@@ -2,13 +2,11 @@
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
-using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Managers.Implementations;
 using TrialByFire.Tresearch.Services.Implementations;
-using TrialByFire.Tresearch.Models.Implementations;
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.AspNetCore.Mvc;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
 {
@@ -26,10 +24,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         }
 
         [Theory]
-        [InlineData("wonderbread@gmail.com", "travelPlans123", "user")]
-        [InlineData("catcherInTheRye@hotmail.com", "undergroundBasketWeaving", "user")]
-        [InlineData("windows365@gmail.com", "myPassphrase123", "user")]
-        public async Task CreateTheUserAccount(string email, string passphrase, string authorizationLevel)
+        [InlineData("pammypoor+UnitManReg1@gmail.com", "undergroundBasketWeaving", "user", "200: Server: success")]
+        [InlineData("pammypoor+UnitManReg2@gmail.com", "myPassphrase", "user", "409: Server: UserAccount  already exists")]
+        public async Task CreateTheUserAccount(string email, string passphrase, string authorizationLevel, string statusCode)
         {
             //Arrange
             IRegistrationManager registrationManager = TestProvider.GetService<IRegistrationManager>();
@@ -37,18 +34,17 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             string baseUrl = "https://trialbyfiretresearch.azurewebsites.net/Register/Confirm?guid=";
 
             //Act
-            string result = await registrationManager.CreateAndSendConfirmationAsync(email, passphrase, authorizationLevel, baseUrl, cancellationTokenSource.Token);
+            string result = await registrationManager.CreateAndSendConfirmationAsync(email, passphrase, authorizationLevel, cancellationTokenSource.Token);
 
             //Assert
-            Assert.Equal("success", result);
+            Assert.Equal(statusCode, result);
         }
 
-        [Theory]
-        [InlineData("", "")]
-        [InlineData("", "")]
         public async Task ConfirmAccount(string guid, string statusCode)
         {
-
+            string[] splitExpectation;
+            splitExpectation = statusCode.Split(":");
+            ObjectResult expectedResult = new ObjectResult(splitExpectation[2]);
             IRegistrationManager registrationManager = TestProvider.GetService<IRegistrationManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             string expected = statusCode;

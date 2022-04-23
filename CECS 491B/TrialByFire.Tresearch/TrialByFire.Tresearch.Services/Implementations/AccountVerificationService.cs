@@ -21,7 +21,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _messageBank = messageBank;
         }
 
-        public async Task<string> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken = default)
+        public async Task<string> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
@@ -49,6 +49,26 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 return "500: Database: " + ex.Message;
             }  
+        }
+
+        public async Task<string> VerifyAccountAuthorizedNodeChangesAsync(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                string result = await _sqlDAO.IsAuthorizedToMakeNodeChangesAsync(nodeIDs, userHash, cancellationToken);
+
+                return result;
+            }
+            catch(InvalidOperationException)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.notFoundOrAuthorized);
+            }
+            catch(Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
         }
     }
 }

@@ -16,9 +16,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         }
 
         [Theory]
-        [InlineData("pammypoor@gmail.com", "https://trialbyfiretresearch.azurewebsites.net/")]
-        [InlineData("pammmmyyyy@gmail.com", "https://trialbyfiretresearch.azurewebsites.net/")]
-        public async Task SendEmail(string email, string url)
+        [InlineData("pammypoor+IntRegMailServ@gmail.com", "https://trialbyfiretresearch.azurewebsites.net/", "200: Server: success")]
+        public async Task SendEmail(string email, string url, string expected)
         {
             //Arrange
             IMailService mailService = TestProvider.GetService<IMailService>();
@@ -27,7 +26,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             string result = await mailService.SendConfirmationAsync(email, url).ConfigureAwait(false);
 
             //Assert
-            Assert.Equal("Success - Confirmation email sent", result);
+            Assert.Equal(expected, result);
         }
 
     }

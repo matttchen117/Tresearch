@@ -1,139 +1,285 @@
 import axios from "axios";
-import React, {useState, useEffect } from "react";
-import Select from 'react-select';
-import { useParams} from "react-router-dom";
-
+import React, { useState } from "react";
+import Select, { createFilter } from 'react-select';
 import Tag from "../../UI/Tag/Tag";
+import jwt_decode from "jwt-decode";  
 import "./Tagger.css";
 
-function Tagger() {
-  // Holds array of tags that node currently has tagged
-  const [tagData, setTagData] = useState([]);
-  //Holds array of tags user can add to their current node (does not inlcude tags in tagData)
-  const [tagOptions, setTagOptions] = useState([]);
-  //Holds null value, when an item is selected, we want search bar to not have previously selected item highlighted
-  const nullSearch = null;  
+class Tagger extends React.PureComponent{
+  constructor(props) {
+    super(props);
 
-  //Array of nodes this views context
-  const [nodeData, setNodeData] =  useState([]);
+    // Retrieve token
+    this.token = sessionStorage.getItem('authorization');
 
-  const {nodeID} = useParams();
-
-  /**
-   * Fetches tag(s) that the current node has tagged. Returns an 
-   */
-  const fetchNodeTags = () => {
-    async function fetchData() {
-        // Get array of tags node currently has tagged
-        const request = await axios.post("https://localhost:7010/Tag/nodeTagList", nodeData );
-        //Set tag array
-        setTagData(request.data);
+    // State of this class
+    this.state = {
+      tagData: [],    
+      tags: [], 
+      tagOptions: [],
+      nodes: props.nodes,
+      nullSearch: null,
+      isConnected: true,
+      errorMessage: ''
     }
-    //Run async fetch data function
-    fetchData();  
   }
 
-  const fetchTagOptions = () => {
-    async function fetchData() {
-      const res = await axios.get("https://localhost:7010/Tag/taglist")
-      const resData = res.data;
-      let diff = await resData.filter(x => !tagData.includes(x));
-      const options = diff.map(d=> ({
-        "value": d,
-        "label": d
-      }))
-      setTagOptions(options);
-    }
-    fetchData();
-  }
+  // Retrieve Tags from tag bank
+  GetTagData = async () => {
 
-  const handleSelection = (e) =>{
-    const value = e.value;
-    axios.post("https://localhost:7010/Tag/addTag?tagName="+value ,nodeData)
-        .then((response => {
-          fetchNodeTags();
-          fetchTagOptions();
-        }))
+     // Set token header when sending post
+     axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
+
+    // Post request
+    await axios.post("https://localhost:7010/Tag/nodeTagList", this.state.nodes)
+    .then(response => {
+      // Data from post
+      const responseData = Object.values(response.data);
+      // Set state to list of node tags
+      this.setState( {tagData: responseData});
+
+      // Retrieve lists of tags
+      axios.get("https://localhost:7010/Tag/taglist", {})
+        .then(response => {
+          // Tags returned from post
+          const responseData = Object.values(response.data);
+          
+          // Map resposne data to tag
+          const options = responseData.map(d => ({
+            "value": d.tagName,
+            "label": d.tagName
+          }));
+
+          // Set state of tag bank
+          this.setState( {tags: options});
+
+          // Remove tags that are used
+          let diff = options.filter(x => !this.state.tagData.includes(x.value));
+
+          // Set state of tag options
+          this.setState( {tagOptions: diff});
+
+          // Refresh Token
+          sessionStorage.setItem('authorization', response.headers['authorization']);
+          
+        })  
         .catch((err => {
-            console.log(err);
-        }))
-  }
-
-  const handleClick = (e) => {
-    var value = e.target.getAttribute('data-item');
-    axios.post("https://localhost:7010/Tag/removeTag?tagName="+value ,nodeData)
-        .then((response => {
-          fetchNodeTags();
-          fetchTagOptions();
-        }))
-        .catch((err => {
-            console.log(err);
-        }))
-  }
-
-  const setNode = (
-    useEffect(() => {
-      GetNodeIDs();
-      fetchNodeTags();
-      fetchTagOptions();
-    }, [])
-  )
-
-  const renderTags = (
-    <div className="tagger-container">
-        <p>Tags:</p>
-        <ul>
-          {tagData.map(item => 
-              <span key={item} onClick = {handleClick}><Tag name = {item}/></span>
-            )}
-        </ul>
-    </div>
-  );
-
-  const renderSearchBar = (
-    <div className = "tagger-searchBar-container">
-      <Select options = {tagOptions} onChange = {handleSelection} value = {nullSearch}/>
-    </div>
-  )
-
-  const GetNodeIDs = () => {
-    var nodes = nodeID;
-    var tempNodes = [];
-    let count = nodeID.split('&').length-1;
-    if(count > 0){
-      //Multiple ids has been passed in
-      for(let i = 0; i <= count; i++){
-          var id = nodes.substring(nodeID.indexOf("=") + 1, nodes.indexOf("&"));
-          if(i == count){
-            //Last iteration does not have &
-             id = nodes.split('=')[1];
-          } else{
-            //Remove first iteration of nodeID
-            nodes = nodes.slice(nodes.indexOf('&')+1).trim();
+          switch(err.response.status){
+            case 400: 
+                break;
+            case 401:          
+                  // Not enabled/confirmed  (account disabled)                
+                  localStorage.removeItem('authorization');
+                  window.location.assign(window.location.origin);
+                  window.location = '/';
+                break;
+            case 403:
+                  // Not authorized to to retrieve tags
+                  window.location = '/Portal';
+              break;
+            case 503: 
+                    // Server cannot make database connection
+                    this.setState({errorMessage: 'Cannot connect to database.'});
+                break;
+            default: 
+              this.setState({errorMessage: 'Unable to retrieve tags.'});
           }
-          tempNodes.push(id);
+        }))
+
+        // Refresh Token
+        sessionStorage.setItem('authorization', response.headers['authorization']);
+    })
+    .catch((err => {
+      switch(err.response.status) {
+        case 400:
+          this.setState({errorMessage: 'Unable to make server request'});
+          break;
+        case 401:
+          // Not authorized to view/make changes to node
+          window.location = '/Portal';
+          break;
+        case 503:
+          // Cannot make database connection
+          this.setState({errorMessage: 'Cannot connect to database.'});
+          break;
+        default: 
+          this.setState({errorMessage: 'Unable to load node tags.'});
       }
-    } else{
-    //Only one id has been passed in
-      var id = nodes.split('=')[1];
-      tempNodes.push(id); 
+    }))
+  }
+
+  // Handle change in internet connection (display message as per BRD) 
+  handleStatus = () => {
+    const conStatus = navigator.onLine ? 'online' : 'offline';
+    this.setState({conStatus: conStatus});
+    if(conStatus == 'offline')
+        this.setState({errorMessage: 'Internet Connection Lost. Your changes will not be saved.'});
+    else{
+      this.GetTagData();
+      this.setState({errorMessage: ''});
     }
-    console.log('test');
-    setNodeData(tempNodes);
-  };
-  
-  return (
-    <div className="tagger-wrapper">
-      {<setNode/>}
-        <div className = "tagger-table-wrapper">
-            {renderTags}
-        </div>
-        <div className = "tagger-search-form-wraper">
-            {renderSearchBar}
-        </div>
-    </div>
-  );
+  }
+
+  // Check JWT Token
+  checkToken = () => {
+    const token = sessionStorage.getItem('authorization');
+    if(token){
+        // Token exists, decode and check credentials
+        const decoded = jwt_decode(token);
+        const tokenExpiration = decoded.tokenExpiration;
+        const now = new Date();
+
+        // Check if expired
+        if(now.getTime() > tokenExpiration * 1000){
+            localStorage.removeItem('authorization');
+            window.location.assign(window.location.origin);
+            window.location = '/';
+        }
+    }else{
+        // Token doesn't exist or not valid
+        localStorage.removeItem('authorization');
+        window.location.assign(window.location.origin);
+        window.location = '/';
+    }
+}
+
+  componentDidMount() {
+    this.checkToken();
+    this.GetTagData();                                          // Retrieve tag data
+    this.handleStatus();                                        // Handle internet status
+    window.addEventListener('online', this.handleStatus );      // Listen for internet online (refresh)
+    window.addEventListener('offline', this.handleStatus);      // Listen for internet offline
+    console.log(this.state.nodes);
+  }
+
+  componentWillUnmount() {
+    this.setState( { tagData: [], tags: [], tagOptions: []})    // Reset state
+    window.removeEventListener('online', this.handleStatus );   // Remove listener
+    window.removeEventListener('offline', this.handleStatus );  // Remove listener
+  }
+
+  // Handle Add
+  handleSelection = (e) => {
+    // Check Token
+    this.checkToken();
+
+    var value = e.value;
+
+    // Set token header when sending post
+    axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
+
+    // Add tag from node(s)
+    axios.post("https://localhost:7010/Tag/addTag?tagName="+this.handleEncoded(value) ,this.state.nodes)
+        .then((response => {
+          this.setState( previousState => ({
+            // Add tags to list of node tags
+            tagData: [...previousState.tagData, value],
+            // Filter tag out of list
+            tagOptions: previousState.tagOptions.filter(item => item.value !== value ), 
+          })); 
+          
+          // Refresh Token
+          sessionStorage.setItem('authorization', response.headers['authorization']);     
+        }))
+        .catch((err => {
+            
+        }))  
+  }
+
+  // Handle refresh of tag options
+  handleSearchRefresh = (e) => {
+    let diff = this.state.tags.filter(x => !this.state.tagData.includes(x.value));
+    this.setState( {tagOptions: diff});
+  }
+
+  // Handle tag remove
+  handleClick = (e) => {
+
+    // Check Token
+    this.checkToken();
+
+    // Retrieve value of tag to remove
+    var value = e.target.getAttribute('data-item');
+
+    // Set token header when sending post
+    axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
+
+    // Delete tag from node(s)
+    axios.post("https://localhost:7010/Tag/removeTag?tagName="+this.handleEncoded(value), this.state.nodes)
+        .then(response => {
+            this.setState( previousState => ({
+                tagData: previousState.tagData.filter(item => item !== value ), 
+                tagOptions: [...previousState.tagOptions, {"value": value, "label": value}],
+            }));
+            this.handleSearchRefresh();
+
+            // Refresh Token
+            sessionStorage.setItem('authorization', response.headers['authorization']);
+        })
+  }
+
+  handleEncoded = (e) => {
+    var parsedData = e.toString();
+    if(parsedData.includes('!')){
+        parsedData = parsedData.replaceAll('!', '%21');
+    }
+    if(parsedData.includes('#')){
+        parsedData = parsedData.replaceAll('#', '%23');
+    }
+    if(parsedData.includes('$')){
+        parsedData = parsedData.replaceAll('$', '%24');
+    }
+
+    // DO NOT DO % SHOULD NOT BE REPLACED
+    
+    if(parsedData.includes('&')){
+        parsedData = parsedData.replaceAll('&', '%26');
+    }
+    if(parsedData.includes('+')){
+        parsedData = parsedData.replaceAll('+', '%2B');
+    }
+    return parsedData;
 }
   
-  export default Tagger;
-  
+  render() {
+    // Render node tags
+    const renderTags = (
+      <div className="tagger-container">
+          <p>Tags:</p>
+          <ul>
+            {this.state.tagData.sort().map(item => 
+                <span key={item} onClick = { this.handleClick } ><Tag name = {item}/></span>
+              )}
+          </ul>
+      </div>
+    );
+
+    // Render search bar for tag options
+    const renderSearchBar = (
+      <div className = "tagger-searchBar-container">
+        <Select 
+          options = {this.state.tagOptions}  
+          onChange = {this.handleSelection} 
+          value = {this.state.nullSearch} 
+          filterOption = {createFilter( {ignoreAccents: false})} 
+        />
+      </div>
+    )
+
+    return(
+      <div className="tagger-wrapper">
+          <div className = "tagger-status-wrapper">
+              {this.state.errorMessage}
+          </div>
+          <div className = "tagger-table-wrapper">
+              {renderTags}
+          </div>
+          <div className = "tagger-search-form-wrapper">
+              {renderSearchBar}
+          </div>
+      </div>
+    )
+  }
+}
+
+export default(Tagger);

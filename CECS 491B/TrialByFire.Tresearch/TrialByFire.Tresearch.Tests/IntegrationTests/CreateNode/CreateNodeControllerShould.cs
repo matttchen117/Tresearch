@@ -31,7 +31,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
             TestServices.AddScoped<ICreateNodeController, CreateNodeController>();
             TestProvider = TestServices.BuildServiceProvider();
         }
-
+        /*
         [Theory]
         [InlineData("jessie@gmail.com", 69420, 3, "Cooking", "Concepts of Preparing Food", true, "jessie@gmail.com", "jessie@gmail.com", "user", "200: Server: Create Node Success")]
         [InlineData("jessie@gmail.com", 69420, 3, "Cooking", "Concepts of Preparing Food", true, "jessie@gmail.com", "jessie@gmail.com", "guest", "403: Database: You are not authorized to perform this operation.")]
@@ -65,6 +65,6 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
             //Assert
             Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);
             Assert.Equal(expectedResult.Value, objectResult.Value);
-        }
+        } */
     }
 }

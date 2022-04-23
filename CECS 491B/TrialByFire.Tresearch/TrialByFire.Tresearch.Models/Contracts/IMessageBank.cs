@@ -13,6 +13,10 @@ namespace TrialByFire.Tresearch.Models.Contracts
         public enum Responses
         {
             generic,
+            unhandledException,
+            operationCancelled,
+
+            databaseConnectionFail,
 
             verifySuccess,
             notEnabled,
@@ -35,6 +39,69 @@ namespace TrialByFire.Tresearch.Models.Contracts
             unknownRole,
             logoutFail,
             logoutRollback,
+
+            logSuccess,
+            logFail,
+            logRollback,
+
+            /// <summary>
+            /// Tag added to node(s)
+            /// </summary>
+            tagAddSuccess,
+            /// <summary>
+            /// Tag removed from node(s)
+            /// </summary>
+            tagRemoveSuccess,
+            /// <summary>
+            /// Tag created in tag bank
+            /// </summary>
+            tagCreateSuccess,
+            /// <summary>
+            /// Tag deleted from tag bank
+            /// </summary>
+            tagDeleteSuccess,
+            /// <summary>
+            /// Tag bank retrieved
+            /// </summary>
+            tagGetSuccess,
+            /// <summary>
+            /// Tag bank retrieval failed
+            /// </summary>
+            tagRetrievalFail,
+            /// <summary>
+            /// Tag already exists in tag bank
+            /// </summary>
+            tagDuplicate,
+            /// <summary>
+            /// Tag does not exist in tag bank
+            /// </summary>
+            tagNotFound,
+            /// <summary>
+            /// Invalid tag count
+            /// </summary>
+            tagCountInvalid,
+            /// <summary>
+            /// Invalid tag name
+            /// </summary>
+            tagNameInvalid,
+
+            //Rating
+            userRateSuccess,
+            userRateFail,
+            getRateSuccess,
+            getRateFail,
+
+            jwtValidationSuccess,
+            jwtValidationFail,
+
+            refreshSessionSuccess,
+            refreshSessionFail,
+            refreshSessionNotAllowed,
+
+            accountUpdateSuccess,
+            accountUpdateFail,
+            accountEnableSuccess,
+            accountDisableSuccess,
 
             badNameOrPass,
             badEmail,
@@ -80,6 +147,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             dailyLoginsExists,
             dailyLoginNotInserted,
             dailyLoginNotExist,
+
             topSearchExists,
             topSearchNotInserted,
             topSearchNotExist,
@@ -87,6 +155,14 @@ namespace TrialByFire.Tresearch.Models.Contracts
             dailyRegistrationNotInserted,
             dailyRegistrationNotExist,
             storeLogFail,
+
+            getAdminsSuccess,
+            accountDeletionSuccess,
+            lastAdminFail,
+            accountAlreadyDeleted,
+            accountDeleteFail,
+            verificationFailure,
+
             nodeTagNodeDoesNotExist,
             tagAlreadyExist,
             tagDoesNotExist,

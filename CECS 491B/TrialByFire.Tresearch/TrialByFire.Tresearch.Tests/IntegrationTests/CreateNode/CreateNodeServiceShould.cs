@@ -26,6 +26,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
             TestProvider = TestServices.BuildServiceProvider();
         }
 
+        /*
         [Theory]
         /*[InlineData("jessie@gmail.com", 69420, 3, "Cooking", "Concepts of Preparing Food", true, false, "jessie@gmail.com", "user", "200: Server: Create Node Success")]
         [InlineData("jessie@gmail.com", 69420, 2, "Cooking", "Concepts of Preparing Food", true, false, "jessie@gmail.com", "user", "200: Server: Create Node Success")]*/
@@ -53,5 +54,6 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
             //Assert
             Assert.Equal(expected, result);
         }
+        */
     }
 }

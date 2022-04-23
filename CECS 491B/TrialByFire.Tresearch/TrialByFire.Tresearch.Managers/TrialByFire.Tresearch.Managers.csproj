@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TrialByFire.Tresearch.DAL\TrialByFire.Tresearch.DAL.csproj" />
     <ProjectReference Include="..\TrialByFire.Tresearch.Models\TrialByFire.Tresearch.Models.csproj" />
     <ProjectReference Include="..\TrialByFire.Tresearch.Services\TrialByFire.Tresearch.Services.csproj" />

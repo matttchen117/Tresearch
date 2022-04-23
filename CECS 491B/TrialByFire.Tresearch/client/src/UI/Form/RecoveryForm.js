@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import {useNavigate} from 'react-router-dom';
-import axios, {AxiosResponse, AxiosError} from 'axios';
+import React from "react";
+import axios from 'axios';
 
 import "./RecoveryForm.css";
 import Button from "../Button/ButtonComponent";
@@ -34,7 +33,7 @@ class RegistrationForm extends React.Component  {
         e.preventDefault();
         
         if(this.handleInput() == true){
-            axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/Recovery/SendRecovery?email=' + this.state.email.toLowerCase() + '&authorizationLevel=user')
+            axios.post('https://localhost:7010/Recovery/SendRecovery?email=' + this.state.email.toLowerCase() + '&authorizationLevel=user')
             .then(res => {
                 this.setState({errorMessage: ''})
                 window.location = '/Recover/RecoverySent';

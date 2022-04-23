@@ -1,7 +1,5 @@
-import React, { useState } from "react";
-import {useNavigate} from 'react-router-dom';
-import axios, {AxiosResponse, AxiosError} from 'axios';
-import pbkdf2 from "pbkdf2/lib/sync";
+import React from "react";
+import axios from 'axios';
 
 import "./RegistrationForm.css";
 import Button from "../Button/ButtonComponent";
@@ -25,7 +23,7 @@ class RegistrationForm extends React.Component  {
         //  passphrase: a-z, A-Z, 0-9, .,@! space
         var regexPassphrase = new RegExp("^[a-zA-Z0-9.,@!\s]+$");
 
-        if(this.state.agreement == false){
+        if(this.state.agreement === false){
             this.setState({errorMessage: 'Must agree to terms to create account'});
             return false;
         }
@@ -57,17 +55,19 @@ class RegistrationForm extends React.Component  {
         this.setState({ passphrase: updatedpassphrase});
     }
 
-    inputCheckboxHandler = (e) => {
-        let updatedAgreement = !this.state.agreement;
-        this.setState({agreement: updatedAgreement});
-    }
-
     hashInput = (value) => {
         var pbkdf2 = require('pbkdf2');      
         const pbkdfKey = pbkdf2.pbkdf2Sync(value, '',  10000,  64, 'sha512');
         return pbkdfKey.toString('hex').toUpperCase();
     }
 
+
+    inputCheckboxHandler = (e) => {
+        let updatedAgreement = !this.state.agreement;
+        this.setState({agreement: updatedAgreement});
+    }
+
+    
 
     onSubmitHandler = (e) => {
         e.preventDefault();
@@ -76,7 +76,7 @@ class RegistrationForm extends React.Component  {
 
         if(this.handleInput()){
             this.setState({errorMessage: ''})
-            axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/Registration/register?email=' + this.state.email.toLowerCase() + '&passphrase=' + this.hashInput(this.state.passphrase.toLowerCase()))
+            axios.post('https://localhost:7010/Registration/register?email=' + this.state.email.toLowerCase() + '&passphrase=' + this.hashInput(this.state.passphrase))
             .then(res => {
                 window.location = '/Register/ConfirmationSent';
             })
@@ -86,6 +86,7 @@ class RegistrationForm extends React.Component  {
                         break;
                     default: this.setState({errorMessage: 'Unable to create account'});
                 }
+                console.log(err);
             })
         }
     }

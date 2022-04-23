@@ -13,5 +13,17 @@ namespace TrialByFire.Tresearch.Models.Implementations
             this.NodeID = nodeID;
             this.TagName = tagName;
         }
+        public override bool Equals(object? obj)
+        {
+            if (!(obj == null))
+            {
+                if (obj is NodeTag)
+                {
+                    NodeTag nodeTag = (NodeTag)obj;
+                    return TagName.Equals(nodeTag.TagName) && NodeID.Equals(nodeTag.NodeID);
+                }
+            }
+            return false;
+        }
     }
 }

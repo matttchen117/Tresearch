@@ -1,0 +1,56 @@
+
+.authenticated-navbar-container {
+    margin: 0;
+    overflow: hidden;
+}
+
+.authenticated-navbar-container ul {
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.authenticated-navbar-container ul li {
+    display: inline-block;
+    list-style-type: none;
+    cursor: pointer;
+    color: #0D6129;
+    
+}
+
+
+.nav-context-menu{
+    background-color: #fff;
+    border-radius: 2px;
+    box-shadow:  0 0 2px black;
+    color: #373a3c;
+    font-size: 1em;
+    font-weight: 400;
+    list-style: none;
+    transition: opacity 0.25s linear;
+    width: 150px;
+    white-space: nowrap;
+    
+}
+
+.profile {
+    background-color: #788770;
+    color: white;
+    font-size: 1em;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    float: right;
+    text-align: center;
+    line-height: 2em;
+    
+}
+
+.profile p {
+    text-align: center;
+}
+.profile-container {
+    font-size: 25px;
+    padding-top: 10px;
+    padding-right:10px;
+}

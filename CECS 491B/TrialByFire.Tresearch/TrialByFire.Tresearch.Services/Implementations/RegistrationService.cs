@@ -1,42 +1,81 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Options;
 using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.DAL.Contracts;
+using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
+using System.Security.Cryptography;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
+    /// <summary>
+    ///     Reigstration service to call sql dao layer. Handles user account registration and confirmation.
+    /// </summary>
     public class RegistrationService : IRegistrationService
     {
+        private BuildSettingsOptions _options { get; }
         private ISqlDAO _sqlDAO { get; set; }
         private ILogService _logService { get; set; }
         private IMessageBank _messageBank { get; set; }
 
         private int linkActivationLimit = 24;
 
-        public RegistrationService(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank)
+        public RegistrationService(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, IOptions<BuildSettingsOptions> options)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
             _messageBank = messageBank;
+            _options = options.Value;
         }
 
-
-        public async Task<string> CreateAccountAsync(string email, string passphrase, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        /// <summary>
+        ///     CreateAccountAsync(email, passphrase, authorizationlevel)
+        ///
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="passphrase"></param>
+        /// <param name="authorizationLevel"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<Tuple<int, string>> CreateAccountAsync(string email, string passphrase, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                IAccount account = new Account(email, email, passphrase, authorizationLevel, true, false);
-                string createResult = await _sqlDAO.CreateAccountAsync(account, cancellationToken).ConfigureAwait(false);
+                IAccount account = new UserAccount(email, passphrase, authorizationLevel, true, false);
+                Tuple<int, string> createResult = await _sqlDAO.CreateAccountAsync(account, cancellationToken).ConfigureAwait(false);
 
-                if(cancellationToken.IsCancellationRequested && createResult == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                if(cancellationToken.IsCancellationRequested && createResult.Item2 == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
                 {
                     //Perform Rollback
+
+                }
+
+                return createResult;
+            }
+            catch (OperationCanceledException)
+            {
+                //Nothing to rollback
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(-1, "500: Server: " + ex.Message);
+            }
+        }
+
+        public async Task<string> CreateOTPAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+               
+                string createResult = await _sqlDAO.CreateOTPAsync(email, authorizationLevel, 0, cancellationToken).ConfigureAwait(false);
+
+                if (cancellationToken.IsCancellationRequested && createResult == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                {
+                    //Perform Rollback
+
                 }
 
                 return createResult;
@@ -52,13 +91,21 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        public async Task<Tuple<IConfirmationLink, string>> CreateConfirmationAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        /// <summary>
+        ///     CreateConfirmationAsync(email, authorizationLevel)
+        ///         Creates Confirmation link
+        /// </summary>
+        /// <param name="username">Email of user</param>
+        /// <param name="authorizationLevel">Authorization Level of user</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Confirmation link and string status code</returns>
+        public async Task<Tuple<IConfirmationLink, string>> CreateConfirmationAsync(string username, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             IConfirmationLink nullLink = null;
             try
             {
                 Guid guid = Guid.NewGuid();
-                IConfirmationLink confirmationLink = new ConfirmationLink(email, authorizationLevel, guid, DateTime.Now);
+                IConfirmationLink confirmationLink = new ConfirmationLink(username, authorizationLevel, guid, DateTime.Now);
 
                 string result = await _sqlDAO.CreateConfirmationLinkAsync(confirmationLink, cancellationToken).ConfigureAwait(false);
 
@@ -83,6 +130,39 @@ namespace TrialByFire.Tresearch.Services.Implementations
             catch (Exception ex)
             {
                 return Tuple.Create(nullLink, "500: Server: " + ex.Message);
+
+            }
+        }
+
+        public async Task<string> CreateConfirmationAsync(IConfirmationLink link, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            IConfirmationLink nullLink = null;
+            try
+            {
+
+                string result = await _sqlDAO.CreateConfirmationLinkAsync(link, cancellationToken).ConfigureAwait(false);
+
+                if (result != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                    return result;
+
+                if (cancellationToken.IsCancellationRequested && result == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                {
+                    string rollbackResult = await _sqlDAO.RemoveConfirmationLinkAsync(link);
+                    if (rollbackResult != await _messageBank.GetMessage(IMessageBank.Responses.generic))
+                        return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
+                    else
+                        throw new OperationCanceledException();
+                }
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                //Rollback taken care of
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Server: " + ex.Message;
 
             }
         }
@@ -151,6 +231,38 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     else
                         throw new OperationCanceledException();
                 }
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Server: " + ex.Message;
+            }
+        }
+
+        public async Task<string> HashValueAsync(string value, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                Rfc2898DeriveBytes pbkdf2 = new Rfc2898DeriveBytes(value, 0, iterations: 10000, HashAlgorithmName.SHA512);
+                return string.Join(string.Empty, Array.ConvertAll(pbkdf2.GetBytes(64), b => b.ToString("X2")));
+            }
+            catch(Exception ex)
+            {
+                return "";
+            }
+        }
+
+        public async Task<string> CreateHashTableEntry(int ID, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                string result = await _sqlDAO.CreateUserHashAsync(ID, hashedEmail, cancellationToken).ConfigureAwait(false);
                 return result;
             }
             catch (OperationCanceledException)

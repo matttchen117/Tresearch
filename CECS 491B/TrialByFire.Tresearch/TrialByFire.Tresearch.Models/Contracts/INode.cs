@@ -8,7 +8,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
     {
         public string UserHash { get; set; }
         public long NodeID { get; set; }
-        public long NodeParentID { get; set; }
+        public long ParentNodeID { get; set; }
         public string NodeTitle { get; set; }
         public string Summary { get; set; }
         public DateTime TimeModified { get; set; }

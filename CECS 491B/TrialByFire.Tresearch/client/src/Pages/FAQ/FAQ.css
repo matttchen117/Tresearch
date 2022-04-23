@@ -1,0 +1,29 @@
+.content-faq-containter{
+    text-align: left;
+    margin-left: 15px;
+    color: #283618;
+}
+
+.feature-faq-container{
+    text-align: left;
+    margin-left: 15px;
+    color: #283618;
+}
+
+.feature-faq-container h3{
+    text-align: left;
+    text-decoration: underline;
+    
+}
+
+.feature-faq-container p{
+    text-align: left;
+    margin-left: 30px;
+    color: #283618;
+}
+
+.feature-faq-container h4{
+    text-align: left;
+    margin-left: 15px;
+    color: #283618;
+}

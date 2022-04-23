@@ -1,44 +1,49 @@
-﻿using Xunit;
-using TrialByFire.Tresearch.DAL.Contracts;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using System.Data.SqlClient;
+using System.Text.RegularExpressions;
 using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Models.Contracts;
-using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Services.Implementations;
+using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
-using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 {
-    public class RegistrationManagerShould : TestBaseClass
+    public class RegistrationManagerShould : TestBaseClass, IClassFixture<RegManDatabaseFixture>
     {
-        public RegistrationManagerShould() : base(new string[] { })
+        RegManDatabaseFixture fixture;
+        public RegistrationManagerShould(RegManDatabaseFixture fixture) : base(new string[] { })
         {
+            this.fixture = fixture;
             TestServices.AddScoped<IMailService, MailService>();
             TestServices.AddScoped<IRegistrationService, RegistrationService>();
             TestServices.AddScoped<IRegistrationManager, RegistrationManager>();
             TestProvider = TestServices.BuildServiceProvider();
         }
+
         [Theory]
-        [InlineData("trialbyfire.tresearch+IntRegMan1@gmail.com", "myPassword","user", "200: Server: success")]
-        [InlineData("trialbyfire.tresearch+IntRegMan2@gmail.com", "unFortunateName","user", "409: Server: Account  already exists")]
-        public async Task RegisterTheUser(string email, string passphrase, string authorizationLevel, string statusCode)
+        [MemberData(nameof(CreateData))]
+        public async Task RegisterTheUser(IRoleIdentity roleIdentity, string email, string passphrase, string authorizationLevel, IMessageBank.Responses response)
         {
             //Arrange
-            string baseUrl = "https://trialbyfiretresearch.azurewebsites.net/Register/Confirm?guid=";
+            IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+            Thread.CurrentPrincipal = rolePrincipal;
             IRegistrationManager registrationManager = TestProvider.GetService<IRegistrationManager>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
+            string expected = await messageBank.GetMessage(response);
+
             //Act
-            string results = await registrationManager.CreateAndSendConfirmationAsync(email, passphrase, authorizationLevel, baseUrl).ConfigureAwait(false);
+            string results = await registrationManager.CreateAndSendConfirmationAsync(email, passphrase, authorizationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
-            Assert.Equal(statusCode , results);
+            Assert.Equal(expected , results);
         }
 
-        [Theory]
-        [InlineData("trialbyfire.tresearch+IntRegMan4@gmail.com", "7f5c634a-ef48-49c2-a20c-adde83b6837d", "200: Server: success")]
-        [InlineData("trialbyfire.tresearch+IntRegMan5@gmail.com", "5278f32c-353f-487d-9145-4320125fc433", "200: Server: success")] //User is already enabled
-        [InlineData("trialbyfire.tresearch+IntRegMan5@gmail.com", "7f5c634a-ef47-49c2-a20c-adde85b6837d", "404: Database: The confirmation link was not found.")]
         public async Task ConfirmTheUser(string username, string guid, string statusCode)
         {
             //Arrange
@@ -53,10 +58,6 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
             Assert.Equal(expected, result);
         }
 
-        [Theory]
-        [InlineData(-24)]
-        [InlineData(-23)]
-        [InlineData(0)]
         public void checkLinkInValidity(int minusHours)
         {
             //Arrange
@@ -73,6 +74,86 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 
             //Assert
             Assert.Equal(expected, actual);
+        }
+
+        public static IEnumerable<object[]> CreateData()
+        {
+            /**
+             *  Case 0: User is Authenticated. Account Exists 
+             *      Account:
+             *          Username: RegManagerIntegration1@tresearch.system
+             *          AuthorizationLevel: user
+             *          AccountStatus: True
+             *          Confirmed: False
+             */
+            IRoleIdentity roleIdentity0 = new RoleIdentity(true, "pammypoor+RegManagerIntegration1@gmail.system", "user", "ceef03d444c0c33847d796ced4ed6cd95e89dbe64a9fbe7dcebcdb6b630d2c341d0c40ef3dcf365ab544ffa5a6fd6463d81a0c224f92fef88e7c4d084e2b6a1c");
+            var username0 = "pammypoor+RegManagerIntegration1@gmail.system";
+            var passphrase0 = "test1";
+            var role0 = "user";
+            var expected0 = IMessageBank.Responses.alreadyAuthenticated;
+
+            /**
+             *  Case 1: User is not authenticated. Account Exists 
+             *      Account:
+             *          Username: RegManagerIntegration1@tresearch.system
+             *          AuthorizationLevel: user
+             *          AccountStatus: True
+             *          Confirmed: False
+             */
+            IRoleIdentity roleIdentity1 = new RoleIdentity(true, "guest", "guest");
+            var username1 = "pammypoor+regManagerCreateUser2@gmail.com";
+            var passphrase1 = "test1";
+            var role1 = "user";
+            var expected1 = IMessageBank.Responses.accountAlreadyCreated;
+
+            return new[]
+            {
+                new object[] { roleIdentity0, username0, passphrase0, role0, expected0 },
+                new object[] { roleIdentity1, username1, passphrase1, role1, expected1 }
+            };
+        }
+
+    }
+
+    public class RegManDatabaseFixture : TestBaseClass, IDisposable
+    {
+        public RegManDatabaseFixture() : base(new string[] { })
+        {
+            TestProvider = TestServices.BuildServiceProvider();
+            IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
+            BuildSettingsOptions optionsValue = options.Value;
+
+            string script = File.ReadAllText("../../../IntegrationTests/Registration/SetupAndCleanup/ManagerIntegrationSetup.sql");
+
+            IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
+            {
+                connection.Open();
+                foreach (string command in commands)
+                    if (!string.IsNullOrWhiteSpace(command.Trim()))
+                        using (var com = new SqlCommand(command, connection))
+                            com.ExecuteNonQuery();
+            }
+        }
+
+        public void Dispose()
+        {
+            IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
+            BuildSettingsOptions optionsValue = options.Value;
+
+            string script = File.ReadAllText("../../../IntegrationTests/Registration/SetupAndCleanup/ManagerIntegrationCleanup.sql");
+
+            IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
+            {
+                connection.Open();
+                foreach (string command in commands)
+                    if (!string.IsNullOrWhiteSpace(command.Trim()))
+                        using (var com = new SqlCommand(command, connection))
+                            com.ExecuteNonQuery();
+            }
         }
     }
 }
