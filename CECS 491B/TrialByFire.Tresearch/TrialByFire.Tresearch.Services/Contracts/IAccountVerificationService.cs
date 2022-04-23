@@ -10,6 +10,6 @@ namespace TrialByFire.Tresearch.Services.Contracts
     public interface IAccountVerificationService
     {
         public Task<string> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken = default);
-        public Task<string> VerifyAccountAuthorizedNodeChangesAsync(List<long> nodeIDs, IAccount account, CancellationToken cancellationToken = default);
+        public Task<string> VerifyAccountAuthorizedNodeChangesAsync(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default);
     }
 }

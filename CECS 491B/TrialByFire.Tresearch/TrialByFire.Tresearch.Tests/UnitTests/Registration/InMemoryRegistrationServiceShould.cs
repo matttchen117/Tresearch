@@ -20,7 +20,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
 
         [Theory]
         [InlineData("pammypoor+UnitSerReg1@gmail.com", "myPassphrase", "user", "200: Server: success")]
-        [InlineData("pammypoor+UnitSerReg2@gmail.com", "myPassphrase", "user", "409: Server: Account  already exists")]
+        [InlineData("pammypoor+UnitSerReg2@gmail.com", "myPassphrase", "user", "409: Server: UserAccount  already exists")]
         public async Task CreateTheUser(string email,  string passphrase, string authorizationLevel, string statusCode)
         {
             //Arrange
@@ -36,9 +36,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         }
 
         [Theory]
-        [InlineData("pammypoor+UnitSerReg3@gmail.com", "user", "200: Server: success")] //Account exists and is not confirmed
+        [InlineData("pammypoor+UnitSerReg3@gmail.com", "user", "200: Server: success")] //UserAccount exists and is not confirmed
         [InlineData("pammypoor+UnitSerReg4@gmail.com", "user", "200: Server: success")]
-        [InlineData("pammypoor+UnitSerReg99@gmail.com", "user", "500: Database: The Account was not found.")]
+        [InlineData("pammypoor+UnitSerReg99@gmail.com", "user", "500: Database: The UserAccount was not found.")]
         public async Task ConfirmTheAccount(string email, string authorizationLevel, string statusCode)
         {
             //Arrange
@@ -56,7 +56,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
         [Theory]
         [InlineData("pammypoor+UnitSerReg2@gmail.com", "user", "200: Server: success")]
         [InlineData("pammypoor+UnitSerReg3@gmail.com", "user", "409: Database: The confirmation link already exists.")]
-        [InlineData("pammypoor+UnitSerReg99@gmail.com", "user", "500: Database: The Account was not found.")]
+        [InlineData("pammypoor+UnitSerReg99@gmail.com", "user", "500: Database: The UserAccount was not found.")]
         public async Task CreateTheLink(string email,  string authorizationLevel, string statusCode)
         {
             //Arrange

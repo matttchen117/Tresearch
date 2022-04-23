@@ -15,7 +15,7 @@ const AccountConfirmed = () => {
         <div className="account-confirmed-component-container">
             <NavigationBar/>
             <div className="caccount-confirmed-title">
-                <h1 className="account-confirmed-title-text">Congradulations!</h1>
+                <h1 className="account-confirmed-title-text">Congratulations!</h1>
             </div>
             {renderBody}
         </div>

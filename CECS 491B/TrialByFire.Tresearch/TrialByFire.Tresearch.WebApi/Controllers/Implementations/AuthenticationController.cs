@@ -20,37 +20,20 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
     public class AuthenticationController : Controller, IAuthenticationController
     {
         private ISqlDAO _sqlDAO { get; }
-        private ILogService _logService { get; }
+        private ILogManager _logManager { get; }
         private IAuthenticationManager _authenticationManager { get; }
         private IMessageBank _messageBank { get; }
 
         private BuildSettingsOptions _buildSettingsOptions { get; }
 
-        public AuthenticationController(ISqlDAO sqlDAO, ILogService logService, 
+        public AuthenticationController(ISqlDAO sqlDAO, ILogManager logManager, 
             IAuthenticationManager authenticationManager, IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> buildSettingsOptions)
         {
             _sqlDAO = sqlDAO;
-            _logService = logService;
+            _logManager = logManager;
             _authenticationManager = authenticationManager;
             _messageBank = messageBank;
             _buildSettingsOptions = buildSettingsOptions.Value;
-        }
-
-        [HttpPost]
-        [Route("test")]
-        public string Test(string username, string otp, string authorizationLevel)
-        {
-            IRoleIdentity roleIdentity = new RoleIdentity(true, username, authorizationLevel);
-            IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            Response.HttpContext.User = new ClaimsPrincipal(rolePrincipal);
-            return HttpContext.User.Identity.Name;
-        }
-
-        [HttpPost]
-        [Route("test2")]
-        public string Test()
-        {
-            return HttpContext.User.IsInRole("user").ToString();
         }
 
         //
@@ -63,41 +46,69 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         //   otp:
         //     The otp entered by the User attempting to Authenticate.
         //   authorizationLevel:
-        //     The selected authorization level for the Account that the User is trying Authenticate for.
+        //     The selected authorization level for the UserAccount that the User is trying Authenticate for.
         //
         // Returns:
         //     The result of the operation with any status codes if applicable.
         [HttpPost]
         [Route("authenticate")]
-        public async Task<IActionResult> AuthenticateAsync(string username, string otp, string authorizationLevel)
+        public async Task<IActionResult> AuthenticateAsync(string username, string otp, 
+            string authorizationLevel, CancellationToken cancellationToken = default)
         {
             string[] split;
-            List<string> results = await _authenticationManager.AuthenticateAsync(username, otp, authorizationLevel, 
-                DateTime.Now.ToUniversalTime()).ConfigureAwait(false);
-            string result = results[0];
-            if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.authenticationSuccess).
-                    ConfigureAwait(false)))
+            string result;
+            try
             {
-                if (_buildSettingsOptions.Environment.Equals("Test"))
+                List<string> results = await _authenticationManager.AuthenticateAsync(username, otp, authorizationLevel,
+                    DateTime.Now.ToUniversalTime()).ConfigureAwait(false);
+                result = results[0];
+                split = result.Split(": ");
+                if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.authenticationSuccess).
+                        ConfigureAwait(false)))
                 {
-                    split = result.Split(": ");
+                    if (_buildSettingsOptions.Environment.Equals("Test"))
+                    {
+                        return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
+                    }
+                    HttpContext.Response.Headers.Add(_buildSettingsOptions.AccessControlHeaderName, _buildSettingsOptions.JWTHeaderName);
+                    HttpContext.Response.Headers.Add(_buildSettingsOptions.JWTHeaderName, results[1]);
+                    _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
+                        category: ILogManager.Categories.Server, 
+                        await _messageBank.GetMessage(IMessageBank.Responses.authenticationSuccess).ConfigureAwait(false));
                     return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                 }
-                HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "Authorization");
-                HttpContext.Response.Headers.Add("Authorization", results[1]);
-                //_logService.CreateLog(DateTime.Now.ToUniversalTime(), "Server", username, "Info", "Authentication Succeeded");
-                split = result.Split(": ");
-                return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
+                if (Enum.TryParse(split[1], out ILogManager.Categories category))
+                {
+                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                    category, split[2]);
+                }
+                else
+                {
+                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                    category: ILogManager.Categories.Server, split[2] + ": Bad category passed back.");
+                }
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
-            // {category}: {error message}
-            //_logService.CreateLog(DateTime.Now.ToUniversalTime(), "Error", username, error[1], error[2]);
-            split = result.Split(": ");
-            return StatusCode(Convert.ToInt32(split[0]), split[2]);
+            catch (OperationCanceledException tce)
+            {
+                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                    category: ILogManager.Categories.Server, await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + tce.Message);
+                return StatusCode(400, tce.Message);
+            }
+            catch (Exception ex)
+            {
+                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level:
+                    ILogManager.Levels.Error,
+                    category: ILogManager.Categories.Server, await
+                    _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false)
+                    + ex.Message);
+                return StatusCode(600, ex.Message);
+            }
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> AuthenticateAsync(string username, string otp, 
-            string authorizationLevel, DateTime now)
+            string authorizationLevel, DateTime now, CancellationToken cancellationToken = default)
         {
             string[] split;
             string result = "";
@@ -106,55 +117,48 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 List<string> results = await _authenticationManager.AuthenticateAsync(username, 
                     otp, authorizationLevel, now).ConfigureAwait(false);
                 result = results[0];
+                split = result.Split(": ");
                 if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.authenticationSuccess).
                     ConfigureAwait(false)))
                 {
                     if (_buildSettingsOptions.Environment.Equals("Test"))
                     {
-                        split = result.Split(": ");
                         return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                     }
-                    //Response.Cookies.Append("TresearchAuthenticationCookie", results[1], CreateCookieOptions());
-                    Response.Headers.Add("Access-Control-Allow-Headers", "Authorization");
-                    Response.Headers.Add("Authorization", results[1]);
-                    //_logService.CreateLog(DateTime.Now.ToUniversalTime(), "Server", username, "Info", "Authentication Succeeded");
-                    split = result.Split(": ");
+                    Response.Headers.Add(_buildSettingsOptions.AccessControlHeaderName, _buildSettingsOptions.JWTHeaderName);
+                    Response.Headers.Add(_buildSettingsOptions.JWTHeaderName, results[1]);
+                    _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
+                        category: ILogManager.Categories.Server,
+                        await _messageBank.GetMessage(IMessageBank.Responses.authenticationSuccess).ConfigureAwait(false));
                     return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                 }
+                if (Enum.TryParse(split[1], out ILogManager.Categories category))
+                {
+                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                    category, split[2]);
+                }
+                else
+                {
+                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                    category: ILogManager.Categories.Server, split[2] + ": Bad category passed back.");
+                }
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
             catch (OperationCanceledException tce)
             {
+                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                    category: ILogManager.Categories.Server, await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + tce.Message);
                 return StatusCode(400, tce.Message);
             }
             catch (Exception ex)
             {
-                return StatusCode(400, ex.Message);
+                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: 
+                    ILogManager.Levels.Error,
+                    category: ILogManager.Categories.Server, await 
+                    _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) 
+                    + ex.Message);
+                return StatusCode(600, ex.Message);
             }
-            // {category}: {error message}
-            //_logService.CreateLog(DateTime.Now.ToUniversalTime(), "Error", username, error[0], error[1]);
-            split = result.Split(": ");
-            return StatusCode(Convert.ToInt32(split[0]), split[2]);
         }
-
-        //
-        // Summary:
-        //     Generates the CookieOptions for the Cookie to be created for the User.
-        //
-        // Returns:
-        //     The created CookieOptions.
-        [ApiExplorerSettings(IgnoreApi = true)]
-        private CookieOptions CreateCookieOptions()
-        {
-            CookieOptions cookieOptions = new CookieOptions();
-            cookieOptions.IsEssential = true;
-            cookieOptions.Expires = DateTime.Now.ToUniversalTime().AddDays(5);
-            //cookieOptions.Path = "/";
-            cookieOptions.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
-            cookieOptions.Secure = true;
-            return cookieOptions;
-            //Return CookieOptions, set actual Cookie in the caller code
-            // For Readability
-        }
-
     }
 }

@@ -1,10 +1,7 @@
 import React from "react";
 import { useParams,} from "react-router-dom";
-import NavigationBar from "../../UI/Navigation/NavigationBar";
 import "./InactiveLink.css";
-import axios, {AxiosResponse, AxiosError} from 'axios';
-
-
+import axios from 'axios';
 
 class InactiveLink extends React.Component {
      render() {

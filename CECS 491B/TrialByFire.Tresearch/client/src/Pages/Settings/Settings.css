@@ -11,6 +11,7 @@
     background-color: var(--form-container-bkg-color);
 }
 
+
 .error-settings{
     color: red;
     padding-top: 10px;

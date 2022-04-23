@@ -96,7 +96,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
         /// <summary>
         ///     GetAccountAsync(email, authorizationLevel)
-        ///         Returns Account from database matching credentials
+        ///         Returns UserAccount from database matching credentials
         /// </summary>
         /// <param name="email">Email of account to get</param>
         /// <param name="authorizationLevel">Authorization Level of account</param>
@@ -129,7 +129,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         ///     CreateRecoveryLinkAsync(account)
         ///        Creates and updates database with recovery link
         /// </summary>
-        /// <param name="account">Account to create recovery link for</param>
+        /// <param name="account">UserAccount to create recovery link for</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>String with status code</returns>
         public async Task<Tuple<IRecoveryLink, string>> CreateRecoveryLinkAsync(IAccount account, CancellationToken cancellationToken=default(CancellationToken))
@@ -140,7 +140,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                linkCreated  = new RecoveryLink(account.Email, account.AuthorizationLevel, DateTime.Now, Guid.NewGuid());
+                linkCreated  = new RecoveryLink(account.Username, account.AuthorizationLevel, DateTime.Now, Guid.NewGuid());
                 string result = await _sqlDAO.CreateRecoveryLinkAsync(linkCreated, cancellationToken);
 
                 if (cancellationToken.IsCancellationRequested && result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))

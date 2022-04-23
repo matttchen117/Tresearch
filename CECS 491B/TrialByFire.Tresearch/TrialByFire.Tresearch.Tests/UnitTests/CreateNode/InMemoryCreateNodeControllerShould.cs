@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -31,14 +31,15 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CreateNode
             TestProvider = TestServices.BuildServiceProvider();
         }
 
+        /*
         [Theory]
-        [InlineData("jessie@gmail.com", 69420, 69419, "Cooking", "Concepts of Preparing Food", true, "jessie@gmail.com", "jessie@gmail.com", "guest", "200: Server: success")]
-        [InlineData("larry@gmail.com", 100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com", "larry@gmail.com", "guest", "409: Database: Node Already Exists")]
+        [InlineData("jessie@gmail.com", 69422, 69420, "Sauteeing ", "Preparing food on a stove", true, "jessie@gmail.com", "jessie@gmail.com", "user", "200: Server: success")]
+        [InlineData("larry@gmail.com", 100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com", "larry@gmail.com", "guest", "403: Database: You are not authorized to perform this operation.")]
         public async Task CreateTheNode(string username, long nodeID, long parentID, string nodeTitle, string summary, bool visibility,
             string accountOwner, string currentIdentity, string currentRole, string expected)
         {
             //Arrange
-            IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
+            IRoleIdentity roleIdentity = new RoleIdentity(true, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             if (!currentIdentity.Equals("guest"))
             {
@@ -50,16 +51,19 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CreateNode
             {
                 StatusCode = Convert.ToInt32(expects[0])
             };
-            Node node = new Node(nodeID, parentID, nodeTitle, summary, visibility, accountOwner);
+            Node node = new Node(nodeID, parentID, nodeTitle, summary, visibility, false, accountOwner);
+            Account account = new Account(username, "jessie123", "user");
 
             //Act
-            IActionResult result = await createNodeController.CreateNodeAsync(username, node).ConfigureAwait(false);
+            IActionResult result = await createNodeController.CreateNodeAsync(account, node).ConfigureAwait(false);
             var objectResult = result as ObjectResult;
 
             //Assert
             Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);
             Assert.Equal(expectedResult.Value, objectResult.Value);
         }
+        
     }
 }
 
+*/

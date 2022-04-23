@@ -42,7 +42,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                IAccount account = new Account(email, passphrase, authorizationLevel, true, false);
+                IAccount account = new UserAccount(email, passphrase, authorizationLevel, true, false);
                 Tuple<int, string> createResult = await _sqlDAO.CreateAccountAsync(account, cancellationToken).ConfigureAwait(false);
 
                 if(cancellationToken.IsCancellationRequested && createResult.Item2 == _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
@@ -95,17 +95,17 @@ namespace TrialByFire.Tresearch.Services.Implementations
         ///     CreateConfirmationAsync(email, authorizationLevel)
         ///         Creates Confirmation link
         /// </summary>
-        /// <param name="email">Email of user</param>
+        /// <param name="username">Email of user</param>
         /// <param name="authorizationLevel">Authorization Level of user</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Confirmation link and string status code</returns>
-        public async Task<Tuple<IConfirmationLink, string>> CreateConfirmationAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Tuple<IConfirmationLink, string>> CreateConfirmationAsync(string username, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
         {
             IConfirmationLink nullLink = null;
             try
             {
                 Guid guid = Guid.NewGuid();
-                IConfirmationLink confirmationLink = new ConfirmationLink(email, authorizationLevel, guid, DateTime.Now);
+                IConfirmationLink confirmationLink = new ConfirmationLink(username, authorizationLevel, guid, DateTime.Now);
 
                 string result = await _sqlDAO.CreateConfirmationLinkAsync(confirmationLink, cancellationToken).ConfigureAwait(false);
 

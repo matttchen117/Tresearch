@@ -27,11 +27,11 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
         //
         // Summary:
-        //     Verifies the Account and calls the DAO to store an OTPClaim for the corresponding Account
+        //     Verifies the UserAccount and calls the DAO to store an OTPClaim for the corresponding UserAccount
         //
         // Parameters:
         //   account:
-        //     The Account to verify and store the OTPClaim for.
+        //     The UserAccount to verify and store the OTPClaim for.
         //   otpClaim:
         //     The OTPClaim to store.
         //

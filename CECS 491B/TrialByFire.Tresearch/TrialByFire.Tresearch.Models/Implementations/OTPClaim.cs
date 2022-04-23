@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -11,9 +12,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class OTPClaim : IOTPClaim
     {
-        public string Username { get; }
+        public string Username { get; set; }
 
-        public string AuthorizationLevel { get; }
+        public string AuthorizationLevel { get; set; }
 
         public string OTP { get; }
 
@@ -49,28 +50,17 @@ namespace TrialByFire.Tresearch.Models.Implementations
             FailCount = 0;
         }
 
-        public OTPClaim(IAccount account)
+        public OTPClaim(IAccount account, string otp)
         {
             Username = account.Username;
             AuthorizationLevel = account.AuthorizationLevel;
-            OTP = GenerateRandomOTP();
+            OTP = otp;
             TimeCreated = DateTime.Now.ToUniversalTime().ToUniversalTime();
             FailCount = 0;
         }
 
         public OTPClaim() { }
-        public string GenerateRandomOTP()
-        {
-            string validCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-            Random random = new Random();
-            int length = random.Next(8, 17);
-            string otp = "";
-            for (int i = 0; i < length; i++)
-            {
-                otp += validCharacters[random.Next(0, validCharacters.Length)];
-            }
-            return otp;
-        }
+        
 
         public override bool Equals(object? obj)
         {

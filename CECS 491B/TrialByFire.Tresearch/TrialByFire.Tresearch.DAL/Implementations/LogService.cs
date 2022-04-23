@@ -21,22 +21,20 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = messageBank;
         }
 
-        public async Task<ILog> CreateLogAsync(DateTime timestamp, string level, string username, 
-            string authorizationLevel, string category, string description, 
-            CancellationToken cancellationToken = default)
+        public async Task<ILog> CreateLogAsync(DateTime timestamp, string level, string category, 
+            string description, CancellationToken cancellationToken = default)
         {
             try
             {
-                IAccount account = new Account(username, authorizationLevel);
-                string userhash = await _sqlDAO.GetUserHashAsync(account).ConfigureAwait(false);
+                string userHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
                 StringBuilder builder = new StringBuilder();
-                builder.AppendFormat("{0} {1} {2} {3} {4}", timestamp.ToUniversalTime().ToString(), level, userhash, category,
-                    description);
+                builder.AppendFormat("{0} {1} {2} {3} {4}", timestamp.ToUniversalTime().ToString(), level,
+                    userHash, category, description);
                 string payload = builder.ToString();
                 byte[] salt = new byte[0];
                 byte[] key = KeyDerivation.Pbkdf2(payload, salt, KeyDerivationPrf.HMACSHA512, 10000, 64);
                 string hash = Convert.ToHexString(key);
-                ILog log = new Log(timestamp, level, userhash, category, description, hash);
+                ILog log = new Log(timestamp, level, userHash, category, description, hash);
                 return log;
             }catch (Exception ex)
             {
@@ -45,7 +43,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
         public async Task<string> StoreLogAsync(ILog log, string destination, 
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
