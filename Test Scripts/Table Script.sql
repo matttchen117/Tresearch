@@ -97,7 +97,7 @@ CREATE TABLE [dbo].OTPClaims(
 CREATE TABLE [dbo].Nodes(
     UserHash VARCHAR(128),
     NodeID BIGINT Identity(1,1) PRIMARY KEY,
-    NodeParentID BIGINT,
+    ParentNodeID BIGINT,
     NodeTitle VARCHAR(100),
     Summary VARCHAR(750),
 	TimeModified DATETIME,
@@ -777,15 +777,15 @@ CREATE PROCEDURE [dbo].[CreateNode]
 (
     @UserHash VARCHAR(128),
     @NodeID BIGINT,
-    @NodeParentID BIGINT,
+    @ParentNodeID BIGINT,
     @NodeTitle VARCHAR(100),
     @Summary VARCHAR(750),
     @Visibility BIT
 )
 as
 begin
-    INSERT INTO Nodes(UserHash, NodeID, NodeParentID, NodeTitle, Summary, Visibility)
-         VALUES(@UserHash, @NodeID, @NodeParentID, @NodeTitle, @Summary, @Visibility);
+    INSERT INTO Nodes(UserHash, NodeID, ParentNodeID, NodeTitle, Summary, Visibility)
+         VALUES(@UserHash, @NodeID, @ParentNodeID, @NodeTitle, @Summary, @Visibility);
 end
 
 SET ANSI_NULLS ON
