@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Models.Contracts
 {
-    public interface IAccount
+    public interface IAccount //: IToken instead
     {
         public string Username { get; set; }
-
-        public string? Email { get; set; }
         public string? Passphrase { get; }
 
         public string AuthorizationLevel { get; set; }

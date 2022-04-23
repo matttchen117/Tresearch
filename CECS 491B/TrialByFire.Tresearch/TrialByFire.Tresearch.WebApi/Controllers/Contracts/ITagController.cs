@@ -3,12 +3,12 @@
 namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
 {
     /// <summary>
-    /// Helper class to access get and post requests regarding tagging feature
+    /// Interface to access get and post requests regarding tagging feature
     /// </summary>
     public interface ITagController
     {
         /// <summary>
-        ///     Gets a string list containing all possible tags 
+        ///     Retrives a list of all possible tags in bank
         /// </summary>
         /// <returns>Status code and List of tags</returns>
         public Task<IActionResult> GetTagsAsync();
@@ -44,10 +44,10 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
         public Task<IActionResult> RemoveTagFromNodesAsync(List<long> nodeIDs, string tagName);
 
         /// <summary>
-        ///     Gets a list of tags a list of nodes contain
+        ///     Retrieves a list of tags a list of nodes contain
         /// </summary>
         /// <param name="nodeIDs">List of nodes to retrieve tags taht all nodes in list contain</param>
-        /// <returns>List of tags common to nodes</returns>
+        /// <returns>List of tags common to nodes And Status Code</returns>
         public Task<IActionResult> GetNodeTagsAsync(List<long> nodeIDs);
     }
 }

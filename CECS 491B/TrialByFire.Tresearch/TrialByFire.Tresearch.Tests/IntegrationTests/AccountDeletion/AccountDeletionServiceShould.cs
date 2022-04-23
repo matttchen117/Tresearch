@@ -33,13 +33,13 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
         [Theory]
         [InlineData("altyn@gmail.com", "user", "200: Server: Account Deletion Successful.")]
         [InlineData("ryst@gmail.com", "admin", "200: Server: Account Deletion Successful.")]
-        
+
         [InlineData("redKeyCard@gmail.com", "admin", "200: Server: Account Deletion Successful.")]
 
         public async Task DeleteTheUserAsync(string currentIdentity, string currentRole, string expected)
         {
 
-            
+
             // Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
@@ -63,7 +63,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
         }
         */
 
-        
+
 
 
 

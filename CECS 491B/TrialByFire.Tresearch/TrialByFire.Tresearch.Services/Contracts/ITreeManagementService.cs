@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.Services.Contracts
 {
-    public interface ILogoutService
+    public interface ITreeManagementService
     {
-        public Task<string> LogoutAsync(CancellationToken cancellationToken = default);
+        Task<Tuple<Tree, string>> GetNodesAsync(string userHash, string accountHash, CancellationToken cancellationToken = default);
     }
 }

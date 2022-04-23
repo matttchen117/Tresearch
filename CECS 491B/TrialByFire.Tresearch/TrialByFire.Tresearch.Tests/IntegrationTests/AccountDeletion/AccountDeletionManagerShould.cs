@@ -20,7 +20,7 @@ using Xunit;
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
 {
 
-    
+
     public class AccountDeletionManagerShould : TestBaseClass
     {
 
@@ -39,7 +39,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
 
         [InlineData("greenKeyCard@gmail.com", "user", "500: Database: The Account was not found.")]
 
-        
+
         public async Task DeleteTheUserAsync(string currentIdentity, string currentRole, string expected)
         {
             // Arrange
@@ -49,7 +49,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
             {
                 Thread.CurrentPrincipal = rolePrincipal;
             }
-            
+
             //CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
@@ -74,11 +74,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.AccountDeletion
         }
         */
 
-        
+
 
 
 
     }
 
-    
+
 }
