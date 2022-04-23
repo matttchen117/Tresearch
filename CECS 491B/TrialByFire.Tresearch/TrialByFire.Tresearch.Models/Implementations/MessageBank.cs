@@ -224,6 +224,22 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "401: Server: Failure to authenticate and verify user for deletion.";
 
 
+                case Responses.copyNodeSuccess:
+                    return "200: Server: Copy Node Successful";
+                case Responses.copyNodeFailure:
+                    return "401: Server: Copy Node failure";
+                case Responses.copyNodeError:
+                    return "503: Database: Paste Node ERROR";
+
+                case Responses.pasteNodeSuccess:
+                    return "200: Server: Paste Node successful";
+                case Responses.pasteNodeFailure:
+                    return "401: Server: Paste Node failure";
+                case Responses.pasteNodeError:
+                    return "503: Database: Paste Node ERROR";
+
+                
+
 
                 default:
                     return "error";

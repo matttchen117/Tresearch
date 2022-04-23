@@ -980,12 +980,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             int affectedRows;
-            if (Thread.CurrentPrincipal.Equals(null))
-            {
-                return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
-            }
-            string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
-            string userName = Thread.CurrentPrincipal.Identity.Name;
+
+
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();                                                      
@@ -994,6 +990,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
                 }
+
+                string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
+                string userName = Thread.CurrentPrincipal.Identity.Name;
+
+
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var parameters = new { Username = userName, AuthorizationLevel = userAuthLevel };

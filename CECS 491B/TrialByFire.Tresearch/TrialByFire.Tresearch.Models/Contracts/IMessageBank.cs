@@ -113,6 +113,15 @@ namespace TrialByFire.Tresearch.Models.Contracts
             tagAlreadyExist,
             tagDoesNotExist,
             createNodeSuccess,
+
+            copyNodeSuccess,
+            copyNodeFailure,
+            copyNodeError,
+            
+            pasteNodeSuccess,
+            pasteNodeFailure,
+            pasteNodeError,
+
         }
         public Task<string> GetMessage(Responses response);
     }
