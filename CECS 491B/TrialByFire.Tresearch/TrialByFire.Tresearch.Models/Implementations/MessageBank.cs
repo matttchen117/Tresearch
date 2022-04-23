@@ -88,6 +88,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.logRollback:
                     return "400: Database: Log rollback occurred.";
 
+                
                 case Responses.tagAddSuccess:
                     return "200: Server: Tag added to node(s).";
                 case Responses.tagRemoveSuccess:

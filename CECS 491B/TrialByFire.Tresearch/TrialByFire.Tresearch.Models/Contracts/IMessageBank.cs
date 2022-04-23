@@ -44,15 +44,45 @@ namespace TrialByFire.Tresearch.Models.Contracts
             logFail,
             logRollback,
 
+            /// <summary>
+            /// Tag added to node(s)
+            /// </summary>
             tagAddSuccess,
+            /// <summary>
+            /// Tag removed from node(s)
+            /// </summary>
             tagRemoveSuccess,
+            /// <summary>
+            /// Tag created in tag bank
+            /// </summary>
             tagCreateSuccess,
+            /// <summary>
+            /// Tag deleted from tag bank
+            /// </summary>
             tagDeleteSuccess,
+            /// <summary>
+            /// Tag bank retrieved
+            /// </summary>
             tagGetSuccess,
+            /// <summary>
+            /// Tag bank retrieval failed
+            /// </summary>
             tagRetrievalFail,
+            /// <summary>
+            /// Tag already exists in tag bank
+            /// </summary>
             tagDuplicate,
+            /// <summary>
+            /// Tag does not exist in tag bank
+            /// </summary>
             tagNotFound,
+            /// <summary>
+            /// Invalid tag count
+            /// </summary>
             tagCountInvalid,
+            /// <summary>
+            /// Invalid tag name
+            /// </summary>
             tagNameInvalid,
 
             //Rating

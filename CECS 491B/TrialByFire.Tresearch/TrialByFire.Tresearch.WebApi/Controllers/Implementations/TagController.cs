@@ -22,8 +22,20 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         /// Cancellation token throws when not updated within 5 seconds, as per BRD
         /// </summary>
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
+        /// <summary>
+        ///     Manager to perform logging for error and success cases
+        /// </summary>
         private ILogManager _logManager { get; set; }
+
+        /// <summary>
+        ///     Model holding string responses to enumerated cases
+        /// </summary>
         private IMessageBank _messageBank { get; set; }
+
+        /// <summary>
+        ///     Manager to perform tag feature
+        /// </summary>
         private ITagManager _tagManager { get; set; }
         public TagController(ILogManager logManager, IMessageBank messageBank, ITagManager tagManager)
         {
@@ -33,7 +45,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         }
 
         /// <summary>
-        ///     Get Request for retrieving all tags and count in the tag database. User must be authenticated and authorized to retrieve list.
+        ///     Get Request for retrieving all tags and count in the tag database. User does not need to be authenticated or authorized to retrieve
         /// </summary>
         /// <returns>Status code and List of Tags</returns>
         [HttpGet]
@@ -42,37 +54,25 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
-                // Check if user identity is known
-                if (Thread.CurrentPrincipal != null)
-                {
-                    // Retrieve tags from tag bank
-                    Tuple<List<ITag>, string> result = await _tagManager.GetTagsAsync(_cancellationTokenSource.Token).ConfigureAwait(false);
+                // Retrieve tags from tag bank
+                Tuple<List<ITag>, string> result = await _tagManager.GetTagsAsync(_cancellationTokenSource.Token).ConfigureAwait(false);
 
-                    // Split string for logging
-                    string[] split;
-                    split = result.Item2.Split(":");
-                    if (result.Item2.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess).ConfigureAwait(false)))
-                    {
-                        // Successfully retrieved tags => store success log
-                        await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
-                        return new OkObjectResult(result.Item1);
-                    }
-                    else
-                    {
-                        // Tags were not successfully retrieved => store error log
-                        Enum.TryParse(split[1], out ILogManager.Categories category);
-                        await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
-                        return StatusCode(Convert.ToInt32(split[0]), result.Item1);
-                    }
+                // Split string for logging
+                string[] split;
+                split = result.Item2.Split(":");
+                if (result.Item2.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess).ConfigureAwait(false)))
+                {
+                    // Successfully retrieved tags => store success log
+                    await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
+                    return new OkObjectResult(result.Item1);
                 }
                 else
                 {
-                    string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated).ConfigureAwait(false);
-                    string[] split;
-                    split = errorMessage.Split(":");
-                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
-                    return new BadRequestObjectResult(split[2]);
-                }          
+                    // Tags were not successfully retrieved => store error log
+                    Enum.TryParse(split[1], out ILogManager.Categories category);
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
+                    return StatusCode(Convert.ToInt32(split[0]), result.Item1);
+                }
             } 
             catch(OperationCanceledException ex)
             {
@@ -122,14 +122,14 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                     if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess)))
                     {
                         // Log success
-                        await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]);
+                        await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
                         return new OkObjectResult(split[2]);
                     }
                     else
                     {
                         // Log error
                         Enum.TryParse(split[1], out ILogManager.Categories category);
-                        await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]);
+                        await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
                         return StatusCode(Convert.ToInt32(split[0]), split[2]);
                     }
                 }

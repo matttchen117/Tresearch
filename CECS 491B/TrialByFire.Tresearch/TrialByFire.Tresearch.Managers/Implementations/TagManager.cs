@@ -357,36 +357,10 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                // Check if the user has known role and is authenticated
-                if (Thread.CurrentPrincipal != null && !Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
-                {
-                    //Get user's role
-                    string role = "";
-                    if (Thread.CurrentPrincipal != null && Thread.CurrentPrincipal.IsInRole(_options.User))
-                        role = _options.User;
-                    else if (Thread.CurrentPrincipal.IsInRole(_options.Admin))
-                        role = _options.Admin;
-                    else
-                        return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.unknownRole));
+                // Get tags. No need to be authenticated or authorized to retrieve tag bank
+                Tuple<List<ITag>, string> result = await _tagService.GetTagsAsync(cancellationToken);
 
-                    //UserAccount with user's username and role
-                    IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
-
-                    //Verify if account is enabled and confirmed
-                    string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken);
-
-                    //Check if account is enabled and confirmed result, if not return error
-                    if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
-                        return Tuple.Create(new List<ITag>(), resultVerifyAccount);
-
-                    Tuple<List<ITag>, string> result = await _tagService.GetTagsAsync(cancellationToken);
-
-                    return result;
-                }
-                else
-                {
-                    return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated));
-                }
+                return result;
             }
             catch (OperationCanceledException)
             {

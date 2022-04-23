@@ -144,6 +144,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedResult.Value, result.Value);
         }
+
         /// <summary>
         ///     Tests users retrieving list of shared tag(s) from node(s).
         /// </summary>
@@ -183,7 +184,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         }
 
         /// <summary>
-        ///     Retrieves list of tags from tag bank
+        ///     Retrieves list of tags from tag bank. User does not need to be authenticated or authorized.
         /// </summary>
         /// <param name="roleIdentity">Identity of user</param>
         /// <param name="response">Expected enumerated response based on case</param>
@@ -1129,7 +1130,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
              *      Role:                       guest
              */
             var roleIdentity2 = new RoleIdentity(false, "guest", "guest");
-            var resultCase2 = IMessageBank.Responses.notAuthenticated;
+            var resultCase2 = IMessageBank.Responses.tagGetSuccess;
 
             /**
              *  Case 3: Retrieve tags from tag bank. User is not enabled
@@ -1137,7 +1138,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
              *      Role:                       user
              */
             var roleIdentity3 = new RoleIdentity(false, "tagControllerIntegrationNotEnabled@tresearch.system", "user");
-            var resultCase3 = IMessageBank.Responses.notEnabled;
+            var resultCase3 = IMessageBank.Responses.tagGetSuccess;
 
             /**
              *  Case 4: Retrieve tags from tag bank. User is not confirmed
@@ -1145,7 +1146,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
              *      Role:                       user
              */
             var roleIdentity4 = new RoleIdentity(false, "tagControllerIntegrationNotConfirmed@tresearch.system", "user");
-            var resultCase4 = IMessageBank.Responses.notConfirmed;
+            var resultCase4 = IMessageBank.Responses.tagGetSuccess;
 
             /**
              *  Case 5: Retrieve tags from tag bank. User has unknown role
@@ -1153,7 +1154,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
              *      Role:                       wrong
              */
             var roleIdentity5 = new RoleIdentity(false, "tagControllerIntegrationAdmin1@tresearch.system", "wrong");
-            var resultCase5 = IMessageBank.Responses.unknownRole;
+            var resultCase5 = IMessageBank.Responses.tagGetSuccess;
 
             /**
              *  Case 6: Retrieve tags from tag bank. Account does not exist
@@ -1161,7 +1162,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
              *      Role:                       user
              */
             var roleIdentity6 = new RoleIdentity(false, "tagControllerNoAccount@tresearch.system", "user");
-            var resultCase6 = IMessageBank.Responses.accountNotFound;
+            var resultCase6 = IMessageBank.Responses.tagGetSuccess;
 
             return new[]
             {

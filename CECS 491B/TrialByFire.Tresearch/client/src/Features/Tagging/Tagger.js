@@ -58,6 +58,9 @@ class Tagger extends React.PureComponent{
 
           // Set state of tag options
           this.setState( {tagOptions: diff});
+
+          // Refresh Token
+          sessionStorage.setItem('authorization', response.headers['authorization']);
           
         })  
         .catch((err => {
@@ -76,13 +79,32 @@ class Tagger extends React.PureComponent{
               break;
             case 503: 
                     // Server cannot make database connection
+                    this.setState({errorMessage: 'Cannot connect to database.'});
                 break;
             default: 
+              this.setState({errorMessage: 'Unable to retrieve tags.'});
           }
         }))
+
+        // Refresh Token
+        sessionStorage.setItem('authorization', response.headers['authorization']);
     })
     .catch((err => {
-
+      switch(err.response.status) {
+        case 400:
+          this.setState({errorMessage: 'Unable to make server request'});
+          break;
+        case 401:
+          // Not authorized to view/make changes to node
+          window.location = '/Portal';
+          break;
+        case 503:
+          // Cannot make database connection
+          this.setState({errorMessage: 'Cannot connect to database.'});
+          break;
+        default: 
+          this.setState({errorMessage: 'Unable to load node tags.'});
+      }
     }))
   }
 
@@ -127,6 +149,7 @@ class Tagger extends React.PureComponent{
     this.handleStatus();                                        // Handle internet status
     window.addEventListener('online', this.handleStatus );      // Listen for internet online (refresh)
     window.addEventListener('offline', this.handleStatus);      // Listen for internet offline
+    console.log(this.state.nodes);
   }
 
   componentWillUnmount() {
@@ -153,14 +176,17 @@ class Tagger extends React.PureComponent{
             tagData: [...previousState.tagData, value],
             // Filter tag out of list
             tagOptions: previousState.tagOptions.filter(item => item.value !== value ), 
-          }));        
+          })); 
+          
+          // Refresh Token
+          sessionStorage.setItem('authorization', response.headers['authorization']);     
         }))
         .catch((err => {
             
-        }))
+        }))  
   }
 
-  
+  // Handle refresh of tag options
   handleSearchRefresh = (e) => {
     let diff = this.state.tags.filter(x => !this.state.tagData.includes(x.value));
     this.setState( {tagOptions: diff});
@@ -186,6 +212,9 @@ class Tagger extends React.PureComponent{
                 tagOptions: [...previousState.tagOptions, {"value": value, "label": value}],
             }));
             this.handleSearchRefresh();
+
+            // Refresh Token
+            sessionStorage.setItem('authorization', response.headers['authorization']);
         })
   }
 

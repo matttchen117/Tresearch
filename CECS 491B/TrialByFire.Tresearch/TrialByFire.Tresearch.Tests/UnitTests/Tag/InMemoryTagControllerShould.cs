@@ -468,23 +468,23 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
 
             //User has not been authenticated
             var roleIdentity2 = new RoleIdentity(false, "guest", "guest");
-            var resultCase2 = IMessageBank.Responses.notAuthenticated;
+            var resultCase2 = IMessageBank.Responses.tagGetSuccess;
 
             //User is not enabled
             var roleIdentity3 = new RoleIdentity(false, "tagControllerIntegrationNotEnabled@tresearch.system", "user");
-            var resultCase3 = IMessageBank.Responses.notEnabled;
+            var resultCase3 = IMessageBank.Responses.tagGetSuccess;
 
             //User is not confirmed
             var roleIdentity4 = new RoleIdentity(false, "tagControllerIntegrationNotConfirmed@tresearch.system", "user");
-            var resultCase4 = IMessageBank.Responses.notConfirmed;
+            var resultCase4 = IMessageBank.Responses.tagGetSuccess;
 
             //User is has unknown role
             var roleIdentity5 = new RoleIdentity(false, "tagControllerIntegrationAdmin1@tresearch.system", "wrong");
-            var resultCase5 = IMessageBank.Responses.unknownRole;
+            var resultCase5 = IMessageBank.Responses.tagGetSuccess;
 
             //UserAccount not found
             var roleIdentity6 = new RoleIdentity(false, "tagControllerNoAccount@tresearch.system", "user");
-            var resultCase6 = IMessageBank.Responses.accountNotFound;
+            var resultCase6 = IMessageBank.Responses.tagGetSuccess;
 
             return new[]
             {
