@@ -36,13 +36,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 
                 //The root node of the tree should have the lowest ID as it should be created before any additional children are
                 //Therefore find the ID of that rootNode
-                long rootID = nodesResult.Item1.Min(Node => Node.NodeID);//check if the nodeID is the ParentID
+                //long rootID = nodesResult.Item1.Min(Node => Node.NodeID);//check if the nodeID is the ParentID
+                var r = nodesResult.Item1.Where(INode => INode.NodeID == INode.NodeParentID).FirstOrDefault();
                 //Assign that node as the rootNode of the Tree object
-                tree.rootNode = new TreeNode(nodesResult.Item1.Find(INode => (INode.NodeID == rootID)));
+                tree.rootNode = new TreeNode(r);
                 //Iterate through the list of Nodes finding where the NodeParentID is equal to that of a TreeNode's NodeID 
                     foreach (INode n in nodesResult.Item1)
                     {
-                        if(n.NodeID == rootID)
+                        if(n.NodeID == tree.rootNode.NodeID)
                         {
                             continue;
                         }
@@ -63,7 +64,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                             addResult = tree.AddChild(tree.rootNode, temp, findResult.NodeID);
                         }
                     }
-                return Tuple.Create(tree, "200: Server: Success");
+                return Tuple.Create(tree, "200: Server: Get Nodes Success");
             }
             catch(OperationCanceledException ex)
             {

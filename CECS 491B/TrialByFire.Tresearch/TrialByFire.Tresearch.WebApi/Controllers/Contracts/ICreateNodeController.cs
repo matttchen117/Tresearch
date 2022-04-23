@@ -4,6 +4,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
 {
     public interface ICreateNodeController
     {
-        public Task<IActionResult> CreateNodeAsync(IAccount account, INode node);
+        public Task<IActionResult> CreateNodeAsync(System.Collections.ArrayList paramList);
     }
 }

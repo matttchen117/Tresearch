@@ -1,6 +1,7 @@
-﻿/*using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -51,11 +52,14 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
             {
                 StatusCode = Convert.ToInt32(expects[0])
             };
-            Node node = new Node(nodeID, parentID, nodeTitle, summary, visibility, false, accountOwner);
-            Account account = new Account(username, "jessie123", currentRole);
+            INode node = new Node(nodeID, parentID, nodeTitle, summary, visibility, false, accountOwner);
+            IAccount account = new Account(username, "jessie123", currentRole);
+            ArrayList paramList = new ArrayList();
+            paramList.Add(account);
+            paramList.Add(node);
 
             //Act
-            IActionResult result = await createNodeController.CreateNodeAsync(account, node).ConfigureAwait(false);
+            IActionResult result = await createNodeController.CreateNodeAsync(paramList).ConfigureAwait(false);
             var objectResult = result as ObjectResult;
 
             //Assert
@@ -63,4 +67,4 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
             Assert.Equal(expectedResult.Value, objectResult.Value);
         }
     }
-}*/
+}

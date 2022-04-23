@@ -9,16 +9,16 @@ namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class TreeNode : Node
     {
-        public List<INode> Children { get; set; }
+        public List<TreeNode> Children { get; set; }
 
         public TreeNode()
         {
-            Children = new List<INode>();
+            Children = new List<TreeNode>();
         }
 
         public TreeNode(INode n)
         {
-            Children = new List<INode>();
+            Children = new List<TreeNode>();
             this.UserHash = n.UserHash;
             this.NodeID = n.NodeID;
             this.NodeParentID = n.NodeParentID;

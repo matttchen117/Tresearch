@@ -9,11 +9,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
     public class Tree
     {
         public TreeNode rootNode { get; set; }
-        public List<TreeNode> allChildren { get; set; }
+        //public List<TreeNode> allChildren { get; set; }
 
         public Tree()
         {
-            allChildren = new List<TreeNode>();
+            //allChildren = new List<TreeNode>();
         }
 
         //Searches through the Tree starting at the rootNode to find the TreeNode in which its ID is equal to the one searched for 
@@ -52,7 +52,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
             if (treeNode.NodeID == nodeID)
             {
-                allChildren.Add(child);
+                //allChildren.Add(child);
                 treeNode.Children.Add(child);
                 return "Success";
             }
@@ -70,5 +70,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
             return null;
         }
 
+        public override string ToString()
+        {
+            return base.ToString();
+        }
     }
 }

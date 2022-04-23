@@ -1,4 +1,4 @@
-﻿/*using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using TrialByFire.Tresearch.DAL.Contracts;
@@ -47,11 +47,13 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         /// <returns></returns>
         [HttpPost]
         [Route("createNode")]
-        public async Task<IActionResult> CreateNodeAsync(IAccount account, INode node)
+        public async Task<IActionResult> CreateNodeAsync(System.Collections.ArrayList paramList)
         {
             try
             {
                 string[] split;
+                IAccount account = Newtonsoft.Json.JsonConvert.DeserializeObject<IAccount>(paramList[0].ToString());
+                INode node = Newtonsoft.Json.JsonConvert.DeserializeObject<INode>(paramList[1].ToString());
                 string result = await _createNodeManager.CreateNodeAsync(account, node, _cancellationTokenSource.Token).ConfigureAwait(false);
                 if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.createNodeSuccess).ConfigureAwait(false)))
                 {
@@ -72,4 +74,3 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         }
     }
 }
-*/
