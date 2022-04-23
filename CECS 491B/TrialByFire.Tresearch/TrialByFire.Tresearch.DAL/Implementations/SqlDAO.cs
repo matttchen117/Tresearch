@@ -142,7 +142,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 parameters.Add("Destination", destination);
                 parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 var result = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters,
-                    commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                    commandType: CommandType.StoredProcedure))
                     .ConfigureAwait(false);
                 return parameters.Get<int>("Result");
             }
@@ -1027,6 +1027,43 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+        public async Task<string> DeleteAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var parameters = new { Username = account.Username, AuthorizationLevel = account.AuthorizationLevel };
+                    var procedure = "dbo.[DeleteAccountStoredProcedure]";
+                    int affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+                    }
+                    if (affectedRows == 0)
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false);
+                    }
+                }
+
+            }
+            catch (OperationCanceledException)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return ("500: Database " + ex.Message);
+            }
+        }
+
+
         public async Task<int> VerifyAccountAsync(IAccount account,
             CancellationToken cancellationToken = default)
         {
@@ -1729,19 +1766,27 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
         /// <summary>
-        ///     AddTagAsync(nodeIDs, tagName)
         ///         Adds a tag to list of node(s) passed in. 
         /// </summary>
-        /// <param name="nodeIDs">List of node IDs to add tag</param>
+        /// <param name="nodeIDs">List of node IDs</param>
         /// <param name="tagName">String tag name</param>
         /// <param name="cancellationToken">Cancellation Token</param>
-        /// <returns>String status</returns>
+        /// <returns>String status result</returns>
         public async Task<string> AddTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 //Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if tag is null or empty
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+
+                // Check if node list is null or empty
+                if (nodeIDs == null || nodeIDs.Count() <= 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound);
+
                 // Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
@@ -1759,6 +1804,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         };
                         //Execute command
                         var executed = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                        
                     }
                     //Check if cancellation token requests cancellation
                     if (cancellationToken.IsCancellationRequested)
@@ -1771,6 +1817,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         else
                             return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
                     }
+
                     //Tag has been added, return success
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess);
                 }
@@ -1802,19 +1849,26 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
         /// <summary>
-        ///     RemoveTagAsync(nodeIDs, tagName)
         ///         Removes tag from list of nodes
         /// </summary>
         /// <param name="nodeIDs">List of node IDs</param>
         /// <param name="tagName">String tag name</param>
         /// <param name="cancellationToken">Cancellation Token</param>
-        /// <returns>String status</returns>
+        /// <returns>String status result</returns>
         public async Task<string> RemoveTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 //Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if tag name is null, empty string or all space
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                // Check if node list is null or empty
+                if (nodeIDs == null || nodeIDs.Count() <= 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+
                 //Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
@@ -1872,12 +1926,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
         /// <summary>
-        ///     GetNodeTagsAsync(nodeIDs)
-        ///         Gets list of tags that a list of node(s) share in common. If only one nod is passed in, all tags are returned
+        ///     Retreives a list of shared tags from a list of node(s). List with single node will return all tags.
         /// </summary>
         /// <param name="nodeIDs">List of node IDs</param>
         /// <param name="cancellationToken">Cancellation Token</param>
-        /// <returns>List of tags and string status</returns>
+        /// <returns>List of tags and string status result</returns>
         public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
            
@@ -1885,6 +1938,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 //Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
+                
+                // Check if node list is null or empty
+                if (nodeIDs == null || nodeIDs.Count() <= 0)
+                    return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false));
+
                 //Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
@@ -1946,65 +2004,29 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            List<string> tags = new List<string>();
-            try
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                using (var connection = new SqlConnection(_options.SqlConnectionString))
-                {
-                    await connection.OpenAsync();
-                    foreach (var nodeId in nodeIDs)
-                    {
-
-                        var procedure = "dbo.[GetNodeTagsDesc]";
-                        var value = new
-                        {
-                            NodeID = nodeId
-                        };
-                        List<string> results = new List<string>(await connection.QueryAsync<string>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
-                        if (nodeId == nodeIDs.First())
-                        {
-                            tags = results;
-                        }
-                        tags = tags.Intersect(results).ToList();
-                    }
-
-                    return Tuple.Create(tags, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
-                }
-            }
-            catch (SqlException ex)
-            {
-                switch (ex.Number)
-                {
-                    default: return Tuple.Create(tags, "500: Database: " + ex.Message);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                // Rollback handled
-                throw;
-            }
-            catch (Exception ex)
-            {
-                return Tuple.Create(tags, "500: Database: " + ex.Message);
-            }
-        }
-
         /// <summary>
-        ///     CreateTagAsync(tagName, count)
-        ///         Creaes a tag in bank with a count of tags
+        ///      Creaes a tag in bank with a count of tags
         /// </summary>
-        /// <param name="tagName">Tag</param>
-        /// <param name="count"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <param name="tagName">Tag name</param>
+        /// <param name="count">Number of nodes tagged</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status result</returns>
         public async Task<string> CreateTagAsync(string tagName, int count, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
+                // Throw if cancellation is requested
                 cancellationToken.ThrowIfCancellationRequested();
+
+                //Check tag input
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+
+                // Check tag count
+                if (count < 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid);
+                
+
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     await connection.OpenAsync();
@@ -2065,12 +2087,18 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// </summary>
         /// <param name="tagName">String tag to delete from bank</param>
         /// <param name="cancellationToken">Cancellation Token</param>
-        /// <returns>String status</returns>
+        /// <returns>String status result</returns>
         public async Task<string> DeleteTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
+                // Throw if cancellation requested
                 cancellationToken.ThrowIfCancellationRequested();
+
+                // Check input
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     await connection.OpenAsync();
@@ -2083,17 +2111,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     };
                     //Execute command, returns count of tags
                     int count = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        //Rollback
-                        string resultRollback = await CreateTagAsync( tagName, 0);
-                        //Check if rollback successful
-                        if (resultRollback.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess)))
-                            return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
-                        else
-                            return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
-                    }
                     //Tag deleted, return success
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess);
                 }
@@ -2125,7 +2142,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         ///         Returns a list of tags in tag bank
         /// </summary>
         /// <param name="cancellationToken">Cancellation  Token</param>
-        /// <returns>List of tags and sting status</returns>
+        /// <returns>List of tags and string status result</returns>
         public async Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
            
@@ -2165,41 +2182,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             catch (Exception ex)
             {
                 return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
-            }
-        }
-
-        public async Task<Tuple<List<string>, string>> GetTagsDescAsync(CancellationToken cancellationToken = default(CancellationToken))
-        {
-            List<string> tags = null;
-            try
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                using (var connection = new SqlConnection(_options.SqlConnectionString))
-                {
-                    await connection.OpenAsync();
-                    var procedure = "dbo.[GetTagsDesc]";
-                    var value = new { };
-                    List<string> results = new List<string>(await connection.QueryAsync<string>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
-
-
-                    return Tuple.Create(results, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
-                }
-            }
-            catch (SqlException ex)
-            {
-                switch (ex.Number)
-                {
-                    default: return Tuple.Create(tags, "500: Database: " + ex.Message);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                // Rollback handled
-                throw;
-            }
-            catch (Exception ex)
-            {
-                return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
             }
         }
 
@@ -2245,12 +2227,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var procedure = "[CreateNode]";
                     var values = new
                     {
-                        nodeID = node.nodeID,
-                        parentNodeId = node.parentNodeID,
-                        nodeTitle = node.nodeTitle,
-                        summary = node.summary,
-                        visibility = node.visibility,
-                        accountOwner = node.accountOwner
+                        nodeID = node.NodeID,
+                        parentNodeId = node.ParentNodeID,
+                        nodeTitle = node.NodeID,
+                        summary = node.Summary,
+                        visibility = node.Visibility,
+                        userHash = node.UserHash
                     };
                     var affectedRows = await connection.QueryAsync<int>(new CommandDefinition(procedure, values, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
@@ -2283,6 +2265,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             INode? nullNode = null;
             try
             {
+
+
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var procedure = "dbo.[GetNode]";
@@ -2372,7 +2356,120 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     case 547:   //Adding rating violates foreign key constraint (AKA NO ACCOUNT)
                         return _messageBank.GetMessage(IMessageBank.Responses.userRateFail).Result;
                     default:
-                        return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                        return  _options.UnhandledExceptionMessage + ex.Message;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback already handled
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+            }
+            catch (Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+            }
+        }
+
+        public async Task<Tuple<List<double>, string>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                //Throw Cancellation Exception if token requests cancellation
+                cancellationToken.ThrowIfCancellationRequested();
+                // Establish connection to database
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Open connection
+                    await connection.OpenAsync();
+                    List<double> ratings = new List<double>();
+                    foreach (var nodeId in nodeIDs)
+                    {
+                        var procedure = "dbo.[GetNodeRating]";
+                        var parameters = new { NodeID = nodeId };
+
+                        var result = await connection.ExecuteScalarAsync<double>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                        
+                        ratings.Add(result);
+                    }
+                    
+                    //Execute command
+                    
+
+                    //Tag has been added, return success
+                    return Tuple.Create(ratings, await _messageBank.GetMessage(IMessageBank.Responses.getRateSuccess));
+                }
+            }
+            catch (SqlException ex)
+            {
+                //Check sql exception
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail));
+                    default:
+                        return Tuple.Create(new List<double>(), _options.UnhandledExceptionMessage + ex.Message);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback already handled
+                return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(new List<double>(), _options.UnhandledExceptionMessage + ex.Message);
+            }
+        }
+
+        public async Task<string> UpdateAccountAsync(IAccount account, IAccount updatedAccount, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                //Throw Cancellation Exception if token requests cancellation
+                cancellationToken.ThrowIfCancellationRequested();
+                // Establish connection to database
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Open connection
+                    await connection.OpenAsync();
+                    var procedure = "dbo.[UpdateAccount]";
+                    var parameters = new
+                    {
+                        Username = account.Username,
+                        AuthorizationRole = account.AuthorizationLevel,
+                        UpdatedUsername = account.Username,
+                        UpdatedAuthorizationLevel = account.AuthorizationLevel,
+                        UpdatedPassphrase = account.Passphrase,
+                        UpdatedAccountStatus = account.AccountStatus,
+                        UpdatedConfirmed = account.Confirmed
+                    };
+                    //Execute command
+                    var executed = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    //Check if cancellation token requests cancellation
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        //Perform rollback
+                        string rollbackResults = await UpdateAccountAsync(updatedAccount, account);
+                        if (rollbackResults.Equals(await _messageBank.GetMessage(IMessageBank.Responses.accountUpdateSuccess)))
+                            return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                        else
+                            return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
+                    }
+                    //Tag has been added, return success
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountUpdateSuccess);
+                }
+            }
+            catch (SqlException ex)
+            {
+                //Check sql exception
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
+                    default:
+                        return _options.UnhandledExceptionMessage + ex.Message;
                 }
             }
             catch (OperationCanceledException)

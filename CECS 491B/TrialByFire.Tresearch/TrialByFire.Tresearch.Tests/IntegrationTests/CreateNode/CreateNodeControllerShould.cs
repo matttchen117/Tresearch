@@ -30,7 +30,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
             TestServices.AddScoped<ICreateNodeController, CreateNodeController>();
             TestProvider = TestServices.BuildServiceProvider();
         }
-
+        /*
         [Theory]
         [InlineData("jessie@gmail.com", 69420, 69419, "Cooking", "Concepts of Preparing Food", true, "jessie@gmail.com", "jessie@gmail.com", "guest", "200: Server: success")]
         [InlineData("larry@gmail.com", 100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com", "larry@gmail.com", "guest", "409: Database: Node Already Exists")]
@@ -59,6 +59,6 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
             //Assert
             Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);
             Assert.Equal(expectedResult.Value, objectResult.Value);
-        }
+        } */
     }
 }

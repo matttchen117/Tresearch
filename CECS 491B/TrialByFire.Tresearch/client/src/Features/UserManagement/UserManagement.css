@@ -1,0 +1,41 @@
+
+
+
+.um-dashboard-create-form {
+    display: inline-block;
+    margin-top: 25px;
+}
+
+.um-dashboard-create-input-container {
+    display: block; 
+    float: left;
+}
+
+.um-dashboard-create-input-container input{
+    background-color: #f2f2f2;
+    border: 0;
+    box-sizing: border-box;
+    outline: 0;
+    padding: 15px 15px 15px 15px;
+    
+    
+}
+
+.um-dashboard-create-button {
+    
+    display: block;
+    float: right;
+
+}
+
+.um-dashboard-back-container{
+    text-align: left;
+    margin-top: 15px;
+    margin-left: 15px;
+}
+
+.um-dashboard-back-container a {
+    text-decoration: none;
+    font-size: 1em;
+    color: #283618;
+}

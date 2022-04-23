@@ -43,7 +43,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
         public async Task<string> StoreLogAsync(ILog log, string destination, 
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
