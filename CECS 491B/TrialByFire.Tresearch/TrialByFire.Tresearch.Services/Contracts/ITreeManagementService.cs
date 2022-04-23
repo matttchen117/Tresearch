@@ -10,6 +10,6 @@ namespace TrialByFire.Tresearch.Services.Contracts
 {
     public interface ITreeManagementService
     {
-        Task<Tuple<Tree, string>> GetNodesAsync(string userHash, CancellationToken cancellationToken = default);
+        Task<Tuple<Tree, string>> GetNodesAsync(string userHash, string accountHash, CancellationToken cancellationToken = default);
     }
 }

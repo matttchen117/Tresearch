@@ -44,9 +44,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
             }
             ICreateNodeService createNodeService = TestProvider.GetRequiredService<ICreateNodeService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            Node node = new Node("AD89551B3BF5021B53AC0C9878DE96EAB72816241C417DDF2FB421BD78B7B7477372245C5EF36FEEE1A5DB096596D170309A904D9D0FDA6FAD4071148AD67C75",
-                nodeID, parentID, nodeTitle, summary, mode, deleted);
-            Account account = new Account(username, "jessie123", "user");
+            INode node = new Node("AD89551B3BF5021B53AC0C9878DE96EAB72816241C417DDF2FB421BD78B7B7477372245C5EF36FEEE1A5DB096596D170309A904D9D0FDA6FAD4071148AD67C75", nodeID, parentID, nodeTitle, summary, mode, deleted);
+            //Account account = new Account(username, "jessie123", "user");
+            IAccount account = new UserAccount(username, "jessie123", "user");
 
             //Act
             string result = await createNodeService.CreateNodeAsync(account, node, cancellationTokenSource.Token).ConfigureAwait(false);
@@ -54,6 +54,5 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
             //Assert
             Assert.Equal(expected, result);
         }
-        */
     }
 }

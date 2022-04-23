@@ -1278,14 +1278,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 List<Node> children = new List<Node>();
                 foreach (Node c in InMemoryDatabase.Nodes)
                 {
-                    if (c.NodeParentID == nodeID)
+                    if (c.ParentNodeID == nodeID)
                     {
                         children.Add(c);
                     }
                 }
                 foreach (Node n in children)
                 {
-                    n.NodeParentID = parentID;
+                    n.ParentNodeID = parentID;
                 }
 
                 foreach (Node n in InMemoryDatabase.Nodes)
@@ -1349,7 +1349,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<Tuple<List<INode>, string>> GetNodesAsync(string userHash, CancellationToken cancellationToken = default)
+        public Task<Tuple<List<INode>, string>> GetNodesAsync(string userHash, string accountHash, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

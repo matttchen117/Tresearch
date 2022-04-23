@@ -28,7 +28,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _treeManagementService = treeManagementService;
             _messageBank = messageBank;
         }
-        public async Task<Tuple<Tree, string>> GetNodesAsync(string userHash, CancellationToken cancellationToken = default)
+        public async Task<Tuple<Tree, string>> GetNodesAsync(string userHash, string accountHash, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             List<INode> nullList = null;
@@ -38,7 +38,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             {
                 //if (roles.Contains((Thread.CurrentPrincipal.Identity as RoleIdentity).AuthorizationLevel))
                 //{
-                    Tuple<Tree, string> results = await _treeManagementService.GetNodesAsync(userHash, cancellationToken);
+                    Tuple<Tree, string> results = await _treeManagementService.GetNodesAsync(userHash, accountHash, cancellationToken);
                     return results;
                 //}
                 /*else

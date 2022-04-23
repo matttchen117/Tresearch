@@ -49,7 +49,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.DeleteNode
             {
                 StatusCode = Convert.ToInt32(expects[0])
             };
-            Account account = new Account(username, "jessie123", "user");
+            string userName = Thread.CurrentPrincipal.Identity.Name;
+
+            string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
+            IAccount account = new UserAccount(userName, userAuthLevel);
 
             //Act
             IActionResult result = await deleteNodeController.DeleteNodeAsync(account, nodeID, parentID).ConfigureAwait(false);

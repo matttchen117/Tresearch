@@ -4,6 +4,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
 {
     public interface ITreeManagementController
     {
-        public Task<IActionResult> GetNodesAsync(string userHash);
+        public Task<IActionResult> GetNodesAsync(string userHash, string accountHash);
     }
 }

@@ -2229,7 +2229,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var values = new
                     {
                         UserHash = node.UserHash,
-                        NodeParentID = node.NodeParentID,
+                        NodeParentID = node.ParentNodeID,
                         NodeTitle = node.NodeTitle,
                         Summary = node.Summary,
                         TimeModified = node.TimeModified,
@@ -2309,7 +2309,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     {
                         UserHash = updatedNode.UserHash,
                         NodeID = updatedNode.NodeID,
-                        NodeParentID = updatedNode.NodeParentID,
+                        NodeParentID = updatedNode.ParentNodeID,
                         NodeTitle = updatedNode.NodeTitle,
                         Summary = updatedNode.Summary,
                         Visibility = updatedNode.Visibility
@@ -2323,7 +2323,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         {
                             UserHash = previousNode.UserHash,
                             NodeID = previousNode.NodeID,
-                            NodeParentID = previousNode.NodeParentID,
+                            NodeParentID = previousNode.ParentNodeID,
                             NodeTitle = previousNode.NodeTitle,
                             Summary = previousNode.Summary,
                             Visibility = previousNode.Visibility
@@ -2401,7 +2401,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<Tuple<List<INode>, string>> GetNodesAsync(string userHash, CancellationToken cancellationToken = default)
+        public async Task<Tuple<List<INode>, string>> GetNodesAsync(string userHash, string accountHash, CancellationToken cancellationToken = default)
         {
             List<INode> nullNodes = null;
             try
@@ -2411,7 +2411,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var procedure = "dbo.[GetNodes]";
                     var parameters = new
                     {
-                        UserHash = userHash
+                        UserHash = userHash,
+                        AccountHash = accountHash
                     };
                     //List<Node> results = new List<Node>();
                     List<Node> results = new List<Node>(await connection.QueryAsync<Node>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList(); 
@@ -2450,6 +2451,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public async Task<Tuple<List<INode>, string>> GetNodeChildren(long nID, CancellationToken cancellationToken = default)
         {
             List<INode> childList = new List<INode>();
+            List <INode> nullList = null;
             try
             {
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
@@ -2471,10 +2473,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     {
                         childList.Add(node);
                     }
-
+                    return (Tuple.Create(childList, await _messageBank.GetMessage(IMessageBank.Responses.getNodesSuccess)));
                 }
             }
-        }*/
+            catch(Exception ex)
+            {
+                return Tuple.Create(nullList, "500: Server: " + ex.Message);
+            }
+        }
 
         public async Task<string> RateNodeAsync(string userHash, long nodeID, int rating, CancellationToken cancellationToken)
         {

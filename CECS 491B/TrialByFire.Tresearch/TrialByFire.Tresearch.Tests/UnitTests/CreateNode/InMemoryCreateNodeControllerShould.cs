@@ -62,7 +62,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CreateNode
             Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);
             Assert.Equal(expectedResult.Value, objectResult.Value);
         }
-        */
+        
     }
 }
 

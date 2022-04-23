@@ -33,8 +33,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.TreeManagement
         [Theory]
         /*[InlineData("27a285fe87f1d0afb44f2310824f49bbf1aaea02b856d314412119142ecfbb46ece7dcadc6c516c4d3918532df9375bd9f377e395143f0a29aed88654bff1c95", "jessie@gmail.com", "user", "200: Server: Get Nodes Success")]
         [InlineData("AD89551B3BF5021B53AC0C9878DE96EAB72816241C417DDF2FB421BD78B7B7477372245C5EF36FEEE1A5DB096596D170309A904D9D0FDA6FAD4071148AD67C75", "jessie@gmail.com", "user", "200: Server: Get Nodes Success")]*/
-        [InlineData("AD89551B3BF5021B53AC0C9878DE96EAB72816241C417DDF2FB421BD78B7B7477372245C5EF36FEEE1A5DB096596D170309A904D9D0FDA6FAD4071148AD67C75", "jelazo@live.com", "user","200: Server: Success")]
-        public async Task GetTheNodes(string userhash, string username, string currentRole, string expected)
+        [InlineData("AD89551B3BF5021B53AC0C9878DE96EAB72816241C417DDF2FB421BD78B7B7477372245C5EF36FEEE1A5DB096596D170309A904D9D0FDA6FAD4071148AD67C75", "AD89551B3BF5021B53AC0C9878DE96EAB72816241C417DDF2FB421BD78B7B7477372245C5EF36FEEE1A5DB096596D170309A904D9D0FDA6FAD4071148AD67C75", "jelazo@live.com", "user","200: Server: Success")]
+        public async Task GetTheNodes(string userhash, string accountHash, string username, string currentRole, string expected)
         {
             //Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(true, username, currentRole);
@@ -46,7 +46,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.TreeManagement
             { StatusCode = Convert.ToInt32(expects[0])};
 
             //Act
-            IActionResult results = await treeManagementController.GetNodesAsync(userhash);
+            IActionResult results = await treeManagementController.GetNodesAsync(userhash, accountHash);
             var result = results as ObjectResult;
 
             //Assert

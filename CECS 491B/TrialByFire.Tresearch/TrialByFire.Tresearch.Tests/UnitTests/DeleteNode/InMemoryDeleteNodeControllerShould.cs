@@ -50,7 +50,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DeleteNode
             {
                 StatusCode = Convert.ToInt32(expects[0])
             };
-            Account account = new Account(username, "jessie123", "user");
+            IAccount account = new UserAccount(username, "jessie123", "user");
 
             //Act
             IActionResult result = await deleteNodeController.DeleteNodeAsync(account, nodeID, parentID).ConfigureAwait(false);

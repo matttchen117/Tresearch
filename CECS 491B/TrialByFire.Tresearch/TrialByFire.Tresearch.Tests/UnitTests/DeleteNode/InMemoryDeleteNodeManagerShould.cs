@@ -40,7 +40,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DeleteNode
             Thread.CurrentPrincipal = rolePrincipal;
             IDeleteNodeManager deleteNodeManager = TestProvider.GetService<IDeleteNodeManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            Account account = new Account(username, "jessie123", "user");
+            IAccount account = new UserAccount(username, "jessie123", "user");
 
             //Act
             string result = await deleteNodeManager.DeleteNodeAsync(account, nodeID, parentID, cancellationTokenSource.Token);

@@ -46,7 +46,7 @@ class NodeCreationForm extends React.Component{
 
         if(this.handleInput()){
             this.setState({errorMessage: ''})
-            axios.post('https://trialbyfiretresearchwebapi.azurewebsites.jet/CreateNode/nodeCreation?email=' + this.state.email.toLowerCase() + 
+            axios.post('https://trialbyfiretresearchwebapi.azurewebsites.jet/CreateNode/createNode?email=' + this.state.email.toLowerCase() + 
             this.state.nodeParentID + this.state.nodeTitle + this.state.summary).then(res => {
                 window.location = 'CreateNode/NodeCreated';
             })
@@ -58,25 +58,26 @@ class NodeCreationForm extends React.Component{
 
     render() {
         const renderForm = (
-            <div className="form-nodeCreation-container">
-                <form className="nodeCreation-form" onSubmit={this.onSubmitHandler}>
-                <div className="input-container">
-                        <input type="email" value={this.state.nodeTitle} required placeholder="Email Address" on onChange={this.inputEmailHandler}/>
+            <div className="form-createNode-container">
+                <form className="createNode-form" onSubmit={this.onSubmitHandler}>
+                    <div className="input-container">
+                        <input type="text" value={this.state.nodeTitle} required placeholder="Email Address" on onChange={this.inputEmailHandler}/>
                     </div>
                     <div className="input-container">
-                        <input type="title" value={this.state.nodeTitle} required placeholder="Node Title" on onChange={this.inputTitleHandler}/>
+                        <input type="text" value={this.state.nodeTitle} required placeholder="Node Title" on onChange={this.inputTitleHandler}/>
                     </div>    
                     <div className="input-container">
-                        <input type="summary" value={this.state.nodeTitle} required placeholder="Node Summary" on onChange={this.inputSummaryHandler}/>
+                        <input type="text" value={this.state.nodeTitle} required placeholder="Node Summary" on onChange={this.inputSummaryHandler}/>
                     </div>  
+                    {this.state.errorMessage && <div className="error-createNode"> {this.state.errorMessage} </div>}
                 </form>
             </div>
         );
 
         return (
-            <div className="form-nodeCreation-wrapper">
-                <div className="container-nodeCreation-text">
-                    <h1 className="nodeCreation-title">Node Creation</h1>
+            <div className="form-createNode-wrapper">
+                <div className="container-createNode-text">
+                    <h1 className="createNode-title">Create Node</h1>
                 </div>    
             </div>
         );

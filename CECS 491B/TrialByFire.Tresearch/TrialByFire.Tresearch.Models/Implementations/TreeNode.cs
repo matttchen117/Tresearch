@@ -13,24 +13,25 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public TreeNode()
         {
+
             Children = new List<TreeNode>();
         }
 
         public TreeNode(INode n)
         {
             Children = new List<TreeNode>();
-            this.UserHash = n.UserHash;
-            this.NodeID = n.NodeID;
-            this.NodeParentID = n.NodeParentID;
-            this.NodeTitle = n.NodeTitle;
-            this.Summary = n.Summary;
-            this.TimeModified = n.TimeModified;
-            this.Visibility = n.Visibility;
-            this.Deleted = n.Deleted;
-            this.ExactMatch = n.ExactMatch;
-            this.Tags = n.Tags;
-            this.TagScore = n.TagScore;
-            this.RatingScore = n.RatingScore;
+            UserHash = n.UserHash;
+            NodeID = n.NodeID;
+            ParentNodeID = n.ParentNodeID;
+            NodeTitle = n.NodeTitle;
+            Summary = n.Summary;
+            TimeModified = n.TimeModified;
+            Visibility = n.Visibility;
+            Deleted = n.Deleted;
+            ExactMatch = n.ExactMatch;
+            Tags = n.Tags;
+            TagScore = n.TagScore;
+            RatingScore = n.RatingScore;
         }
 
 

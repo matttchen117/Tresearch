@@ -130,7 +130,7 @@ CREATE TABLE [dbo].NodeRatings(
 	CONSTRAINT user_ratings_pk PRIMARY KEY(UserHash, NodeID)
 );
 
---shouldn’t you combine both EditDate and EditTime into one attribute so the datatype can be DateTime
+--shouldnï¿½t you combine both EditDate and EditTime into one attribute so the datatype can be DateTime
 CREATE TABLE [dbo].TreeHistories(
 	EditDate DATE,
 	EditTime TIME,
@@ -787,6 +787,35 @@ begin
     INSERT INTO Nodes(UserHash, NodeID, NodeParentID, NodeTitle, Summary, Visibility)
          VALUES(@UserHash, @NodeID, @NodeParentID, @NodeTitle, @Summary, @Visibility);
 end
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:      Jessie Lazo 
+-- Description: Return list of Nodes pertaining to the UserHash
+-- =============================================
+CREATE PROCEDURE [dbo].[GetNodes]
+(
+    -- Add the parameters for the stored procedure here
+    @UserHash VARCHAR(128),
+	@AccountHash VARCHAR(128)
+)
+AS
+BEGIN
+    IF (@UserHash = @AccountHash)
+		BEGIN
+			SELECT UserHash, NodeID, ParentNodeID, NodeTitle, Summary, TimeModified, Visibility, Deleted FROM Nodes	
+				WHERE Userhash = @UserHash AND Deleted = 0
+		END
+
+	ELSE
+		BEGIN
+			SELECT UserHash, NodeID, ParentNodeID, NodeTitle, Summary, TimeModified, Visibility, Deleted FROM Nodes
+				WHERE UserHash = @UserHash AND Visibility = 1 AND Deleted = 0
+		END
+END
 
 -- =============================================
 --Author:        Pammy Poor

@@ -11,10 +11,21 @@
     background-color: var(--form-container-bkg-color);
 }
 
--nodeCreation-title {
+.nodeCreation-title {
     font-size: 45px;
     font-weight: 500;
     color: #788770;
+}
+
+.form-nodeCreation-wrapper input[type='text']{
+    outline: 0;
+    border: 0;
+    background: var(--form-input-color);
+    width: 100%;
+    margin: 0 0 15px;
+    padding: 15px;
+    box-sizing: border-box;
+    background-color: var(--form-container-input-color);
 }
 
 .form-nodeCreation-wrapper input[type='text'] {

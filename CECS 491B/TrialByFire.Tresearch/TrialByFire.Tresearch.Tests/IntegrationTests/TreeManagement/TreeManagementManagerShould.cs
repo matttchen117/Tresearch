@@ -27,8 +27,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.TreeManagement
         }
 
         [Theory]
-        [InlineData("27a285fe87f1d0afb44f2310824f49bbf1aaea02b856d314412119142ecfbb46ece7dcadc6c516c4d3918532df9375bd9f377e395143f0a29aed88654bff1c95", "jessie@gmail.com", "user", "200: Server: Get Nodes Success")]
-        public async Task GetTheNodes(string userHash, string username, string currentRole, string expected)
+        [InlineData("27a285fe87f1d0afb44f2310824f49bbf1aaea02b856d314412119142ecfbb46ece7dcadc6c516c4d3918532df9375bd9f377e395143f0a29aed88654bff1c95", "27a285fe87f1d0afb44f2310824f49bbf1aaea02b856d314412119142ecfbb46ece7dcadc6c516c4d3918532df9375bd9f377e395143f0a29aed88654bff1c95", "jessie@gmail.com", "user", "200: Server: Get Nodes Success")]
+        public async Task GetTheNodes(string userHash, string accountHash, string username, string currentRole, string expected)
         {
             //Arrange
             IRoleIdentity roleIdentity = new RoleIdentity(true, username, currentRole);
@@ -38,7 +38,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.TreeManagement
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
             //Act
-            Tuple<Tree, string> result = await treeManagementManager.GetNodesAsync(userHash, cancellationTokenSource.Token);
+            Tuple<Tree, string> result = await treeManagementManager.GetNodesAsync(userHash, accountHash, cancellationTokenSource.Token);
 
             //Assert
             Assert.Equal(expected, result.Item2);

@@ -23,7 +23,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _messageBank = messageBank;
         }
 
-        public async Task<Tuple<Tree, string>> GetNodesAsync(string userHash, CancellationToken cancellationToken = default)
+        public async Task<Tuple<Tree, string>> GetNodesAsync(string userHash, string accountHash, CancellationToken cancellationToken = default)
         {
             List<INode> nullNodes = new List<INode>();
             Tree nullTree = null;
@@ -32,19 +32,20 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 //Store the result of the DAO method as a tuple of the List of Nodes retrieved as well as the completion result
-                Tuple<List<INode>, string> nodesResult = await _sqlDAO.GetNodesAsync(userHash, cancellationToken).ConfigureAwait(false);
+                Tuple<List<INode>, string> nodesResult = await _sqlDAO.GetNodesAsync(userHash, accountHash, cancellationToken).ConfigureAwait(false);
                 
                 //The root node of the tree should have the lowest ID as it should be created before any additional children are
                 //Therefore find the ID of that rootNode
                 //long rootID = nodesResult.Item1.Min(Node => Node.NodeID);//check if the nodeID is the ParentID
-                var r = nodesResult.Item1.Where(INode => INode.NodeID == INode.NodeParentID).FirstOrDefault();
+                //INode r = nodesResult.Item1.Where(INode => INode.NodeID == INode.ParentNodeID).FirstOrDefault();
                 //Assign that node as the rootNode of the Tree object
-                tree.rootNode = new TreeNode(r);
+                //tree.rootNode = new TreeNode(r);
                 //Iterate through the list of Nodes finding where the NodeParentID is equal to that of a TreeNode's NodeID 
                     foreach (INode n in nodesResult.Item1)
                     {
-                        if(n.NodeID == tree.rootNode.NodeID)
+                        if(n.NodeID == n.ParentNodeID)
                         {
+                            tree.rootNode = new TreeNode(n);
                             continue;
                         }
                         //Create a TreeNode from the current Node
@@ -56,7 +57,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                         //Performs a DFS of the Tree to find the TreeNode that is the parent of the current INode "n"
                         TreeNode findResult = new TreeNode();
 
-                        findResult = tree.FindNode(tree.rootNode, temp.NodeParentID);
+                        findResult = tree.FindNode(tree.rootNode, temp.ParentNodeID);
                         //If the result of the search is not null, then there exists a TreeNode that is the parent of the current INode "n"
                         if (findResult != null)
                         {

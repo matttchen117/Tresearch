@@ -31,11 +31,11 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         [HttpPost]
         [Route("treeManagement")]
-        public async Task<IActionResult> GetNodesAsync(string userhash)
+        public async Task<IActionResult> GetNodesAsync(string userhash, string accountHash)
         {
             try
             {
-                Tuple<Tree, string> result = await _treeManagementManager.GetNodesAsync(userhash, _cancellationTokenSource.Token).ConfigureAwait(false);
+                Tuple<Tree, string> result = await _treeManagementManager.GetNodesAsync(userhash, accountHash, _cancellationTokenSource.Token).ConfigureAwait(false);
                 string[] split;
                 split = result.Item2.Split(":");
                 return StatusCode(Convert.ToInt32(split[0]), result.Item1);
