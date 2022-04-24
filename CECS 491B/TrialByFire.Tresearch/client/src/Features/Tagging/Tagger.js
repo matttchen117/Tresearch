@@ -141,7 +141,7 @@ class Tagger extends React.PureComponent{
         window.location.assign(window.location.origin);
         window.location = '/';
     }
-}
+  }
 
   componentDidMount() {
     this.checkToken();

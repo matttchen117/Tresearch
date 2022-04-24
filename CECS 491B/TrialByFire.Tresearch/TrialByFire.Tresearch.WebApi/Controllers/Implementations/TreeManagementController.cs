@@ -17,7 +17,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
-        private ITreeManagementManager _treeManagementManager { get; } 
+        private ITreeManagementManager _treeManagementManager { get; }
         private IMessageBank _messageBank { get; }
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 

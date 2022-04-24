@@ -1,96 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import axios from "axios";
 import NavBar from "../../UI/Navigation/NavBar";
 import TreeView from "../../UI/Components/Tree/TreeView";
+import jwt_decode from "jwt-decode";  
 import './Portal.css';
 
 class Portal extends React.PureComponent{
   constructor(props){
     super(props);
 
+    this.token = sessionStorage.getItem('authorization');
+
     this.state = {
-      nodes:  []
+      nodes:  null,
+      nodesGet: [],
+      userHash: ''
     }
-    
-    this.nodesRetrieved = [{
-      "rootNode": {
-        "children": [
-          {
-            "children": [
-              {
-                "children": [
-                  {
-                    "children": [],
-                    "userHash": "AD89551B3BF5021B53AC0C9878DE96EAB72816241C417DDF2FB421BD78B7B7477372245C5EF36FEEE1A5DB096596D170309A904D9D0FDA6FAD4071148AD67C75",
-                    "nodeID": 339,
-                    "nodeParentID": 5,
-                    "nodeTitle": "Querying",
-                    "summary": "Performing Operations to the Database",
-                    "timeModified": "0001-01-01T00:00:00",
-                    "visibility": true,
-                    "deleted": false,
-                    "exactMatch": false,
-                    "tags": null,
-                    "tagScore": 0,
-                    "ratingScore": 0
-                  }
-                ],
-                "userHash": "AD89551B3BF5021B53AC0C9878DE96EAB72816241C417DDF2FB421BD78B7B7477372245C5EF36FEEE1A5DB096596D170309A904D9D0FDA6FAD4071148AD67C75",
-                "nodeID": 5,
-                "nodeParentID": 3,
-                "nodeTitle": "Intro to SQL",
-                "summary": "Best Language",
-                "timeModified": "0001-01-01T00:00:00",
-                "visibility": true,
-                "deleted": false,
-                "exactMatch": false,
-                "tags": null,
-                "tagScore": 0,
-                "ratingScore": 0
-              }
-            ],
-            "userHash": "AD89551B3BF5021B53AC0C9878DE96EAB72816241C417DDF2FB421BD78B7B7477372245C5EF36FEEE1A5DB096596D170309A904D9D0FDA6FAD4071148AD67C75",
-            "nodeID": 3,
-            "nodeParentID": 2,
-            "nodeTitle": "Intro to HTML/CSS",
-            "summary": "Summary of Hypertext language",
-            "timeModified": "0001-01-01T00:00:00",
-            "visibility": true,
-            "deleted": false,
-            "exactMatch": false,
-            "tags": null,
-            "tagScore": 0,
-            "ratingScore": 0
-          },
-          {
-            "children": [],
-            "userHash": "AD89551B3BF5021B53AC0C9878DE96EAB72816241C417DDF2FB421BD78B7B7477372245C5EF36FEEE1A5DB096596D170309A904D9D0FDA6FAD4071148AD67C75",
-            "nodeID": 4,
-            "nodeParentID": 2,
-            "nodeTitle": "Intro to Javascript",
-            "summary": "Annoying Language",
-            "timeModified": "0001-01-01T00:00:00",
-            "visibility": true,
-            "deleted": false,
-            "exactMatch": false,
-            "tags": null,
-            "tagScore": 0,
-            "ratingScore": 0
-          }
-        ],
-        "userHash": "AD89551B3BF5021B53AC0C9878DE96EAB72816241C417DDF2FB421BD78B7B7477372245C5EF36FEEE1A5DB096596D170309A904D9D0FDA6FAD4071148AD67C75",
-        "nodeID": 2,
-        "nodeParentID": 2,
-        "nodeTitle": "Computer Programming",
-        "summary": "Summary of Computer Programming",
-        "timeModified": "0001-01-01T00:00:00",
-        "visibility": true,
-        "deleted": false,
-        "exactMatch": false,
-        "tags": null,
-        "tagScore": 0,
-        "ratingScore": 0
-      }
-    }]
   }
 
   mapper = (nodeData) => {
@@ -109,27 +34,59 @@ class Portal extends React.PureComponent{
     })
   }
 
-  setup = () => {
-    var temp = Object.values(this.nodesRetrieved);
+  setup = (n) => {
+    var temp = Object.values(n);
     var temp2 = this.mapper(temp);
-    console.log(temp2[0].rootNode);
-    return temp2[0].rootNode;
+    return temp2[0];
   }
 
   componentDidMount() {
-   this.setState( {nodes: this.setup()})
+    const token = this.checkToken();
+    if(token != null){
+      console.log("TEST");
+    }
+    axios.get("https://localhost:7010/TreeManagement/getNodes?owner=" + "AD89551B3BF5021B53AC0C9878DE96EAB72816241C417DDF2FB421BD78B7B7477372245C5EF36FEEE1A5DB096596D170309A904D9D0FDA6FAD4071148AD67C75")
+    .then( res => {
+      const nodes = this.setup(res.data);
+      this.setState({nodes});
+    });
   }
 
+  // Check JWT Token
+  checkToken = () => {
+    const token = sessionStorage.getItem('authorization');
+    if(token){
+        // Token exists, decode and check credentials
+        const decoded = jwt_decode(token);
+        const tokenExpiration = decoded.tokenExpiration;
+        const now = new Date();
 
-  
+        // Check if expired
+        if(now.getTime() > tokenExpiration * 1000){
+            localStorage.removeItem('authorization');
+            window.location.assign(window.location.origin);
+            window.location = '/';
+        }
+
+        return decoded;
+    }else{
+        // Token doesn't exist or not valid
+        localStorage.removeItem('authorization');
+        window.location.assign(window.location.origin);
+        window.location = '/';
+    }
+  }
+ 
   render () {
     return (
       <div className="Portal-wrapper"> 
         {<NavBar/>}
         <div className = "portal-tree-wrapper">
-          <TreeView nodes = {this.setup()} />
+          {this.state.nodes && (
+            <TreeView nodes = {this.state.nodes} />
+          )}
         </div>
-    </div>
+      </div>
     )
   }
 }
