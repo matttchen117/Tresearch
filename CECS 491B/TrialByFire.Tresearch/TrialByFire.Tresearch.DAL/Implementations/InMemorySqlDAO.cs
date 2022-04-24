@@ -328,11 +328,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             InMemoryDatabase.Nodes.RemoveAt(j);
                         }
                     }
-                    for (int j = 0; j < InMemoryDatabase.Ratings.Count; j++)
+                    for (int j = 0; j < InMemoryDatabase.NodeRatings.Count; j++)
                     {
-                        if (InMemoryDatabase.Ratings[j].Username.Equals(accountName))
+                        if (InMemoryDatabase.NodeRatings[j].UserHash.Equals(accountName))
                         {
-                            InMemoryDatabase.Ratings.RemoveAt(j);
+                            InMemoryDatabase.NodeRatings.RemoveAt(j);
                         }
                     }
                     for (int j = 0; j < InMemoryDatabase.ConfirmationLinks.Count; j++)

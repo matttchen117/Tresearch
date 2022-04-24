@@ -20,7 +20,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
             TimeSpan.FromSeconds(15));
-        public LogManager(ILogService logService, IOptionsSnapshot<BuildSettingsOptions> options)
+        public LogManager(ILogService logService, IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> options)
         {
             _logService = logService;
             _messageBank = messageBank;
