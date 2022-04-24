@@ -92,6 +92,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.nodeSearchSuccess:
                     return "200: Server: Node search success. Search: {0}, Tags: {1}, FilterByRating: {2}, FilterByTime: {3}";
 
+                
                 case Responses.tagAddSuccess:
                     return "200: Server: Tag added to node(s).";
                 case Responses.tagRemoveSuccess:
@@ -108,12 +109,21 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "409: Database: The tag already exists.";
                 case Responses.tagRetrievalFail:
                     return "502: Server: Unable to get tag data.";
+                case Responses.tagCountInvalid:
+                    return "422: Server: Invalid tag count.";
+                case Responses.tagNameInvalid:
+                    return "422: Server: Invalid tag name.";
 
 
                 case Responses.userRateSuccess:
                     return "200: Server: User rating added.";
+                case Responses.getRateSuccess:
+                    return "200: Server: Rating retrieved.";
                 case Responses.userRateFail:
                     return "502: Server: Unable rate node.";
+                case Responses.getRateFail:
+                    return "502: Server: Unable to get rating data.";
+
 
                 case Responses.createNodeSuccess:
                     return "200: Server: Create Node Success";
@@ -130,6 +140,19 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.refreshSessionNotAllowed:
                     return "400: Server: Refresh Session Failed: User is not logged in.";
 
+                case Responses.accountUpdateSuccess:
+                    return "200: Server: Account updated.";
+                case Responses.accountEnableSuccess:
+                    return "200: Server: Account enabled.";
+                case Responses.accountDisableSuccess:
+                    return "200: Server: Account disabled.";
+                case Responses.accountUpdateFail:
+                    return "502: Server: Unable to update account.";
+
+                case Responses.deleteNodeSuccess:
+                    return "200: Server: Delete Node Success";
+                case Responses.getNodesSuccess:
+                    return "200: Server: Get Nodes Success";
                 case Responses.storeLogFail:
                     return "503: Database: Failed to store the log.";
                 case Responses.badNameOrPass:
@@ -158,7 +181,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "404: Database: UserAccount not found or not authorized to perform the " +
                 "operation.";
                 case Responses.nodeNotFound:
-                    return "404: Database: The node was not found.";
+                    return "504: Database: The node was not found.";
                 case Responses.tagDoesNotExist:
                     return "404: Database: Tag not found.";
                 case Responses.recoveryLinkNotFound:
@@ -205,6 +228,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "504: Server rollback failed";
                 case Responses.createNodeFail:
                     return "503: Database: Failed to create node.";
+                case Responses.deleteNodeFail:
+                    return "503: Database: Failed to delete node.";
+                case Responses.updateNodeFail:
+                    return "503: Database: Failed to update node.";
                 case Responses.nodeAlreadyExists:
                     return "409: Database: Node Already Exists";
                 case Responses.createdNodesExists:

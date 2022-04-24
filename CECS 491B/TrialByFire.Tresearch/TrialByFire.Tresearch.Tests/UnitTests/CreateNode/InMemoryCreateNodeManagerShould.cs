@@ -27,28 +27,28 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CreateNode
             TestProvider = TestServices.BuildServiceProvider();
         }
 
+        /*
         [Theory]
-        [InlineData("jessie@gmail.com", 69420, 69419, "Cooking", "Concepts of Preparing Food", true, "jessie@gmail.com", "jessie@gmail.com", "guest", "200: Server: success")]
-        [InlineData("larry@gmail.com", 100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com", "larry@gmail.com", "guest", "409: Database: Node Already Exists")]
+        [InlineData("jessie@gmail.com", 69422, 69420, "Sauteeing ", "Preparing food on a stove", true, "jessie@gmail.com", "jessie@gmail.com", "user", "200: Server: success")]
+        [InlineData("larry@gmail.com", 100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com", "larry@gmail.com", "guest", "403: Database: You are not authorized to perform this operation.")]
         public async Task CreateTheNode(string username, long nodeID, long parentID, string nodeTitle, string summary, bool visibility,
             string accountOwner, string currentIdentity, string currentRole, string expected)
         {
             //Arrange
-            IRoleIdentity roleIdentity = new RoleIdentity(false, currentIdentity, currentRole);
+            IRoleIdentity roleIdentity = new RoleIdentity(true, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            if (!currentIdentity.Equals("guest"))
-            {
-                Thread.CurrentPrincipal = rolePrincipal;
-            }
+            Thread.CurrentPrincipal = rolePrincipal;
             ICreateNodeManager createNodeManager = TestProvider.GetService<ICreateNodeManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            Node node = new Node(accountOwner, nodeID, parentID, nodeTitle, summary, DateTime.UtcNow, visibility, false);
+            Node node = new Node(nodeID, parentID, nodeTitle, summary, visibility, false, accountOwner);
+            Account account = new Account(username, "jessie123", "user");
 
             //Act
-            string result = await createNodeManager.CreateNodeAsync(username, node, cancellationTokenSource.Token).ConfigureAwait(false);
+            string result = await createNodeManager.CreateNodeAsync(account, node, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
             Assert.Equal(expected, result);
         }
+        */
     }
 }

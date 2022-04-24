@@ -46,5 +46,28 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
+
+
+        public async Task<Tuple<List<double>, string>> GetNodeRatingAsync(List<long> nodeID, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                Tuple<List<double>, string> result = await _sqlDAO.GetNodeRatingAsync(nodeID, cancellationToken);
+
+                return result;
+
+            }
+            catch (OperationCanceledException)
+            {
+                //rollback not necessary
+                return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
+            }
+        }
     }
 }

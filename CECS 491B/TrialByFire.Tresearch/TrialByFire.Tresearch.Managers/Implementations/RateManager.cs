@@ -34,7 +34,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 //Check if user is authenticated
-                if (Thread.CurrentPrincipal != null)
+                if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
                     //Get user's role
                     string role = "";
@@ -69,6 +69,47 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             catch (Exception ex)
             {
                 return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+            }
+        }
+
+        public async Task<Tuple<List<double>, string>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            { 
+                cancellationToken.ThrowIfCancellationRequested();
+                if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
+                {
+                    //Get user's role
+                    string role = "";
+                    if (Thread.CurrentPrincipal.IsInRole(_options.User))
+                        role = _options.User;
+                    else if (Thread.CurrentPrincipal.IsInRole(_options.Admin))
+                        role = _options.Admin;
+                    else
+                        return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.unknownRole));
+
+                    //UserAccount with user's username and role
+                    IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
+
+                    //Verify if account is enabled and confirmed
+                    string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken);
+
+                    //Check if account is enabled and confirme, if not return error
+                    if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
+                        return Tuple.Create(new List<double>(), resultVerifyAccount);
+
+                    Tuple<List<double>, string> results = await _rateService.GetNodeRatingAsync(nodeIDs, cancellationToken);
+
+                    return results;
+                }
+                else
+                    return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated));
+
+
+            }
+            catch (Exception ex)
+            {
+                return  Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
             }
         }
     }

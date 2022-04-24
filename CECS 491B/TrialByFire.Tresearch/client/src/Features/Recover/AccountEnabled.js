@@ -15,7 +15,7 @@ const AccountEnabled = () => {
         <div className="account-enabled-component-container">
             <NavigationBar/>
             <div className="account-enabled-title">
-                <h1 className="account-enabled-title-text">Congradulations!</h1>
+                <h1 className="account-enabled-title-text">Congratulations!</h1>
             </div>
             {renderBody}
         </div>

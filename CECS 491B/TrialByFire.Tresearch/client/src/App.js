@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import axios, {AxiosResponse, AxiosError} from 'axios';
 import './App.css';
+import UserManagement from "./Features/UserManagement/UserManagement";
 
 import ConfirmationSent from './Features/Registration/ConfirmationSent';
 import Login from "./Features/Login/Login";
@@ -20,8 +21,11 @@ import Tagger from "./Features/Tagging/Tagger";
 import InactiveLink from "./Features/Registration/InactiveLink";
 import Portal from "./Pages/Portal/Portal";
 import AdminPortal from "./Pages/AdminPortal/AdminPortal";
+import AdminLogin from "./Pages/AdminLogin/AdminLogin";
 import Error404 from "./Pages/Error404/Error404";
 import Settings from "./Pages/Settings/Settings";
+import FAQ from "./Pages/FAQ/FAQ";
+import Features from "./Pages/Features/Features";
 import Search from "./Features/Search/NodeSearch";
 
 class App extends React.Component {
@@ -47,7 +51,8 @@ class App extends React.Component {
             <Route path="/" element = {<Home />}/>
             <Route path = "/Portal" element ={<Portal />}/>
             <Route path = "/Settings" element = {<Settings/>} exact/>
-
+            <Route path = "/Features" element = {<Features/>}/>
+            <Route path = "/FAQ" element ={<FAQ />}/>
 
             <Route path="/Login/Login" element = {<Login />}/>
             <Route path="/Logout/Logout" element = {<Logout />}/>
@@ -63,9 +68,10 @@ class App extends React.Component {
             <Route path = "/Recover/Enable/:recoveryConfirm" element = {<RecoveryConfirm guid={this.state.recoveryConfirm}/>}/>
             <Route path = "/Recover/AccountEnabled" element = {<AccountEnabled/>} />
 
-
+            <Route path = "/Admin/Login" element = {<AdminLogin/>} />
             <Route path = "/Admin/Dashboard" element = {<AdminPortal/>} />
             <Route path = "/Admin/TagDashboard" element = {<TagDashboard/>} />
+            <Route path = "/Admin/UserManagement" element = {<UserManagement/>} />
 
             <Route path = "/Tagger" element = {<Tagger/>} exact/>
             <Route path = "/Search" element = {<Search/>} exact/>

@@ -19,8 +19,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private BuildSettingsOptions _buildSettings;
 
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
-            TimeSpan.FromSeconds(5));
-        public LogManager(ILogService logService, IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> options)
+            TimeSpan.FromSeconds(15));
+        public LogManager(ILogService logService, IOptionsSnapshot<BuildSettingsOptions> options)
         {
             _logService = logService;
             _messageBank = messageBank;
@@ -28,7 +28,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         }
 
         public async Task<string> StoreAnalyticLogAsync(DateTime timestamp, Levels level, Categories category, 
-            string description, CancellationToken cancellationToken = default)
+            string description, CancellationToken cancellationToken = default(CancellationToken))
         {
             ILog log = await _logService.CreateLogAsync(timestamp, level.ToString(), category.ToString(), 
                 description, _cancellationTokenSource.Token).ConfigureAwait(false);

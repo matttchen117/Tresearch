@@ -1,14 +1,12 @@
 import React from "react";
 import { useParams,} from "react-router-dom";
-import NavigationBar from "../../UI/Navigation/NavigationBar";
 import "./RecoveryConfirm.css";
-import axios, {AxiosResponse, AxiosError} from 'axios';
+import axios from 'axios';
 
 class RecoveryConfirm extends React.Component {
      render() {
         function GetGuid() {
             const { recoveryConfirm } = useParams();
-            console.log(recoveryConfirm);
             if(recoveryConfirm != null){
                 axios.post('https://localhost:7010/Recovery/recover?'+recoveryConfirm)
                 .then(res => {
@@ -16,9 +14,15 @@ class RecoveryConfirm extends React.Component {
                     return res;
                 })
                 .catch( err => {
-                    //window.location = '/Register/EULATerms';
-                    console.log(err);
-                    return err;
+                    
+                    switch(err.response.status){
+                        case 404: {
+                        }
+                            break;
+                        default: {
+
+                        }
+                    }
                 })
             }
             return null;

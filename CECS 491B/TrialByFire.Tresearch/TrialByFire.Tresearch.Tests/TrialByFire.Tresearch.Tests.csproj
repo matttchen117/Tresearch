@@ -39,6 +39,7 @@
 
   <ItemGroup>
     <Folder Include="IntegrationTests\Rating\SetupAndCleanup\" />
+    <Folder Include="IntegrationTests\Recovery\SetupAndCleanup\" />
     <Folder Include="IntegrationTests\Registration\SetupAndCleanup\" />
   </ItemGroup>
 

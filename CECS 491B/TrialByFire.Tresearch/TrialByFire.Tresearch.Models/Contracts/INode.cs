@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Runtime.Serialization;
+using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Models.Contracts
 {
@@ -18,3 +20,4 @@ namespace TrialByFire.Tresearch.Models.Contracts
         public double RatingScore { get; set; }
     }
 }
+

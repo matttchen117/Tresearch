@@ -143,13 +143,37 @@ namespace TrialByFire.Tresearch.Models.Implementations
             accounts.Add(new UserAccount("altyn@gmail.com", "asdfasdf", "user", true, true));
             accounts.Add(new UserAccount("ryst@gmail.com", "asdfasdf123", "admin", true, true));
 
+
+            /*
+             *  Initialize accounts for InMemoryTagManagerShould
+             */
+            accounts.Add(new UserAccount("tagManagerIntegration1@tresearch.system", "myPassphrase", "user", true, true));
+            accounts.Add(new UserAccount("tagManagerIntegration2@tresearch.system", "myPassphrase", "user", true, true));
+            accounts.Add(new UserAccount("tagManagerIntegrationNotEnabled@tresearch.system", "myPassphrase", "user", false, true));
+            accounts.Add(new UserAccount("tagManagerIntegrationNotConfirmed@tresearch.system", "myPassphrase", "user", true, false));
+            accounts.Add(new UserAccount("tagManagerIntegration3@tresearch.system", "myPassphrase", "user", true, true));
+            accounts.Add(new UserAccount("tagManagerIntegrationAdmin1@tresearch.system", "myPassphrase", "admin", true, true));
+
+            /*
+             * Initialize accounts for InMemoryTagControllerShould
+             */
+            accounts.Add(new UserAccount("tagControllerIntegration1@tresearch.system", "myPassphrase", "user", true, true));
+            accounts.Add(new UserAccount("tagControllerIntegration2@tresearch.system", "myPassphrase", "user", true, true));
+            accounts.Add(new UserAccount("tagControllerIntegrationNotEnabled@tresearch.system", "myPassphrase", "user", false, true));
+            accounts.Add(new UserAccount("tagControllerIntegrationNotConfirmed@tresearch.system", "myPassphrase", "user", true, false));
+            accounts.Add(new UserAccount("tagControllerIntegration3@tresearch.system", "myPassphrase", "user", true, true));
+            accounts.Add(new UserAccount("tagControllerIntegrationAdmin1@tresearch.system", "myPassphrase", "admin", true, true));
+
+
+
+
             return accounts;
         }
 
         private List<INode> InitializeNodes()
         {
             List<INode> nodes = new List<INode>();
-            /*
+            /**
             nodes.Add(new Node(69420, 69419, "Cooking", "Concepts of Preparing Food", true, "jessie@gmail.com"));
             nodes.Add(new Node(100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com"));
             nodes.Add(new Node(100001, 100002, "Title 2", "Summary 2", false, "larry@gmail.com"));
@@ -168,6 +192,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodes.Add(new Node(67892, 67891, "Subject2", "Somewhat hard subject", true, "82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b"));
             nodes.Add(new Node(67893, 67891, "Subject3", "This is a hard subject", true, "82336d2e39f058bbc65703caf7247c47a8362279f88f39f5e60ed125485adcf0ad6f6ced311e432f7a10491717f74101d6281540ab6073977853263035f0c62b"));
 
+             */
             nodes.Add(new Node(55, 55, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
             nodes.Add(new Node(2022030533, 2022030533, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
             nodes.Add(new Node(2022030534, 2022030533, "Sql DAO Tag Test", "EH", true, "5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf"));
@@ -191,6 +216,57 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodes.Add(new Node("CB3C47AD9DCEFA2CAC50D472CAFA954F00476EA58B11E8F2CD32E46F4C3DC1C990867A78D484BB25E8FF2FB44CE9F99F356E275E7E2684FFF714BAC11B663FBF", 10, 1, "Cooking", "This is a test node.", new DateTime(2022, 4, 19), false, false));
             nodes.Add(new Node("E5D6801551E6079FCAF2B10403FA86F9B9EC40B0D7A70256EDA0A9988ABAB4CC250681D5054D18E224DCF0CADB730BCF6E07546F2B775A0E31D64C3DC41BC159", 11, 1, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 19), false, true));
             nodes.Add(new Node("CB3C47AD9DCEFA2CAC50D472CAFA954F00476EA58B11E8F2CD32E46F4C3DC1C990867A78D484BB25E8FF2FB44CE9F99F356E275E7E2684FFF714BAC11B663FBF", 12, 1, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 19), true, true));
+
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 55, 55, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2022030533, 2022030533, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2022030534, 2022030533, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2022030535, 2022030533, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2022030536, 2022030533, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2022030537, 2022030533, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2022030538, 2022030533, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2022030539, 2022030533, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2022030540, 2022030533, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2022030541, 2022030533, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false)); 
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2072942630, 2072942630, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2072942631, 2072942630, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2072942632, 2072942630, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2072942633, 2072942630, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2072942634, 2072942630, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2072942635, 2072942630, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2072942636, 2072942630, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2072942637, 2072942630, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2072942638, 2072942630, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+
+            nodes.Add(new Node("d9e22e6b5668fe3bc85246df7aee535f65cc3fdcd95d468993136da4a35e2f4ac1052c667064368236a0f6a120771aa6f6e332d73215df7339a727e1d32cd648", 8019303350, 8019303350, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("d9e22e6b5668fe3bc85246df7aee535f65cc3fdcd95d468993136da4a35e2f4ac1052c667064368236a0f6a120771aa6f6e332d73215df7339a727e1d32cd648", 8019303351, 8019303350, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("d9e22e6b5668fe3bc85246df7aee535f65cc3fdcd95d468993136da4a35e2f4ac1052c667064368236a0f6a120771aa6f6e332d73215df7339a727e1d32cd648", 8019303352, 8019303350, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("f59b47456839aadf4328940ee16e473659a48978f5bf81669dee37aac6ecd1a1e380947d68343f3c634378d7964ec573e211e8796036188b417d3265d8fd7a89", 8019303353, 8019303353, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("f59b47456839aadf4328940ee16e473659a48978f5bf81669dee37aac6ecd1a1e380947d68343f3c634378d7964ec573e211e8796036188b417d3265d8fd7a89", 8019303354, 8019303353, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+
+            nodes.Add(new Node("571510127f69c2e3dee263541e8551d8339dc1d98c4b253b5feb5202b41d420dd55c172818feeb5fd7bf85c067c5af142cb930fac9d776b644428adb4b9c4f7b", 8019303356, 8019303356, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("571510127f69c2e3dee263541e8551d8339dc1d98c4b253b5feb5202b41d420dd55c172818feeb5fd7bf85c067c5af142cb930fac9d776b644428adb4b9c4f7b", 8019303357, 8019303357, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("571510127f69c2e3dee263541e8551d8339dc1d98c4b253b5feb5202b41d420dd55c172818feeb5fd7bf85c067c5af142cb930fac9d776b644428adb4b9c4f7b", 8019303358, 8019303358, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("571510127f69c2e3dee263541e8551d8339dc1d98c4b253b5feb5202b41d420dd55c172818feeb5fd7bf85c067c5af142cb930fac9d776b644428adb4b9c4f7b", 8019303359, 8019303359, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("571510127f69c2e3dee263541e8551d8339dc1d98c4b253b5feb5202b41d420dd55c172818feeb5fd7bf85c067c5af142cb930fac9d776b644428adb4b9c4f7b", 8019303360, 8019303360, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("571510127f69c2e3dee263541e8551d8339dc1d98c4b253b5feb5202b41d420dd55c172818feeb5fd7bf85c067c5af142cb930fac9d776b644428adb4b9c4f7b", 8019303361, 8019303361, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+
+            nodes.Add(new Node("09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5", 9019303350, 9019303350, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5", 9019303351, 9019303351, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5", 9019303352, 9019303352, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+
+
+            nodes.Add(new Node("20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb", 9019303353, 9019303353, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("20b5738a239a937e6e04375836610a07f6380581bd295ea57b9da041981527c832aaffdb0f67dc9dc4d31754e3faa4bf486079076e9340e96d14310c654a17bb", 9019303354, 9019303353, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+
+
+            nodes.Add(new Node("0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f", 9019303356, 9019303356, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f", 9019303357, 9019303357, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f", 9019303358, 9019303358, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f", 9019303359, 9019303359, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f", 9019303361, 9019303361, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f", 9019303360, 9019303360, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+
+
 
             return nodes;
         }
@@ -218,6 +294,51 @@ namespace TrialByFire.Tresearch.Models.Implementations
             tags.Add(new Tag("Tresearch SqlDAO Delete Tag2", 0));
             tags.Add(new Tag("Tresearch SqlDAO Delete Tag3", 0));
             tags.Add(new Tag("Tresearch SqlDAO Delete Tag4", 0));
+            tags.Add(new Tag("Tresearch Service Add Tag1", 0));
+            tags.Add(new Tag("Tresearch Service Add Tag2", 0));
+            tags.Add(new Tag("Tresearch Service Add Tag3", 0));
+            tags.Add(new Tag("Tresearch Service Add Tag4", 0));
+            tags.Add(new Tag("Tresearch Service Create tag2"));
+            tags.Add(new Tag("Tresearch Service Delete tag1"));
+            tags.Add(new Tag("Tresearch Service Delete tag3"));
+
+            tags.Add(new Tag("Tresearch Manager Add Tag1", 0));
+            tags.Add(new Tag("Tresearch Manager Add Tag2"));
+            tags.Add(new Tag("Tresearch Manager Add Tag3"));
+            tags.Add(new Tag("Tresearch Manager Add Tag4"));
+            tags.Add(new Tag("Tresearch Manager Delete Tag1", 0));
+            tags.Add(new Tag("Tresearch Manager Delete Tag2"));
+            tags.Add(new Tag("Tresearch Manager Delete Tag3"));
+            tags.Add(new Tag("Tresearch Manager Delete Tag4"));
+
+            tags.Add(new Tag("Tresearch Manager Get Tag1", 0));
+            tags.Add(new Tag("Tresearch Manager Get Tag2"));
+            tags.Add(new Tag("Tresearch Manager Get Tag3"));
+            tags.Add(new Tag("Tresearch Manager Get Tag4"));
+
+            tags.Add(new Tag("Tresearch Manager Tag Exist"));
+
+            tags.Add(new Tag("Tresearch Manager REMOVE Tag Exist"));
+
+
+            /*
+             * Initialize Tags for InMemoryTagControllerShould
+             */
+            tags.Add(new Tag("Tresearch Controller Add Tag1", 0));
+            tags.Add(new Tag("Tresearch Controller Add Tag2", 0));
+            tags.Add(new Tag("Tresearch Controller Add Tag3", 0));
+            tags.Add(new Tag("Tresearch Controller Add Tag4", 0));
+            tags.Add(new Tag("Tresearch Controller Tag Exist", 0));
+            tags.Add(new Tag("Tresearch Controller REMOVE Tag Exist", 0));
+            tags.Add(new Tag("Tresearch Controller REMOVE Exist and Tagged", 1));
+            tags.Add(new Tag("Tresearch Controller Get Tag1", 0));
+            tags.Add(new Tag("Tresearch Controller Get Tag2", 0));
+            tags.Add(new Tag("Tresearch Controller Get Tag3", 0));
+            tags.Add(new Tag("Tresearch Controller Get Tag4", 0));
+            tags.Add(new Tag("Tresearch Controller Delete Tag1", 0));
+            tags.Add(new Tag("Tresearch Controller Delete Tag2", 0));
+            tags.Add(new Tag("Tresearch Controller Delete Tag3", 0));
+            tags.Add(new Tag("Tresearch Controller Delete Tag4", 0));
 
             return tags;
         }
@@ -259,6 +380,78 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodeTags.Add(new NodeTag(2022030548, "Tresearch SqlDAO Delete Tag1"));
 
             nodeTags.Add(new NodeTag(2022030536, "Tresearch SqlDAO Delete Tag4"));
+            nodeTags.Add(new NodeTag(2072942638, "Tresearch Service Delete tag3"));
+
+            // Case 0: In memory tag manager should
+            nodeTags.Add(new NodeTag(8019303350, "Tresearch Manager Add Tag1"));
+            nodeTags.Add(new NodeTag(8019303351, "Tresearch Manager Add Tag1"));
+            nodeTags.Add(new NodeTag(8019303352, "Tresearch Manager Add Tag1"));
+
+            // Case 2: In memory tag manager should
+            nodeTags.Add(new NodeTag(8019303350, "Tresearch Manager Add Tag3"));
+
+            // Case 6: In memory tag manager should
+            nodeTags.Add(new NodeTag(8019303351, "Tresearch Manager Add Tag3"));
+
+            // Case 0: In memory tag manager should
+            nodeTags.Add(new NodeTag(8019303350, "Tresearch Manager Delete Tag1"));
+            nodeTags.Add(new NodeTag(8019303351, "Tresearch Manager Delete Tag1"));
+            nodeTags.Add(new NodeTag(8019303352, "Tresearch Manager Delete Tag1"));
+
+            // Case 2: In memory tag manager should
+            nodeTags.Add(new NodeTag(8019303350, "Tresearch Manager Delete Tag3"));
+
+            // Case 6: In memory tag manager should
+            nodeTags.Add(new NodeTag(8019303351, "Tresearch Manager DELETE Tag3"));
+
+            nodeTags.Add(new NodeTag(8019303356, "Tresearch Manager Get Tag1"));
+            nodeTags.Add(new NodeTag(8019303356, "Tresearch Manager Get Tag2"));
+
+            nodeTags.Add(new NodeTag(8019303357, "Tresearch Manager Get Tag1"));
+            nodeTags.Add(new NodeTag(8019303357, "Tresearch Manager Get Tag2"));
+
+            nodeTags.Add(new NodeTag(8019303358, "Tresearch Manager Get Tag1"));
+            nodeTags.Add(new NodeTag(8019303358, "Tresearch Manager Get Tag2"));
+            nodeTags.Add(new NodeTag(8019303358, "Tresearch Manager Get Tag3"));
+
+            nodeTags.Add(new NodeTag(8019303360, "Tresearch Manager Get Tag1"));
+
+
+            nodeTags.Add(new NodeTag(9019303350, "Tresearch Controller Add Tag1"));
+            nodeTags.Add(new NodeTag(9019303351, "Tresearch Controller Add Tag1"));
+            nodeTags.Add(new NodeTag(9019303352, "Tresearch Controller Add Tag1"));
+
+            // Case 2: In memory tag manager should
+            nodeTags.Add(new NodeTag(9019303350, "Tresearch Controller Add Tag3"));
+
+            // Case 6: In memory tag manager should
+            nodeTags.Add(new NodeTag(9019303351, "Tresearch Controller Add Tag3"));
+
+            nodeTags.Add(new NodeTag(55, "Tresearch Controller REMOVE Exist and Tagged"));
+
+            nodeTags.Add(new NodeTag(9019303356, "Tresearch Controller Get Tag1"));
+            nodeTags.Add(new NodeTag(9019303356, "Tresearch Controller Get Tag2"));
+
+            nodeTags.Add(new NodeTag(9019303357, "Tresearch Controller Get Tag1"));
+            nodeTags.Add(new NodeTag(9019303357, "Tresearch Controller Get Tag2"));
+
+            nodeTags.Add(new NodeTag(9019303358, "Tresearch Controller Get Tag1"));
+            nodeTags.Add(new NodeTag(9019303358, "Tresearch Controller Get Tag2"));
+            nodeTags.Add(new NodeTag(9019303358, "Tresearch Controller Get Tag3"));
+            nodeTags.Add(new NodeTag(9019303359, "Tresearch Controller Get Tag2"));
+            nodeTags.Add(new NodeTag(9019303360, "Tresearch Controller Get Tag1"));
+
+            // Case 0: In memory tag manager should
+            nodeTags.Add(new NodeTag(9019303350, "Tresearch Controller Delete Tag1"));
+            nodeTags.Add(new NodeTag(9019303351, "Tresearch Controller Delete Tag1"));
+            nodeTags.Add(new NodeTag(9019303352, "Tresearch Controller Delete Tag1"));
+
+            // Case 2: In memory tag manager should
+            nodeTags.Add(new NodeTag(9019303350, "Tresearch Controller Delete Tag3"));
+
+            // Case 6: In memory tag manager should
+            nodeTags.Add(new NodeTag(9019303351, "Tresearch Controller DELETE Tag3"));
+
 
             nodeTags.Add(new NodeTag(1, "cooking"));
             nodeTags.Add(new NodeTag(2, "cooking"));
@@ -756,6 +949,14 @@ namespace TrialByFire.Tresearch.Models.Implementations
             userHashObjects.Add(new UserHashObject("qarry@gmail.com", "user", "96077B964424761F51F2A59340F0E40ADB225C69087AD599D13E8622BEA4A0EABBD0BFEEBAAF9CD4F9CDFA2AE765630B9AD9C0668E5BF9C5F1CAD6EA7F96FE92"));
             userHashObjects.Add(new UserHashObject("rarry@gmail.com", "user", "104FE34A615CA8D52BDF5AF486999767CD43DEF539FD52973B5CFB6A08753AB0382AD2111530F50B5614B9E6F6333CCB3DA65F9E25E81F5B8305CFAAC2A76303"));
             userHashObjects.Add(new UserHashObject("sarry@gmail.com", "admin", "4901F9B280F604E861C14451768BEF3F10E8DD9808662B76BB8BFC9A12D0DF2D2B8FC5162D0271FED66057B9F0000B1D49AC2110D168CE37CEF47E1A20304B85"));
+
+
+
+            userHashObjects.Add(new UserHashObject("tagManagerIntegration1@tresearch.system", "user", "d9e22e6b5668fe3bc85246df7aee535f65cc3fdcd95d468993136da4a35e2f4ac1052c667064368236a0f6a120771aa6f6e332d73215df7339a727e1d32cd648"));
+            userHashObjects.Add(new UserHashObject("tagManagerIntegration2@tresearch.system", "user", "f59b47456839aadf4328940ee16e473659a48978f5bf81669dee37aac6ecd1a1e380947d68343f3c634378d7964ec573e211e8796036188b417d3265d8fd7a89"));
+            userHashObjects.Add(new UserHashObject("tagManagerIntegrationNotEnabled@tresearch.system", "user", "820868f6b568617dca6164bd6d129fd3f0d47ee2da6785c2247f74b5fa174c8b0b4630b4c21e49f410db2293d2c89b2177a8ef5855e34a9b71402d8d57d7de8b"));
+            userHashObjects.Add(new UserHashObject("tagManagerIntegrationNotConfirmed@tresearch.system", "user", "e129733b11ce19340d78c79468ac3723632faede195ee8a78864afdd9a08cc6841feefee84b21a4f48c6e59d182c061b03439fed15f2c8ba8a5022ce1bcaffd3"));
+            userHashObjects.Add(new UserHashObject("tagManagerIntegration3@tresearch.system", "user", "571510127f69c2e3dee263541e8551d8339dc1d98c4b253b5feb5202b41d420dd55c172818feeb5fd7bf85c067c5af142cb930fac9d776b644428adb4b9c4f7b"));
 
             return userHashObjects;
         }

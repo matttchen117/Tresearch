@@ -26,19 +26,30 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
             TestProvider = TestServices.BuildServiceProvider();
         }
 
+        /*
         [Theory]
-        [InlineData("jessie@gmail.com", 69420, 69419, "Cooking", "Concepts of Preparing Food", true, "jessie@gmail.com", "200: Server: success")]
-        [InlineData("larry@gmail.com", 100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com", "409: Database: Node Already Exists")]
-        public async Task CreateTheNode(string username, long nodeID, long parentID, string nodeTitle, string summary, bool mode,
-            string accountOwner, string expected)
+        /*[InlineData("jessie@gmail.com", 69420, 3, "Cooking", "Concepts of Preparing Food", true, false, "jessie@gmail.com", "user", "200: Server: Create Node Success")]
+        [InlineData("jessie@gmail.com", 69420, 2, "Cooking", "Concepts of Preparing Food", true, false, "jessie@gmail.com", "user", "200: Server: Create Node Success")]*/
+        [InlineData("jelazo@live.com", 6969, null, "Root", "Root Node", true, false, false, "jelazo@live.com", "user", "200: Server: Create Node Success")]
+        public async Task CreateTheNode(string username, long nodeID, long parentID, string nodeTitle, string summary, bool visibility, bool mode, bool deleted,
+            string accountOwner, string currentRole, string expected)
         {
             //Arrange
+            //Arrange
+            IRoleIdentity roleIdentity = new RoleIdentity(false, username, currentRole);
+            IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+            if (!username.Equals("guest"))
+            {
+                Thread.CurrentPrincipal = rolePrincipal;
+            }
             ICreateNodeService createNodeService = TestProvider.GetRequiredService<ICreateNodeService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            Node node = new Node(accountOwner, nodeID, parentID, nodeTitle, summary, DateTime.UtcNow, false, false);
-            
+            INode node = new Node("AD89551B3BF5021B53AC0C9878DE96EAB72816241C417DDF2FB421BD78B7B7477372245C5EF36FEEE1A5DB096596D170309A904D9D0FDA6FAD4071148AD67C75", nodeID, parentID, nodeTitle, summary, mode, deleted);
+            //Account account = new Account(username, "jessie123", "user");
+            IAccount account = new UserAccount(username, "jessie123", "user");
+
             //Act
-            string result = await createNodeService.CreateNodeAsync(username, node, cancellationTokenSource.Token).ConfigureAwait(false);
+            string result = await createNodeService.CreateNodeAsync(account, node, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
             Assert.Equal(expected, result);

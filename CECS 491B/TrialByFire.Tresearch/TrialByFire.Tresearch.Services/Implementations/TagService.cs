@@ -7,36 +7,26 @@ using TrialByFire.Tresearch.Models.Contracts;
 namespace TrialByFire.Tresearch.Services.Implementations
 {
     /// <summary>
-    ///     Tag Service: Class used to perform business logic regarding a node's tags
+    ///     Tag Service: Class to perform business logic regarding a node's tags
     /// </summary>
     public class TagService: ITagService
     {
-        private ISqlDAO _sqlDAO { get; set; }
-
-        private ILogService _logService { get; set; }
-
-        private IMessageBank _messageBank { get; set; }
-
-        private BuildSettingsOptions _options { get; }
+        private ISqlDAO _sqlDAO { get; set; }                               // Perform database operations
+        private IMessageBank _messageBank { get; set; }                     // Retrieve status codes
 
         /// <summary>
-        ///     public RecoveryClass(sqlDAO, logService, messageBank)
-        ///         Constructor for Tag service class
+        ///     Constructor for Tag service class
         /// </summary>
         /// <param name="sqlDAO"> SQL object to perform changes to database</param>
-        /// <param name="logService"> Log service</param>
         /// <param name="messageBank"> Message bank containing status code enumerables</param>
-        public TagService(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, IOptions<BuildSettingsOptions> options)
+        public TagService(ISqlDAO sqlDAO,  IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
-            _logService = logService;
             _messageBank = messageBank;
-            _options = options.Value;
         }
 
         /// <summary>
-        ///     AddTagToNodeAsync(nodeIDs, tagName)
-        ///         Adds a tag to node.  
+        ///      Adds a tag to node. Must have at least one node.
         /// </summary>
         /// <param name="nodeIDs">List of nodes' ids to add tag</param>
         /// <param name="tagName">String tag to add to nodes</param>
@@ -46,21 +36,25 @@ namespace TrialByFire.Tresearch.Services.Implementations
         {
             try
             {
+                //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
+                // Check if tag is null or empty
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
                 //Check if list contains more than one node
-                if (nodeIDs.Count > 0)
-                {
-                    string result = await _sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationToken);
-                    return result;
-                }
-                else
-                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound);
+                if (nodeIDs == null || nodeIDs.Count <= 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+
+                string result = await _sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationToken).ConfigureAwait(false);
+                
+                return result;
+
             }
             catch (OperationCanceledException)
             {
                 //rollback not necessary
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch(Exception ex)
             {
@@ -69,8 +63,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         }
 
         /// <summary>
-        ///     RemoveTagFromNodesAsync(nodeIDs, tagName)
-        ///         Removes tag from nodes passed in. Checks if list has at least one node.
+        ///     Removes tag from nodes passed in. Must have at least one node
         /// </summary>
         /// <param name="nodeIDs">List of nodes</param>
         /// <param name="tagName">String tag name</param>
@@ -80,23 +73,24 @@ namespace TrialByFire.Tresearch.Services.Implementations
         {
             try
             {
-                
+                //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
-                //Check if list contains at least one node
-                if (nodeIDs.Count > 0)
-                {
-                    //Remove tag from node(s)
-                    string result = await _sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationToken);
-                    return result;
-                }
-                else
-                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound);
+                // Check if tag is null or empty
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                //Check if list contains more than one node
+                if (nodeIDs == null || nodeIDs.Count <= 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+
+                string result = await _sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationToken).ConfigureAwait(false);
+                return result;
+
             }
             catch (OperationCanceledException)
             {
                 //rollback not necessary
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -104,26 +98,33 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
+        /// <summary>
+        ///     Retrieves all tags shared by node(s). If list contains single node, all tags are returned. 
+        /// </summary>
+        /// <param name="nodeIDs"> List of node IDs</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>List of all tags shared by node(s).</returns>
         public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             List<string> tags = new List<string>();
             try
             {
+                //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
-                if (nodeIDs.Count > 0)
-                {
-                    Tuple<List<string>, string> result = await _sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationToken);
-                    if (cancellationToken.IsCancellationRequested)
-                        throw new OperationCanceledException();
-                    return result;
-                }
-                else
-                    return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound));
+                //Check if list contains more than one node
+                if (nodeIDs == null || nodeIDs.Count <= 0)
+                    return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false));
+
+                Tuple<List<string>, string> result = await _sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationToken).ConfigureAwait(false);
+                
+                return result;
+
             }
             catch (OperationCanceledException)
             {
-                throw;
+                // No rollback necessary
+                return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false));
             }
             catch (Exception ex)
             {
@@ -131,44 +132,37 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        public async Task<Tuple<List<string>, string>> GetNodeTagsDescAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            try
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                if (nodeIDs.Count > 0)
-                {
-                    Tuple<List<string>, string> result = await _sqlDAO.GetNodeTagsDescAsync(nodeIDs, cancellationToken);
-                    if (cancellationToken.IsCancellationRequested)
-                        throw new OperationCanceledException();
-                    return result;
-                }
-                else
-                    return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound));
-            }
-            catch (OperationCanceledException)
-            {
-                return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
-            }
-            catch (Exception ex)
-            {
-                return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
-            }
-        }
-
+        /// <summary>
+        ///  Creates a tag in tag bank.
+        /// </summary>
+        /// <param name="tagName">String tag name</param>
+        /// <param name="count">count of nodes tagged</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns></returns>
         public async Task<string> CreateTagAsync(string tagName, int count, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
-                //Check if cancellation token requests cancellation
+                //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
-                //Create tag in bank
-                string result = await _sqlDAO.CreateTagAsync(tagName, count, cancellationToken);
+
+                // Check if tag is null or empty
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+
+                // Validate count (must be greater or eaqual to 0)
+                if(count < 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid).ConfigureAwait(false);
+
+                string result = await _sqlDAO.CreateTagAsync(tagName, count, cancellationToken).ConfigureAwait(false);
                 return result;
+                
+                
             }
             catch (OperationCanceledException)
             {
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                //  No rollback necessary
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -176,17 +170,25 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
+        /// <summary>
+        ///     Retrieves list of all tags in tag bank.
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>List of tags and status code</returns>
         public async Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
+
             try
             {
+                //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
-                Tuple<List<ITag>, string> result = await _sqlDAO.GetTagsAsync(cancellationToken);
+
+                Tuple<List<ITag>, string> result = await _sqlDAO.GetTagsAsync(cancellationToken).ConfigureAwait(false);
                 return result;
             }
             catch (OperationCanceledException)
             {
-                return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+                return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false));
             }
             catch (Exception ex)
             {
@@ -194,47 +196,32 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        public async Task<Tuple<List<string>, string>> GetTagsDescAsync(CancellationToken cancellationToken = default(CancellationToken))
-        {
-            List<string> tags = null;
-            try
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                Tuple<List<string>, string> result = await _sqlDAO.GetTagsDescAsync(cancellationToken);
-                if (cancellationToken.IsCancellationRequested)
-                    throw new OperationCanceledException();
-                return result;
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
-            }
-        }
-
+        /// <summary>
+        ///      Removes tag from tag bank
+        /// </summary>
+        /// <param name="tagName">Tag to remove</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>String status code</returns>
         public async Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
+                //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
-                string result = await _sqlDAO.DeleteTagAsync(tagName, cancellationToken);
-                if (cancellationToken.IsCancellationRequested && result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
-                {
-                    //Perform Rollback
-                    string resultRollback = await _sqlDAO.CreateTagAsync(tagName, 0, cancellationToken);
-                    if (resultRollback.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
-                        throw new OperationCanceledException();
-                    else
-                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
-                }
+
+                // Check if tag is null or empty
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+
+                // Delete tag
+                string result = await _sqlDAO.DeleteTagAsync(tagName, cancellationToken).ConfigureAwait(false);
+
                 return result;
             }
             catch (OperationCanceledException)
             {
-                throw;
+                // No rollback necessary
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
