@@ -1,17 +1,19 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import NavBar from "../../UI/Navigation/NavBar";
 import TreeView from "../../UI/Components/Tree/TreeView";
-import './Portal.css';
+import { useSearchParams } from "react-router-dom";
 
-class Portal extends React.PureComponent{
+class SearchPage extends React.PureComponent{
   constructor(props){
     super(props);
 
     this.state = {
-      nodes:  []
+      page: new URLSearchParams(window.location.search).get('page'),
+      nodes: [{}]
     }
-    
-    this.nodesRetrieved = [{
+
+    this.defaultNodes = [{
       "rootNode": {
         "children": [
           {
@@ -110,17 +112,32 @@ class Portal extends React.PureComponent{
   }
 
   setup = () => {
-    var temp = Object.values(this.nodesRetrieved);
-    var temp2 = this.mapper(temp);
-    console.log(temp2[0].rootNode);
-    return temp2[0].rootNode;
+    axios.get("https://localhost:7010/TreeManagement/getNodes?owner=" + this.state.page)
+    .then((response => {
+      console.log(response.data)
+      var temp = Object.values(response.data);
+      var temp2 = this.mapper(temp);
+      console.log(temp2[0]);
+      return temp2[0].rootNode;
+      console.log(response.data)
+      this.setState( {nodes: this.mapper(Object.values(response.data))})
+      //console.log(this.state.nodes[0].rootNode)
+      return this.state.nodes[0].rootNode;
+    }))
+    .catch((err => {
+      switch(err.response.status){
+          case 503: {
+                  console.log("Database offline");
+                  //this.setState( {nodes: this.mapper(Object.values(this.defaultNodes))})
+          }
+          break;
+      }
+    }))
+    return this.state.nodes;
   }
 
   componentDidMount() {
-   this.setState( {nodes: this.setup()})
   }
-
-
   
   render () {
     return (
@@ -134,4 +151,4 @@ class Portal extends React.PureComponent{
   }
 }
 
-export default Portal;
+export default SearchPage;

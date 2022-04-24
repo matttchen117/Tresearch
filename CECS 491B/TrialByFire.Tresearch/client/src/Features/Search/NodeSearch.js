@@ -4,7 +4,7 @@ import Select from 'react-select';
 import { useParams} from "react-router-dom";
 
 import "./NodeSearch.css";
-import Tag from "../../UI/Tag/Tag";
+import userEvent from "@testing-library/user-event";
 
 function Search() {
     // Holds array of nodes result
@@ -68,7 +68,6 @@ function Search() {
         axios.get(request)
         .then(response => {
             setNodeData(response.data);
-            console.log(nodeData);
         })
         .catch(err => {
             switch(err.response.data){
@@ -162,24 +161,6 @@ function Search() {
         );
     };
 
-    const testClick = (e) =>{
-        async function test() {
-            const request = await axios.post("https://localhost:7010/NodeSearch/test")
-            .then((response => {
-                console.log(response.data);
-            }))
-            .catch((err => {
-                switch(err.response.status){
-                    case 503: {
-                            console.log("Database offline"); 
-                    }
-                        break;
-                }
-            }))
-        }
-        test();
-    }
-
     function getIndex(array, value, prop) {
         for(var i = 0; i < array.length; i++) {
             if(array[i][prop] === value) {
@@ -197,7 +178,6 @@ function Search() {
             var name = e.target.getAttribute("value");
             var index = getIndex(tags, name, 'tagName');
             var tag = tags[index];
-            //console.log(JSON.stringify(tag));
             if(!(tagData.some(tag => tag.tagName === name)))
             {
                 setTagData([...tagData, tag])
@@ -227,6 +207,10 @@ function Search() {
             })
             setTagData(data)
         }
+    }
+
+    const testClick = (user) =>{
+        window.location = '/SearchPage?page=' + user;
     }
 
     const renderAvailableTags = (
@@ -263,7 +247,7 @@ function Search() {
                     <tbody>
                         {nodeData.map(item =>{
                             return(
-                                <tr key={item.nodeID} onClick={testClick} className = "row-node-table">
+                                <tr key={item.nodeID} onClick={testClick(item.nodeID)} className = "row-node-table">
                                         <td className = "node-table-id" data-item = {item.nodeID} >{item.nodeID}</td>
                                         <td className = "node-table-title" data-item = {item.nodeTitle} >{item.nodeTitle}</td>
                                         <td className = "node-table-summary" data-item = {item.summary} >{item.summary}</td>
@@ -277,7 +261,7 @@ function Search() {
                     <tbody>
                         {nodeData.map(item =>{
                             return(
-                                <tr key={item.nodeID} onClick={testClick} className = "row-node-table">
+                                <tr key={item.nodeID} onClick={() => testClick(item.userHash)} className = "row-node-table">
                                         <td className = "node-table-id" data-item = {item.nodeID} >{item.nodeID}</td>
                                         <td className = "node-table-title" data-item = {item.nodeTitle} >{item.nodeTitle}</td>
                                         <td className = "node-table-summary" data-item = {item.summary} >{item.summary}</td>
