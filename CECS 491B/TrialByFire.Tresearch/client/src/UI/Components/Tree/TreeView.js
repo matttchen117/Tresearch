@@ -20,7 +20,7 @@ class TreeView extends React.Component{
             collapsible: false,
             translate: {
                 x: window.innerWidth/2,
-                y: window.innerHeight/6
+                y: window.innerHeight/10
             },
             nodeSize: {
                 x: 200,
@@ -171,15 +171,17 @@ class TreeView extends React.Component{
         const renderTree = (
             <div className = "tree-portal-container">
                 <div className= {`${this.state.isTaggerOpen ? "taggerOpen" : "base"}`} onClick = {resetShiftCollection} >
-                    <Tree 
-                            data = {this.treeData} 
-                            orientation = {this.treeConfiguration.orientation}
-                            collapsible = {this.treeConfiguration.collapsible} 
-                            translate = {this.treeConfiguration.translate}
-                            renderCustomNodeElement = {(nodeInfo) => renderNodeWithCustomEvents({...nodeInfo})}
-                            nodeSize = {this.treeConfiguration.nodeSize}
-                            pathFunc = {this.treeConfiguration.pathFunc} 
-                    />
+                    {this.treeData.length != 0 ? (
+                        <Tree 
+                        data = {this.treeData} 
+                        orientation = {this.treeConfiguration.orientation}
+                        collapsible = {this.treeConfiguration.collapsible} 
+                        translate = {this.treeConfiguration.translate}
+                        renderCustomNodeElement = {(nodeInfo) => renderNodeWithCustomEvents({...nodeInfo})}
+                        nodeSize = {this.treeConfiguration.nodeSize}
+                        pathFunc = {this.treeConfiguration.pathFunc}
+                       />
+                    ): null}
                     {this.state.isShown && (
                         <div style={{ top: this.state.y, left: this.state.x}}  className="tag-context-menu" >
                             <div className="option" >
