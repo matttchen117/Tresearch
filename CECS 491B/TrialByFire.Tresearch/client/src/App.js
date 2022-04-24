@@ -22,6 +22,7 @@ import Portal from "./Pages/Portal/Portal";
 import AdminPortal from "./Pages/AdminPortal/AdminPortal";
 import Error404 from "./Pages/Error404/Error404";
 import Settings from "./Pages/Settings/Settings";
+import Search from "./Features/Search/NodeSearch";
 
 class App extends React.Component {
   constructor(props){
@@ -67,6 +68,7 @@ class App extends React.Component {
             <Route path = "/Admin/TagDashboard" element = {<TagDashboard/>} />
 
             <Route path = "/Tagger" element = {<Tagger/>} exact/>
+            <Route path = "/Search" element = {<Search/>} exact/>
           </Routes>
         </Router>
       </div>
