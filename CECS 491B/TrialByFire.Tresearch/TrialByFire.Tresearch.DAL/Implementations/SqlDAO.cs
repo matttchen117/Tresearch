@@ -1781,11 +1781,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                 // Check if tag is null or empty
                 if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
 
                 // Check if node list is null or empty
                 if (nodeIDs == null || nodeIDs.Count() <= 0)
-                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
 
                 // Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
@@ -1804,22 +1804,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         };
                         //Execute command
                         var executed = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                        
-                    }
-                    //Check if cancellation token requests cancellation
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        //Perform rollback
-                        string rollbackResult = await RemoveTagAsync(nodeIDs, tagName);
-                        //Check if rollback was successful
-                        if (rollbackResult.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess)))
-                            return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
-                        else
-                            return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
                     }
 
                     //Tag has been added, return success
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess).ConfigureAwait(false);
                 }
             }
             catch (SqlException ex)
@@ -1829,10 +1817,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //Unable to connect to database
                     case -1:
-                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false);
                     //Adding tag to node violates foreign key constraint (AKA tag doesn't exist in bank)
                     case 547:   
-                        return _messageBank.GetMessage(IMessageBank.Responses.tagNotFound).Result;
+                        return await _messageBank.GetMessage(IMessageBank.Responses.tagNotFound).ConfigureAwait(false);
                     default: 
                         return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
                 }
@@ -1840,7 +1828,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             catch (OperationCanceledException)
             {
                 // Rollback already handled
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -2026,7 +2014,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 if (count < 0)
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid);
                 
-
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     await connection.OpenAsync();
@@ -2038,20 +2025,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         TagName = tagName,
                         TagCount = count
                     };
+
                     //Execute statement
                     var execute = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
-                    //Check if cancellationToken requests cancellation
-                    if(cancellationToken.IsCancellationRequested)
-                    {
-                        //Rollback
-                        string resultRollback = await DeleteTagAsync(tagName);
-                        //Check if rollback successfull
-                        if (resultRollback.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess)))
-                            return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
-                        else
-                            return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
-                    }
                     //Tag created, return success
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess);
                 }
