@@ -35,19 +35,20 @@ namespace TrialByFire.Tresearch.Services.Implementations
         /// <summary>
         /// Checks that the User attempting to create a Node is the same as the onwer of the tree.
         /// </summary>
-        /// <param name="username">The username attempting to create a Node</param>
+        /// <param name="account">The username attempting to create a Node</param>
         /// <param name="node">Node object for creation</param>
         /// <param name="cancellationToken"></param>
         /// <returns>The result of the operation.</returns>
         /// <returns>The result of the operation with any status codes if applicable</returns>
-        public async Task<string> CreateNodeAsync(string username, INode node, CancellationToken cancellationToken = default)
+        public async Task<string> CreateNodeAsync(IAccount account, INode node, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             string result;
             try
             {
+                //node.accountOwner = (Thread.CurrentPrincipal.Identity as RoleIdentity).UserHash;
                 result = await _sqlDAO.CreateNodeAsync(node, cancellationToken).ConfigureAwait(false);
-                if (cancellationToken.IsCancellationRequested && result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
+                /*if (cancellationToken.IsCancellationRequested && result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
                 {
                     string rollbackResult = "Delete Node Success";
                     if (rollbackResult != "Delete Node Success")
@@ -58,7 +59,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     {
                         throw new OperationCanceledException();
                     }
-                }
+                }*/
                 return result;
             }
             catch (OperationCanceledException ece)

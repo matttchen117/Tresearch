@@ -30,9 +30,11 @@ builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 builder.Services.AddScoped<IUADService, UADService>();
 builder.Services.AddScoped<IValidationService, ValidationService>();
 builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddScoped<ITreeManagementService, TreeManagementService>();
 builder.Services.AddScoped<IRateService, RateService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 
+builder.Services.AddScoped<INodeSearchService, NodeSearchService>();
 // Managers
 builder.Services.AddScoped<ILogManager, LogManager>();
 builder.Services.AddScoped<IAccountDeletionManager, AccountDeletionManager>();
@@ -43,10 +45,14 @@ builder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
 builder.Services.AddScoped<ILogoutManager, LogoutManager>();
 builder.Services.AddScoped<ILogManager, LogManager>();
 builder.Services.AddScoped<ITagManager, TagManager>();
+builder.Services.AddScoped<IUADManager, UADManager>();  
+builder.Services.AddScoped<ITreeManagementManager, TreeManagementManager>();
 builder.Services.AddScoped<IUADManager, UADManager>();
 builder.Services.AddScoped<IRateManager, RateManager>();
 builder.Services.AddScoped<IUserManagementManager, UserManagementManager>(); 
 
+builder.Services.AddScoped<IUADManager, UADManager>();
+builder.Services.AddScoped<INodeSearchManager, NodeSearchManager>();
 // Unnecessary, only here temporarily for successful build
 
 builder.Services.AddControllers();

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Models.Implementations
@@ -8,11 +9,16 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public long NodeID { get; set; }
         public string TagName { get; set; }
 
+        public NodeTag()
+        {
+        }
+
         public NodeTag(long nodeID, string tagName)
         {
-            this.NodeID = nodeID;
-            this.TagName = tagName;
+            NodeID = nodeID;
+            TagName = tagName;
         }
+
         public override bool Equals(object? obj)
         {
             if (!(obj == null))
@@ -20,7 +26,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 if (obj is NodeTag)
                 {
                     NodeTag nodeTag = (NodeTag)obj;
-                    return TagName.Equals(nodeTag.TagName) && NodeID.Equals(nodeTag.NodeID);
+                    return NodeID.Equals(nodeTag.NodeID) && TagName.Equals(nodeTag.TagName);
                 }
             }
             return false;

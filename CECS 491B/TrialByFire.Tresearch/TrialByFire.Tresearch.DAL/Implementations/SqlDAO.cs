@@ -10,6 +10,9 @@ using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
+    /// <summary>
+    ///     SqlDAO: Data Access Object abstraction to interact with Sql (relational) databases
+    /// </summary>
     public class SqlDAO : ISqlDAO
     {
         private BuildSettingsOptions _options { get; }
@@ -19,6 +22,67 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             _messageBank = messageBank;
             _options = options.Value;
+        }
+
+        /// <summary>
+        ///     SearchForNodeAsync():
+        ///         Returns a IResponse of IEnumerable<Node> of all nodes related to the Search provided by ISearchInput
+        /// </summary>
+        /// <param name="searchInput">Custom input object that contains relevant information for methods related to Search</param>
+        /// <returns>Response that contains the results of querying the database</returns>
+        public async Task<IResponse<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput)
+        {
+            // Check if search input null
+            if (searchInput != null)
+            {
+                try
+                {
+                    searchInput.CancellationToken.ThrowIfCancellationRequested();
+                    using (var connection = new SqlConnection(_options.SqlConnectionString))
+                    {
+                        var procedure = "[SearchNodes]";
+                        var parameters = new DynamicParameters();
+                        parameters.Add("Search", searchInput.Search);
+                        // Utilizing Dapper Multi-Relationship capabilities to associate relevant data to Node's
+                        var nodes = await connection.QueryAsync<Node, NodeTag, int, Node>(procedure, (node, tag, rating) =>
+                        {
+                            if (!(tag is null))
+                            {
+                                tag.NodeID = node.NodeID;
+                                node.Tags.Add(tag);
+                            }
+                            node.RatingScore = rating;
+                            return node;
+                        },
+                        parameters,
+                        commandType: CommandType.StoredProcedure,
+                        splitOn: "TagName, Rating");
+                        // Group query results since it comes back as one row per relation
+                        // (Grouping all tags of a node into a single Node's Tags property)
+                        var results = nodes.GroupBy(n => n.NodeID).ToList().Select(g =>
+                        {
+                            var groupedNode = g.FirstOrDefault();
+                            // Verify there is a node
+                            if(groupedNode != null)
+                            {
+                                groupedNode.Tags = g.Select(n => n.Tags.SingleOrDefault()).Where(nt => nt != null).ToList();
+                            }
+                            return groupedNode;
+                        }).ToList();
+                        return new SearchResponse<IEnumerable<Node>>("", results, 200, true);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return new SearchResponse<IEnumerable<Node>>(await _messageBank.GetMessage(
+                        IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+                }
+            }
+            else
+            {
+                return new SearchResponse<IEnumerable<Node>>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.noSearchInput).ConfigureAwait(false), null, 400, false);
+            }
         }
         public async Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -2224,30 +2288,28 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    var procedure = "[CreateNode]";
+                    //node.accountOwner = "27a285fe87f1d0afb44f2310824f49bbf1aaea02b856d314412119142ecfbb46ece7dcadc6c516c4d3918532df9375bd9f377e395143f0a29aed88654bff1c95";
+                    var procedure = "dbo.[CreateNode]";
                     var values = new
                     {
-                        nodeID = node.NodeID,
-                        parentNodeId = node.ParentNodeID,
-                        nodeTitle = node.NodeID,
-                        summary = node.Summary,
-                        visibility = node.Visibility,
-                        userHash = node.UserHash
+                        UserHash = node.UserHash,
+                        NodeParentID = node.ParentNodeID,
+                        NodeTitle = node.NodeTitle,
+                        Summary = node.Summary,
+                        TimeModified = node.TimeModified,
+                        Visibility = node.Visibility,
+                        Deleted = false,
                     };
-                    var affectedRows = await connection.QueryAsync<int>(new CommandDefinition(procedure, values, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, values, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
-                    if (cancellationToken.IsCancellationRequested)
+                    if(affectedRows == 1)
                     {
-                        string rollbackResult = "Delete Node";
-                        //to do
-                        //if(rollback != "200"
-                        //return 503
-                        //else
-                        //return 500
-                        return "500";
+                        return await _messageBank.GetMessage(IMessageBank.Responses.createNodeSuccess).ConfigureAwait(false);
                     }
-
-                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    else
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.createNodeFail).ConfigureAwait(false);
+                    }
                 }
             }
             catch(OperationCanceledException)
@@ -2259,6 +2321,106 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return "500: Database: " + ex.Message;
             }
         }
+
+        public async Task<string> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                int affectedRows;
+                cancellationToken.ThrowIfCancellationRequested();
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+                }
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var procedure = "dbo.[DeleteNode]";
+                    var parameters = new
+                    {
+                        NodeID = nodeID,
+                        NodeParentID = parentID
+                    };
+                    affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    if (affectedRows == 0)
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.deleteNodeSuccess).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.deleteNodeFail).ConfigureAwait(false);
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return ("500: Database: " + ex.Message);
+            }
+        }
+
+        public async Task<string> UpdateNodeAsync(INode updatedNode, INode previousNode, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var procedure = "[UpdateNode]";
+                    var values = new
+                    {
+                        UserHash = updatedNode.UserHash,
+                        NodeID = updatedNode.NodeID,
+                        NodeParentID = updatedNode.ParentNodeID,
+                        NodeTitle = updatedNode.NodeTitle,
+                        Summary = updatedNode.Summary,
+                        Visibility = updatedNode.Visibility
+                    };
+
+                    var affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, values, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        var restoreValues = new
+                        {
+                            UserHash = previousNode.UserHash,
+                            NodeID = previousNode.NodeID,
+                            NodeParentID = previousNode.ParentNodeID,
+                            NodeTitle = previousNode.NodeTitle,
+                            Summary = previousNode.Summary,
+                            Visibility = previousNode.Visibility
+                        };
+                        affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, restoreValues, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                        if (affectedRows < 1)
+                            return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                        else
+                            throw new OperationCanceledException();
+                    }
+
+                    if(affectedRows < 1)
+                    {
+                        return _messageBank.GetMessage(IMessageBank.Responses.updateNodeFail).Result;
+                    }
+                    else
+                    {
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    }
+                }
+            }
+            catch(OperationCanceledException)
+            {
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+
+        
 
         public async Task<Tuple<INode, string>> GetNodeAsync(long nID, CancellationToken cancellationToken = default)
         {
@@ -2276,7 +2438,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     };
                     var Nodes = await connection.QueryAsync<Node>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
-                    if(Nodes.Count() == 0)
+                    if (Nodes.Count() == 0)
                     {
                         return Tuple.Create(nullNode, _messageBank.ErrorMessages["nodeNotFound"]);
                     }
@@ -2289,7 +2451,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     }
                     else
                     {
-                        return Tuple.Create(nullNode, _messageBank.SuccessMessages["generic"]);
+                        return Tuple.Create(node, _messageBank.SuccessMessages["generic"]);
                     }
                 }
             }
@@ -2297,23 +2459,92 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 return Tuple.Create(nullNode, _messageBank.ErrorMessages["cancellationRequested"]);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return Tuple.Create(nullNode, "500: Database: " + ex.Message);
             }
         }
 
-        /*public async Task<string> UpdateNode(INode node)
+        public async Task<Tuple<List<INode>, string>> GetNodesAsync(string userHash, string accountHash, CancellationToken cancellationToken = default)
         {
-            using (var connection = new SqlConnection(_options.SqlConnectionString))
+            List<INode> nullNodes = null;
+            try
             {
-                var procedure = "[CreateNode]";
-                var values = new
+                using(var connection = new SqlConnection(_options.SqlConnectionString))
                 {
+                    var procedure = "dbo.[GetNodes]";
+                    var parameters = new
+                    {
+                        UserHash = userHash,
+                        AccountHash = accountHash
+                    };
+                    //List<Node> results = new List<Node>();
+                    List<Node> results = new List<Node>(await connection.QueryAsync<Node>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList(); 
+                    /*foreach(Node n in (new List<Node>(await connection.QueryAsync<Node>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList()))
+                    {
+                        results.Add(new Node(n));
+                    }*/
+                    if(results.Count == 0)
+                    {
+                        return Tuple.Create(nullNodes, await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound));
+                    }
+                    List<INode> castResults = new List<INode>();
+                    foreach(Node n in results)
+                    {
+                        castResults.Add(n);
+                    }
 
+                    //TODO Add MessageBank success log
+                    return Tuple.Create(castResults, await _messageBank.GetMessage(IMessageBank.Responses.getNodesSuccess));
                 }
             }
-        }*/
+            catch(SqlException se)
+            {
+                return Tuple.Create(nullNodes, se.Message);
+            }
+            catch (OperationCanceledException)
+            {
+                return Tuple.Create(nullNodes, await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+            }
+            catch(Exception ex)
+            {
+                return Tuple.Create(nullNodes, ex.Message);
+            }
+        }
+
+        public async Task<Tuple<List<INode>, string>> GetNodeChildren(long nID, CancellationToken cancellationToken = default)
+        {
+            List<INode> childList = new List<INode>();
+            List <INode> nullList = null;
+            try
+            {
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var procedure = "dbo.{GetNodeChildren]";
+                    var parameters = new
+                    {
+                        nodeID = nID
+                    };
+                    var Nodes = await connection.QueryAsync<Node>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    if (Nodes.Count() == 0)
+                    {
+                        return Tuple.Create(childList, _messageBank.ErrorMessages["nodeChildrenNotFound"]);
+                    }
+
+                    //Iterate through the list so the list of type INode takes in entries of type Node
+                    foreach (var node in Nodes)
+                    {
+                        childList.Add(node);
+                    }
+                    return (Tuple.Create(childList, await _messageBank.GetMessage(IMessageBank.Responses.getNodesSuccess)));
+                }
+            }
+            catch(Exception ex)
+            {
+                return Tuple.Create(nullList, "500: Server: " + ex.Message);
+            }
+        }
 
         public async Task<string> RateNodeAsync(string userHash, long nodeID, int rating, CancellationToken cancellationToken)
         {

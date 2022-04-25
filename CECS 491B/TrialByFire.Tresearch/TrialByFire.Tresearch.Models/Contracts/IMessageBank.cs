@@ -15,6 +15,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             generic,
             unhandledException,
             operationCancelled,
+            operationTimeExceeded,
 
             databaseConnectionFail,
 
@@ -42,7 +43,12 @@ namespace TrialByFire.Tresearch.Models.Contracts
 
             logSuccess,
             logFail,
+            logTimeExceeded,
             logRollback,
+
+            nodeSearchSuccess,
+            noSearchInput,
+
 
             /// <summary>
             /// Tag added to node(s)
@@ -138,6 +144,8 @@ namespace TrialByFire.Tresearch.Models.Contracts
             databaseFail,
             rollbackFailed,
             createNodeFail,
+            deleteNodeFail,
+            updateNodeFail,
             nodeAlreadyExists,
             createdNodesExists,
             createdNodeNotExist,
@@ -165,7 +173,10 @@ namespace TrialByFire.Tresearch.Models.Contracts
             tagAlreadyExist,
             tagDoesNotExist,
             createNodeSuccess,
+            deleteNodeSuccess,
+            getNodesSuccess
         }
         public Task<string> GetMessage(Responses response);
     }
 }
+

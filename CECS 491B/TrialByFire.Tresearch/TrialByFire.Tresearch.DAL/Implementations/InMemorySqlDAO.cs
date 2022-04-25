@@ -20,6 +20,32 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = new MessageBank();
         }
 
+        public async Task<IResponse<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput)
+        {
+            try
+            {
+                IList<Node> nodes = new List<Node>();
+                foreach(Node n in InMemoryDatabase.Nodes)
+                {
+                    if(n.Visibility != false && n.Deleted != true)
+                    {
+                        if (n.NodeTitle.Contains(searchInput.Search, StringComparison.OrdinalIgnoreCase))
+                        {
+                            n.Tags = InMemoryDatabase.NodeTags.Where(nt => nt.NodeID == n.NodeID).ToList();
+                            n.RatingScore = InMemoryDatabase.NodeRatings.Where(nr => nr.NodeID == n.NodeID).Sum(nr => nr.Rating);
+                            nodes.Add(n);
+                        }
+                    }
+                }
+                return new SearchResponse<IEnumerable<Node>>("", nodes, 200, true);
+            }
+            catch (Exception ex)
+            {
+                return new SearchResponse<IEnumerable<Node>>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 400, false);
+            }
+        }
+
         public async Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default)
         {
             foreach(UserHashObject u in InMemoryDatabase.UserHashTable)
@@ -238,11 +264,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             InMemoryDatabase.Nodes.RemoveAt(j);
                         }
                     }
-                    for (int j = 0; j < InMemoryDatabase.Ratings.Count; j++)
+                    for (int j = 0; j < InMemoryDatabase.NodeRatings.Count; j++)
                     {
-                        if (InMemoryDatabase.Ratings[j].Username.Equals(accountName))
+                        if (InMemoryDatabase.NodeRatings[j].UserHash.Equals(accountName))
                         {
-                            InMemoryDatabase.Ratings.RemoveAt(j);
+                            InMemoryDatabase.NodeRatings.RemoveAt(j);
                         }
                     }
                     for (int j = 0; j < InMemoryDatabase.ConfirmationLinks.Count; j++)
@@ -302,11 +328,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             InMemoryDatabase.Nodes.RemoveAt(j);
                         }
                     }
-                    for (int j = 0; j < InMemoryDatabase.Ratings.Count; j++)
+                    for (int j = 0; j < InMemoryDatabase.NodeRatings.Count; j++)
                     {
-                        if (InMemoryDatabase.Ratings[j].Username.Equals(accountName))
+                        if (InMemoryDatabase.NodeRatings[j].UserHash.Equals(accountName))
                         {
-                            InMemoryDatabase.Ratings.RemoveAt(j);
+                            InMemoryDatabase.NodeRatings.RemoveAt(j);
                         }
                     }
                     for (int j = 0; j < InMemoryDatabase.ConfirmationLinks.Count; j++)
@@ -1224,7 +1250,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 bool nodeExists = false;
-                foreach(var n in InMemoryDatabase.Nodes)
+                foreach (var n in InMemoryDatabase.Nodes)
                 {
                     if(node.NodeID == n.NodeID)
                     {
@@ -1255,6 +1281,59 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+        public async Task<string> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                bool nodeExists = false;
+                Node targetNode;
+                foreach (Node n in InMemoryDatabase.Nodes)
+                {
+                    if (nodeID == n.NodeID)
+                    {
+                        nodeExists = true;
+                    }
+                }
+
+                if (!nodeExists)
+                {
+                    return _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).Result;
+                }
+
+                List<Node> children = new List<Node>();
+                foreach (Node c in InMemoryDatabase.Nodes)
+                {
+                    if (c.ParentNodeID == nodeID)
+                    {
+                        children.Add(c);
+                    }
+                }
+                foreach (Node n in children)
+                {
+                    n.ParentNodeID = parentID;
+                }
+
+                foreach (Node n in InMemoryDatabase.Nodes)
+                {
+                    if (nodeID == n.NodeID)
+                    {
+                        n.Deleted = true;
+                    }
+                }
+                return _messageBank.GetMessage(IMessageBank.Responses.deleteNodeSuccess).Result;
+
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+
         public async Task<Tuple<INode, string>> GetNodeAsync(long nID, CancellationToken cancellationToken = default)
         {
             INode nullNode = null;
@@ -1280,15 +1359,30 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 throw;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return Tuple.Create(nullNode, "500: Database: " + ex.Message);
             }
         }
 
+        Task<string> ISqlDAO.UpdateNodeAsync(INode updatedNode, INode previousNode, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Tuple<List<INode>, string>> ISqlDAO.GetNodeChildren(long nID, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Tuple<List<INode>, string>> GetNodesAsync(string userHash, string accountHash, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<string> RateNodeAsync(string userHash, long nodeID, int rating, CancellationToken cancellationToken = default(CancellationToken))
         {
-            InMemoryDatabase.Ratings.Add(new Rating(userHash, nodeID, rating));
+            InMemoryDatabase.NodeRatings.Add(new NodeRating(userHash, nodeID, rating));
             return await _messageBank.GetMessage(IMessageBank.Responses.userRateSuccess);
         }
 

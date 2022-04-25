@@ -6,14 +6,23 @@ using System.Threading.Tasks;
 using Xunit;
 
 using TrialByFire.Tresearch.Models.Implementations;
+using TrialByFire.Tresearch.DAL.Contracts;
+using Microsoft.Extensions.DependencyInjection;
+using TrialByFire.Tresearch.DAL.Implementations;
+using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
 {
-    public class InMemoryDAOShould : InMemoryTestDependencies
+    public class InMemoryDAOShould : TestBaseClass
     {
-        public InMemoryDAOShould() : base()
+        private ISqlDAO _sqlDAO;
+        private InMemoryDatabase _inMemoryDatabase;
+        public InMemoryDAOShould() : base(new string[] { })
         {
-            
+            TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
+            TestProvider = TestServices.BuildServiceProvider();
+            _sqlDAO = TestProvider.GetService<ISqlDAO>();
+            _inMemoryDatabase = new InMemoryDatabase();
         }
 
         [Theory]
@@ -25,7 +34,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
             NodesCreated nodesCreated = new NodesCreated(new DateTime(year, month, day), count);
 
             // Act
-            string result = SqlDAO.CreateNodesCreated(nodesCreated);
+            string result = _sqlDAO.CreateNodesCreated(nodesCreated);
 
             // Assert
             Assert.Equal(expected, result);
@@ -47,7 +56,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
             NodesCreated nodesCreated = new NodesCreated(new DateTime (year, month, day), count);
 
             // Act
-            string result = SqlDAO.UpdateNodesCreated(nodesCreated);
+            string result = _sqlDAO.UpdateNodesCreated(nodesCreated);
 
             // Assert
             Assert.Equal(expected , result);
@@ -63,7 +72,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
             DailyLogin dailyLogin = new DailyLogin(new DateTime(year, month, day), count);
 
             // Act
-            string result = SqlDAO.CreateDailyLogin(dailyLogin);
+            string result = _sqlDAO.CreateDailyLogin(dailyLogin);
 
             // Assert
             Assert.Equal(expected, result);
@@ -84,7 +93,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
             DailyLogin dailyLogin = new DailyLogin(new DateTime (year, month, day), count);
 
             // Act
-            string result = SqlDAO.UpdateDailyLogin(dailyLogin);
+            string result = _sqlDAO.UpdateDailyLogin(dailyLogin);
 
             // Assert
             Assert.Equal(expected, result);
@@ -99,7 +108,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
             TopSearch topSearch = new TopSearch(new DateTime(year, month, day), searchString, count);
 
             // Act
-            string result = SqlDAO.CreateTopSearch(topSearch);
+            string result = _sqlDAO.CreateTopSearch(topSearch);
 
             // Assert
             Assert.Equal(expected, result);
@@ -122,7 +131,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
             TopSearch topSearch = new TopSearch(new DateTime(year, month, day), searchString, count);
 
             // Act
-            string result = SqlDAO.UpdateTopSearch(topSearch);
+            string result = _sqlDAO.UpdateTopSearch(topSearch);
 
             // Assert
             Assert.Equal(expected, result);
@@ -137,7 +146,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
             DailyRegistration dailyRegistration = new DailyRegistration(new DateTime(year, month, day), count);
             
             // Act
-            string result = SqlDAO.CreateDailyRegistration(dailyRegistration);
+            string result = _sqlDAO.CreateDailyRegistration(dailyRegistration);
 
             // Assert
             Assert.Equal(expected, result);
@@ -160,7 +169,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DAL
             DailyRegistration dailyRegistration = new DailyRegistration(new DateTime(year, month, day), count);
 
             // Act
-            string result = SqlDAO.UpdateDailyRegistration(dailyRegistration);
+            string result = _sqlDAO.UpdateDailyRegistration(dailyRegistration);
 
             // Assert
             Assert.Equal(expected, result);

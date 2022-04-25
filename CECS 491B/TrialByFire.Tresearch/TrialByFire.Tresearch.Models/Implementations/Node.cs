@@ -34,24 +34,39 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public Node()
         {
+            RatingScore = 1;
             Tags = new List<INodeTag>();
         }
 
-        public Node(string userHash, long nodeID, long parentNodeID, string nodeTitle, string summary, DateTime timeModified,
-            bool visibility, bool deleted)
+        public Node(string userhash, long nodeID, long nodeParentID, string nodeTitle, string summary,
+            DateTime timeModifed, bool visibility, bool deleted)
         {
-            UserHash = userHash;
+            UserHash = userhash;
             NodeID = nodeID;
-            ParentNodeID = parentNodeID;
+            ParentNodeID = nodeParentID;
             NodeTitle = nodeTitle;
             Summary = summary;
-            TimeModified = timeModified;
+            TimeModified = timeModifed;
             Visibility = visibility;
             Deleted = deleted;
-            ExactMatch = false;
-            Tags = new List<INodeTag>();
             TagScore = 0;
             RatingScore = 0;
+            Tags = new List<INodeTag>();
+        }
+
+        public Node(long nodeID, long nodeParentID, string nodeTitle, string summary, DateTime timeModifed, bool visibility, bool deleted, string userhash, double tagScore, double ratingScore)
+        {
+            NodeID = nodeID;
+            ParentNodeID = nodeParentID;
+            NodeTitle = nodeTitle;
+            Summary = summary;
+            TimeModified = timeModifed;
+            Visibility = visibility;
+            Deleted = deleted;
+            UserHash = userhash;
+            TagScore = 0;
+            RatingScore = ratingScore;
+            Tags = new List<INodeTag>();
         }
 
         public override bool Equals(object? obj)
