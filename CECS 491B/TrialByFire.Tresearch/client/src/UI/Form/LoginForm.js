@@ -86,13 +86,13 @@ class LoginForm extends React.Component  {
         return pbkdfKey.toString('hex').toUpperCase();
     }
 
-    verifyToken = () => {
-        
+    checkToken = () => {
+
     }
 
     onSubmitHandler = (e) => {
         e.preventDefault();
-        this.verifyToken();
+        this.checkToken();
         axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
         // pbkdf2 uses callbacks not promises, need to wrap in a promise object
 

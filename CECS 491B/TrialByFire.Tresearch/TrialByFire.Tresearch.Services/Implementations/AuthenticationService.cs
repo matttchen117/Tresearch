@@ -23,7 +23,6 @@ namespace TrialByFire.Tresearch.Services.Implementations
     public class AuthenticationService : IAuthenticationService
     {
         private ISqlDAO _sqlDAO { get; }
-        private ILogService _logService { get; }
         private BuildSettingsOptions _options { get; }
         private IMessageBank _messageBank { get; }
         private string _payLoad { get; }

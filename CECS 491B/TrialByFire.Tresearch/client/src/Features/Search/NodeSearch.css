@@ -1,0 +1,34 @@
+.box {
+    text-align: left;
+    border: black ridge 1px;
+    border-radius: 10px;
+    margin: 3px;
+    width: 20rem;
+    padding-left: 10px;
+  }
+
+.available-tags-container {
+    max-height: 300px;
+    overflow-y: auto;
+    text-align: left;
+    padding: 100px;
+    margin-left: 200px;
+}
+
+.selected-tags-container {
+  max-height: 300px;
+  overflow-y: auto;
+  text-align: left;
+  padding: 100px;
+  margin-left: 200px;
+}
+
+.node-search-table-container {
+  border: 1px  solid #f3f3f3;
+  border-collapse: collapse;
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  width: 500px;
+  color: #283618;
+}

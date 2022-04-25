@@ -10,6 +10,9 @@ using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
+    /// <summary>
+    ///     SqlDAO: Data Access Object abstraction to interact with Sql (relational) databases
+    /// </summary>
     public class SqlDAO : ISqlDAO
     {
         private BuildSettingsOptions _options { get; }
@@ -19,6 +22,67 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             _messageBank = messageBank;
             _options = options.Value;
+        }
+
+        /// <summary>
+        ///     SearchForNodeAsync():
+        ///         Returns a IResponse of IEnumerable<Node> of all nodes related to the Search provided by ISearchInput
+        /// </summary>
+        /// <param name="searchInput">Custom input object that contains relevant information for methods related to Search</param>
+        /// <returns>Response that contains the results of querying the database</returns>
+        public async Task<IResponse<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput)
+        {
+            // Check if search input null
+            if (searchInput != null)
+            {
+                try
+                {
+                    searchInput.CancellationToken.ThrowIfCancellationRequested();
+                    using (var connection = new SqlConnection(_options.SqlConnectionString))
+                    {
+                        var procedure = "[SearchNodes]";
+                        var parameters = new DynamicParameters();
+                        parameters.Add("Search", searchInput.Search);
+                        // Utilizing Dapper Multi-Relationship capabilities to associate relevant data to Node's
+                        var nodes = await connection.QueryAsync<Node, NodeTag, int, Node>(procedure, (node, tag, rating) =>
+                        {
+                            if (!(tag is null))
+                            {
+                                tag.NodeID = node.NodeID;
+                                node.Tags.Add(tag);
+                            }
+                            node.RatingScore = rating;
+                            return node;
+                        },
+                        parameters,
+                        commandType: CommandType.StoredProcedure,
+                        splitOn: "TagName, Rating");
+                        // Group query results since it comes back as one row per relation
+                        // (Grouping all tags of a node into a single Node's Tags property)
+                        var results = nodes.GroupBy(n => n.NodeID).ToList().Select(g =>
+                        {
+                            var groupedNode = g.FirstOrDefault();
+                            // Verify there is a node
+                            if(groupedNode != null)
+                            {
+                                groupedNode.Tags = g.Select(n => n.Tags.SingleOrDefault()).Where(nt => nt != null).ToList();
+                            }
+                            return groupedNode;
+                        }).ToList();
+                        return new SearchResponse<IEnumerable<Node>>("", results, 200, true);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return new SearchResponse<IEnumerable<Node>>(await _messageBank.GetMessage(
+                        IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+                }
+            }
+            else
+            {
+                return new SearchResponse<IEnumerable<Node>>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.noSearchInput).ConfigureAwait(false), null, 400, false);
+            }
         }
         public async Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
         {
