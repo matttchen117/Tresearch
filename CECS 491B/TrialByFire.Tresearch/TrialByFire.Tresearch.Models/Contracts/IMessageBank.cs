@@ -15,6 +15,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             generic,
             unhandledException,
             operationCancelled,
+            operationTimeExceeded,
 
             databaseConnectionFail,
 
@@ -46,6 +47,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             logRollback,
 
             nodeSearchSuccess,
+            noSearchInput,
 
 
             /// <summary>

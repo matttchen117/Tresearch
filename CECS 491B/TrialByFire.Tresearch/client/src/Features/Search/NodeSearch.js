@@ -56,8 +56,9 @@ function Search() {
         return parsedData;
     }
 
-    const handleSubmit = (event) => {
+    const handleSubmit = event => {
         event.preventDefault();
+        //axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
         var parsedData = handleEncoded(query);
         var request = "https://localhost:7010/NodeSearch/search?search=" + parsedData + "&filterByRating=" + filterByRating + 
         "&filterByTime=" + filterByTime;
@@ -65,34 +66,28 @@ function Search() {
         {
             request += "&tags=" + tagData[i].tagName;
         }
-        axios.get(request)
-        .then(response => {
-            setNodeData(response.data);
-        })
-        .catch(err => {
-            switch(err.response.data){
-                case 403: {
+        async function fetchData()
+        {
+            const response = await axios.get(request);
+            if(response !== null && response !== undefined)
+            {
+                setNodeData(response.data);
+            }else{
                 setNodeData(nullSearch);
-                console.log('test');
-                }
             }
-        })
+        }
+        fetchData()
     };
 
     const fetchTableData = () => {
         async function fetchData() {
-            const request = await axios.get("https://localhost:7010/Tag/taglist")
-            .then((response => {
+            const response = await axios.get("https://localhost:7010/Tag/taglist");
+            if(response !== null && response !== undefined)
+            {
                 setTagOptions(Object.values(response.data));
-            }))
-            .catch((err => {
-                switch(err.response.status){
-                    case 503: {
-                            console.log("Database offline");
-                    }
-                        break;
-                }
-            }))
+            }else{
+                setTagOptions(nullSearch);
+            }
         }
         fetchData();
     }
@@ -108,8 +103,8 @@ function Search() {
             var node = copy[i]
             var numMatches = node.tags.filter(t => tagData.some(td => td.tagName === t.tagName)).length
             node.tagScore = numMatches / (tagData.length + node.tags.length - numMatches)
+            console.log(node.tagScore)
         }
-
         if(filterByTime && filterByRating)
         {
             const sorted = [...nodeData].sort((a,b) => {
@@ -143,11 +138,6 @@ function Search() {
                 // if exactMatch are the same, order by tagScore, otherwise order by exactMatch
                 return a.exactMatch - b.exactMatch || a.tagScore - b.tagScore
             });
-            console.log("")
-            for(var i=0; i<sorted.length; i++)
-            {
-                console.log(sorted[i])
-            }
             setNodeData(sorted.reverse())
         }
     }, [filterByRating, filterByTime, tagData]);
@@ -191,7 +181,6 @@ function Search() {
 
     //remove tag from selected tags, readd tag to options
     const removeTag = (e) => {
-        console.log(e.target.key)
         if(e.target.getAttribute("value") !== null)
         {
             var tags = [...tagData];
@@ -209,7 +198,16 @@ function Search() {
         }
     }
 
-    const testClick = (user) =>{
+    const getTags = (item) => {
+        let text = ""
+        for(var i=0; i<item.tags.length; i++)
+        {
+            text += item.tags[i].tagName + " "
+        }
+        return text
+    }
+
+    const movePage = (user) =>{
         window.location = '/SearchPage?page=' + user;
     }
 
@@ -247,11 +245,10 @@ function Search() {
                     <tbody>
                         {nodeData.map(item =>{
                             return(
-                                <tr key={item.nodeID} onClick={testClick(item.nodeID)} className = "row-node-table">
-                                        <td className = "node-table-id" data-item = {item.nodeID} >{item.nodeID}</td>
+                                <tr key={item.nodeID} onClick={() => movePage(item.nodeID)} className = "row-node-table">
                                         <td className = "node-table-title" data-item = {item.nodeTitle} >{item.nodeTitle}</td>
-                                        <td className = "node-table-summary" data-item = {item.summary} >{item.summary}</td>
-                                        <td className = "node-table-time-modified" data-item = {item.timeModified} >{item.timeModified}</td>
+                                        <td>{getTags(item)}</td>
+                                        <td className = "node-table-time-modified" data-item = {new Date(item.timeModified)} >{item.timeModified}</td>
                                         <td className = "node-table-rating" data-item = {item.ratingScore} >{item.ratingScore}</td>
                                 </tr>
                             );
@@ -261,10 +258,9 @@ function Search() {
                     <tbody>
                         {nodeData.map(item =>{
                             return(
-                                <tr key={item.nodeID} onClick={() => testClick(item.userHash)} className = "row-node-table">
-                                        <td className = "node-table-id" data-item = {item.nodeID} >{item.nodeID}</td>
+                                <tr key={item.nodeID} onClick={() => movePage(item.userHash)} className = "row-node-table">
                                         <td className = "node-table-title" data-item = {item.nodeTitle} >{item.nodeTitle}</td>
-                                        <td className = "node-table-summary" data-item = {item.summary} >{item.summary}</td>
+                                        <td>{getTags(item)}</td>
                                         <td className = "node-table-time-modified" data-item = {item.timeModified} >{item.timeModified}</td>
                                         <td className = "node-table-rating" data-item = {item.ratingScore} >{item.ratingScore}</td>
                                 </tr>
@@ -296,20 +292,14 @@ function Search() {
                         />
                     </div>
                     <div>
-                        <Checkbox
-                            label = "Reverse Result List"
-                            value = {reverseList}
-                            onChange = {handleReverseList}
-                        />
-                    </div>
-                    <div>
-                        {renderTable}
+                        <button value={reverseList} onClick={handleReverseList}>Reverse Result List</button>
                     </div>
                     <div className="search-button-container">
                         <input type="submit" value="Search" />
                     </div>
                 </form>
                 <div>
+                    {renderTable}
                     {renderSelectedTags}
                     {renderAvailableTags}
                 </div>

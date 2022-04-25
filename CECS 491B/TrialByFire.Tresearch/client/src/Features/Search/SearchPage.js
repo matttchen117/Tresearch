@@ -36,12 +36,14 @@ class SearchPage extends React.PureComponent{
     return temp2[0];
   }
 
-  componentDidMount() {
-    axios.get("https://localhost:7010/TreeManagement/getNodes?owner=" + this.state.page)
-    .then( res => {
-      const nodes = this.setup(res.data);
-      this.setState({nodes});
-    });
+  async componentDidMount() {
+    //axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
+    const response = await axios.get("https://localhost:7010/TreeManagement/getNodes?owner=" + this.state.page)
+    if(response !== null && response !== undefined)
+    {
+      const nodes = this.setup(response.data);
+    this.setState({nodes});
+    }
   }
   
   render () {

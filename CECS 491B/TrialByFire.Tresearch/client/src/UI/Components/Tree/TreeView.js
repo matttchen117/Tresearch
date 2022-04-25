@@ -74,7 +74,6 @@ class TreeView extends React.Component{
         document.addEventListener('contextmenu', (e) => {
             e.preventDefault();
         });
-        console.log(this.treeData);
     }
 
     // When leaving page run
