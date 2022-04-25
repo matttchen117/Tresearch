@@ -32,6 +32,9 @@ function AdminPortal() {
                     <a href="/Admin/UserManagement" className = "side-menu-link">User Management</a>
                 </li>
                 <li className = "side-menu-item">
+                    <a href="/Admin/FAQ" className = "side-menu-link">Admin FAQ</a>
+                </li>
+                <li className = "side-menu-item">
                     <a href="/Settings" className = "side-menu-link">Settings</a>
                 </li>
                 <li className = "side-menu-item">

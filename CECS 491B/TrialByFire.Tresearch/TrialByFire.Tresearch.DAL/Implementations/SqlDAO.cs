@@ -2065,7 +2065,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// <param name="tagName">String tag to delete from bank</param>
         /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns>String status result</returns>
-        public async Task<string> DeleteTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {

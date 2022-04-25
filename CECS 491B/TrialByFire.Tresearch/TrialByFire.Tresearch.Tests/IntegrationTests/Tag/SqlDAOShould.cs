@@ -106,8 +106,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         /// <param name="response">Expected enumerated response based on case</param>
         /// <returns></returns>
         [Theory]
-        [MemberData(nameof(DeleteData))]
-        public async Task DeleteTagAsync(string tagName, IMessageBank.Responses response)
+        [MemberData(nameof(RemoveTagData))]
+        public async Task RemoveTagAsync(string tagName, IMessageBank.Responses response)
         {
             //Arrange
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
@@ -116,7 +116,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await sqlDAO.DeleteTagAsync(tagName, cancellationTokenSource.Token);
+            string result = await sqlDAO.RemoveTagAsync(tagName, cancellationTokenSource.Token);
 
             //Assert
             Assert.Equal(expected, result);
@@ -182,8 +182,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         /// <param name="response">Expected enumerated response based on case</param>
         /// <returns></returns>
         [Theory]
-        [MemberData(nameof(RemoveTagData))]
-        public async Task RemoveTagAsync(List<int> index, string tagName, IMessageBank.Responses response)
+        [MemberData(nameof(RemoveNodeTagData))]
+        public async Task RemoveNodeTagAsync(List<int> index, string tagName, IMessageBank.Responses response)
         {
             //Arrange
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
@@ -439,9 +439,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         ///     <br>Case 0: Remove from tag bank. Tag exists.</br>
         ///     <br>Case 1: Remove from tag bank. Tag doesn't exist</br>
         ///     <br>Case 2: Remove from tag bank. Tag is null</br>
+        ///     <br>Case 3: Remove from tag bank. Tag is empty</br>
+        ///     <br>Case 4: Remove from tag bank. Tag is string with only whitespace characters</br>
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<object[]> DeleteData()
+        public static IEnumerable<object[]> RemoveTagData()
         {
             /**
              *  Case 0: Remove from tag bank. Tag exists.  
@@ -469,7 +471,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             var resultCase2 = IMessageBank.Responses.tagNameInvalid;
 
             /*
-             * Case 2: Remove from tag bank. Tag is empty
+             * Case 3: Remove from tag bank. Tag is empty
              *      Tag Name:                   null
              */
             var tagNameCase3 = "";
@@ -576,7 +578,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         ///     <br>Case 3: Remove tag from node. No node passed in.</br>
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<object[]> RemoveTagData()
+        public static IEnumerable<object[]> RemoveNodeTagData()
         {
             //nodes already have tag
             var tagNameCase0 = "Tresearch SqlDAO Delete Tag1";

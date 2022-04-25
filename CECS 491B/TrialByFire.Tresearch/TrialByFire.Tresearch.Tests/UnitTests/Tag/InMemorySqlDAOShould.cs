@@ -62,7 +62,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await sqlDAO.DeleteTagAsync(tagName, cancellationTokenSource.Token);
+            string result = await sqlDAO.RemoveTagAsync(tagName, cancellationTokenSource.Token);
 
             //Arrange
             Assert.Equal(expected, result);

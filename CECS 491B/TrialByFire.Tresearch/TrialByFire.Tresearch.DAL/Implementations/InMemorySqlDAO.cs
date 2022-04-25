@@ -1178,7 +1178,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// <param name="tagName">Tag name</param>
         /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns>String status code</returns>
-        public async Task<string> DeleteTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
