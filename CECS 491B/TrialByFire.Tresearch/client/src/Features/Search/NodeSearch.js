@@ -213,7 +213,7 @@ function Search() {
 
     const renderAvailableTags = (
         <div className="available-tags-container">
-            <p>Available Tags:</p>
+            <p className="tags-header">Available Tags:</p>
             <ol>
               {tagOptions.map(item => 
                   <button key={item.tagName} value={item.tagName} onClick={selectTag}>{item.tagName}</button>
@@ -224,7 +224,7 @@ function Search() {
 
     const renderSelectedTags = (
         <div className="selected-tags-container">
-            <p>Selected Tags:</p>
+            <p className="tags-header">Selected Tags:</p>
             <ol>
               {tagData.map(item => 
                   <button key={item.tagName} value={item.tagName} onClick={removeTag}>{item.tagName}</button>
@@ -245,7 +245,7 @@ function Search() {
                     <tbody>
                         {nodeData.map(item =>{
                             return(
-                                <tr key={item.nodeID} onClick={() => movePage(item.nodeID)} className = "row-node-table">
+                                <tr key={item.nodeID} onClick={() => movePage(item.userHash)} className = "row-search-table">
                                         <td className = "node-table-title" data-item = {item.nodeTitle} >{item.nodeTitle}</td>
                                         <td>{getTags(item)}</td>
                                         <td className = "node-table-time-modified" data-item = {new Date(item.timeModified)} >{item.timeModified}</td>
@@ -274,12 +274,12 @@ function Search() {
 
     return (
         <div>
-            <div className="form-login-container">
+            <div className="form-search-container">
                 <form onSubmit = {handleSubmit}>
-                    <div className="input-container">
+                    <div className="search-bar-container">
                         <input type="text" value={query} placeholder="Search" onChange = {event => setQuery(event.target.value)}/>
                     </div>
-                    <div>
+                    <div className="search-filter-container">
                         <Checkbox
                             label = "Filter By Rating"
                             value = {filterByRating}
@@ -290,12 +290,7 @@ function Search() {
                             value = {filterByTime}
                             onChange={handleChangeFilterByTime}
                         />
-                    </div>
-                    <div>
                         <button value={reverseList} onClick={handleReverseList}>Reverse Result List</button>
-                    </div>
-                    <div className="search-button-container">
-                        <input type="submit" value="Search" />
                     </div>
                 </form>
                 <div>
