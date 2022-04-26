@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
@@ -164,7 +163,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         /// <param name="nodeIDs"></param>
         /// <param name="order"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <returns>List of shared tags and string result</returns>
         public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -262,8 +261,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     return resultVerifyAccount;
 
                 string result = await _tagService.CreateTagAsync(tagName, 0, cancellationToken);
+                
                 return result;
-
             }
             catch (OperationCanceledException)
             {
@@ -316,6 +315,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     return resultVerifyAccount;
 
                 string result = await _tagService.RemoveTagAsync(tagName, cancellationToken);
+                
                 return result;
             }
             catch (OperationCanceledException)

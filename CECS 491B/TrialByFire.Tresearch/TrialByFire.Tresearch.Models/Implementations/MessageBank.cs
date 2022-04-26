@@ -108,16 +108,15 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.tagGetSuccess:
                     return "200: Server: Tag(s) retrieved.";
                 case Responses.tagNotFound:
-                    return "404: Database: Tag not found.";
+                    return "404: Data: Tag not found.";
                 case Responses.tagDuplicate:
-                    return "409: Database: The tag already exists.";
+                    return "409: Data: The tag already exists.";
                 case Responses.tagRetrievalFail:
                     return "502: Server: Unable to get tag data.";
                 case Responses.tagCountInvalid:
-                    return "422: Server: Invalid tag count.";
+                    return "422: Data: Invalid tag count.";
                 case Responses.tagNameInvalid:
-                    return "422: Server: Invalid tag name.";
-
+                    return "422: Data: Invalid tag name.";
 
                 case Responses.userRateSuccess:
                     return "200: Server: User rating added.";
@@ -185,9 +184,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "404: Database: UserAccount not found or not authorized to perform the " +
                 "operation.";
                 case Responses.nodeNotFound:
-                    return "504: Database: The node was not found.";
+                    return "404: Data: The node was not found.";
                 case Responses.tagDoesNotExist:
-                    return "404: Database: Tag not found.";
+                    return "404: Data: Tag not found.";
                 case Responses.recoveryLinkNotFound:
                     return "404: Database: The recovery link was not found";
                 case Responses.cancellationRequested:

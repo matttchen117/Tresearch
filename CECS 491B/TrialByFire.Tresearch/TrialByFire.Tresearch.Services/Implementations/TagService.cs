@@ -49,7 +49,6 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 string result = await _sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationToken).ConfigureAwait(false);
                 
                 return result;
-
             }
             catch (OperationCanceledException)
             {
@@ -84,8 +83,8 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
 
                 string result = await _sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationToken).ConfigureAwait(false);
+                
                 return result;
-
             }
             catch (OperationCanceledException)
             {
@@ -119,7 +118,6 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 Tuple<List<string>, string> result = await _sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationToken).ConfigureAwait(false);
                 
                 return result;
-
             }
             catch (OperationCanceledException)
             {
@@ -155,9 +153,8 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid).ConfigureAwait(false);
 
                 string result = await _sqlDAO.CreateTagAsync(tagName, count, cancellationToken).ConfigureAwait(false);
-                return result;
                 
-                
+                return result;   
             }
             catch (OperationCanceledException)
             {
@@ -177,13 +174,13 @@ namespace TrialByFire.Tresearch.Services.Implementations
         /// <returns>List of tags and status code</returns>
         public async Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-
             try
             {
                 //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
                 Tuple<List<ITag>, string> result = await _sqlDAO.GetTagsAsync(cancellationToken).ConfigureAwait(false);
+                
                 return result;
             }
             catch (OperationCanceledException)

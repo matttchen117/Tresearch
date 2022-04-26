@@ -1,12 +1,12 @@
 ﻿using Dapper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using TrialByFire.Tresearch.DAL.Contracts;
-using TrialByFire.Tresearch.Models;
-using TrialByFire.Tresearch.Models.Contracts;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text.RegularExpressions;
+using TrialByFire.Tresearch.DAL.Contracts;
+using TrialByFire.Tresearch.Models;
+using TrialByFire.Tresearch.Models.Contracts;
 using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
@@ -72,8 +72,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             string result = await sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
 
             //Assert
-            Assert.NotNull(result);
-            Assert.Equal(expected, result);
+            Assert.NotNull(result);                         
+            Assert.Equal(expected, result);                 
         }
 
         /// <summary>
@@ -152,8 +152,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             Tuple<List<string>, string> result = await sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationTokenSource.Token);
 
             //Assert
-            Assert.NotNull(result);
+            Assert.NotNull(result);         
             Assert.Equal(expected, result.Item2);
+            Assert.Equal(tags.Count(), result.Item1.Count());
             Assert.Equal(tags, result.Item1);
         }
 
@@ -657,6 +658,9 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             }
         }
 
+        /// <summary>
+        ///     Runs once after ALL tests have been ran. Clean up tests from database
+        /// </summary>
         public void Dispose()
         {
             IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();

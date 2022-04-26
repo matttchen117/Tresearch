@@ -1870,7 +1870,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         var executed = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     }
 
-                    //Tag has been added, return success
+                    //Tag(s) has been added, return success
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess).ConfigureAwait(false);
                 }
             }

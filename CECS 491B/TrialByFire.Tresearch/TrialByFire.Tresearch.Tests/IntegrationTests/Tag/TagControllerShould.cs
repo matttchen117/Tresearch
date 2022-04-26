@@ -61,7 +61,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         [MemberData(nameof(AddNodeTagData))]
         public async Task AddTagToNodeAsync(IRoleIdentity roleIdentity, List<int> index, string tagName, IMessageBank.Responses response)
         {
-            //Arrange
+            // Arrange
             ITagController tagController = TestProvider.GetService<ITagController>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
 
@@ -70,20 +70,25 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 
             List<long> nodeIDs;
             if (index == null)
+            {
                 nodeIDs = null;
+            }         
             else
+            {
                 nodeIDs = GetNodes(index);
+            }
+                
 
             string expected = await messageBank.GetMessage(response);
             string[] exps = expected.Split(":");
             ObjectResult expectedResult = new ObjectResult(exps[2])
             { StatusCode = Convert.ToInt32(exps[0]) };
 
-            //Act
+            // Act
             IActionResult aResult = await tagController.AddTagToNodesAsync(nodeIDs, tagName);
             var result = aResult as ObjectResult;
 
-            //Assert
+            // Assert
             Assert.NotNull(result);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedResult.Value, result.Value);
@@ -100,7 +105,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         [MemberData(nameof(CreateTagData))]
         public async Task CreateTag(IRoleIdentity roleIdentity, string tagName, IMessageBank.Responses response)
         {
-            //Arrange
+            // Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
@@ -111,11 +116,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 
             ITagController tagController = TestProvider.GetService<ITagController>();
 
-            //Act
+            // Act
             IActionResult results = await tagController.CreateTagAsync(tagName);
             var result = results as ObjectResult;
 
-            //Arrange
+            // Arrange
             Assert.NotNull(result);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedResult.Value, expectedResult.Value);
@@ -127,7 +132,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         [MemberData(nameof(DeleteTagData))]
         public async Task DeleteTagAsync(IRoleIdentity roleIdentity, string tagName, IMessageBank.Responses response)
         {
-            //Arrange
+            // Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
@@ -138,11 +143,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 
             ITagController tagController = TestProvider.GetService<ITagController>();
 
-            //Act
+            // Act
             IActionResult results = await tagController.DeleteTagAsync(tagName);
             var result = results as ObjectResult;
 
-            //Arrange
+            // Arrange
             Assert.NotNull(result);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedResult.Value, result.Value);
@@ -160,7 +165,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         [MemberData(nameof(GetNodeTagData))]
         public async Task GetNodeTagsAsync(IRoleIdentity roleIdentity, List<int> index, List<string> expectedTags, IMessageBank.Responses response)
         {
-            //Arrange
+            // Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
@@ -171,17 +176,21 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 
             List<long> nodeIDs;
             if (index == null)
+            {
                 nodeIDs = null;
+            }  
             else
+            {
                 nodeIDs = GetNodes(index);
-
+            }
+                
             ITagController tagController = TestProvider.GetService<ITagController>();
 
-            //Act
+            // Act
             IActionResult results = await tagController.GetNodeTagsAsync(nodeIDs);
             var result = results as ObjectResult;
 
-            //Arrange
+            // Arrange
             Assert.NotNull(result);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedTags, result.Value);
@@ -197,7 +206,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         [MemberData(nameof(GetTagData))]
         public async Task GetTagsAsync(IRoleIdentity roleIdentity, IMessageBank.Responses response)
         {
-            //Arrange
+            // Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
@@ -208,11 +217,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 
             ITagController tagController = TestProvider.GetService<ITagController>();
 
-            //Act
+            // Act
             IActionResult resultTags = await tagController.GetTagsAsync();
             var result = resultTags as ObjectResult;
 
-            //Arrange
+            // Arrange
             Assert.NotNull(result);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
         }
@@ -229,7 +238,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
         [MemberData(nameof(RemoveNodeTagData))]
         public async Task RemoveNodeTagDataAsync(IRoleIdentity roleIdentity, List<int> index, string tagName, IMessageBank.Responses response)
         {
-            //Arrange
+            // Arrange
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
             ITagController tagController = TestProvider.GetService<ITagController>();
@@ -241,16 +250,19 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
 
             List<long> nodeIDs;
             if (index == null)
+            {
                 nodeIDs = null;
+            }
             else
+            {
                 nodeIDs = GetNodes(index);
-
-
-            //Act
+            }
+                
+            // Act
             IActionResult aResult = await tagController.RemoveTagFromNodesAsync(nodeIDs, tagName);
             var result = aResult as ObjectResult;
 
-            //Assert
+            // Assert
             Assert.NotNull(result);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedResult.Value, result.Value);
