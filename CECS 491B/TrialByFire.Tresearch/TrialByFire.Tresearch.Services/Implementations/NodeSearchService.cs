@@ -37,6 +37,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
         /// <returns>Response that contains the results of assigning Node's scores</returns>
         public async Task<IResponse<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput)
         {
+            // do input validation for pagination page value (if BRD said 100 nodes per page, then would be a business rule)
+            // (manager would check input for 100, service would check response for 100)
+            // decide to cache or return as list
             if (searchInput != null)
             {
                 try

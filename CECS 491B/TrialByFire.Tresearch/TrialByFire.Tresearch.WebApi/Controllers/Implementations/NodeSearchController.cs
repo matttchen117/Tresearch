@@ -95,6 +95,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                     search, string.Join(",", tags), filterByRating, filterByTime).ToString());
                 await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server,
                     stringBuilder.ToString());
+                // 500 instead
                 return BadRequest();
             }
         }
