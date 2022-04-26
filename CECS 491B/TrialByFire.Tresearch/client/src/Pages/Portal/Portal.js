@@ -18,6 +18,7 @@ class Portal extends React.PureComponent{
     }
   }
 
+  // Map backend return to data usable by react-d3
   mapper = (nodeData) => {
     return nodeData.map((node) => {
       if(node.rootNode != null){
@@ -43,13 +44,15 @@ class Portal extends React.PureComponent{
   componentDidMount() {
     const token = this.checkToken();
     if(token != null){
-      console.log("TEST");
+      // Set token header when sending post
+      axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
+      axios.get("https://localhost:7010/TreeManagement/getNodes?owner=" + token.userHash)
+      .then( res => {
+        const nodes = this.setup(res.data);
+        this.setState({nodes});
+      });
     }
-    axios.get("https://localhost:7010/TreeManagement/getNodes?owner=" + "AD89551B3BF5021B53AC0C9878DE96EAB72816241C417DDF2FB421BD78B7B7477372245C5EF36FEEE1A5DB096596D170309A904D9D0FDA6FAD4071148AD67C75")
-    .then( res => {
-      const nodes = this.setup(res.data);
-      this.setState({nodes});
-    });
+    
   }
 
   // Check JWT Token

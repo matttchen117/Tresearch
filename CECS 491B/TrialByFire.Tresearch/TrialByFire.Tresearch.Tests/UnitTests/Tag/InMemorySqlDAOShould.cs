@@ -42,6 +42,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             string result = await sqlDAO.CreateTagAsync(tagName, count, cancellationTokenSource.Token);
 
             //Arrange
+            Assert.NotNull(result);
             Assert.Equal(expected, result);
         }
 
@@ -62,9 +63,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await sqlDAO.DeleteTagAsync(tagName, cancellationTokenSource.Token);
+            string result = await sqlDAO.RemoveTagAsync(tagName, cancellationTokenSource.Token);
 
             //Arrange
+            Assert.NotNull(result);
             Assert.Equal(expected, result);
         }
 
@@ -87,6 +89,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             string result = resultTags.Item2;
 
             //Assert
+            Assert.NotNull(result);
             Assert.Equal(expected, result);
         }
 
@@ -112,6 +115,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             string result = await sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
 
             //Assert
+            Assert.NotNull(result);
             Assert.Equal(expected, result);
         }
 
@@ -140,6 +144,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
 
 
             //Assert
+            Assert.NotNull(myResult);
             Assert.Equal(expected, result);
             Assert.Equal(expectedTags, resultTags);
         }
@@ -158,10 +163,20 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             string result = await sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
 
             //Arrange
+            Assert.NotNull(result);
             Assert.Equal(expected, result);
         }
 
-
+        /// <summary>
+        ///  Test data of user creating a tag in tag bank
+        ///  <br>Case 0: Create tag.  Tag does not exist in database</br>
+        ///  <br>Case 1: Create tag.  Tag already exists in database</br>
+        ///  <br>Case 2: Create tag.  Tag name is null</br>
+        ///  <br>Case 3: Create tag.  Tag name is empty</br>
+        ///  <br>Case 4: Create tag.  Tag count is negative</br>
+        ///  <br>Case 5: Create tag.  Tag count is not zero</br>
+        /// </summary>
+        /// <returns></returns>
         public static IEnumerable<object[]> CreateTagData()
         {
             /**
@@ -224,9 +239,17 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             };
         }
 
+        /// <summary>
+        ///  Test data to remove tag from tag bank
+        ///  <br>Case 0: Delete tag.  Tag does not exist in database</br>
+        ///  <br>Case 1: Delete tag.  Tag already exists in database</br>
+        ///  <br>Case 2: Delete tag.  Tag name is null</br>
+        ///  <br>Case 3: Delete tag.  Tag name is empty</br>
+        ///  <br>Case 4: Delete tag.  Nodes contain tag.</br>
+        /// </summary>
+        /// <returns></returns>
         public static IEnumerable<object[]> DeleteTagData()
         {
-            
             /**
              *  Case 0: Delete tag.  Tag does not exist in database
              *      Tag Name: Tresearch This Tag Doesnt exist
@@ -382,6 +405,14 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
         }
 
         
+        /// <summary>
+        ///  Test data to remove tag from node(s).
+        ///  <br>Case 0: Nodes already have tag.</br>
+        ///  <br>Case 1: Nodes do not contain these tags already</br>
+        ///  <br>Case 2: Node does not contain tag</br>
+        ///  <br>Case 3: Node has tag.</br>
+        /// </summary>
+        /// <returns></returns>
         public static IEnumerable<object[]> RemoveTagData()
         {
             //nodes already have tag

@@ -67,6 +67,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             string result = await tagManager.AddTagToNodesAsync(GetNodes(index), tagName, cancellationTokenSource.Token);
 
             //Arrange
+            Assert.NotNull(result);
             Assert.Equal(expected, result);
         }
 
@@ -86,6 +87,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             string result = await tagManager.CreateTagAsync(tagName, cancellationTokenSource.Token);
 
             //Arrange
+            Assert.NotNull(result);
             Assert.Equal(expected, result);
         }
 
@@ -106,6 +108,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             string result = await tagManager.RemoveTagAsync(tagName, cancellationTokenSource.Token);
 
             //Arrange
+            Assert.NotNull(result);
             Assert.Equal(expected, result);
         }
 
@@ -128,6 +131,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             string result = results.Item2;
 
             //Arrange
+            Assert.NotNull(result);
             Assert.Equal(expected, result);
             Assert.Equal(expectedTags, resultTags);
         }
@@ -150,6 +154,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             string result = resultTags.Item2;
 
             //Arrange
+            Assert.NotNull(result);
             Assert.Equal(expected, result);
         }
 
@@ -169,6 +174,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             string result = await tagManager.RemoveTagFromNodesAsync(GetNodes(nodeIDs), tagName, cancellationTokenSource.Token);
 
             //Arrange
+            Assert.NotNull(result);
             Assert.Equal(expected, result);
         }
 

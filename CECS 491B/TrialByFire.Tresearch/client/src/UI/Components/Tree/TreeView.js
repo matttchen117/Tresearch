@@ -26,15 +26,16 @@ class TreeView extends React.Component{
                 x: 200,
                 y: 200
             },
-            stroke: "#344e41", 
+            color: "#344e41", 
+            stroke: 'black',
             strokeWidth: "1",
             pathFunc: 'diagonal'
         }
 
         this.treeOnHighlight = {
-            stroke: "#ff5714",
-            strokergb : "rgb(255, 87, 20)",
-            strokeWidth: "5"
+            stroke: "#99e2b4",
+            strokergb : "rgb(153, 226, 180)",
+            strokeWidth: "6"
         }
 
         // Configuration ot tree context menu
@@ -93,11 +94,20 @@ class TreeView extends React.Component{
         }
     }
 
+    unhighlight = () => {
+        var elements = document.querySelectorAll("*");
+        for (var i = 0; i < elements.length; i++){
+            elements[i].style.stroke = this.treeConfiguration.stroke;
+            elements[i].style.strokeWidth = this.treeConfiguration.strokeWidth;
+        }
+    }
+
     // User clicks edit 
     EditTags = (e) => {
         e.stopPropagation();
         const currentState = Array.from(new Set(this.state.nodeSelect));
         this.setState( { nodeSelect: currentState, isTaggerOpen: true, isShown: false,  x: e.pageX, y: e.pageY}) 
+        this.unhighlight();
     }
 
      render() {
@@ -151,15 +161,15 @@ class TreeView extends React.Component{
         // Clear shift collection
         const resetShiftCollection = (e) => {
             this.setState( { isShown: false, x: e.pageX, y: e.pageYm, nodeSelect: [], shiftCollection: []})
+            this.unhighlight(); 
         }
 
         // Render individual nodes
         const renderNodeWithCustomEvents = ({
             nodeDatum
         }) => (
-            
             <g data-item = {nodeDatum.nodeID} id = {nodeDatum.nodeID}>          
-                <circle fill = {this.treeConfiguration.stroke} stroke = "black" strokeWidth = "1" r = "20" onClick = {(e) => leftClickNode(e, nodeDatum) }  data-item = {nodeDatum.nodeID} onContextMenu = {(e) => rightClickNode(e, nodeDatum) }/>
+                <circle className = "circle" fill = {this.treeConfiguration.color} stroke = "black" strokeWidth = "1" r = "20" onClick = {(e) => leftClickNode(e, nodeDatum) }  data-item = {nodeDatum.nodeID} onContextMenu = {(e) => rightClickNode(e, nodeDatum) }/>
                 <text fill = "black" x = "20" dy = "20" data-item = {nodeDatum.nodeID}> 
                     {nodeDatum.nodeTitle}
                 </text>       

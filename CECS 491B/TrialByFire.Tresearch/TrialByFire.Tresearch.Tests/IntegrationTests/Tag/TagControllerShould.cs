@@ -84,6 +84,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             var result = aResult as ObjectResult;
 
             //Assert
+            Assert.NotNull(result);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedResult.Value, result.Value);
         }
@@ -115,6 +116,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             var result = results as ObjectResult;
 
             //Arrange
+            Assert.NotNull(result);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedResult.Value, expectedResult.Value);
         }
@@ -141,6 +143,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             var result = results as ObjectResult;
 
             //Arrange
+            Assert.NotNull(result);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedResult.Value, result.Value);
         }
@@ -179,6 +182,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             var result = results as ObjectResult;
 
             //Arrange
+            Assert.NotNull(result);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedTags, result.Value);
         }
@@ -209,6 +213,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             var result = resultTags as ObjectResult;
 
             //Arrange
+            Assert.NotNull(result);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
         }
 
@@ -246,6 +251,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             var result = aResult as ObjectResult;
 
             //Assert
+            Assert.NotNull(result);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedResult.Value, result.Value);
         }

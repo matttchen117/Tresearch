@@ -10,7 +10,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 {
     public class InMemorySqlDAO : ISqlDAO
     {
-
         public InMemoryDatabase InMemoryDatabase { get; set; }
         private IMessageBank _messageBank { get; }
 
@@ -1154,7 +1153,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// <returns>String status result</returns>
         public async Task<string> CreateTagAsync(string tagName, int count,CancellationToken cancellationToken = default(CancellationToken))
         {
-
             try
             {
                 // Throw if cancellation is requested
@@ -1204,7 +1202,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// <param name="tagName">Tag name</param>
         /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns>String status code</returns>
-        public async Task<string> DeleteTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
