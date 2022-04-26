@@ -7,6 +7,7 @@ import "./LoginForm.css";
 import Button from "../Button/ButtonComponent";
 
 class LoginForm extends React.Component  {
+    
     state = {
         email: '',
         passphrase: '',
@@ -15,6 +16,8 @@ class LoginForm extends React.Component  {
         token: sessionStorage.getItem('authorization'),
         errorMessage: ''
     }
+    
+    
 
     handleInput() {
         // [username]@[domain name].[domain]
@@ -134,9 +137,9 @@ class LoginForm extends React.Component  {
                         </div>
                         <div className="input-container">
                             {this.state.verified ? 
-                            <input type="password" value={this.state.otp} required placeholder="OTP" onChange = {this.inputOTPHandler}/>
+                            (<input type="password" value={this.state.otp} required placeholder="OTP" onChange = {this.inputOTPHandler}/>)
                             :
-                            <input type="password" value={this.state.passphrase} required placeholder="Passphrase" onChange = {this.inputPassphraseHandler}/>
+                            (<input type="password" value={this.state.passphrase} required placeholder="Passphrase" onChange = {this.inputPassphraseHandler}/>)
                             }
                         </div>
                         <div className="create-button-container">

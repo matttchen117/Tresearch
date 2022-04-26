@@ -6,7 +6,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
     /// <summary>
     ///     Tag class. Holds tag name and number of nodes it is tagged with
     /// </summary>
-    public class Tag : ITag
+    public class Tag : ITag, IEquatable<Tag>
     {
         /// <summary>
         ///     String holding name of tag
@@ -52,6 +52,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 }
             }
             return false;
+        }
+
+        public bool Equals(Tag t)
+        {
+            return (tagName == t.tagName);
         }
     }
 }

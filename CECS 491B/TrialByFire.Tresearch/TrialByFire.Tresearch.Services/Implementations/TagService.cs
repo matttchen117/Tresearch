@@ -214,7 +214,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
 
                 // Delete tag
-                string result = await _sqlDAO.DeleteTagAsync(tagName, cancellationToken).ConfigureAwait(false);
+                string result = await _sqlDAO.RemoveTagAsync(tagName, cancellationToken).ConfigureAwait(false);
 
                 return result;
             }
