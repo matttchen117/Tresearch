@@ -36,15 +36,19 @@ namespace TrialByFire.Tresearch.Services.Implementations
         {
             try
             {
-                //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Check if tag is null or empty
                 if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                {
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
-                //Check if list contains more than one node
+                } 
+                    
+                // Check if list contains more than one node
                 if (nodeIDs == null || nodeIDs.Count <= 0)
+                {
                     return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+                }
 
                 string result = await _sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationToken).ConfigureAwait(false);
                 
@@ -72,15 +76,19 @@ namespace TrialByFire.Tresearch.Services.Implementations
         {
             try
             {
-                //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
-                // Check if tag is null or empty
+                // Check if tag is null or empty 
                 if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                {
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
-                //Check if list contains more than one node
+                }
+                    
+                // Check if list contains more than one node
                 if (nodeIDs == null || nodeIDs.Count <= 0)
+                {
                     return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+                }
 
                 string result = await _sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationToken).ConfigureAwait(false);
                 
@@ -88,7 +96,6 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch (OperationCanceledException)
             {
-                //rollback not necessary
                 return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -108,20 +115,20 @@ namespace TrialByFire.Tresearch.Services.Implementations
             List<string> tags = new List<string>();
             try
             {
-                //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
-                //Check if list contains more than one node
+                // Check if list contains more than one node
                 if (nodeIDs == null || nodeIDs.Count <= 0)
+                {
                     return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false));
-
+                }
+                    
                 Tuple<List<string>, string> result = await _sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationToken).ConfigureAwait(false);
                 
                 return result;
             }
             catch (OperationCanceledException)
             {
-                // No rollback necessary
                 return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false));
             }
             catch (Exception ex)
@@ -141,16 +148,19 @@ namespace TrialByFire.Tresearch.Services.Implementations
         {
             try
             {
-                //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Check if tag is null or empty
                 if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                {
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                }
 
                 // Validate count (must be greater or eaqual to 0)
                 if(count < 0)
+                {
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid).ConfigureAwait(false);
+                }
 
                 string result = await _sqlDAO.CreateTagAsync(tagName, count, cancellationToken).ConfigureAwait(false);
                 
@@ -158,7 +168,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch (OperationCanceledException)
             {
-                //  No rollback necessary
+                // No rollback necessary
                 return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -176,7 +186,6 @@ namespace TrialByFire.Tresearch.Services.Implementations
         {
             try
             {
-                //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
                 Tuple<List<ITag>, string> result = await _sqlDAO.GetTagsAsync(cancellationToken).ConfigureAwait(false);
@@ -203,12 +212,13 @@ namespace TrialByFire.Tresearch.Services.Implementations
         {
             try
             {
-                //Throw exception if cancellation is requested.
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Check if tag is null or empty
                 if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                {
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                }
 
                 // Delete tag
                 string result = await _sqlDAO.RemoveTagAsync(tagName, cancellationToken).ConfigureAwait(false);
@@ -217,7 +227,6 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch (OperationCanceledException)
             {
-                // No rollback necessary
                 return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch (Exception ex)
