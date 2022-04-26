@@ -81,10 +81,6 @@ class AdminLogin extends React.Component  {
         return pbkdfKey.toString('hex').toUpperCase();
     }
 
-    verifyToken = () => {
-        
-    }
-
     onSubmitHandler = (e) => {
         e.preventDefault();
         this.verifyToken();

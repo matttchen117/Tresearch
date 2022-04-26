@@ -363,6 +363,16 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
                 new object[] { nodeListCase4, tagNameCase4, resultCase4 }
             };
         }
+
+        /// <summary>
+        ///  Test data to retreive shared tags from a list of node(s).
+        ///  <br>Case 0: Nodes contain shared tags</br>
+        ///  <br>Case 1: Nodes contain no shared tags</br>
+        ///  <br>Case 2: Node has tags</br>
+        ///  <br>Case 3: Node contains no tags</br>
+        ///  <br>Case 4: No nodes passed in</br>
+        /// </summary>
+        /// <returns></returns>
         public static IEnumerable<object[]> GetNodeTagData()
         {
             /**Nodes contain shared tags

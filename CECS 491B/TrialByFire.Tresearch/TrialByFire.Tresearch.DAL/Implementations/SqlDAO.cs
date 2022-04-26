@@ -1840,37 +1840,40 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             try
             {
-                //Throw Cancellation Exception if token requests cancellation
+                // Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Check if tag is null or empty
                 if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                {
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
-
+                }
                 // Check if node list is null or empty
                 if (nodeIDs == null || nodeIDs.Count() <= 0)
+                {
                     return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+                }
 
                 // Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    //Open connection
+                    // Open connection
                     await connection.OpenAsync();
-                    //Iterate through each tag and add tag to each node
+                    // Iterate through each node and add tag
                     foreach(var nodeId in nodeIDs)
                     {
-                        //Set up command
+                        // Set up command
                         var procedure = "dbo.[AddTagToNode]";
                         var parameters = new
                         {
                             NodeID = nodeId,
                             TagName = tagName
                         };
-                        //Execute command
+                        // Execute command
                         var executed = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     }
 
-                    //Tag has been added, return success
+                    // Tag(s) has been added, return success
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess).ConfigureAwait(false);
                 }
             }
@@ -1891,7 +1894,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (OperationCanceledException)
             {
-                // Rollback already handled
                 return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -1911,46 +1913,40 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             try
             {
-                //Throw Cancellation Exception if token requests cancellation
+                // Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Check if tag name is null, empty string or all space
                 if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                {
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                }
+                    
                 // Check if node list is null or empty
                 if (nodeIDs == null || nodeIDs.Count() <= 0)
+                {
                     return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+                }
 
-                //Establish connection to database
+                // Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    //Open connection to database
+                    // Open connection to database
                     await connection.OpenAsync();
-                    //Iterate through each tag and remoe tag from node
+                    // Iterate through each tag and remoe tag from node
                     foreach (var nodeId in nodeIDs)
                     {
-                        //Set up command
+                        // Set up command
                         var procedure = "dbo.[RemoveTagFromNode]";
                         var value = new
                         {
                             NodeID = nodeId,
                             TagName = tagName
                         };
-                        //Execute command
+                        // Execute command
                         var execute = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     }
 
-                    //Check if cancellation token requests cancellation
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        //Perform rollback
-                        string rollbackResult = await AddTagAsync(nodeIDs, tagName);
-                        //Check if rollback was successful
-                        if (rollbackResult.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess)))
-                            return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
-                        else
-                            return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
-                    }
                     //Tag has been removed, return success message
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess);
                 }
@@ -1959,7 +1955,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 switch (ex.Number)
                 {
-                    //Unable to connect to database
                     case -1:
                         return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
                     default: 
@@ -1968,7 +1963,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (OperationCanceledException)
             {
-                // Rollback handled
                 return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
             }
             catch (Exception ex)
@@ -1988,48 +1982,53 @@ namespace TrialByFire.Tresearch.DAL.Implementations
            
             try
             {
-                //Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
                 
                 // Check if node list is null or empty
                 if (nodeIDs == null || nodeIDs.Count() <= 0)
+                {
                     return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false));
+                }
+                    
 
-                //Establish connection to database
+                // Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    //Open connection to database
+                    // Open connection to database
                     await connection.OpenAsync();
                     
                     List<string> tags = new List<string>();         //List of tags that all node(s) share in common
                     
-                    //Iterate through each node to get list of tags for each node then intersec
+                    // Iterate through each node to get list of tags for each node then intersect
                     foreach (var nodeId in nodeIDs)
                     {
-                        //Set up command
+                        // Set up command
                         var procedure = "dbo.[GetNodeTags]";
                         var value = new
                         {
                             NodeID = nodeId
                         };
-                        //Execute command: Get tags for current node
-                        List<string> results = new List<string>(await connection.QueryAsync<string>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
-                        //Checks if node did not exist
+                        // Execute command: Get tags for current node
+                        List<string> results = new List<string>(await connection.QueryAsync<string>
+                                (new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+                        
+                        // Checks if node did not exist
                         if (results.Contains("-1 invalid"))
+                        {
                             return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound));
-                        //Checks if first node in list
+                        }
+
+                        // Checks if first node in list
                         if (nodeId == nodeIDs.First())
                         {
-                            //set first tag list as base list
+                            // Set first tag list as base list
                             tags = results;
                         }
-                        //Get tags that are shared between all nodes
+
+                        // Get tags that are shared between all nodes
                         tags = tags.Intersect(results).ToList();
                     }
                     //Tags have been retrieved, return success message
-
-                    if(cancellationToken.IsCancellationRequested)
-                        return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
 
                     return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess));
                 }
@@ -2047,7 +2046,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (OperationCanceledException)
             {
-                // Rollback handled
                 return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
             }
             catch (Exception ex)
@@ -2067,16 +2065,19 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             try
             {
-                // Throw if cancellation is requested
                 cancellationToken.ThrowIfCancellationRequested();
 
                 //Check tag input
                 if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                }
 
                 // Check tag count
                 if (count < 0)
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid);
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid).ConfigureAwait(false);
+                }     
                 
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
@@ -2094,7 +2095,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var execute = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                     //Tag created, return success
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess).ConfigureAwait(false);
                 }
             }
             catch (SqlException ex)
@@ -2103,10 +2104,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //Unable to connect to database
                     case -1:
-                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false);
                     //Adding tag violates primary key constraint (AKA tag already exists in database)
                     case 2627: 
-                        return await _messageBank.GetMessage(IMessageBank.Responses.tagDuplicate);
+                        return await _messageBank.GetMessage(IMessageBank.Responses.tagDuplicate).ConfigureAwait(false);
                     default: 
                         return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
                 }
@@ -2114,7 +2115,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             catch (OperationCanceledException)
             {
                 // Rollback handled
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -2138,7 +2139,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                 // Check input
                 if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                }
+                    
 
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
@@ -2153,7 +2157,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Execute command, returns count of tags
                     int count = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     //Tag deleted, return success
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess).ConfigureAwait(false);
                 }
             }
             catch (SqlException ex)
@@ -2162,7 +2166,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //Unable to connect to database
                     case -1:
-                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false);
                     default: 
                         return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
                 }
@@ -2170,7 +2174,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             catch (OperationCanceledException)
             {
                 // Rollback handled
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -2201,7 +2205,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Execute statement
                     List<ITag> results = new List<ITag>(await connection.QueryAsync<Tag>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
                     //tags retrieved, return success
-                    return Tuple.Create(results, await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess));
+                    return Tuple.Create(results, await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess).ConfigureAwait(false));
                 }
             }
             catch (SqlException ex)
@@ -2210,7 +2214,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //Unable to connect to database
                     case -1:
-                        return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail));
+                        return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false));
                     default: 
                         return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
                 }
@@ -2218,7 +2222,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             catch (OperationCanceledException)
             {
                 // Rollback handled
-                return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+                return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false));
             }
             catch (Exception ex)
             {
@@ -2226,6 +2230,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+        /// <summary>
+        ///     Checks if a user is authorized to make changes to a list of node(s).
+        /// </summary>
+        /// <param name="nodeIDs">List of node ids</param>
+        /// <param name="userHash">Accounts User Hash</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns></returns>
         public async Task<string> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -2244,14 +2255,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         var isAuthorized = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                         if (isAuthorized == 0)
-                            return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized);
+                            return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
                     }
-                    return await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false);
                 }
             }
             catch(OperationCanceledException)
             {
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch(Exception ex)
             {
