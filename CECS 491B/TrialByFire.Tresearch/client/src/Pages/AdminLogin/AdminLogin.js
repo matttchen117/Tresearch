@@ -146,7 +146,7 @@ class AdminLogin extends React.Component  {
         );
 
         return (
-            <div className="form-login-wrapper">
+            <div className="admin-login-wrapper">
                 <div className="container-login-text">
                     <h1 className="login-title">{this.state.verified ? "Login" : "Verify"}</h1>
                 </div>

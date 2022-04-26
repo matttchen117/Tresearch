@@ -72,6 +72,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             string result = await sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
 
             //Assert
+            Assert.NotNull(result);
             Assert.Equal(expected, result);
         }
 
@@ -96,6 +97,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             string result = await sqlDAO.CreateTagAsync(tagName, count, cancellationTokenSource.Token);
 
             //Assert
+            Assert.NotNull(result);
             Assert.Equal(expected, result);
         }
 
@@ -119,6 +121,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             string result = await sqlDAO.RemoveTagAsync(tagName, cancellationTokenSource.Token);
 
             //Assert
+            Assert.NotNull(result);
             Assert.Equal(expected, result);
         }
 
@@ -146,11 +149,12 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
                 nodeIDs = GetNodes(index);
 
             //Act
-            Tuple<List<string>, string> result0 = await sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationTokenSource.Token);
+            Tuple<List<string>, string> result = await sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationTokenSource.Token);
 
             //Assert
-            Assert.Equal(expected, result0.Item2);
-            Assert.Equal(tags, result0.Item1);
+            Assert.NotNull(result);
+            Assert.Equal(expected, result.Item2);
+            Assert.Equal(tags, result.Item1);
         }
 
         /// <summary>
@@ -171,6 +175,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             string result = resultTags.Item2;
 
             //Assert
+            Assert.NotNull(result);
             Assert.Equal(expected, result);
         }
 
@@ -201,6 +206,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             string result = await sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
 
             //Arrange
+            Assert.NotNull(result);
             Assert.Equal(expected, result);
         }
 
