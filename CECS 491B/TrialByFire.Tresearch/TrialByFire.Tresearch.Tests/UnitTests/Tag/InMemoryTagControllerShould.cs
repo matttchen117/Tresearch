@@ -41,7 +41,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             { StatusCode = Convert.ToInt32(exps[0]) };
 
             // Act
-            IActionResult resultAdd = await tagController.AddTagToNodesAsync(nodeIDs, tagName);
+            IActionResult resultAdd = await tagController.AddTagToNodesAsync(nodeIDs, tagName).ConfigureAwait(false);
             var result = resultAdd as ObjectResult;
 
             // Assert
@@ -65,7 +65,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             { StatusCode = Convert.ToInt32(exps[0]) };
 
             // Act
-            IActionResult resultCreate = await tagController.CreateTagAsync(tagName);
+            IActionResult resultCreate = await tagController.CreateTagAsync(tagName).ConfigureAwait(false);
             var result = resultCreate as ObjectResult;
 
             // Assert
@@ -91,7 +91,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             { StatusCode = Convert.ToInt32(exps[0]) };
 
             // Act
-            IActionResult resultDelete = await tagController.DeleteTagAsync(tagName);
+            IActionResult resultDelete = await tagController.DeleteTagAsync(tagName).ConfigureAwait(false);
             var result = resultDelete as ObjectResult;
 
             // Assert
@@ -116,7 +116,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             { StatusCode = Convert.ToInt32(exps[0]) };
 
             // Act
-            IActionResult resultGet = await tagController.GetNodeTagsAsync(nodeIDs);
+            IActionResult resultGet = await tagController.GetNodeTagsAsync(nodeIDs).ConfigureAwait(false);
             var result = resultGet as ObjectResult;
 
             // Assert
@@ -141,7 +141,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             { StatusCode = Convert.ToInt32(exps[0]) };
 
             // Act
-            IActionResult resultGet = await tagController.GetTagsAsync();
+            IActionResult resultGet = await tagController.GetTagsAsync().ConfigureAwait(false);
             var result = resultGet as ObjectResult;
 
             // Assert
@@ -166,7 +166,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             { StatusCode = Convert.ToInt32(exps[0]) };
 
             // Act
-            IActionResult resultRemove = await tagController.RemoveTagFromNodesAsync(nodeIDs, tagName);
+            IActionResult resultRemove = await tagController.RemoveTagFromNodesAsync(nodeIDs, tagName).ConfigureAwait(false);
             var result = resultRemove as ObjectResult;
 
             // Assert

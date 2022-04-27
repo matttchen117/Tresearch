@@ -63,7 +63,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await sqlDAO.RemoveTagAsync(tagName, cancellationTokenSource.Token);
+            string result = await sqlDAO.RemoveTagAsync(tagName, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Arrange
             Assert.NotNull(result);
@@ -85,7 +85,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            Tuple<List<ITag>, string> resultTags = await sqlDAO.GetTagsAsync(cancellationTokenSource.Token);
+            Tuple<List<ITag>, string> resultTags = await sqlDAO.GetTagsAsync(cancellationTokenSource.Token).ConfigureAwait(false);
             string result = resultTags.Item2;
 
             //Assert
@@ -112,7 +112,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
+            string result = await sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
             Assert.NotNull(result);
@@ -138,7 +138,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             string expected = await messageBank.GetMessage(response);
 
             //Act
-            Tuple<List<string>, string> myResult = await sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationTokenSource.Token);
+            Tuple<List<string>, string> myResult = await sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationTokenSource.Token).ConfigureAwait(false);
             string result = myResult.Item2;
             List<string> resultTags = myResult.Item1;
 
@@ -160,7 +160,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             string expected = await messageBank.GetMessage(response);
 
             //Act
-            string result = await sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
+            string result = await sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Arrange
             Assert.NotNull(result);
