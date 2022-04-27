@@ -15,11 +15,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
     public class AuthorizationService : IAuthorizationService
     {
         private ISqlDAO _sqlDAO { get; }
-        private ILogService _logService { get; }
-        public AuthorizationService(ISqlDAO sqlDAO, ILogService logService)
+        public AuthorizationService(ISqlDAO sqlDAO)
         {
             _sqlDAO = sqlDAO;
-            _logService = logService;
         }
 
         //

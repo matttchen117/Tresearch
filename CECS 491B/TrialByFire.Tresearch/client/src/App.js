@@ -22,10 +22,13 @@ import InactiveLink from "./Features/Registration/InactiveLink";
 import Portal from "./Pages/Portal/Portal";
 import AdminPortal from "./Pages/AdminPortal/AdminPortal";
 import AdminLogin from "./Pages/AdminLogin/AdminLogin";
+import AdminFAQ from "./Pages/AdminFAQ/AdminFAQ";
 import Error404 from "./Pages/Error404/Error404";
 import Settings from "./Pages/Settings/Settings";
 import FAQ from "./Pages/FAQ/FAQ";
 import Features from "./Pages/Features/Features";
+import Search from "./Features/Search/NodeSearch";
+import SearchPage from "./Features/Search/SearchPage";
 
 class App extends React.Component {
   constructor(props){
@@ -71,8 +74,11 @@ class App extends React.Component {
             <Route path = "/Admin/Dashboard" element = {<AdminPortal/>} />
             <Route path = "/Admin/TagDashboard" element = {<TagDashboard/>} />
             <Route path = "/Admin/UserManagement" element = {<UserManagement/>} />
+            <Route path = "/Admin/FAQ" element = {<AdminFAQ/>}/>
 
             <Route path = "/Tagger" element = {<Tagger/>} exact/>
+            <Route path = "/Search" element = {<Search/>} exact/>
+            <Route path = "/SearchPage" element = {<SearchPage/>} exact/>
           </Routes>
         </Router>
       </div>

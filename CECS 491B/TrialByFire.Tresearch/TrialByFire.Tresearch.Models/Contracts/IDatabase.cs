@@ -17,7 +17,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
         public IList<INode> Nodes { get; set; }
         public IList<ITag> Tags { get; set; }
         public IList<INodeTag> NodeTags { get; set; }
-        public IList<IRating> Ratings { get; set; }
+        public IList<INodeRating> NodeRatings { get; set; }
         /*        public IList<ITreeHistory> TreeHistories { get; set; }
                 public IList<IWebPageKPI> WebPageKPIs { get; set; }
                 public IList<IDailyRegistrationKPI> DailyRegistrationKPIs { get; set; }*/

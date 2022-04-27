@@ -20,21 +20,22 @@ class TreeView extends React.Component{
             collapsible: false,
             translate: {
                 x: window.innerWidth/2,
-                y: window.innerHeight/6
+                y: window.innerHeight/10
             },
             nodeSize: {
                 x: 200,
                 y: 200
             },
-            stroke: "#344e41", 
+            color: "#344e41", 
+            stroke: 'black',
             strokeWidth: "1",
             pathFunc: 'diagonal'
         }
 
         this.treeOnHighlight = {
-            stroke: "#e9ff70",
-            strokergb : "rgb(233, 255, 112)",
-            strokeWidth: "5"
+            stroke: "#99e2b4",
+            strokergb : "rgb(153, 226, 180)",
+            strokeWidth: "6"
         }
 
         // Configuration ot tree context menu
@@ -93,16 +94,25 @@ class TreeView extends React.Component{
         }
     }
 
+    unhighlight = () => {
+        var elements = document.querySelectorAll("*");
+        for (var i = 0; i < elements.length; i++){
+            elements[i].style.stroke = this.treeConfiguration.stroke;
+            elements[i].style.strokeWidth = this.treeConfiguration.strokeWidth;
+        }
+    }
+
     // User clicks edit 
     EditTags = (e) => {
         e.stopPropagation();
         const currentState = Array.from(new Set(this.state.nodeSelect));
         this.setState( { nodeSelect: currentState, isTaggerOpen: true, isShown: false,  x: e.pageX, y: e.pageY}) 
+        this.unhighlight();
     }
 
      render() {
         const  ToggleTagger = () => {
-            window.location.reload();
+            
             this.setState({
                 isTaggerOpen: false
             })     
@@ -116,13 +126,13 @@ class TreeView extends React.Component{
             // Check if user is trying to select multiple
             if(this.state.shiftDown){
                 var currentState = this.state.shiftCollection;
-                if(!currentState.includes(nodeData.attributes.nodeID)){
-                    handleHighLight(e, nodeData.attributes.nodeID);
-                    this.setState({shiftCollection: [...currentState, nodeData.attributes.nodeID]})
+                if(!currentState.includes(nodeData.nodeID)){
+                    handleHighLight(e, nodeData.nodeID);
+                    this.setState({shiftCollection: [...currentState, nodeData.nodeID]})
                 } else{
                     // Douible click (remove from shift collection)
-                    this.setState({shiftCollection: this.state.shiftCollection.filter(x => x != nodeData.attributes.nodeID) });
-                    handleHighLight(e, nodeData.attributes.nodeID);
+                    this.setState({shiftCollection: this.state.shiftCollection.filter(x => x != nodeData.nodeID) });
+                    handleHighLight(e, nodeData.nodeID);
                 }
             } else{
                 this.setState({ shiftCollection: []});
@@ -144,42 +154,43 @@ class TreeView extends React.Component{
 
         // Right click node, open context menu
         const rightClickNode = (e, nodeData) => {
-            this.setState({ nodeSelect: [...this.state.shiftCollection, nodeData.attributes.nodeID], shiftCollection: []});
+            this.setState({ nodeSelect: [...this.state.shiftCollection, nodeData.nodeID], shiftCollection: []});
             this.setState( { isShown: true, x: e.pageX, y: e.pageY})
         }
 
         // Clear shift collection
         const resetShiftCollection = (e) => {
             this.setState( { isShown: false, x: e.pageX, y: e.pageYm, nodeSelect: [], shiftCollection: []})
+            this.unhighlight(); 
         }
 
         // Render individual nodes
         const renderNodeWithCustomEvents = ({
             nodeDatum
         }) => (
-            <g data-item = {nodeDatum.attributes.nodeID} id = {nodeDatum.attributes.nodeID}>          
-                <circle fill = {this.treeConfiguration.stroke} stroke = "black" strokeWidth = "1" r = "20" onClick = {(e) => leftClickNode(e, nodeDatum) }  data-item = {nodeDatum.attributes.nodeID} onContextMenu = {(e) => rightClickNode(e, nodeDatum) }/>
-                <text fill = "black" x = "20" dy = "20" data-item = {nodeDatum.attributes.nodeID}> 
+            <g data-item = {nodeDatum.nodeID} id = {nodeDatum.nodeID}>          
+                <circle className = "circle" fill = {this.treeConfiguration.color} stroke = "black" strokeWidth = "1" r = "20" onClick = {(e) => leftClickNode(e, nodeDatum) }  data-item = {nodeDatum.nodeID} onContextMenu = {(e) => rightClickNode(e, nodeDatum) }/>
+                <text fill = "black" x = "20" dy = "20" data-item = {nodeDatum.nodeID}> 
                     {nodeDatum.nodeTitle}
                 </text>       
             </g>
-            
         );
 
         // Render user's tree
         const renderTree = (
             <div className = "tree-portal-container">
                 <div className= {`${this.state.isTaggerOpen ? "taggerOpen" : "base"}`} onClick = {resetShiftCollection} >
-                    <Tree 
-                            data = {this.treeData} 
-                            orientation = {this.treeConfiguration.orientation}
-                            collapsible = {this.treeConfiguration.collapsible} 
-                            translate = {this.treeConfiguration.translate}
-                            renderCustomNodeElement = {(nodeInfo) => renderNodeWithCustomEvents({...nodeInfo})}
-                            nodeSize = {this.treeConfiguration.nodeSize}
-                            pathFunc = {this.treeConfiguration.pathFunc}
-                            
-                    />
+                    {this.treeData.length != 0 ? (
+                        <Tree 
+                        data = {this.treeData} 
+                        orientation = {this.treeConfiguration.orientation}
+                        collapsible = {this.treeConfiguration.collapsible} 
+                        translate = {this.treeConfiguration.translate}
+                        renderCustomNodeElement = {(nodeInfo) => renderNodeWithCustomEvents({...nodeInfo})}
+                        nodeSize = {this.treeConfiguration.nodeSize}
+                        pathFunc = {this.treeConfiguration.pathFunc}
+                       />
+                    ): null}
                     {this.state.isShown && (
                         <div style={{ top: this.state.y, left: this.state.x}}  className="tag-context-menu" >
                             <div className="option" >
