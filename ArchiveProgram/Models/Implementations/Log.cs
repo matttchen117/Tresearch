@@ -11,16 +11,16 @@ namespace ArchiveProgram.Models.Implementations
     {
         public DateTime Timestamp { get; }
         public string Level { get; }
-        public string Username { get; }
+        public string UserHash { get; }
         public string Category { get; }
         public string Description { get; }
         public string Hash { get; }
-        public Log(DateTime timestamp, string level, string username, string category, string description,
+        public Log(DateTime timestamp, string level, string userHash, string category, string description,
             string hash)
         {
             Timestamp = timestamp;
             Level = level;
-            Username = username;
+            UserHash = userHash;
             Category = category;
             Description = description;
             Hash = hash;
@@ -34,7 +34,7 @@ namespace ArchiveProgram.Models.Implementations
                 {
                     ILog log = (ILog)obj;
                     return Timestamp.Equals(log.Timestamp) && Level.Equals(log.Level) &&
-                        Username.Equals(log.Username) && Category.Equals(log.Category) &&
+                        UserHash.Equals(log.UserHash) && Category.Equals(log.Category) &&
                         Description.Equals(log.Description) && Hash.Equals(log.Hash);
                 }
             }
@@ -42,7 +42,7 @@ namespace ArchiveProgram.Models.Implementations
         }
         public override string ToString()
         {
-            return $"{Timestamp} {Level} {Username} {Category} {Description} {Hash}";
+            return $"{Timestamp} {Level} {UserHash} {Category} {Description} {Hash}";
         }
     }
 }

@@ -10,6 +10,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 {
     public interface ISqlDAO
     {
+        public Task<IResponse<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput); 
         public Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> CreateUserHashAsync(int ID, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default);
@@ -199,7 +200,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         /// <param name="tagName">Tag name</param>
         /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns>String status result</returns>
-        public Task<string> DeleteTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         ///     Retrieves list of tags from tag bank

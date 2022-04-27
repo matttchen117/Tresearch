@@ -10,7 +10,7 @@ namespace ArchiveProgram.Models.Contracts
     {
         public DateTime Timestamp { get; }
         public string Level { get; }
-        public string Username { get; }
+        public string UserHash { get; }
         public string Category { get; }
         public string Description { get; }
         public string Hash { get; }

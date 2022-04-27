@@ -11,6 +11,7 @@
 - [FAQ](#faq)
   - [Tagging](#tagging-1)
 - [User Manual](#user-manual)
+  - [Tagging](#tagging-2)
 ### What is Tresearch?
 --------------------------------
 Tresearch is an interactive mind mapping tool for documenting users' learning journey.  Users can create their own knowledge tree(s) to document what they are currently learning and have learned throughout their life. Knowledge trees are made up of nodes that consist of a title,  description/summary, and optional tag. Branches that come off of nodes point to nodes that utilize or require knowledge from the previous node. Users can view any other user's public knowledge trees to see what they are learning or have learned and how. If a user finds another user’s tree or a portion of their tree to be particularly useful or helpful, they can rate a particular node or section of the tree and they can also copy that section over to their own tree. Users can add additional information to their public profiles such as what they are currently learning, and where they are working/what they currently do or have done. Users can utilize a search function in order to find people whose trees contain a certain topic or keyword/phrase, and can also utilize a filter to narrow searches by users who are learning said topic, are using said topic (i.e. in their work or otherwise), by rating, and by tags.
@@ -68,7 +69,7 @@ $ npm run start
       - Feature will be accessible 90% of the time
       - Text is a minimum of 16 pixels
       - Errors and Success Logged
-      - Feature is only visibale and users by Authenticated and Authorized users on tree page
+      - Feature is only visible by authenticated and authorized users
   - [Low Level Design](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams)
     - [Add Tag To Node](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams/Add%20Node%20Tag)
     - [Create Tag](https://github.com/Drakat7/Tresearch/tree/main/Sequence%20Diagrams/Tagging%20Diagrams/Create%20Tag)
@@ -89,7 +90,6 @@ $ npm run start
 - [Azure Cloud Hosting](https://azure.microsoft.com/en-us/services/cloud-services/#pricing) - Cloud host for WebAPI and Front-End Client.
 - [Azure Sql Database](https://azure.microsoft.com/en-us/products/azure-sql/database/) - Azure persistent data store
 - [Dapper](https://github.com/DapperLib/Dapper) - Object relational mapping library
-- [.NET 6.0](https://dotnet.microsoft.com/en-us/learn/dotnet/what-is-dotnet) - Backend framework
 - [SendGrid API](https://sendgrid.com/) - Email API used to send confirmation and recovery links.
 - [xUnit](https://xunit.net/) - Testing tool for .NET Framework
 #### Front-End
@@ -117,21 +117,51 @@ $ npm run start
 - What are tags?
   - Tags provide a visual description of a node. 
   - Tags are useful when categorizing nodes as well as allows users to find public nodes easier.
-- Adding a node tag
-  - Right click on node and select "Edit Tags" in the context menu. Select tag from search bar. 
-- Adding tag to multiple nodes
-  - Shift and left click on all the nodes to tag and then right click on your final node. Select edit tags in the context menu. Select tag from search bar
-  - The tags displayed are shared tags among the groups of nodes selected. Any changes made will affect all nodes selected.
-- Searching for a tag
-  - Click on the search bar and search for the tag or scroll through the list of tags available
-  - Search bar will show autocomplete tags
-- Remove a tag from node(s)
-  - Click on the tag.
-- Adding a tag to the tag bank
-  - As an administrator, navigate to the tag dashboard. Enter the tag name in the input field and click "Add Tag".
-- Deleting a tag from the tag bank
-  - As an administrator, navigate to to the tag dashboard. Find the tag in the tag table and click the delete button located next to the name.
-
+- How are tags provided?
+  - Users are provided with a bank of tags to choose from.
+  - Administrators are responsible for adding and removing tags from the tag bank.
+    - Duplicate tags are not allowed
+- What tags are displayed when editing tags for multiple nodes?
+  - Only shared tags among nodes will be displayed. If all nodes do not contain a tag, the tag will not appear. 
+- What happens when tag changes are made to multiple nodes
+  - If a tag is added to a list of nodes, all nodes will recieve the tag unless the node already contains tag.
+  - If a tag is removed from a list of nodes, all nodes will remove tag.
 ### User Manual
 --------------------------------
 #### Tagging
+- Tag single node
+  - Navigate to user's portal (must be authenticated and authorized)
+  - Right click node.
+  - Select *Edit Tags* in the context menu
+  - Search for tag in dropdown menu
+  - Click tag in drop down menu
+- Tag Multiple nodes
+  - Navigate to user's portal (must be authenticated and authorized)
+  - Hold shift and left click node
+    - Repeat until all nodes selected
+  - Right a node in node selection
+  - Select *Edit Tags* in the context menu
+  - Search for tag in drop down menu
+  - Click tag in drop down menu
+- Delete tag from node
+  - Navigate to user's portal (must be authenticated and authorized)
+  - Right click node
+  - Select *Edit Tags* in the context menu
+  - Click on the tag to be deleted
+- Delete tag from nodes
+  - Navigate to user's portal (must be authenticated and authorized)
+  - Hold shift and left click node
+    - Repeat until all nodes selected
+  - Right a node in node selection
+  - Select *Edit Tags* in the context menu
+  - Click on the tag to be deleted
+- Creating a tag in bank
+  - Navigate to administrative dashboard
+  - Navigate to Tag Dashboard
+  - Enter tag name
+  - Click on the *Create Tag* button
+  - Tag will be updated in table
+- Deleting a tag from bank
+  - Navigate to administrative dashboard
+  - Navigate to Tag Dashboard
+  - Click on the delete symbol next to tag in table

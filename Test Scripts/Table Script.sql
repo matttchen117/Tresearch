@@ -62,6 +62,7 @@ DROP PROCEDURE IF EXISTS StoreLog
 DROP PROCEDURE IF EXISTS GetUserHash
 DROP PROCEDURE IF EXISTS SearchNodes
 DROP PROCEDURE IF EXISTS RefreshSession
+DROP PROCEDURE IF EXISTS GetNodes
 
 CREATE TABLE [dbo].Accounts(
 	UserID INT IDENTITY(1,1) NOT NULL,
@@ -130,7 +131,7 @@ CREATE TABLE [dbo].NodeRatings(
 	CONSTRAINT user_ratings_pk PRIMARY KEY(UserHash, NodeID)
 );
 
---shouldn�t you combine both EditDate and EditTime into one attribute so the datatype can be DateTime
+--shouldn’t you combine both EditDate and EditTime into one attribute so the datatype can be DateTime
 CREATE TABLE [dbo].TreeHistories(
 	EditDate DATE,
 	EditTime TIME,

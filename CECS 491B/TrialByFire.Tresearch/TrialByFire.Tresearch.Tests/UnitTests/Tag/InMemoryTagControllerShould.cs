@@ -12,7 +12,6 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Implementations;
 using Xunit;
 
-
 namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
 {
     public class InMemoryTagControllerShould : TestBaseClass
@@ -46,6 +45,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             var result = resultAdd as ObjectResult;
 
             // Assert
+            Assert.NotNull(resultAdd);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedResult.Value, result.Value);
         }
@@ -69,6 +69,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             var result = resultCreate as ObjectResult;
 
             // Assert
+            Assert.NotNull(resultCreate);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedResult.Value, result.Value);
 
@@ -94,6 +95,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             var result = resultDelete as ObjectResult;
 
             // Assert
+            Assert.NotNull(resultDelete);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedResult.Value, result.Value);
         }
@@ -118,6 +120,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             var result = resultGet as ObjectResult;
 
             // Assert
+            Assert.NotNull(resultGet);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
             Assert.Equal(expectedTags, result.Value);
         }
@@ -142,7 +145,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             var result = resultGet as ObjectResult;
 
             // Assert
+            Assert.NotNull(resultGet);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
+
         }
 
         [Theory]
@@ -165,7 +170,10 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             var result = resultRemove as ObjectResult;
 
             // Assert
+            Assert.NotNull(resultRemove);
             Assert.Equal(expectedResult.StatusCode, result.StatusCode);
+            Assert.Equal(expectedResult.Value, result.Value);
+
         }
 
         public static IEnumerable<object[]> AddNodeTagData()

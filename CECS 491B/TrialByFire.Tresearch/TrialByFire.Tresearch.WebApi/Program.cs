@@ -34,6 +34,7 @@ builder.Services.AddScoped<ITreeManagementService, TreeManagementService>();
 builder.Services.AddScoped<IRateService, RateService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 
+builder.Services.AddScoped<INodeSearchService, NodeSearchService>();
 // Managers
 builder.Services.AddScoped<ILogManager, LogManager>();
 builder.Services.AddScoped<IAccountDeletionManager, AccountDeletionManager>();
@@ -50,6 +51,8 @@ builder.Services.AddScoped<IUADManager, UADManager>();
 builder.Services.AddScoped<IRateManager, RateManager>();
 builder.Services.AddScoped<IUserManagementManager, UserManagementManager>(); 
 
+builder.Services.AddScoped<IUADManager, UADManager>();
+builder.Services.AddScoped<INodeSearchManager, NodeSearchManager>();
 // Unnecessary, only here temporarily for successful build
 
 builder.Services.AddControllers();
