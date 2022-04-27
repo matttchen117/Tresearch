@@ -168,11 +168,12 @@ namespace TrialByFire.Tresearch.Models.Contracts
             tagDoesNotExist,
             createNodeSuccess,
             deleteNodeSuccess,
-            getNodesSuccess
+            getNodesSuccess,
 
             copyNodeSuccess,
             copyNodeFailure,
             copyNodeError,
+            copyNodeEmptyError,
             
             pasteNodeSuccess,
             pasteNodeFailure,

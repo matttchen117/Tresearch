@@ -207,5 +207,11 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns>List of tags and string status result</returns>
         public Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken));
+
+
+        public Task<Tuple<List<INode>, string>> CopyNodeAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<string> PasteNodeAsync(List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken));
+
     }
 }

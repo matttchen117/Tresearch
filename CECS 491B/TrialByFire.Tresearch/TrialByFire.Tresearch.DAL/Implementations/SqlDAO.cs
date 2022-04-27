@@ -2650,5 +2650,65 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
+
+
+        public async Task<Tuple<List<INode>, string>> CopyNodeAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    await connection.OpenAsync();
+
+                    var procedure = "dbo.[GetNodesFromNodeID]";
+                    var value = new { nodeIDs };
+
+                    List<INode> nodes = new List<INode>(await connection.QueryAsync<Node>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+
+                    if (nodes.Count.Equals(nodeIDs.Count))
+                    {
+                        return Tuple.Create(nodes, await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess).ConfigureAwait(false));
+                    }
+                    else
+                    {
+                        return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.copyNodeError).ConfigureAwait(false));
+                    }
+                }
+
+            }
+
+
+
+
+            catch (SqlException ex)
+            {
+                //Check sql exception
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false)) ;
+                    default:
+                        return Tuple.Create(new List<INode>(), _options.UnhandledExceptionMessage + ex.Message);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false));
+
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
+
+            }
+        }
+
+
+        public async Task<string> PasteNodeAsync(INode nodeToPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken))
+        {
+
+        }
     }
 }

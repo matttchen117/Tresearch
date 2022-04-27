@@ -277,7 +277,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.copyNodeFailure:
                     return "401: Server: Copy Node failure";
                 case Responses.copyNodeError:
-                    return "503: Database: Paste Node ERROR";
+                    return "503: Database: Copy Node ERROR";
+                case Responses.copyNodeEmptyError:
+                    return "400: Server: No nodes to copy failure";
+                
 
                 case Responses.pasteNodeSuccess:
                     return "200: Server: Paste Node successful";

@@ -7,7 +7,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
     {
         public Task<IActionResult> CopyNodeAsync(List<long> nodeIDs);
 
-        public Task<IActionResult> PasteNodeAsync(List<INode> nodes);
+        public Task<IActionResult> PasteNodeAsync(INode nodeToPasteTo, List<INode> nodes);
 
     }
 }

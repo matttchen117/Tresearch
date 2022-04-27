@@ -22,14 +22,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
         private ISqlDAO _sqlDAO { get; }
 
-        /// <summary>
-        ///     Manager to perform logging for error and success cases
-        /// </summary>
-        private ILogManager _logManager { get; }
-
 
         private IAccountVerificationService _accountVerificationService { get; }
-
 
         /// <summary>
         ///     Manager to perform copy and paste feature feature
@@ -64,17 +58,34 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 string userName = Thread.CurrentPrincipal.Identity.Name;
                 string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
                 string confirmed = "";
+                Tuple<List<INode>, string> resultCopy;
 
                 IAccount account = new UserAccount(userName, userAuthLevel);
                 confirmed = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken).ConfigureAwait(false);
 
+                //Account is verified and good to perform operation
                 if (confirmed.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false)))
                 {
 
+                    if(nodeIDs == null || nodeIDs.Count <= 0)
+                    {
+                        return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false));
+                    }
+                    else
+                    {
+                        resultCopy = await _copyAndPasteService.CopyNodeAsync(nodeIDs, cancellationToken).ConfigureAwait(false);
+                        return resultCopy;
+                    }
+
+
+
+                }
+                else
+                {
+                    return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.verificationFailure).ConfigureAwait(false));
                 }
 
             }
-
 
             catch (OperationCanceledException)
             {
@@ -85,6 +96,12 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
 
             }
+        }
+
+
+        public async Task<string> PasteNodeAsync(List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken))
+        {
+
         }
 
     }

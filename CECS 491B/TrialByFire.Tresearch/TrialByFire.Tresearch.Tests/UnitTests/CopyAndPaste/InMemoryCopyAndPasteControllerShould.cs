@@ -31,6 +31,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CopyAndPaste
             TestProvider = TestServices.BuildServiceProvider();
         }
 
+        /*
+
         [Theory]
         [InlineData()]
 
@@ -41,6 +43,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CopyAndPaste
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal rolePrincipal;
         }
+
+        */
 
 
     }

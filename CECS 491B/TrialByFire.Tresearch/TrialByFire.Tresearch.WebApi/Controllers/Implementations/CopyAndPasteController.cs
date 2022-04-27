@@ -59,23 +59,60 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
+
+
+                Tuple<List<INode>, string> result = await _copyAndPasteManager.CopyNodeAsync(nodeIDs, _cancellationTokenSource.Token).ConfigureAwait(false);
+
                 string[] split;
-                string result = "";
-
-                result - await _copyAndPasteManager.CopyNodeAsync(nodeIDs, CancellationTokenSource.Token).ConfigureAwait(false);
-
-            } 
 
 
+                split = result.Item2.Split(":");
+
+
+                if(result.Item2.Equals(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess)))
+                {
+                    await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
+                    return new OkObjectResult(result.Item1);
+                }
+                else
+                {
+                    Enum.TryParse(split[1], out ILogManager.Categories category);
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
+                    return StatusCode(Convert.ToInt32(split[0]), result.Item1);
+                }
+
+            }
+            catch(OperationCanceledException ex)
+            {
+                string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + ex.Message;
+                string[] split;
+
+                split = errorMessage.Split(":");
+                Enum.TryParse(split[1], out ILogManager.Categories category);
+                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
+            }
+
+            catch (Exception ex)
+            {
+                string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                string[] split;
+
+                split = errorMessage.Split(":");
+                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
+                return new BadRequestObjectResult(split[2]);
+            }
 
 
 
 
-            throw new NotImplementedException();
+
+
         }
 
-        public Task<IActionResult> PasteNodeAsync(List<long> nodeIDs)
+        public async Task<IActionResult> PasteNodeAsync(List<INode> nodes)
         {
+
             throw new NotImplementedException();
         }
     }

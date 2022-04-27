@@ -9,8 +9,8 @@ namespace TrialByFire.Tresearch.Services.Contracts
 {
     public interface ICopyAndPasteService
     {
-        public Task<List<INode>> CopyNodeAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<Tuple<List<INode>, string>> CopyNodeAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken));
 
-        public Task<string> PasteNodeAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> PasteNodeAsync(INode nodeToPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken));
     }
 }
