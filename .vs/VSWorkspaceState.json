@@ -5,16 +5,13 @@
     "\\CECS 491B\\TrialByFire.Tresearch",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests\\Authentication",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests\\Authorization",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests\\AccountDeletion",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\UnitTests",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\UnitTests\\AccountDeletion",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\UnitTests\\Authentication"
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\Controllers",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\Controllers\\Contracts",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\Controllers\\Implementations"
   ],
-<<<<<<< HEAD
-  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\TrialByFire.Tresearch.Tests.csproj",
-=======
   "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.sln",
->>>>>>> origin/JessieTestMerge
   "PreviewInSolutionExplorer": false
 }
