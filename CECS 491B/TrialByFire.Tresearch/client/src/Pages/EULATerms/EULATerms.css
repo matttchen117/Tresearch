@@ -1,0 +1,27 @@
+.eula-text p{
+    text-align: left;
+    position: relative;
+    padding-left:15%;
+    padding-right: 15%;
+    z-index: -1;
+}
+
+.eula-text h3{
+    text-align: left;
+    position: relative;
+    padding-left:15%;
+    padding-right: 15%;
+    z-index: -1;
+}
+
+.eula-wrapper {
+    z-index:  1;
+}
+.eula-nav {
+    z-index: 3;
+}
+
+.eula-Container {
+    color: #283618;
+}
+

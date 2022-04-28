@@ -2,3 +2,22 @@
     list-style-type: none;
     
 }
+
+.tagger-container {
+    max-height: 180px;
+    overflow-y: auto;
+    text-align: left;
+    padding: 10px;
+    margin-left: 40px;
+    
+    font-size: 16px;
+    
+}
+
+.tagger-searchBar-container{
+    margin: 40px;
+}
+
+.tagger-status-wrapper {
+    color: red;
+}

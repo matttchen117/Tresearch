@@ -11,19 +11,9 @@ namespace TrialByFire.Tresearch.Managers.Contracts
 {
     public interface IRegistrationManager
     {
-        public IMailService _mailService { get; set; }
-        public IRegistrationService _registrationService { get; set; }
-
-        public IValidationService _validationService { get; set; }
-
-        public List<string> SendConfirmation(string email, string baseUrl);
-
-        public List<string> CreatePreConfirmedAccount(string email, string passphrase);
-
-        public List<string> ConfirmAccount(string url);
-
-        public bool IsConfirmationLinkValid(IConfirmationLink confirmationLink);
-
-
+        public Task<string> CreateAndSendConfirmationAsync(string email, string passphrases, string authorizationLevel, CancellationToken cancellationToken = default);
+        public Task<string> ConfirmAccountAsync(string guid, CancellationToken cancellationToken = default(CancellationToken));
+        public bool IsConfirmationLinkInvalid(IConfirmationLink confirmationLink);
+        public Task<string> ResendConfirmation(string guid, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

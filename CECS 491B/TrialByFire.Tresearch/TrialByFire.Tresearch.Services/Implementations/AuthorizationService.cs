@@ -15,11 +15,9 @@ namespace TrialByFire.Tresearch.Services.Implementations
     public class AuthorizationService : IAuthorizationService
     {
         private ISqlDAO _sqlDAO { get; }
-        private ILogService _logService { get; }
-        public AuthorizationService(ISqlDAO sqlDAO, ILogService logService)
+        public AuthorizationService(ISqlDAO sqlDAO)
         {
             _sqlDAO = sqlDAO;
-            _logService = logService;
         }
 
         //
@@ -33,10 +31,22 @@ namespace TrialByFire.Tresearch.Services.Implementations
         //
         // Returns:
         //     The result of the verification process.
-        public async Task<string> VerifyAuthorizedAsync(string requiredAuthLevel, 
-            CancellationToken cancellationToken = default)
+        public async Task<bool> VerifyAuthorizedAsync(string requiredAuthLevel, 
+            string identity, CancellationToken cancellationToken = default)
         {
-            return await _sqlDAO.VerifyAuthorizedAsync(requiredAuthLevel, cancellationToken);
+            if(Thread.CurrentPrincipal != null)
+            {
+                if(!requiredAuthLevel.Equals(""))
+                {
+                    return Thread.CurrentPrincipal.IsInRole(requiredAuthLevel)
+                    || Thread.CurrentPrincipal.IsInRole("admin");
+                }
+                else if(!identity.Equals(""))
+                {
+                    return Thread.CurrentPrincipal.Identity.Name.Equals(identity);
+                }
+            }
+            return false;
         }
     }
 }

@@ -8,14 +8,12 @@ namespace TrialByFire.Tresearch.Models.Contracts
 {
     public interface IOTPClaim
     {
-        string Username { get; }
+        string Username { get; set; }
 
-        string AuthorizationLevel { get; }
+        string AuthorizationLevel { get; set; }
         string OTP { get; }
         DateTime TimeCreated { get; }
 
         int FailCount { get; set; }
-
-        public string GenerateRandomOTP();
     }
 }

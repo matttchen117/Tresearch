@@ -2,28 +2,32 @@
 using SendGrid.Helpers.Mail;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Services.Contracts;
+using Microsoft.Extensions.Options;
+using TrialByFire.Tresearch.Models;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
    public  class MailService: IMailService 
     {
         private IMessageBank _messageBank { get; }
-        private string _APIKey = "";
+        private BuildSettingsOptions _options { get; }
+
         private string _sender = "no-reply@tresearch.systems";
         private string _senderName = "Tresearch Support";
         private string _confirmationTemplate = "d-a7af897441a34066b64fe416cf76d29b";
-        private string _recoveryTemplate = "d-a7af897441a34066b64fe416cf76d29b";
+        private string _recoveryTemplate = "d-a8d61f53ced342a9addb30a043e6ef01";
 
-        public MailService(IMessageBank messageBank) 
+        public MailService(IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> options) 
         { 
             _messageBank = messageBank;
+            _options = options.Value;
         }
 
-        public string SendConfirmation(string email, string url)
+        public async Task<string> SendConfirmationAsync(string email, string url, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
-                var client = new SendGridClient(_APIKey);
+                var client = new SendGridClient(_options.SendGridAPIKey);
                 var confirmation = new SendGridMessage();
                 confirmation.SetFrom(_sender, _senderName);
                 confirmation.AddTo(email);
@@ -33,11 +37,15 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     url = url
                 });
                 var result = client.SendEmailAsync(confirmation).Result;
-            } catch
+                if (result.IsSuccessStatusCode)
+                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                else
+                    return _messageBank.GetMessage(IMessageBank.Responses.sendEmailFail).Result;
+            } 
+            catch(Exception ex)
             {
-                return "Failed - Couldn't send confirmation email";
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
-            return "Success - Confirmation email sent";
         }
 
         public async Task<string> SendOTPAsync(string email, string subject, string plainBody, string htmlBody, 
@@ -46,23 +54,27 @@ namespace TrialByFire.Tresearch.Services.Implementations
             cancellationToken.ThrowIfCancellationRequested();
             try
             {
-                var client = new SendGridClient(_APIKey);
+                var client = new SendGridClient(_options.SendGridAPIKey);
                 var from = new EmailAddress(_sender, _senderName);
                 var to = new EmailAddress(email);
                 var msg = MailHelper.CreateSingleEmail(from, to, subject, plainBody, htmlBody);
                 var response = await client.SendEmailAsync(msg, cancellationToken).ConfigureAwait(false);
-            } catch
+                if (response.IsSuccessStatusCode)
+                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                else
+                    return _messageBank.GetMessage(IMessageBank.Responses.sendEmailFail).Result;
+            } 
+            catch(Exception ex)
             {
-                return _messageBank.ErrorMessages["sendEmailFail"];
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
-            return _messageBank.SuccessMessages["generic"];
         }
 
         public async Task<string> SendRecoveryAsync(string email, string url, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
-                var client = new SendGridClient(_APIKey);
+                var client = new SendGridClient(_options.SendGridAPIKey);
                 var confirmation = new SendGridMessage();
                 confirmation.SetFrom(_sender, _senderName);
                 confirmation.AddTo(email);
@@ -73,12 +85,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 });
                 cancellationToken.ThrowIfCancellationRequested();
                 var result = client.SendEmailAsync(confirmation).Result;
-                return _messageBank.SuccessMessages["generic"];
-
+                if (result.IsSuccessStatusCode)
+                    return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                else
+                    return _messageBank.GetMessage(IMessageBank.Responses.sendEmailFail).Result;
             }
             catch(Exception ex)
             {
-                return "500: Server: " + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
     }

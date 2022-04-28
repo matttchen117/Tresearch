@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
+using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Services.Contracts;
 
@@ -15,19 +17,16 @@ namespace TrialByFire.Tresearch.Managers.Implementations
     //     appropriate services for the operation.
     public class LogoutManager : ILogoutManager
     {
-        private ISqlDAO _sqlDAO { get; }
-        private ILogService _logService { get; }
-
         private IMessageBank _messageBank { get; }
-        private ILogoutService _logoutService { get; }
+        private BuildSettingsOptions _options { get; }
 
-        public LogoutManager(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank, 
-            ILogoutService logoutService)
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
+            TimeSpan.FromSeconds(5));
+
+        public LogoutManager(IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> options)
         {
-            _sqlDAO = sqlDAO;
-            _logService = logService;
             _messageBank = messageBank;
-            _logoutService = logoutService;
+            _options = options.Value;
         }
 
         //
@@ -37,20 +36,16 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         //
         // Returns:
         //     The result of the operation.
-        public async Task<string> Logout(CancellationToken cancellationToken)
+        public async Task<string> LogoutAsync(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if(Thread.CurrentPrincipal != null)
+            if(!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
             {
-                try
-                {
-                    return await _logoutService.Logout(cancellationToken).ConfigureAwait(false);
-                }catch (Exception ex)
-                {
-                    return "400: Server: Logout Error Occurred";
-                }
+                return await _messageBank.GetMessage(IMessageBank.Responses.logoutSuccess)
+                .ConfigureAwait(false);
             }
-            return _messageBank.ErrorMessages["notAuthenticated"];
+            return await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated)
+                .ConfigureAwait(false);
         }
     }
 }

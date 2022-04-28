@@ -1,94 +1,159 @@
-﻿using Xunit;
-using TrialByFire.Tresearch.DAL.Contracts;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using System.Data.SqlClient;
+using System.Text.RegularExpressions;
 using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Models.Contracts;
-using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Services.Implementations;
+using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
+using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.Registration
 {
-    public class RegistrationManagerShould : IntegrationTestDependencies
+    public class RegistrationManagerShould : TestBaseClass, IClassFixture<RegManDatabaseFixture>
     {
-
-        public IRegistrationService _registrationService { get; set; }
-
-        public IMailService _mailService { get; set; }
-        public IRegistrationManager _registrationManager { get; set; }
-
-        public RegistrationManagerShould() : base()
+        RegManDatabaseFixture fixture;
+        public RegistrationManagerShould(RegManDatabaseFixture fixture) : base(new string[] { })
         {
-            _mailService = new MailService(MessageBank);
-            _registrationService = new RegistrationService(SqlDAO, LogService);
-            _registrationManager = new RegistrationManager(SqlDAO, LogService, _registrationService, _mailService, ValidationService, MessageBank);
-        }
-        [Theory]
-        [InlineData("skiPatrol@gmail.com", "myRegisterPassword")]
-        [InlineData("snowboarder@hotmail.com", "unFortunateName")]
-        public void RegisterTheUser(string email, string passphrase)
-        {
-            //Arrange 
-
-            //Act
-            List<string> results = _registrationManager.CreatePreConfirmedAccount(email, passphrase);
-
-            //Assert
-            Assert.Equal('S', results.Last()[0]);
+            this.fixture = fixture;
+            TestServices.AddScoped<IMailService, MailService>();
+            TestServices.AddScoped<IRegistrationService, RegistrationService>();
+            TestServices.AddScoped<IRegistrationManager, RegistrationManager>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
-        [InlineData("confirmMeMan@gmail.com", "myPassword", "user", true, false)]
-        [InlineData("confirmMeMan2@gmail.com", "myPassword", "user", true, false)]
-        public void ConfirmTheUser(string email, string passphrase, string authenticationLevel, bool status, bool confirmed)
+        [MemberData(nameof(CreateData))]
+        public async Task RegisterTheUser(IRoleIdentity roleIdentity, string email, string passphrase, string authorizationLevel, IMessageBank.Responses response)
         {
             //Arrange
-            IConfirmationLink link = new ConfirmationLink(email, Guid.NewGuid(), DateTime.Now);
-            string url = link.UniqueIdentifier.ToString();
-            SqlDAO.CreateConfirmationLink(link);
-            IAccount _account = new Account(email, email, passphrase, authenticationLevel, status, confirmed);
-            SqlDAO.CreateAccount(_account);
+            IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+            Thread.CurrentPrincipal = rolePrincipal;
+            IRegistrationManager registrationManager = TestProvider.GetService<IRegistrationManager>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
+            string expected = await messageBank.GetMessage(response);
 
             //Act
-            List<string> results = _registrationManager.ConfirmAccount(url);
+            string results = await registrationManager.CreateAndSendConfirmationAsync(email, passphrase, authorizationLevel, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
-            Assert.Equal('S', results.Last()[0]);
-        }
-        [Theory]
-        [InlineData("pammypoor@gmail.com", "www.google.com")]
-        [InlineData("jelazo@live.com", "www.tresearch.systems/")]
-        public void SendConfirmation(string email, string url)
-        {
-
-            //Act
-            List<string> results = _registrationManager.SendConfirmation(email, url);
-
-            //Assert
-            Assert.Equal('S', results.Last()[0]);
+            Assert.Equal(expected , results);
         }
 
-
-        [Theory]
-        [InlineData("cottonEyedJoe@gmail.com", -1)]
-        [InlineData("innnout@live.com", 0)]
-        public void checkLinkValidity(string email, int sub)
+        public async Task ConfirmTheUser(string username, string guid, string statusCode)
         {
             //Arrange
-            DateTime now = DateTime.Now;
-            IConfirmationLink link = new ConfirmationLink(email, Guid.NewGuid(), now.AddDays(sub));
-            Boolean expected;
-            if (sub < 0)
+            IRegistrationManager registrationManager = TestProvider.GetService<IRegistrationManager>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            string expected = statusCode;
+
+            //Act
+            string result = await registrationManager.ConfirmAccountAsync(guid, cancellationTokenSource.Token);
+
+            //Assert
+            Assert.Equal(expected, result);
+        }
+
+        public void checkLinkInValidity(int minusHours)
+        {
+            //Arrange
+            IRegistrationManager registrationManager = TestProvider.GetService<IRegistrationManager>();
+            IConfirmationLink confirmationLink = new ConfirmationLink("test@gmail.com", "user", Guid.NewGuid(), DateTime.Now.AddHours(minusHours));
+            bool expected;
+            if (minusHours <= -24)
                 expected = false;
             else
                 expected = true;
 
             //Act
-            bool actual = _registrationManager.IsConfirmationLinkValid(link);
+            bool actual = registrationManager.IsConfirmationLinkInvalid(confirmationLink);
 
             //Assert
             Assert.Equal(expected, actual);
+        }
+
+        public static IEnumerable<object[]> CreateData()
+        {
+            /**
+             *  Case 0: User is Authenticated. Account Exists 
+             *      Account:
+             *          Username: RegManagerIntegration1@tresearch.system
+             *          AuthorizationLevel: user
+             *          AccountStatus: True
+             *          Confirmed: False
+             */
+            IRoleIdentity roleIdentity0 = new RoleIdentity(true, "pammypoor+RegManagerIntegration1@gmail.system", "user", "ceef03d444c0c33847d796ced4ed6cd95e89dbe64a9fbe7dcebcdb6b630d2c341d0c40ef3dcf365ab544ffa5a6fd6463d81a0c224f92fef88e7c4d084e2b6a1c");
+            var username0 = "pammypoor+RegManagerIntegration1@gmail.system";
+            var passphrase0 = "test1";
+            var role0 = "user";
+            var expected0 = IMessageBank.Responses.alreadyAuthenticated;
+
+            /**
+             *  Case 1: User is not authenticated. Account Exists 
+             *      Account:
+             *          Username: RegManagerIntegration1@tresearch.system
+             *          AuthorizationLevel: user
+             *          AccountStatus: True
+             *          Confirmed: False
+             */
+            IRoleIdentity roleIdentity1 = new RoleIdentity(true, "guest", "guest");
+            var username1 = "pammypoor+regManagerCreateUser2@gmail.com";
+            var passphrase1 = "test1";
+            var role1 = "user";
+            var expected1 = IMessageBank.Responses.accountAlreadyCreated;
+
+            return new[]
+            {
+                new object[] { roleIdentity0, username0, passphrase0, role0, expected0 },
+                new object[] { roleIdentity1, username1, passphrase1, role1, expected1 }
+            };
+        }
+
+    }
+
+    public class RegManDatabaseFixture : TestBaseClass, IDisposable
+    {
+        public RegManDatabaseFixture() : base(new string[] { })
+        {
+            TestProvider = TestServices.BuildServiceProvider();
+            IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
+            BuildSettingsOptions optionsValue = options.Value;
+
+            string script = File.ReadAllText("../../../IntegrationTests/Registration/SetupAndCleanup/ManagerIntegrationSetup.sql");
+
+            IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
+            {
+                connection.Open();
+                foreach (string command in commands)
+                    if (!string.IsNullOrWhiteSpace(command.Trim()))
+                        using (var com = new SqlCommand(command, connection))
+                            com.ExecuteNonQuery();
+            }
+        }
+
+        public void Dispose()
+        {
+            IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
+            BuildSettingsOptions optionsValue = options.Value;
+
+            string script = File.ReadAllText("../../../IntegrationTests/Registration/SetupAndCleanup/ManagerIntegrationCleanup.sql");
+
+            IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
+            {
+                connection.Open();
+                foreach (string command in commands)
+                    if (!string.IsNullOrWhiteSpace(command.Trim()))
+                        using (var com = new SqlCommand(command, connection))
+                            com.ExecuteNonQuery();
+            }
         }
     }
 }

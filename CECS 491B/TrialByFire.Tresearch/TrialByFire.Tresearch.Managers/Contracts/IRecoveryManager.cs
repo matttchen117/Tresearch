@@ -8,8 +8,8 @@ namespace TrialByFire.Tresearch.Managers.Contracts
 {
     public interface IRecoveryManager
     {
-        public Task<string> SendRecoveryEmail(string email, string baseurl, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> SendRecoveryEmailAsync(string email, string baseurl, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken));
 
-        public Task<string> EnableAccountAsync(Guid guid, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<string> EnableAccountAsync(string guid, CancellationToken cancellationToken = default(CancellationToken));
     }
 }
