@@ -21,6 +21,12 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _messageBank = messageBank;
         }
 
+        /// <summary>
+        ///  Verifies if an account exists and is enabled.
+        /// </summary>
+        /// <param name="account">User's Account</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String result</returns>
         public async Task<string> VerifyAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -43,32 +49,38 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch (InvalidOperationException ioe)
             {
-                return _messageBank.ErrorMessages["notFoundOrEnabled"];
+                return await _messageBank.GetMessage(IMessageBank.Responses.notFoundOrEnabled).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                return "500: Database: " + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }  
         }
 
-        public async Task<string> VerifyAccountAuthorizedNodeChangesAsync(List<long> nodeIDs, IAccount account, CancellationToken cancellationToken = default)
+        /// <summary>
+        ///     Verifies if a user is authorized to make node changes.
+        /// </summary>
+        /// <param name="nodeIDs">List of node IDs to check</param>
+        /// <param name="userHash">User's Hash</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String verification status</returns>
+        public async Task<string> VerifyAccountAuthorizedNodeChangesAsync(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default)
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                cancellationToken.ThrowIfCancellationRequested();
 
-                string result = await _sqlDAO.IsAuthorizedToMakeNodeChangesAsync(nodeIDs, account, cancellationToken);
+                string result = await _sqlDAO.IsAuthorizedToMakeNodeChangesAsync(nodeIDs, userHash, cancellationToken).ConfigureAwait(false);
 
                 return result;
             }
             catch(InvalidOperationException)
             {
-                return await _messageBank.GetMessage(IMessageBank.Responses.notFoundOrAuthorized);
+                return await _messageBank.GetMessage(IMessageBank.Responses.notFoundOrAuthorized).ConfigureAwait(false);
             }
             catch(Exception ex)
             {
-                return "500: Database: " + ex.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
     }

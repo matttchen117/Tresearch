@@ -1,7 +1,5 @@
-import React, { useState } from "react";
-import {useNavigate} from 'react-router-dom';
-import axios, {AxiosResponse, AxiosError} from 'axios';
-import pbkdf2 from "pbkdf2/lib/sync";
+import React from "react";
+import axios from 'axios';
 
 import "./RegistrationForm.css";
 import Button from "../Button/ButtonComponent";
@@ -25,7 +23,7 @@ class RegistrationForm extends React.Component  {
         //  passphrase: a-z, A-Z, 0-9, .,@! space
         var regexPassphrase = new RegExp("^[a-zA-Z0-9.,@!\s]+$");
 
-        if(this.state.agreement == false){
+        if(this.state.agreement === false){
             this.setState({errorMessage: 'Must agree to terms to create account'});
             return false;
         }
@@ -88,7 +86,7 @@ class RegistrationForm extends React.Component  {
                         break;
                     default: this.setState({errorMessage: 'Unable to create account'});
                 }
-                console.log(err.errorMessage);
+                console.log(err);
             })
         }
     }

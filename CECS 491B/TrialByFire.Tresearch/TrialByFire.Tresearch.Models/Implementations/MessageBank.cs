@@ -33,9 +33,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.generic:
                     return "200: Server: success";
                 case Responses.unhandledException:
-                    return "600: Server: Unhandled Exception: ";
+                    return "500: Server: Unhandled Exception: {0}, Operation: {1}";
                 case Responses.operationCancelled:
-                    return "400: Server: Operation Cancelled Exception: ";
+                    return "500: Server: Operation Cancelled Exception: ";
+                case Responses.operationTimeExceeded:
+                    return "500: Server: Operation Exceeded Time Limiet Exception: ";
 
                 case Responses.databaseConnectionFail:
                     return "503: Database: Unable to connect to database.";
@@ -85,8 +87,15 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "200: Server: Log success.";
                 case Responses.logFail:
                     return "503: Server: Log failed.";
+                case Responses.logTimeExceeded:
+                    return "503: Datastore: Logging exceeded time: ";
                 case Responses.logRollback:
                     return "400: Database: Log rollback occurred.";
+
+                case Responses.nodeSearchSuccess:
+                    return "200: Server: Node search success. Search: {0}, Tags: {1}, FilterByRating: {2}, FilterByTime: {3}";
+                case Responses.noSearchInput:
+                    return "400: Data: No search input provided.";
 
                 case Responses.tagAddSuccess:
                     return "200: Server: Tag added to node(s).";
@@ -99,11 +108,24 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.tagGetSuccess:
                     return "200: Server: Tag(s) retrieved.";
                 case Responses.tagNotFound:
-                    return "404: Database: Tag not found.";
+                    return "404: Data: Tag not found.";
                 case Responses.tagDuplicate:
-                    return "409: Database: The tag already exists.";
+                    return "409: Data: The tag already exists.";
                 case Responses.tagRetrievalFail:
                     return "502: Server: Unable to get tag data.";
+                case Responses.tagCountInvalid:
+                    return "422: Data: Invalid tag count.";
+                case Responses.tagNameInvalid:
+                    return "422: Data: Invalid tag name.";
+
+                case Responses.userRateSuccess:
+                    return "200: Server: User rating added.";
+                case Responses.getRateSuccess:
+                    return "200: Server: Rating retrieved.";
+                case Responses.userRateFail:
+                    return "502: Server: Unable rate node.";
+                case Responses.getRateFail:
+                    return "502: Server: Unable to get rating data.";
 
 
                 case Responses.createNodeSuccess:
@@ -121,6 +143,19 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.refreshSessionNotAllowed:
                     return "400: Server: Refresh Session Failed: User is not logged in.";
 
+                case Responses.accountUpdateSuccess:
+                    return "200: Server: Account updated.";
+                case Responses.accountEnableSuccess:
+                    return "200: Server: Account enabled.";
+                case Responses.accountDisableSuccess:
+                    return "200: Server: Account disabled.";
+                case Responses.accountUpdateFail:
+                    return "502: Server: Unable to update account.";
+
+                case Responses.deleteNodeSuccess:
+                    return "200: Server: Delete Node Success";
+                case Responses.getNodesSuccess:
+                    return "200: Server: Get Nodes Success";
                 case Responses.storeLogFail:
                     return "503: Database: Failed to store the log.";
                 case Responses.badNameOrPass:
@@ -149,9 +184,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "404: Database: UserAccount not found or not authorized to perform the " +
                 "operation.";
                 case Responses.nodeNotFound:
-                    return "404: Database: The node was not found.";
+                    return "404: Data: The node was not found.";
                 case Responses.tagDoesNotExist:
-                    return "404: Database: Tag not found.";
+                    return "404: Data: Tag not found.";
                 case Responses.recoveryLinkNotFound:
                     return "404: Database: The recovery link was not found";
                 case Responses.cancellationRequested:
@@ -196,6 +231,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "504: Server rollback failed";
                 case Responses.createNodeFail:
                     return "503: Database: Failed to create node.";
+                case Responses.deleteNodeFail:
+                    return "503: Database: Failed to delete node.";
+                case Responses.updateNodeFail:
+                    return "503: Database: Failed to update node.";
                 case Responses.nodeAlreadyExists:
                     return "409: Database: Node Already Exists";
                 case Responses.createdNodesExists:

@@ -81,6 +81,7 @@ namespace TrialByFire.Tresearch.Middlewares
                         if (result.Equals(await messageBank.GetMessage(IMessageBank.Responses.refreshSessionSuccess).
                                 ConfigureAwait(false)))
                         {
+                            // Decide if refresh even on fail
                             httpContext.Response.Headers.Add(_options.CurrentValue.AccessControlHeaderName, _options.CurrentValue.JWTHeaderName);
                             httpContext.Response.Headers.Add(_options.CurrentValue.JWTHeaderName, results[1]);
                             split = result.Split(": ");
@@ -121,7 +122,7 @@ namespace TrialByFire.Tresearch.Middlewares
             }
             catch (Exception ex)
             {
-                IRoleIdentity roleIdentity = new RoleIdentity(true, "","", _options.CurrentValue.GuestHash);
+                IRoleIdentity roleIdentity = new RoleIdentity(true, "", "", _options.CurrentValue.GuestHash);
                 IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
                 Thread.CurrentPrincipal = rolePrincipal;
                 logManager.StoreArchiveLogAsync(DateTime.UtcNow, level: ILogManager.Levels.Error, 

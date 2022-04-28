@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,8 +22,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
     //     appropriate services for the operation.
     public class OTPRequestManager : IOTPRequestManager
     {
-        private ISqlDAO _sqlDAO { get; }
-        private ILogService _logService { get; }
         private IOTPRequestService _otpRequestService { get; }
         private IAccountVerificationService _accountVerificationService { get; }
         private IMessageBank _messageBank { get; }
@@ -31,12 +30,10 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
             TimeSpan.FromSeconds(5));
 
-        public OTPRequestManager(ISqlDAO sqlDAO, ILogService logService, IOTPRequestService otpRequestService, 
+        public OTPRequestManager(IOTPRequestService otpRequestService, 
             IAccountVerificationService accountVerificationService, IMessageBank messageBank, 
             IMailService mailService, IOptionsSnapshot<BuildSettingsOptions> options)
         {
-            _sqlDAO = sqlDAO;
-            _logService = logService;
             _otpRequestService = otpRequestService;
             _accountVerificationService = accountVerificationService;
             _messageBank = messageBank;
@@ -80,7 +77,11 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     if (result.Equals(_messageBank.SuccessMessages["generic"]))
                     {*/
                     IAccount account = new UserAccount(username, passphrase, authorizationLevel);
-                    IOTPClaim otpClaim = new OTPClaim(account);
+                    string otp = await GenerateRandomOTPAsync(_cancellationTokenSource.Token).ConfigureAwait(false);
+                    byte[] salt = new byte[0];
+                    byte[] key = KeyDerivation.Pbkdf2(otp, salt, KeyDerivationPrf.HMACSHA512, 10000, 64);
+                    string hash = Convert.ToHexString(key);
+                    IOTPClaim otpClaim = new OTPClaim(account, hash);
                     result = await _accountVerificationService.VerifyAccountAsync(account, 
                         _cancellationTokenSource.Token).ConfigureAwait(false);
                     if(result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)
@@ -94,8 +95,11 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                             // No API Key right now
                             if (!_options.Environment.Equals("Test"))
                             {
-                                result = await _mailService.SendOTPAsync(account.Username, otpClaim.OTP,
-                                    otpClaim.OTP, otpClaim.OTP, _cancellationTokenSource.Token).ConfigureAwait(false);
+                                result = await _mailService.SendOTPAsync(account.Username, otp,
+                                    otp, otp, _cancellationTokenSource.Token).ConfigureAwait(false);
+                                // FOR TESTING ONLY
+                                /*_logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
+                                 category: ILogManager.Categories.Server, otp);*/
                             }
                         }
                     }
@@ -113,6 +117,19 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             {
                 return occfe.Message;
             }
+        }
+
+        public async Task<string> GenerateRandomOTPAsync(CancellationToken cancellationToken = default)
+        {
+            string validCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+            Random random = new Random();
+            int length = 8;
+            string otp = "";
+            for (int i = 0; i < length; i++)
+            {
+                otp += validCharacters[random.Next(0, validCharacters.Length)];
+            }
+            return otp;
         }
     }
 }

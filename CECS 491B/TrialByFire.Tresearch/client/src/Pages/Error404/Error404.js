@@ -1,9 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import NavBar from '../../UI/Navigation/NavBar';
 
 const Error404 = () => {
         return (
             <div>
+                {<NavBar/>}
                 <h1>404 - Page doesn't exist</h1>
             </div>
         );

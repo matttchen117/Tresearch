@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -70,6 +71,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             }
             rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
+            byte[] salt = new byte[0];
+            byte[] key = KeyDerivation.Pbkdf2(otp, salt, KeyDerivationPrf.HMACSHA512, 10000, 64);
+            string hash = Convert.ToHexString(key);
             IAuthenticationController authenticationController = TestProvider.
                 GetService<IAuthenticationController>();
             DateTime now = new DateTime(year, month, day, hour, minute, second);
@@ -78,7 +82,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Authentication
             { StatusCode = Convert.ToInt32(expecteds[0]) };
 
             // Act
-            IActionResult result = await authenticationController.AuthenticateAsync(username, otp, 
+            IActionResult result = await authenticationController.AuthenticateAsync(username, hash, 
                 authorizationLevel, now).ConfigureAwait(false);
             var objectResult = result as ObjectResult;
 

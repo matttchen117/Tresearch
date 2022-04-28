@@ -7,13 +7,17 @@ import "./LoginForm.css";
 import Button from "../Button/ButtonComponent";
 
 class LoginForm extends React.Component  {
+    
     state = {
         email: '',
         passphrase: '',
         otp: '',
         verified: false,
+        token: sessionStorage.getItem('authorization'),
         errorMessage: ''
     }
+    
+    
 
     handleInput() {
         // [username]@[domain name].[domain]
@@ -82,8 +86,13 @@ class LoginForm extends React.Component  {
         return pbkdfKey.toString('hex').toUpperCase();
     }
 
+    checkToken = () => {
+
+    }
+
     onSubmitHandler = (e) => {
         e.preventDefault();
+        this.checkToken();
         axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
         // pbkdf2 uses callbacks not promises, need to wrap in a promise object
 
@@ -91,32 +100,29 @@ class LoginForm extends React.Component  {
             this.setState({errorMessage: ''})
             {this.state.verified ? 
                 axios.post('https://localhost:7010/Authentication/authenticate?username=' + this.state.username.toLowerCase() + 
-                '&otp=' + this.state.otp + '&authorizationLevel=user')
+                '&otp=' + this.hashInput(this.state.otp) + '&authorizationLevel=user')
                 .then(response => {
-                        console.log(response.data);
-                        console.log(response.headers['authorization']);
-                        localStorage.setItem('authorization', response.headers['authorization']);
+                        sessionStorage.setItem('authorization', response.headers['authorization']);
                         window.location = '/Portal';
                 }).catch(err => {
                         console.log(err.data);
-                        sessionStorage.setItem('authorization', err.headers['authorization']);
+                        //sessionStorage.setItem('authorization', err.headers['authorization']);
                     })
                 :
                 axios.post('https://localhost:7010/OTPRequest/requestotp?username=' + this.state.username.toLowerCase() + 
                 '&passphrase=' + this.hashInput(this.state.passphrase) + '&authorizationLevel=user')
                 .then(response => {
-                        console.log(response.data);
-                        console.log(response.headers['authorization']);
                         this.setState({verified: true});
-                        sessionStorage.setItem('authorization', response.headers['authorization']);
+                        
                         //navigate('/Login/Authentication');
                 }).catch(err => {
                     console.log(err.data)
-                    sessionStorage.setItem('authorization', err.headers['authorization']);
-                    this.setState({verified: true}); // remvoe later once added in api key
+                    //sessionStorage.setItem('authorization', err.headers['authorization']);
+                    //this.setState({verified: true}); // remvoe later once added in api key
                 })
             }
         }
+        
         this.setState({ username: ''});
         this.setState({ passphrase: ''});
         this.setState({ otp: ''});
@@ -131,9 +137,9 @@ class LoginForm extends React.Component  {
                         </div>
                         <div className="input-container">
                             {this.state.verified ? 
-                            <input type="password" value={this.state.otp} required placeholder="OTP" onChange = {this.inputOTPHandler}/>
+                            (<input type="password" value={this.state.otp} required placeholder="OTP" onChange = {this.inputOTPHandler}/>)
                             :
-                            <input type="password" value={this.state.passphrase} required placeholder="Passphrase" onChange = {this.inputPassphraseHandler}/>
+                            (<input type="password" value={this.state.passphrase} required placeholder="Passphrase" onChange = {this.inputPassphraseHandler}/>)
                             }
                         </div>
                         <div className="create-button-container">
