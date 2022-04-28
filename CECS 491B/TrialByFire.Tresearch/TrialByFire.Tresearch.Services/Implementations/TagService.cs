@@ -56,7 +56,6 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
             catch (OperationCanceledException)
             {
-                //rollback not necessary
                 return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch(Exception ex)
@@ -156,7 +155,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
                 }
 
-                // Validate count (must be greater or eaqual to 0)
+                // Check count (must be greater or eaqual to 0)
                 if(count < 0)
                 {
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid).ConfigureAwait(false);

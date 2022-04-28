@@ -301,6 +301,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             tags.Add(new Tag("Tresearch Service Create tag2"));
             tags.Add(new Tag("Tresearch Service Delete tag1"));
             tags.Add(new Tag("Tresearch Service Delete tag3"));
+            tags.Add(new Tag("Tresearch Service Delete tag4"));
 
             tags.Add(new Tag("Tresearch Manager Add Tag1", 0));
             tags.Add(new Tag("Tresearch Manager Add Tag2"));

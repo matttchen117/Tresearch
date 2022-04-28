@@ -42,10 +42,10 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         }
 
         /// <summary>
-        ///     Adds a tag from bank to node
+        ///     Adds a tag from bank to list of node(s)
         /// </summary>
-        /// <param name="nodeIDs">List of long nodeIDs to add tag to</param>
-        /// <param name="tagName">String tag name to add to node</param>
+        /// <param name="nodeIDs">List of long nodeIDs to tag</param>
+        /// <param name="tagName">String tag name</param>
         /// <returns>Status code and string status</returns>
         [HttpPost("addTag")]
         public async Task<IActionResult> AddTagToNodesAsync(List<long> nodeIDs, string tagName)
@@ -76,7 +76,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 }
                 else
                 {
-                    result = await _tagManager.AddTagToNodesAsync(nodeIDs, tagName, _cancellationTokenSource.Token);
+                    result = await _tagManager.AddTagToNodesAsync(nodeIDs, tagName, _cancellationTokenSource.Token).ConfigureAwait(false);
                 }              
 
                 // Split for logging
@@ -84,7 +84,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 split = result.Split(":");
 
                 // Check if add node tag was successfull
-                if (!result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess)))
+                if (!result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess).ConfigureAwait(false)))
                 {
                     // Log error
                     Enum.TryParse(split[1], out ILogManager.Categories category);
@@ -402,6 +402,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 }
 
                 string result;
+
                 // Check if tag name is null, empty string or all space
                 if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
                 {
@@ -413,7 +414,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 }
                 else
                 {
-                    result = await _tagManager.RemoveTagFromNodesAsync(nodeIDs, tagName, _cancellationTokenSource.Token);
+                    result = await _tagManager.RemoveTagFromNodesAsync(nodeIDs, tagName, _cancellationTokenSource.Token).ConfigureAwait(false);
                 }
 
                 // Log success/error
@@ -421,7 +422,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 split = result.Split(":");
 
                 // Check if result is successful
-                if (!result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess)))
+                if (!result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess).ConfigureAwait(false)))
                 {
                     // Log error
                     Enum.TryParse(split[1], out ILogManager.Categories category);

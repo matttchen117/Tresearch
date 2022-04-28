@@ -1880,13 +1880,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (SqlException ex)
             {
-                //Check sql exception
+                // Check sql exception
                 switch (ex.Number)
                 {
-                    //Unable to connect to database
+                    // Unable to connect to database
                     case -1:
                         return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false);
-                    //Adding tag to node violates foreign key constraint (AKA tag doesn't exist in bank)
+                    // Adding tag to node violates foreign key constraint (AKA tag doesn't exist in bank)
                     case 547:   
                         return await _messageBank.GetMessage(IMessageBank.Responses.tagNotFound).ConfigureAwait(false);
                     default: 
@@ -1948,7 +1948,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         var execute = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     }
 
-                    //Tag has been removed, return success message
+                    // Tag has been removed, return success message
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess);
                 }
             }
@@ -2028,8 +2028,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                         // Get tags that are shared between all nodes
                         tags = tags.Intersect(results).ToList();
-                    }
-                    //Tags have been retrieved, return success message
+                    } 
+                    // Tags have been retrieved, return success message
 
                     return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess));
                 }
@@ -2038,7 +2038,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 switch (ex.Number)
                 {
-                    //Unable to connect to database
+                    // Unable to connect to database
                     case -1:
                         return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail));
                     default: 
@@ -2245,6 +2245,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
+                    // Iterate through each node and check
                     foreach (var nodeId in nodeIDs)
                     {
                         var procedure = "dbo.[IsAuthorizedNodeChanges]";
