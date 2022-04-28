@@ -16,17 +16,15 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
     [Route("[controller]")]
     public class LogoutController : Controller, ILogoutController
     {
-        private ISqlDAO _sqlDAO { get; }
         private ILogManager _logManager { get; }
         private IMessageBank _messageBank { get; }
 
         private ILogoutManager _logoutManager { get; }
 
         private BuildSettingsOptions _options { get; }
-        public LogoutController(ISqlDAO sqlDAO, ILogManager logManager, IMessageBank messageBank, 
+        public LogoutController(ILogManager logManager, IMessageBank messageBank, 
             ILogoutManager logoutManager, IOptionsSnapshot<BuildSettingsOptions> options)
         {
-            _sqlDAO = sqlDAO;
             _logManager = logManager;
             _messageBank = messageBank;
             _logoutManager = logoutManager;
@@ -58,32 +56,32 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                     }
                     HttpContext.User = null;
                     Response.Headers.Remove(_options.JWTHeaderName);
-                    _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
+                    await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
                         category: ILogManager.Categories.Server, 
                         await _messageBank.GetMessage(IMessageBank.Responses.logoutSuccess).ConfigureAwait(false));
                     return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                 }
                 if (Enum.TryParse(split[1], out ILogManager.Categories category))
                 {
-                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                    await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
                     category, split[2]);
                 }
                 else
                 {
-                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                    await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
                     category: ILogManager.Categories.Server, split[2] + ": Bad category passed back.");
                 }
                 return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
             catch (OperationCanceledException tce)
             {
-                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
                     category: ILogManager.Categories.Server, await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + tce.Message);
                 return StatusCode(400, tce.Message);
             }
             catch (Exception ex)
             {
-                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level:
+                await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level:
                     ILogManager.Levels.Error,
                     category: ILogManager.Categories.Server, await
                     _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false)

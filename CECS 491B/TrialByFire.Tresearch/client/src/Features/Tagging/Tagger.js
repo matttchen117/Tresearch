@@ -141,8 +141,9 @@ class Tagger extends React.PureComponent{
         window.location.assign(window.location.origin);
         window.location = '/';
     }
-}
+  }
 
+  // Runs when page laods
   componentDidMount() {
     this.checkToken();
     this.GetTagData();                                          // Retrieve tag data
@@ -152,6 +153,7 @@ class Tagger extends React.PureComponent{
     console.log(this.state.nodes);
   }
 
+  // Runs before user leaves component
   componentWillUnmount() {
     this.setState( { tagData: [], tags: [], tagOptions: []})    // Reset state
     window.removeEventListener('online', this.handleStatus );   // Remove listener

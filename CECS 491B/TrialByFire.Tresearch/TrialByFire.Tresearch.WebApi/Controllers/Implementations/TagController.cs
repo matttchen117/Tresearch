@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
-using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
@@ -19,7 +16,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
     public class TagController: ControllerBase, ITagController
     {
         /// <summary>
-        /// Cancellation token throws when not updated within 5 seconds, as per BRD
+        ///     Cancellation token throws when not updated within 5 seconds, as per BRD
         /// </summary>
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
@@ -45,38 +42,62 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         }
 
         /// <summary>
-        ///     Get Request for retrieving all tags and count in the tag database. User does not need to be authenticated or authorized to retrieve
+        ///     Adds a tag from bank to list of node(s)
         /// </summary>
-        /// <returns>Status code and List of Tags</returns>
-        [HttpGet]
-        [Route("taglist")]
-        public async Task<IActionResult> GetTagsAsync()
+        /// <param name="nodeIDs">List of long nodeIDs to tag</param>
+        /// <param name="tagName">String tag name</param>
+        /// <returns>Status code and string status</returns>
+        [HttpPost("addTag")]
+        public async Task<IActionResult> AddTagToNodesAsync(List<long> nodeIDs, string tagName)
         {
             try
             {
-                // Retrieve tags from tag bank
-                Tuple<List<ITag>, string> result = await _tagManager.GetTagsAsync(_cancellationTokenSource.Token).ConfigureAwait(false);
-
-                // Split string for logging
-                string[] split;
-                split = result.Item2.Split(":");
-                if (result.Item2.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess).ConfigureAwait(false)))
+                // Check if user identity is unknown
+                if (Thread.CurrentPrincipal == null)
                 {
-                    // Successfully retrieved tags => store success log
-                    await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
-                    return new OkObjectResult(result.Item1);
+                    // User identity not known, log error and return
+                    string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated).ConfigureAwait(false);
+                    string[] errorSplit;
+                    errorSplit = errorMessage.Split(":");
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, errorSplit[2]).ConfigureAwait(false);
+                    return new BadRequestObjectResult(errorSplit[2]);
+                }
+
+                string result;
+
+                // Check if tag name is null, empty string or all space
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                {
+                    result = await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                }   
+                else if (nodeIDs == null || nodeIDs.Count() <= 0)
+                {
+                    result = await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
                 }
                 else
                 {
-                    // Tags were not successfully retrieved => store error log
+                    result = await _tagManager.AddTagToNodesAsync(nodeIDs, tagName, _cancellationTokenSource.Token).ConfigureAwait(false);
+                }              
+
+                // Split for logging
+                string[] split;
+                split = result.Split(":");
+
+                // Check if add node tag was successfull
+                if (!result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess).ConfigureAwait(false)))
+                {
+                    // Log error
                     Enum.TryParse(split[1], out ILogManager.Categories category);
-                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
-                    return StatusCode(Convert.ToInt32(split[0]), result.Item1);
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]);
+                    return StatusCode(Convert.ToInt32(split[0]), split[2]);
                 }
-            } 
-            catch(OperationCanceledException ex)
+
+                // Log success
+                await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]);
+                return new OkObjectResult(split[2]);
+            }
+            catch (OperationCanceledException ex)
             {
-                // Operation cancelled threw exception no rollback necessary
                 string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + ex.Message;
                 string[] split;
                 split = errorMessage.Split(":");
@@ -84,7 +105,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
                 return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
                 string[] split;
@@ -104,44 +125,46 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
-                // Check if user identity is known
-                if (Thread.CurrentPrincipal != null)
-                {
-                    string result;
-                    //Check tag input is null, empty string or string whith only whitespace
-                    if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
-                        result = await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
-                    else
-                        result = await _tagManager.CreateTagAsync(tagName, _cancellationTokenSource.Token).ConfigureAwait(false);
-
-                    // Split result for logging
-                    string[] split;
-                    split = result.Split(":");
-
-                    // Check if result successfull
-                    if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess)))
-                    {
-                        // Log success
-                        await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
-                        return new OkObjectResult(split[2]);
-                    }
-                    else
-                    {
-                        // Log error
-                        Enum.TryParse(split[1], out ILogManager.Categories category);
-                        await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
-                        return StatusCode(Convert.ToInt32(split[0]), split[2]);
-                    }
-                }
-                else
+                // Check if user identity is unknown
+                if (Thread.CurrentPrincipal == null)
                 {
                     // Uknown identity
                     string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated).ConfigureAwait(false);
-                    string[] split;
-                    split = errorMessage.Split(":");
-                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
-                    return new BadRequestObjectResult(split[2]);
+                    string[] errorSplit;
+                    errorSplit = errorMessage.Split(":");
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, errorSplit[2]).ConfigureAwait(false);
+                    return new BadRequestObjectResult(errorSplit[2]);
+                }  
+
+                string result;
+
+                //Check tag input is null, empty string or string whith only whitespace
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                {
+                    result = await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
                 }
+                else
+                {
+                    result = await _tagManager.CreateTagAsync(tagName, _cancellationTokenSource.Token).ConfigureAwait(false);
+                }
+                    
+
+                // Split result for logging
+                string[] split;
+                split = result.Split(":");
+
+                // Check if result successfull
+                if (!result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess)))
+                {
+                    // Log error
+                    Enum.TryParse(split[1], out ILogManager.Categories category);
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
+                    return StatusCode(Convert.ToInt32(split[0]), split[2]);
+                }
+
+                // Log success
+                await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
+                return new OkObjectResult(split[2]);
 
             }
             catch (OperationCanceledException ex)
@@ -173,44 +196,45 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
-                // CHeck if user identity is known
-                if (Thread.CurrentPrincipal != null)
-                {
-                    string result;
-                    //Check tag input if null, empty string or string with only whitespace
-                    if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
-                        result = await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
-                    else
-                        result = await _tagManager.RemoveTagAsync(tagName, _cancellationTokenSource.Token).ConfigureAwait(false);
-
-                    // Split result for logging
-                    string[] split;
-                    split = result.Split(":");
-
-                    // Check if result successful
-                    if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess)))
-                    {
-                        // Log success
-                        await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]);
-                        return new OkObjectResult(split[2]);
-                    }
-                    else
-                    {
-                        // Log error
-                        Enum.TryParse(split[1], out ILogManager.Categories category);
-                        await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]);
-                        return StatusCode(Convert.ToInt32(split[0]), split[2]);
-                    }
-                }
-                else
+                // Check if user identity is unknown
+                if (Thread.CurrentPrincipal == null)
                 {
                     // Unknown user identity
                     string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated).ConfigureAwait(false);
-                    string[] split;
-                    split = errorMessage.Split(":");
-                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
-                    return new BadRequestObjectResult(split[2]);
+                    string[] errorSplit;
+                    errorSplit = errorMessage.Split(":");
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, errorSplit[2]).ConfigureAwait(false);
+                    return new BadRequestObjectResult(errorSplit[2]);
                 }
+
+                string result;
+
+                // Check tag input if null, empty string or string with only whitespace
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                {
+                    result = await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                }
+                else
+                {
+                    result = await _tagManager.RemoveTagAsync(tagName, _cancellationTokenSource.Token).ConfigureAwait(false);
+                }
+                    
+                // Split result for logging
+                string[] split;
+                split = result.Split(":");
+
+                // Check if result successful
+                if (!result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess)))
+                {
+                    // Log error
+                    Enum.TryParse(split[1], out ILogManager.Categories category);
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]);
+                    return StatusCode(Convert.ToInt32(split[0]), split[2]);
+                }
+
+                // Log success
+                await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]);
+                return new OkObjectResult(split[2]);
 
             }
             catch (OperationCanceledException ex)
@@ -242,46 +266,46 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
-                // Check if user identity is known
-                if (Thread.CurrentPrincipal != null)
-                {
-                    Tuple<List<string>, string> result;
-
-                    // Validate input
-                    if (nodeIDs == null || nodeIDs.Count() <= 0)
-                        result =  Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false));
-                    else
-                        result = await _tagManager.GetNodeTagsAsync(nodeIDs, _cancellationTokenSource.Token);
-
-                    // Split result for logging
-                    string[] split;
-                    split = result.Item2.Split(":");
-
-                    // Check if result successful
-                    if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess)))
-                    {
-                        // Log success
-                        await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]);
-                        return new OkObjectResult(result.Item1);
-                    }
-                    else
-                    {
-                        // Log error
-                        Enum.TryParse(split[1], out ILogManager.Categories category);
-                        await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]);
-                        return StatusCode(Convert.ToInt32(split[0]), result.Item1);
-                    }
-                }
-                else
+                // Check if user identity is unknown
+                if (Thread.CurrentPrincipal == null)
                 {
                     // Unknown user identity
                     string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated).ConfigureAwait(false);
-                    string[] split;
-                    split = errorMessage.Split(":");
-                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
-                    return new BadRequestObjectResult(split[2]);
+                    string[] errorSplit;
+                    errorSplit = errorMessage.Split(":");
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, errorSplit[2]).ConfigureAwait(false);
+                    return new BadRequestObjectResult(errorSplit[2]);
                 }
 
+                Tuple<List<string>, string> result;
+
+                // Validate input
+                if (nodeIDs == null || nodeIDs.Count() <= 0)
+                {
+                    result =  Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false));
+                }                  
+                else
+                {
+                    result = await _tagManager.GetNodeTagsAsync(nodeIDs, _cancellationTokenSource.Token);
+                }
+
+                // Split result for logging
+                string[] split;
+                split = result.Item2.Split(":");
+
+                // Check if result successful
+                if (!result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess)))
+                {
+                    // Log error
+                    Enum.TryParse(split[1], out ILogManager.Categories category);
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]);
+                    return StatusCode(Convert.ToInt32(split[0]), result.Item1);
+                }
+
+                // Log success
+                await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]);
+                
+                return new OkObjectResult(result.Item1);
             }
             catch (OperationCanceledException ex)
             {
@@ -302,62 +326,40 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             }
         }
 
-
         /// <summary>
-        ///     Adds a tag from bank to node
+        ///     Get Request for retrieving all tags and count in the tag database. User does not need to be authenticated or authorized to retrieve.
         /// </summary>
-        /// <param name="nodeIDs">List of long nodeIDs to add tag to</param>
-        /// <param name="tagName">String tag name to add to node</param>
-        /// <returns>Status code and string status</returns>
-        [HttpPost("addTag")]
-        public async Task<IActionResult> AddTagToNodesAsync(List<long> nodeIDs, string tagName)
+        /// <returns>Status code and List of Tags</returns>
+        [HttpGet]
+        [Route("taglist")]
+        public async Task<IActionResult> GetTagsAsync()
         {
             try
             {
-                // Check if user identity is known
-                if (Thread.CurrentPrincipal != null)
+                // Retrieve tags from tag bank
+                Tuple<List<ITag>, string> result = await _tagManager.GetTagsAsync(_cancellationTokenSource.Token).ConfigureAwait(false);
+
+                // Split string for logging
+                string[] split;
+                split = result.Item2.Split(":");
+
+
+                if (!result.Item2.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess).ConfigureAwait(false)))
                 {
-                    string result;
-
-                    // Check if tag name is null, empty string or all space
-                    if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
-                        result = await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
-                    else if (nodeIDs == null || nodeIDs.Count() <= 0)
-                        result = await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
-                    else
-                        result = await _tagManager.AddTagToNodesAsync(nodeIDs, tagName, _cancellationTokenSource.Token);
-
-                    // Split for logging
-                    string[] split;
-                    split = result.Split(":");
-
-                    // Check if add node tag was successfull
-                    if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess)))
-                    {
-                        // Log success
-                        await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]);
-                        return new OkObjectResult(split[2]);
-                    }
-                    else
-                    {
-                        // Log error
-                        Enum.TryParse(split[1], out ILogManager.Categories category);
-                        await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]);
-                        return StatusCode(Convert.ToInt32(split[0]), split[2]);
-                    }
+                    // Tags were not successfully retrieved => store error log
+                    Enum.TryParse(split[1], out ILogManager.Categories category);
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
+                    return StatusCode(Convert.ToInt32(split[0]), result.Item1);
                 }
-                else
-                {
-                    // User identity not known, log error
-                    string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated).ConfigureAwait(false);
-                    string[] split;
-                    split = errorMessage.Split(":");
-                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
-                    return new BadRequestObjectResult(split[2]);
-                }
+
+                // Successfully retrieved tags => store success log
+                await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
+                return new OkObjectResult(result.Item1);
+
             }
             catch (OperationCanceledException ex)
             {
+                // Operation cancelled threw exception no rollback necessary
                 string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + ex.Message;
                 string[] split;
                 split = errorMessage.Split(":");
@@ -374,6 +376,9 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 return new BadRequestObjectResult(split[2]);
             }
         }
+
+
+        
 
         /// <summary>
         ///     Removes a tag from node
@@ -386,40 +391,48 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         {
             try
             {
-                // Check if user identity is known
-                if (Thread.CurrentPrincipal != null)
+                // Check if user identity is unknown
+                if (Thread.CurrentPrincipal == null)
                 {
-                    string result;
-                    // Check if tag name is null, empty string or all space
-                    if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
-                        result = await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
-                    else if (nodeIDs == null || nodeIDs.Count() <= 0)
-                        result = await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
-                    else
-                        result = await _tagManager.RemoveTagFromNodesAsync(nodeIDs, tagName, _cancellationTokenSource.Token);
+                    string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated).ConfigureAwait(false);
+                    string[] errorSplit;
+                    errorSplit = errorMessage.Split(":");
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, errorSplit[2]).ConfigureAwait(false);
+                    return new BadRequestObjectResult(errorSplit[2]);
+                }
 
-                    string[] split;
-                    split = result.Split(":");
-                    if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess)))
-                    {
-                        await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]);
-                        return new OkObjectResult(split[2]);
-                    }
-                    else
-                    {
-                        Enum.TryParse(split[1], out ILogManager.Categories category);
-                        await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]);
-                        return StatusCode(Convert.ToInt32(split[0]), split[2]);
-                    }
+                string result;
+
+                // Check if tag name is null, empty string or all space
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                {
+                    result = await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                }
+                else if (nodeIDs == null || nodeIDs.Count() <= 0)
+                {
+                    result = await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
                 }
                 else
                 {
-                    string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated).ConfigureAwait(false);
-                    string[] split;
-                    split = errorMessage.Split(":");
-                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
-                    return new BadRequestObjectResult(split[2]);
+                    result = await _tagManager.RemoveTagFromNodesAsync(nodeIDs, tagName, _cancellationTokenSource.Token).ConfigureAwait(false);
                 }
+
+                // Log success/error
+                string[] split;
+                split = result.Split(":");
+
+                // Check if result is successful
+                if (!result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess).ConfigureAwait(false)))
+                {
+                    // Log error
+                    Enum.TryParse(split[1], out ILogManager.Categories category);
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]);
+                    return StatusCode(Convert.ToInt32(split[0]), split[2]);
+                }
+
+                // Log Success
+                await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]);
+                return new OkObjectResult(split[2]);
             }
             catch (OperationCanceledException ex)
             {

@@ -38,82 +38,34 @@ namespace TrialByFire.Tresearch.Models.Implementations
             Tags = new List<INodeTag>();
         }
 
-        public Node(string userHash, long nodeID, long parentNodeID, string nodeTitle, string summary, DateTime timeModified,
-            bool visibility, bool deleted)
+        public Node(string userhash, long nodeID, long nodeParentID, string nodeTitle, string summary,
+            DateTime timeModifed, bool visibility, bool deleted)
         {
-            this.UserHash = userHash;
-            this.NodeID = nodeID;
-            this.ParentNodeID = parentNodeID;
-            this.NodeTitle = nodeTitle;
-            this.Summary = summary;
-            this.TimeModified = timeModified;
-            this.Visibility = visibility;
-            this.Deleted = deleted;
-            this.ExactMatch = false;
-            this.Tags = new List<INodeTag>();
-            this.TagScore = 0;
-            this.RatingScore = 2;
+            UserHash = userhash;
+            NodeID = nodeID;
+            ParentNodeID = nodeParentID;
+            NodeTitle = nodeTitle;
+            Summary = summary;
+            TimeModified = timeModifed;
+            Visibility = visibility;
+            Deleted = deleted;
+            TagScore = 0;
+            RatingScore = 0;
+            Tags = new List<INodeTag>();
         }
 
-        public Node(Node n)
-        {
-            this.UserHash = n.UserHash;
-            this.NodeID = n.NodeID;
-            this.ParentNodeID = n.ParentNodeID;
-            this.NodeTitle = n.NodeTitle;
-            this.Summary = n.Summary;
-            this.TimeModified = n.TimeModified;
-            this.Visibility = n.Visibility;
-            this.Deleted = n.Deleted;
-            this.ExactMatch = false;
-            this.Tags = n.Tags;
-            this.TagScore = 0;
-            //this.RatingScore = n.RatingScore;
-            this.RatingScore = 3;
-        }
-
-        public Node(string userHash, long nodeID, long nodeParentID, string nodeTitle, string summary, bool visibility, bool deleted)
-        {
-            this.UserHash = userHash;
-            this.NodeID = nodeID;
-            this.ParentNodeID = nodeParentID;
-            this.NodeTitle = nodeTitle;
-            this.Summary = summary;
-            this.Visibility = visibility;
-            this.Deleted = deleted;
-            this.ExactMatch = false;
-            this.TimeModified = DateTime.UtcNow;
-            Tags = new List<INodeTag>();
-            TagScore = 0;
-            RatingScore = 4;
-        }
-        public Node(long nodeID, long nodeParentID, string nodeTitle, string summary, bool visibility, bool deleted, string userHash)
-        {
-            this.NodeID = nodeID;
-            this.ParentNodeID = nodeParentID;
-            this.NodeTitle = nodeTitle;
-            this.Summary = summary;
-            this.Visibility = visibility;
-            this.Deleted = deleted;
-            this.UserHash = userHash;
-            this.ExactMatch = false;
-            TimeModified = DateTime.UtcNow;
-            Tags = new List<INodeTag>();
-            TagScore = 0;
-            RatingScore = 5;
-        }
         public Node(long nodeID, long nodeParentID, string nodeTitle, string summary, DateTime timeModifed, bool visibility, bool deleted, string userhash, double tagScore, double ratingScore)
         {
-            this.NodeID = nodeID;
-            this.ParentNodeID = nodeParentID;
-            this.NodeTitle = nodeTitle;
-            this.Summary = summary;
-            this.TimeModified = timeModifed;
-            this.Visibility = visibility;
-            this.Deleted = deleted;
-            this.UserHash = userhash;
-            this.TagScore = 0;
-            this.RatingScore = ratingScore;
+            NodeID = nodeID;
+            ParentNodeID = nodeParentID;
+            NodeTitle = nodeTitle;
+            Summary = summary;
+            TimeModified = timeModifed;
+            Visibility = visibility;
+            Deleted = deleted;
+            UserHash = userhash;
+            TagScore = 0;
+            RatingScore = ratingScore;
             Tags = new List<INodeTag>();
         }
 
