@@ -18,26 +18,37 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
         public async Task<Tuple<List<INode>, string>> CopyNodeAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
-            string[] split;
             try
             {
                 
                 cancellationToken.ThrowIfCancellationRequested();
-                Tuple<List<INode>,string> result = await _sqlDAO.CopyNodeAsync(nodeIDs, cancellationToken).ConfigureAwait(false);
-                split = result.Item2.Split(":");
+
+                string[] split;
+
+                Tuple<List<INode>,string> resultCopy = await _sqlDAO.CopyNodeAsync(nodeIDs, cancellationToken).ConfigureAwait(false);
+                split = resultCopy.Item2.Split(":");
 
 
+                if (!resultCopy.Item2.Equals(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess).ConfigureAwait(false)))
+                {
+                    return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.copyNodeError).ConfigureAwait(false);
+                }
 
+                //return Tuple.Create(resultCopy, await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess).ConfigureAwait(false));
+                return Tuple.Create(resultCopy.Item1, await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess).ConfigureAwait(false));
 
             }
             catch (OperationCanceledException)
             {
-                //rollback not necessary
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+                // Operation cancelled threw exception no rollback necessary
+                string cancellationMessage = await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + ex.Message;
+                return Tuple.Create(new List<INode>(), cancellationMessage);
             }
             catch (Exception ex)
             {
-                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                string exceptionMessage = await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                return Tuple.Create(new List<INode>(), exceptionMessage);
+
             }
         }
 

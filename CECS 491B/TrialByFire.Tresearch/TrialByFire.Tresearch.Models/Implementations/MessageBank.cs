@@ -295,7 +295,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "401: Server: Paste Node failure";
                 case Responses.pasteNodeError:
                     return "503: Database: Paste Node ERROR";
-
+                case Responses.pasteNodeEmptyError:
+                    return "400: Server: No nodes to paste failure";
                 
 
 

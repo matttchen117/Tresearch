@@ -960,5 +960,24 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
             return userHashObjects;
         }
+
+        private List<long> NodeIDsList()
+        {
+            List<long> nodeIDsList = new List<long>();
+            nodeIDsList.Add(1);
+            nodeIDsList.Add(2);
+            nodeIDsList.Add(3);
+            nodeIDsList.Add(4);
+            nodeIDsList.Add(5);
+            nodeIDsList.Add(6);
+            nodeIDsList.Add(7);
+            nodeIDsList.Add(8);
+            nodeIDsList.Add(9);
+            nodeIDsList.Add(10);
+            nodeIDsList.Add(11);
+            nodeIDsList.Add(12);
+
+            return nodeIDsList;
+        }
     }
 }

@@ -184,7 +184,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             pasteNodeSuccess,
             pasteNodeFailure,
             pasteNodeError,
-
+            pasteNodeEmptyError
         }
         public Task<string> GetMessage(Responses response);
     }

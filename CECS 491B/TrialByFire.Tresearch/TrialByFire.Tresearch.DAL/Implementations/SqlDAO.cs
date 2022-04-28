@@ -2727,10 +2727,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.copyNodeError).ConfigureAwait(false));
                     }
                 }
-
             }
-
-
 
 
             catch (SqlException ex)
@@ -2760,7 +2757,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public async Task<string> PasteNodeAsync(INode nodeToPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken))
         {
-
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    await connection.OpenAsync();
+                }
+            }
         }
     }
 }
