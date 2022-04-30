@@ -33,6 +33,8 @@ builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<ITreeManagementService, TreeManagementService>();
 builder.Services.AddScoped<IRateService, RateService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+builder.Services.AddScoped<ICopyAndPasteService, CopyAndPasteService>();
+
 
 builder.Services.AddScoped<INodeSearchService, NodeSearchService>();
 // Managers
@@ -49,7 +51,10 @@ builder.Services.AddScoped<IUADManager, UADManager>();
 builder.Services.AddScoped<ITreeManagementManager, TreeManagementManager>();
 builder.Services.AddScoped<IUADManager, UADManager>();
 builder.Services.AddScoped<IRateManager, RateManager>();
-builder.Services.AddScoped<IUserManagementManager, UserManagementManager>(); 
+builder.Services.AddScoped<IUserManagementManager, UserManagementManager>();
+builder.Services.AddScoped<ICopyAndPasteManager, CopyAndPasteManager>();
+
+
 
 builder.Services.AddScoped<IUADManager, UADManager>();
 builder.Services.AddScoped<INodeSearchManager, NodeSearchManager>();
@@ -58,6 +63,8 @@ builder.Services.AddScoped<INodeSearchManager, NodeSearchManager>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
 
 // Invoked during build, not waht we want, want it to be invoked for AuthN process
 // Need to DI inject into Middleware - look into source code for how to do

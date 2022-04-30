@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,28 +38,29 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private IMessageBank _messageBank { get; set; }
 
 
-        public CopyAndPasteManager(ISqlDAO sqlDAO, IMessageBank messageBank, IAccountVerificationService accountVerificationService, IOptionsSnapshot<BuildSettingsOptions> options)
+        public CopyAndPasteManager(ISqlDAO sqlDAO, IMessageBank messageBank, IAccountVerificationService accountVerificationService, ICopyAndPasteService copyAndPasteService, IOptionsSnapshot<BuildSettingsOptions> options)
         {
             _sqlDAO = sqlDAO;
             _messageBank = messageBank;
             _accountVerificationService = accountVerificationService;
+            _copyAndPasteService = copyAndPasteService;
             _buildSettingsOptions = options.Value;
 
         }
 
 
 
-        public async Task<Tuple<List<INode>,string>> CopyNodeAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        //public async Task<Tuple<List<INode>, string>> CopyNodeAsync(List<INode> nodesCopy, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<IEnumerable<Node>>> CopyNodeAsync(List<long> nodesCopy, CancellationToken cancellationToken = default(CancellationToken))
+
         {
+
             try
             {
+
                 cancellationToken.ThrowIfCancellationRequested();
 
-
-                if(Thread.CurrentPrincipal == null || Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
-                {
-                    return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.verificationFailure).ConfigureAwait(false));
-                }
+                //IResponse<IEnumerable<Node>> response = await _copyAndPasteService.CopyNodeAsync(nodesCopy, cancellationToken);
 
                 // Get user's role
                 string role = "";
@@ -66,13 +68,9 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 {
                     role = _buildSettingsOptions.User;
                 }
-                else if (Thread.CurrentPrincipal.IsInRole(_buildSettingsOptions.Admin))
-                {
-                    role = _buildSettingsOptions.Admin;
-                }
                 else
                 {
-                    return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.unknownRole).ConfigureAwait(false));
+                    role = _buildSettingsOptions.Admin;
                 }
 
 
@@ -82,36 +80,37 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
                 if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false)))
                 {
-                    return Tuple.Create(new List<INode>(), resultVerifyAccount);
+
+                    return new CopyResponse<IEnumerable<Node>>(resultVerifyAccount, null, 401, false);
                 }
 
-                //Do i need to check for string resultVerifyAuthorized = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(nodeIDs, userHash, cancellationToken);
-
-
-
-                Tuple<List<INode>, string> resultCopy;
-
-
-
-                if(nodeIDs == null || nodeIDs.Count <= 0)
+                if(nodesCopy == null || nodesCopy.Count <= 0)
                 {
-                    return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false));
+                    return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false), null, 400, false);
                 }
-                else
+
+                IResponse<IEnumerable<Node>> response = await _copyAndPasteService.CopyNodeAsync(nodesCopy, cancellationToken).ConfigureAwait(false);
+
+
+                if (!response.IsSuccess)
                 {
-                    resultCopy = await _copyAndPasteService.CopyNodeAsync(nodeIDs, cancellationToken).ConfigureAwait(false);
-                    return resultCopy;
+                    //might need to return a more meaningful statuscode or message indicating what went wrong
+                    return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeFailure).ConfigureAwait(false), null, 400, false);
                 }
+
+                return response;
 
             }
 
             catch (OperationCanceledException)
             {
-                return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false));
+                //return code for operationCancelled is 500
+                return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
             }
             catch (Exception ex)
             {
-                return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
+                //return code for unhandledException is 500
+                return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
 
             }
         }
@@ -144,8 +143,11 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     return await _messageBank.GetMessage(IMessageBank.Responses.unknownRole).ConfigureAwait(false);
                 }
 
+                //getting userhash to change the data for pasting in new nodes
+                string userHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
 
                 IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
+
 
                 string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken).ConfigureAwait(false);
 
@@ -154,13 +156,22 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     return resultVerifyAccount;
                 }
 
+                //need to check if node pasting to is a leaf, doing the check here
+
+
+
+
+
+
+
+
                 string resultPaste;
 
 
 
                 if (nodes == null || nodes.Count <= 0)
                 {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.pasteNodeEmptyError).ConfigureAwait(false));
+                    return await _messageBank.GetMessage(IMessageBank.Responses.pasteNodeEmptyError).ConfigureAwait(false);
                 }
                 else
                 {
@@ -178,11 +189,11 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
             catch (OperationCanceledException)
             {
-                return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false));
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
 
             }
         }

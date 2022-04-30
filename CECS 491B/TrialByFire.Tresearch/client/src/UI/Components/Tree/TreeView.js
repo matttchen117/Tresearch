@@ -205,6 +205,12 @@ class TreeView extends React.Component{
                             <div className="option">
                                 Delete Node(s)
                             </div>
+                            <div className="option" onClick = {this.CopyNodes}>
+                                Copy Node(s)
+                            </div>
+                            <div className="option" onClick = {this.pasteNodes}>
+                                Paste Node(s)
+                            </div>
                         </div>
                     )}
                 </div>

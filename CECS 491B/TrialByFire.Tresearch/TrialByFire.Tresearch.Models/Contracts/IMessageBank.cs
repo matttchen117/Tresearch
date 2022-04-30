@@ -180,6 +180,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             copyNodeFailure,
             copyNodeError,
             copyNodeEmptyError,
+            copyNodeMistmatchError,
             
             pasteNodeSuccess,
             pasteNodeFailure,

@@ -1425,20 +1425,79 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
 
-        public async Task<Tuple<List<INode>, string>> CopyNodeAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> CopyNodeAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+
+        //public async Task<Tuple<List<INode>, string>> CopyNodeAsync(List<INode> nodesCopy, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
+
+
+
                 if(nodeIDs == null || nodeIDs.Count <= 0)
                 {
-                     return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false));
+                    return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false);
                 }
 
-                Tuple<List<INode>, string> resultCopy;
+                List<INode> copiedNodes = new List<INode>();
+
+                for(int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
+                {
+                    for(int j = 0; j < nodeIDs.Count; j++)
+                    {
+                        if (nodeIDs[j].Equals(InMemoryDatabase.Nodes[i].NodeID))
+                        {
+                            copiedNodes.Add(InMemoryDatabase.Nodes[i]);
+                        }
+                    }
+                }
+
+                if (copiedNodes == null || copiedNodes.Count <= 0)
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false);
+                }
+
+                if (!copiedNodes.Count.Equals(nodeIDs.Count))
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeMistmatchError).ConfigureAwait(false);
+                }
+
+
+                // will optimize later
+                /*
+                for(int i = 0; i < nodeIDs.Count; i++)
+                {
+                    if
+                    if(InMemoryDatabase.Nodes)
+
+
+                    copiedNodes.Add(InMemoryDatabase.Nodes.At)
+                }
+                */
 
 
 
+
+
+
+                return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess).ConfigureAwait(false);
+
+
+
+
+
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback already handled
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+
+                //return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
     }

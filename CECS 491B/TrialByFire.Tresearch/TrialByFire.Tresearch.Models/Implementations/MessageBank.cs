@@ -287,6 +287,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "503: Database: Copy Node ERROR";
                 case Responses.copyNodeEmptyError:
                     return "400: Server: No nodes to copy failure";
+                case Responses.copyNodeMistmatchError:
+                    return "503: Database: Mismatched amount of nodes returned";
                 
 
                 case Responses.pasteNodeSuccess:

@@ -2705,54 +2705,92 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
 
-        public async Task<Tuple<List<INode>, string>> CopyNodeAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        //public async Task<Tuple<List<INode>, string>> CopyNodeAsync(List<INode> nodesCopy, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<IEnumerable<Node>>> CopyNodeAsync(List<long> nodesCopy, CancellationToken cancellationToken = default(CancellationToken))
+
         {
-            try
+            if(nodesCopy != null)
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                try
                 {
-                    await connection.OpenAsync();
-
-                    var procedure = "dbo.[GetNodesFromNodeID]";
-                    var value = new { nodeIDs };
-
-                    List<INode> nodes = new List<INode>(await connection.QueryAsync<Node>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
-
-                    if (nodes.Count.Equals(nodeIDs.Count))
+                    cancellationToken.ThrowIfCancellationRequested();
+                    using (var connection = new SqlConnection(_options.SqlConnectionString))
                     {
-                        return Tuple.Create(nodes, await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess).ConfigureAwait(false));
+                        await connection.OpenAsync();
+
+                        /*
+                        List<long> nodeIDs = new();
+
+                        for(int i = 0; i < nodesCopy.Count; i++)
+                        {
+                            nodeIDs.Add(nodesCopy[i].NodeID);
+                        }
+                        */
+
+                        var procedure = "dbo.[GetNodesFromNodeID]";
+                        //var value = new { nodeIDs };
+                        var value = new { nodesCopy };
+
+
+                        List<Node> nodes = new List<Node>(await connection.QueryAsync<Node>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+
+                        //checking if got correct amount of nodes back from query
+                        //if (nodes.Count.Equals(nodeIDs.Count))
+                        if (!nodes.Count.Equals(nodesCopy.Count))
+
+                        {
+                            return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeMistmatchError).ConfigureAwait(false), null, 400, false);
+                        }
+
+                        return new CopyResponse<IEnumerable<Node>>("", nodes, 200, true);
+
+                        //return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess).ConfigureAwait(false);
+
+
                     }
-                    else
+                }
+
+
+                catch (SqlException ex)
+                {
+                    //Check sql exception
+                    switch (ex.Number)
                     {
-                        return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.copyNodeError).ConfigureAwait(false));
+                        //Unable to connect to database
+                        case -1:
+                            return new CopyResponse<IEnumerable<Node>>( await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false), null, 400, false);
+                        default:
+                            return new CopyResponse<IEnumerable<Node>>(_options.UnhandledExceptionMessage + ex.Message, null, 400, false);
                     }
+                }
+                catch (OperationCanceledException)
+                {
+                    //return code for operationCancelled is 500
+                    return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
+
+                }
+                catch (Exception ex)
+                {
+                    //return code for unhandledException is 500
+                    return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+
                 }
             }
 
-
-            catch (SqlException ex)
+            else
             {
-                //Check sql exception
-                switch (ex.Number)
-                {
-                    //Unable to connect to database
-                    case -1:
-                        return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false)) ;
-                    default:
-                        return Tuple.Create(new List<INode>(), _options.UnhandledExceptionMessage + ex.Message);
-                }
+                return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false), null, 400, false);
             }
-            catch (OperationCanceledException)
-            {
-                return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false));
 
-            }
-            catch (Exception ex)
-            {
-                return Tuple.Create(new List<INode>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
 
-            }
+        }
+
+
+        /*
+
+        public async Task<string> IsNodeLeaf(INode nodeToPasteTo, CancellationToken cancellationToken = default(CancellationToken))
+        {
+
         }
 
 
@@ -2767,5 +2805,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 }
             }
         }
+
+
+        */
+
+
+
     }
 }
