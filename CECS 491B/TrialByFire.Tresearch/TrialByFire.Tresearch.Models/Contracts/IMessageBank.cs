@@ -181,11 +181,18 @@ namespace TrialByFire.Tresearch.Models.Contracts
             copyNodeError,
             copyNodeEmptyError,
             copyNodeMistmatchError,
-            
+
+            isLeaf,
+            isNotLeaf,
+
             pasteNodeSuccess,
             pasteNodeFailure,
             pasteNodeError,
-            pasteNodeEmptyError
+            pasteNodeEmptyError,
+            pasteNodeMistmatchError,
+            notAuthorizedToPasteTo,
+
+
         }
         public Task<string> GetMessage(Responses response);
     }

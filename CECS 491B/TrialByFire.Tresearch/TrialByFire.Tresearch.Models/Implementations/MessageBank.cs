@@ -289,7 +289,13 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "400: Server: No nodes to copy failure";
                 case Responses.copyNodeMistmatchError:
                     return "503: Database: Mismatched amount of nodes returned";
-                
+
+
+                case Responses.isLeaf:
+                    return "200: Server: Is a leaf";
+                case Responses.isNotLeaf:
+                    return "400: Server: Not a leaf";
+
 
                 case Responses.pasteNodeSuccess:
                     return "200: Server: Paste Node successful";
@@ -299,6 +305,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "503: Database: Paste Node ERROR";
                 case Responses.pasteNodeEmptyError:
                     return "400: Server: No nodes to paste failure";
+                case Responses.pasteNodeMistmatchError:
+                    return "503: Database: Mismatched amount of nodes pasted";
+                case Responses.notAuthorizedToPasteTo:
+                    return "400: Server: Cannot paste to another user's tree";
                 
 
 

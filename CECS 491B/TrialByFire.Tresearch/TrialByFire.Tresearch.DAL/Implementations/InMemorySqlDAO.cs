@@ -5,6 +5,8 @@ using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Exceptions;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
@@ -1425,7 +1427,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
 
-        public async Task<string> CopyNodeAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<IEnumerable<Node>>> CopyNodeAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
 
         //public async Task<Tuple<List<INode>, string>> CopyNodeAsync(List<INode> nodesCopy, CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -1437,30 +1439,56 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                 if(nodeIDs == null || nodeIDs.Count <= 0)
                 {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false);
+                    return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false), null, 400, false);
                 }
 
-                List<INode> copiedNodes = new List<INode>();
+                IList<Node> copiedNodes = new List<Node>();
 
-                for(int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
+
+                //List<INode> copiedNodes = new List<INode>();
+
+                /*
+                Dictionary<long, Node> myDictionary = new System.Collections.Generic.Dictionary<long, Node>(); 
+
+
+                for()
+
+                for(int i = 0; i <)
+
+                foreach(int n in nodeIDs)
+                {
+                            Node r = InMemoryDatabase.Nodes.Where(INode => INode.NodeID == n);
+                    Node r = InMemoryDatabase.Nodes.Where(INode => INode.NodeID == n).FirstOrDefault;
+
+                    //Node r = InMemoryDatabase.Nodes.
+                            copiedNodes.Add(r);
+                    //INode n = InMemoryDatabase.Nodes.
+                }
+                */
+
+
+
+                
+                for (int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
                 {
                     for(int j = 0; j < nodeIDs.Count; j++)
                     {
                         if (nodeIDs[j].Equals(InMemoryDatabase.Nodes[i].NodeID))
                         {
-                            copiedNodes.Add(InMemoryDatabase.Nodes[i]);
+                            copiedNodes.Add((Node)InMemoryDatabase.Nodes[i]);
                         }
                     }
                 }
+                
 
                 if (copiedNodes == null || copiedNodes.Count <= 0)
                 {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false);
+                    return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false), null, 400, false);
                 }
 
                 if (!copiedNodes.Count.Equals(nodeIDs.Count))
                 {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeMistmatchError).ConfigureAwait(false);
+                    return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeMistmatchError).ConfigureAwait(false), null, 400, false);
                 }
 
 
@@ -1480,8 +1508,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
 
 
+                return new CopyResponse<IEnumerable<Node>>("", copiedNodes, 200, true);
 
-                return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess).ConfigureAwait(false);
+                //return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess).ConfigureAwait(false);
 
 
 
@@ -1490,15 +1519,29 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (OperationCanceledException)
             {
-                // Rollback already handled
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+                //return code for operationCancelled is 500
+                return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
+
             }
             catch (Exception ex)
             {
-                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                //return code for unhandledException is 500
+                return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
 
-                //return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
+        }
+
+
+        //fake inmemorysqldao object
+        public async Task<IResponse<string>> PasteNodeAsync(string userHash, long nodeIDPasteTo, List<INode> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return new CopyResponse<string>("", await _messageBank.GetMessage(IMessageBank.Responses.pasteNodeSuccess).ConfigureAwait(false), 200, true);
+        }
+
+        //fake obj
+        public async Task<string> IsNodeLeaf(long nodeIDToPasteTo, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return await _messageBank.GetMessage(IMessageBank.Responses.isLeaf).ConfigureAwait(false);
         }
     }
 }

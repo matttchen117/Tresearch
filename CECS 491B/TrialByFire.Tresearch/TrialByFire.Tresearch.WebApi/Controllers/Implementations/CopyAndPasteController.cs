@@ -24,7 +24,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         private BuildSettingsOptions _buildSettingsOptions { get; }
 
-        private ISqlDAO _sqlDAO { get; }
 
         /// <summary>
         ///     Manager to perform logging for error and success cases
@@ -46,9 +45,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
 
 
-        public CopyAndPasteController(ISqlDAO sqlDAO, ILogManager logManager, IMessageBank messageBank, ICopyAndPasteManager copyAndPasteManager, IOptionsSnapshot<BuildSettingsOptions> buildSettingsOptions)
+        public CopyAndPasteController(ILogManager logManager, IMessageBank messageBank, ICopyAndPasteManager copyAndPasteManager, IOptionsSnapshot<BuildSettingsOptions> buildSettingsOptions)
         {
-            _sqlDAO = sqlDAO;
             _logManager = logManager;
             _copyAndPasteManager = copyAndPasteManager;
             _messageBank = messageBank;
@@ -57,10 +55,13 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
 
 
-        
-        [HttpPost]
-        [Route("CopyAndPaste")]
-        
+        /// <summary>
+        ///     CopyNodeAsync:
+        ///         Async method that grabs a list of nodes from the database given a list of nodeIDs from the front end
+        /// </summary>
+        /// <param name="nodesCopy">The list of nodeIDs that will be used to query for nodes</param>
+        /// <returns></returns>
+        [HttpPost("Copy")]
         public async Task<ActionResult<IEnumerable<Node>>> CopyNodeAsync(List<long> nodesCopy)
         {
 
@@ -69,9 +70,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             try
             {
 
-                
-
-                // Check if user identity is unknown
+                // Check if the current thread principal is null or guest
                 if (Thread.CurrentPrincipal == null || Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
                     // User identity not known, log error and return
@@ -82,14 +81,18 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                     return new BadRequestObjectResult(errorSplit[2]);
                 }
 
+                //getting response here by calling manager
                 IResponse<IEnumerable<Node>> response = await _copyAndPasteManager.CopyNodeAsync(nodesCopy).ConfigureAwait(false);
 
+                // Checks if response  
                 if (response.Data != null && response.IsSuccess && response.StatusCode == 200)
                 {
                     if (response.ErrorMessage.Equals(""))
                     {
-                        //figure this out later
+                        //building the string here with correct message
                         stringBuilder.AppendFormat(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess).ConfigureAwait(false));
+
+                        //logging here
                         await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Info, ILogManager.Categories.Server, stringBuilder.ToString());
                     }
                     else
@@ -98,6 +101,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                     }
                     return response.Data.ToList();
                 }
+
+                // Checks if status code is greater than 500.
                 else if (response.StatusCode >= 500)
                 {
                     stringBuilder.AppendFormat(response.ErrorMessage);
@@ -110,35 +115,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                     await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Data, stringBuilder.ToString());
                     return new BadRequestObjectResult(response.ErrorMessage) { StatusCode = response.StatusCode };
                 }
-
-
-
-
-                /*
-                if (nodesCopy == null || nodesCopy.Count <= 0)
-                {
-                    result = await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false);
-                }
-
-                result = await _copyAndPasteManager.CopyNodeAsync(nodesCopy).ConfigureAwait(false);
-
-
-                // Splitting string for logging
-                string[] split;
-                split = result.Split(":");
-
-                if(!result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess)))
-                {
-                    Enum.TryParse(split[1], out ILogManager.Categories category);
-                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
-                    return StatusCode(Convert.ToInt32(split[0]), split[2]);
-
-                }
-
-                await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
-                return new OkObjectResult(split[2]);
-
-                */
 
             }
             catch(OperationCanceledException ex)
@@ -159,50 +135,67 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 return BadRequest();
 
 
-                /*
-                
-                string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
-                string[] split;
-                split = errorMessage.Split(":");
-                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
-                return new BadRequestObjectResult(split[2]);
-
-                */
-
-
             }
         }
 
 
 
+        
 
-        /*
-        public async Task<IActionResult> PasteNodeAsync(INode nodeToPasteTo, List<INode> nodes)
+        [HttpPost("Paste")]
+        public async Task<ActionResult<string>> PasteNodeAsync(long nodeIDToPasteTo, [FromQuery]List<INode> nodes)
         {
+
+            StringBuilder stringBuilder = new StringBuilder();
+
             try
             {
-                // beginning pasting list of nodes controller
-                string result = await _copyAndPasteManager.PasteNodeAsync(nodeToPasteTo, nodes, _cancellationTokenSource.Token).ConfigureAwait(false);
 
-                // Splitting string for logging
-                string[] split;
-                split = result.Split(":");
-                string resultMessage = split[2];
-
-
-                if (!resultMessage.Equals(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess)))
+                // Check if user identity is unknown
+                if (Thread.CurrentPrincipal == null || Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
-                    Enum.TryParse(split[1], out ILogManager.Categories category);
-                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, category, split[2]).ConfigureAwait(false);
-                    return StatusCode(Convert.ToInt32(split[0]));
-
+                    // User identity not known, log error and return
+                    string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated).ConfigureAwait(false);
+                    string[] errorSplit;
+                    errorSplit = errorMessage.Split(":");
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, errorSplit[2]).ConfigureAwait(false);
+                    return new BadRequestObjectResult(errorSplit[2]);
                 }
 
-                await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Info, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
-                return new OkObjectResult(result);
+
+                // Getting response here by calling Manager
+                IResponse<string> response = await _copyAndPasteManager.PasteNodeAsync(nodeIDToPasteTo, nodes).ConfigureAwait(false);
+
+
+                if (response.Data != null && response.IsSuccess && response.StatusCode == 200)
+                {
+                    if (response.ErrorMessage.Equals(""))
+                    {
+                        //figure this out later
+                        stringBuilder.AppendFormat(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess).ConfigureAwait(false));
+                        await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Info, ILogManager.Categories.Server, stringBuilder.ToString());
+                    }
+                    else
+                    {
+                        await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, response.ErrorMessage);
+                    }
+                    return response.Data;
+                }
+                else if (response.StatusCode >= 500)
+                {
+                    stringBuilder.AppendFormat(response.ErrorMessage);
+                    await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, stringBuilder.ToString());
+                    return StatusCode(response.StatusCode, response.ErrorMessage);
+                }
+                else
+                {
+                    stringBuilder.AppendFormat(response.ErrorMessage);
+                    await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Data, stringBuilder.ToString());
+                    return new BadRequestObjectResult(response.ErrorMessage) { StatusCode = response.StatusCode };
+                }
+
 
             }
-
             catch (OperationCanceledException ex)
             {
                 string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false) + ex.Message;
@@ -216,17 +209,21 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
             catch (Exception ex)
             {
-                string errorMessage = await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
-                string[] split;
-                split = errorMessage.Split(":");
-                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, split[2]).ConfigureAwait(false);
-                return new BadRequestObjectResult(split[2]);
+                stringBuilder.AppendFormat(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false), ex.Message);
+                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server, stringBuilder.ToString());
+                return BadRequest();
+
+
             }
+        
+            
 
 
 
         }
+        
 
-        */
+        
     }
 }
+

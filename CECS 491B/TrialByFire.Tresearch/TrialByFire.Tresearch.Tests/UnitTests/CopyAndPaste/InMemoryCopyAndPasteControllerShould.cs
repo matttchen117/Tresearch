@@ -22,6 +22,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CopyAndPaste
 {
     public class InMemoryCopyAndPasteControllerShould : TestBaseClass
     {
+        private ICopyAndPasteController _copyAndPasteController;
         public InMemoryCopyAndPasteControllerShould() : base(new string[] { })
         {
             TestServices.AddScoped<ISqlDAO, InMemorySqlDAO>();
@@ -29,6 +30,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CopyAndPaste
             TestServices.AddScoped<ICopyAndPasteManager, CopyAndPasteManager>();
             TestServices.AddScoped<ICopyAndPasteController, CopyAndPasteController>();
             TestProvider = TestServices.BuildServiceProvider();
+            _copyAndPasteController = TestProvider.GetService<ICopyAndPasteController>();
+
+
         }
 
         
@@ -37,49 +41,54 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CopyAndPaste
         
 
         [Theory]
-
         [MemberData(nameof(CopyNodeData))]
-        
 
-        
-
-        public async Task CopyNodeAsync(IRoleIdentity roleIdentity, List<long> nodesCopy, IMessageBank.Responses response)
+        public async Task CopyNodeAsync(IRoleIdentity roleIdentity, List<long> nodesCopy, IResponse<IList<Node>> expected)
         {
+
             // Arrange
-            ICopyAndPasteController copyAndPasteController = TestProvider.GetService<ICopyAndPasteController>();
-            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
 
-            string expected = await messageBank.GetMessage(response);
-            string[] exps = expected.Split(":");
-            ObjectResult expectedResult = new ObjectResult(exps[2]) { StatusCode = Convert.ToInt32(exps[0]) };
-
             // Act
-            IActionResult resultCopy = await copyAndPasteController.CopyNodeAsync(nodesCopy).ConfigureAwait(false);
-            var result = resultCopy as ObjectResult;
+            ActionResult <IEnumerable<Node>> response = await _copyAndPasteController.CopyNodeAsync(nodesCopy).ConfigureAwait(false);
 
             // Assert
-            Assert.NotNull(resultCopy);
-            //Assert.Equal(expectedResult.StatusCode, result.StatusCode);
-            Assert.Equal(expectedResult.Value, result.Value);
+            Assert.Equal(expected.Data, response.Value);
+
         }
 
 
-        /*
+        
 
+        
         [Theory]
         [MemberData(nameof(PasteNodeData))]
 
 
-        */
+        public async Task PasteNodeAsync(IRoleIdentity roleIdentity, long nodeIDtoPasteTo, List<INode> nodes, IResponse<string> expected)
+        {
 
+            // Arrange
+            IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
+            Thread.CurrentPrincipal = rolePrincipal;
 
+            // Act
+            ActionResult<string> response = await _copyAndPasteController.PasteNodeAsync(nodeIDtoPasteTo, nodes).ConfigureAwait(false);
 
+            // Assert
+            Assert.Equal(expected.Data, response.Value);
 
-
+        }
         
-        
+
+
+
+
+
+
+
+
         public static IEnumerable<object[]> CopyNodeData()
         {
 
@@ -103,77 +112,66 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CopyAndPaste
             // User not authenticated and nodeID list is empty
             IRoleIdentity roleIdentity0 = new RoleIdentity(true, "guest", "guest", "");
             var nodesToCopyList0 = new List<long>();
+            IResponse<IList<Node>> nodesCopiedResult0 = new CopyResponse<IList<Node>>("401: Server: No active session found. Please login and try again.", null, 400, false);
+
+
             var resultCase0 = IMessageBank.Responses.notAuthenticated;
 
 
             // User authenticated but nodeID list is empty
             IRoleIdentity roleIdentity1 = new RoleIdentity(true, "grizzly@gmail.com", "user", "87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae");
             var nodesToCopyList1 = new List<long>();
+            IResponse<IList<Node>> nodesCopiedResult1 = new CopyResponse<IList<Node>>("400: Server: No nodes to copy failure", null, 400, false);
+            
+
             var resultCase1 = IMessageBank.Responses.copyNodeEmptyError;
 
 
-            // User authenticated and nodelist not empty, but amount of nodeID is not equal to amount of nodes getting back
-            IRoleIdentity roleIdentity2 = new RoleIdentity(true, "grizzly@gmail.com", "user", "87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae");
-            var nodesToCopyList2 = new List<long> { 1, 2, 3 };
-            var resultCase2 = IMessageBank.Responses.copyNodeMistmatchError;
+
 
 
             // User authenticated and nodeID list is populated, and was successful in grabbing nodes from database
             IRoleIdentity roleIdentity3 = new RoleIdentity(true, "grizzly@gmail.com", "user", "87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae");
             var nodesToCopyList3 = new List<long> { 1, 2, 3 };
+            var nodesCopiedList3 = new List<Node> { node1, node2, node3 };
+            IResponse<IList<Node>> nodesCopiedResult3 = new CopyResponse<IList<Node>>("200: Server: Copy Node Successful", nodesCopiedList3, 200, false);
+
+
             var resultCase3 = IMessageBank.Responses.copyNodeSuccess;
-
-
-            // User not authenticated but nodeID list is NOT empty
-
-
-
-
-            // User authenticated and duplicated nodeID in list, meaning they copied the same node twice
-            IRoleIdentity roleIdentity4 = new RoleIdentity(true, "user1", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-
-            // User authenticated and nodeIDs 
-            IRoleIdentity roleIdentity5 = new RoleIdentity(true, "user1", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-
-            // User authenticated
-            IRoleIdentity roleIdentity6 = new RoleIdentity(true, "user1", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-
-            // User authenticated
-            IRoleIdentity roleIdentity7 = new RoleIdentity(true, "user1", "user", "09bdb27005ebc8c2f3894957ece9703d2d2c7b848d5175da7181af2841e35be54708d3faf6b16e7ee29eef8bb71e2debebc619401a118849435368da610c20f5");
-
-
-
-
-
-            var nodeList1 = new List<INode>() { node1, node2, node3, node4, node5, node6, node7, node8, node9};
-
-
 
 
 
 
             return new[]
             {
-                //new object[] { roleIdentity0, nodesToCopyList0, resultCase0},
-                //new object[] { roleIdentity1, nodesToCopyList1, resultCase1},
-                new object[] { roleIdentity2, nodesToCopyList2, resultCase2},
-                new object[] { roleIdentity3, nodesToCopyList3, resultCase3},
+
+                new object[] { roleIdentity0, nodesToCopyList0, nodesCopiedResult0},
+                new object[] { roleIdentity1, nodesToCopyList1, nodesCopiedResult1},
+                //new object[] { roleIdentity2, nodesToCopyList2, nodesCopiedResult2},
+                new object[] { roleIdentity3, nodesToCopyList3, nodesCopiedResult3},
+
+            };
+        }
+
+
+
+        
+
+
+
+
+
+        
+
+        public static IEnumerable<object[]> PasteNodeData()
+        {
+            return new[]
+            {
+                new object[]{ }
             };
         }
         
 
-
-
-
-
-        /*
-
-        public static IEnumerable<object[]> PasteNodeData()
-        {
-
-        }
-        
-        */
 
         
 

@@ -14,6 +14,6 @@ namespace TrialByFire.Tresearch.Managers.Contracts
 
         public Task<IResponse<IEnumerable<Node>>> CopyNodeAsync(List<long> nodesCopy, CancellationToken cancellationToken = default(CancellationToken));
 
-        //public Task<string> PasteNodeAsync(INode nodeToPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<IResponse<string>> PasteNodeAsync(long nodeIDToPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

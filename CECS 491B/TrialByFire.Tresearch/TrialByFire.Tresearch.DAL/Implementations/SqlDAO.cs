@@ -1,5 +1,7 @@
 ﻿using Dapper;
+using System.Linq;
 using Microsoft.Extensions.Options;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using TrialByFire.Tresearch.DAL.Contracts;
@@ -2705,7 +2707,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
 
-        //public async Task<Tuple<List<INode>, string>> CopyNodeAsync(List<INode> nodesCopy, CancellationToken cancellationToken = default(CancellationToken))
+
+        /// <summary>
+        ///     CopyNodeAsync method 
+        /// </summary>
+        /// <param name="nodesCopy"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task<IResponse<IEnumerable<Node>>> CopyNodeAsync(List<long> nodesCopy, CancellationToken cancellationToken = default(CancellationToken))
 
         {
@@ -2713,39 +2721,42 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 try
                 {
+                    
                     cancellationToken.ThrowIfCancellationRequested();
                     using (var connection = new SqlConnection(_options.SqlConnectionString))
                     {
+
+                        //creating a DataTable to pass into the query as a table valued parameter
+                        var workTable = new DataTable();
+                        DataColumn workCol = workTable.Columns.Add("NodeIDsColumn", typeof(long));
+                        workCol.AllowDBNull = false;
+                        workCol.Unique = true;
+
+                        //adding rows of nodeIDs to the DataTable
+                        foreach (var n in nodesCopy)
+                        {
+                            var row = workTable.NewRow();
+                            row[0] = n;
+                            workTable.Rows.Add(row);
+                        }
+
                         await connection.OpenAsync();
 
-                        /*
-                        List<long> nodeIDs = new();
-
-                        for(int i = 0; i < nodesCopy.Count; i++)
-                        {
-                            nodeIDs.Add(nodesCopy[i].NodeID);
-                        }
-                        */
-
                         var procedure = "dbo.[GetNodesFromNodeID]";
-                        //var value = new { nodeIDs };
-                        var value = new { nodesCopy };
 
 
-                        List<Node> nodes = new List<Node>(await connection.QueryAsync<Node>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+                        // Calling stored procedure to get list of nodes from the azure database
+                        List<Node> nodes = new List<Node>(await connection.QueryAsync<Node>(new CommandDefinition(procedure, new { NodeIDs = workTable.AsTableValuedParameter("dbo.NodeIDList") },
+                        commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
 
-                        //checking if got correct amount of nodes back from query
-                        //if (nodes.Count.Equals(nodeIDs.Count))
+
+                        // Checking if got correct amount of nodes back from query
                         if (!nodes.Count.Equals(nodesCopy.Count))
-
                         {
                             return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeMistmatchError).ConfigureAwait(false), null, 400, false);
                         }
 
                         return new CopyResponse<IEnumerable<Node>>("", nodes, 200, true);
-
-                        //return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess).ConfigureAwait(false);
-
 
                     }
                 }
@@ -2786,28 +2797,155 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
 
-        /*
-
-        public async Task<string> IsNodeLeaf(INode nodeToPasteTo, CancellationToken cancellationToken = default(CancellationToken))
-        {
-
-        }
 
 
-        public async Task<string> PasteNodeAsync(INode nodeToPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<string>> PasteNodeAsync(string userHash, long nodeIDPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
+
+
+                    var procedure = "dbo.[PasteNodes]";
+
+                    var workTable = new DataTable();
+                    DataColumn workCol = workTable.Columns.Add("UserHashColumn", typeof(string));
+                    workTable.Columns.Add("NodeIDColumn", typeof(long));
+                    workTable.Columns.Add("ParentNodeIDColumn", typeof(int));
+                    workTable.Columns.Add("NodeTitleColumn", typeof(string));
+                    workTable.Columns.Add("SummaryColumn", typeof(string));
+                    workTable.Columns.Add("TimeModifiedColumn", typeof(DateTime));
+                    workTable.Columns.Add("VisibilityColumn", typeof(int));
+                    workTable.Columns.Add("DeletedColumn", typeof(int));
+                    workCol.AllowDBNull = false;
+                    workCol.Unique = true;
+
+                    foreach (var n in nodes)
+                    {
+                        var row = workTable.NewRow();
+                        row[0] = n.UserHash;
+                        row[1] = n.NodeID;
+                        row[2] = n.ParentNodeID;
+                        row[3] = n.NodeTitle;
+                        row[4] = n.Summary;
+                        row[5] = n.TimeModified;
+                        row[6] = n.Visibility;
+                        row[7] = n.Deleted;
+                        workTable.Rows.Add(row);
+                    }
+
                     await connection.OpenAsync();
+
+
+                    int affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, new { NodesPaste = workTable.AsTableValuedParameter("dbo.NodesToPaste") }, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    if (affectedRows.Equals(0))
+                    {
+                        return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.pasteNodeEmptyError).ConfigureAwait(false), null, 400, false);
+                    }
+                    else if (!affectedRows.Equals(nodes.Count))
+                    {
+                        return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.pasteNodeMistmatchError).ConfigureAwait(false), null, 400, false);
+                    }
+
+                    return new PasteResponse<string>("", await _messageBank.GetMessage(IMessageBank.Responses.pasteNodeSuccess).ConfigureAwait(false), 200, true);
+
                 }
+            }
+
+            catch (SqlException ex)
+            {
+                //Check sql exception
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false), null, 400, false);
+                    default:
+                        return new PasteResponse<string>(_options.UnhandledExceptionMessage + ex.Message, null, 400, false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                //return code for operationCancelled is 500
+                return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
+
+            }
+            catch (Exception ex)
+            {
+                //return code for unhandledException is 500
+                return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+
             }
         }
 
 
-        */
+
+        public async Task<string> IsNodeLeaf(long nodeIDToPasteTo, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (!nodeIDToPasteTo.Equals(null))
+            {
+                try
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    using (var connection = new SqlConnection(_options.SqlConnectionString))
+                    {
+
+
+                        var procedure = "dbo.[IsNodeLeaf]";
+
+                        await connection.OpenAsync();
+
+                        var parameters = new { nodeIDToPasteTo };
+
+                        int affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                        if (!affectedRows.Equals(0))
+                        {
+                            return await _messageBank.GetMessage(IMessageBank.Responses.isNotLeaf).ConfigureAwait(false);
+                        }
+
+                        return await _messageBank.GetMessage(IMessageBank.Responses.isLeaf).ConfigureAwait(false);
+
+                    }
+
+                }
+
+                catch (SqlException ex)
+                {
+                    //Check sql exception
+                    switch (ex.Number)
+                    {
+                        //Unable to connect to database
+                        case -1:
+                            return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false);
+                        default:
+                            return _options.UnhandledExceptionMessage + ex.Message;
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    //return code for operationCancelled is 500
+                    return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+
+                }
+                catch (Exception ex)
+                {
+                    //return code for unhandledException is 500
+                    return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false);
+
+                }
+            }
+            else
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false);
+            }
+        }
+
+
+
 
 
 

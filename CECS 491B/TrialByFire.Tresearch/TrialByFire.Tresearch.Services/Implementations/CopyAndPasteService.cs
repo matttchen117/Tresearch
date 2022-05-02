@@ -23,11 +23,16 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _messageBank = messageBank;
         }
 
-
-        //public async Task<Tuple<List<INode>, string>> CopyNodeAsync(List<INode> nodesCopy, CancellationToken cancellationToken = default(CancellationToken))
+        /// <summary>
+        ///     Copy Node async method that is passed a list of nodeIDs to query the database for corresponding nodes
+        /// </summary>
+        /// <param name="nodesCopy"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task<IResponse<IEnumerable<Node>>> CopyNodeAsync(List<long> nodesCopy, CancellationToken cancellationToken = default(CancellationToken))
 
         {
+            //checks if list passed in is empty or null
             if (nodesCopy != null)
             {
 
@@ -36,12 +41,13 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
                     cancellationToken.ThrowIfCancellationRequested();
 
-
+                    
                     IResponse<IEnumerable<Node>> response = await _sqlDAO.CopyNodeAsync(nodesCopy, cancellationToken).ConfigureAwait(false);
 
                     int amountOfNodesToCopy = nodesCopy.Count;
                     int copiedNodes = 0;
 
+                    //checking if amount of nodes got back is equal to the amount of nodeIDs to copy
                     if(response.Data != null)
                     {
                         if (response.Data.Any())
@@ -65,29 +71,15 @@ namespace TrialByFire.Tresearch.Services.Implementations
                     return response;
 
 
-                    /*
-
-                    if (!resultCopy.Equals(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess).ConfigureAwait(false)))
-                    {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeError).ConfigureAwait(false);
-                    }
-
-                    //return Tuple.Create(resultCopy, await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess).ConfigureAwait(false));
-                    return resultCopy;
-                    //return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess).ConfigureAwait(false);
-
-
-                    */
-
                 }
                 catch (OperationCanceledException)
                 {
-                    //return code for operationCancelled is 500
+                    //return code for operationCancelled is 500*
                     return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
                 }
                 catch (Exception ex)
                 {
-                    //return code for unhandledException is 500
+                    //return code for unhandledException is 500*
                     return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
 
                 }
@@ -112,32 +104,49 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
 
 
-        public async Task<string> PasteNodeAsync(INode nodeToPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<string>> PasteNodeAsync(IAccount account, string currentUserHash, long nodeIDToPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                //string resultPaste = await _sqlDAO.PasteNodeAsync(nodeToPasteTo, nodes, cancellationToken).ConfigureAwait(false);
-                string resultPaste = "";
+                string userHash = await _sqlDAO.GetUserHashAsync(account, cancellationToken);
 
-                //fake return
 
-                return resultPaste;
+                if (!currentUserHash.Equals(userHash))
+                {
+                    return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.notAuthorizedToPasteTo).ConfigureAwait(false), null, 400, false);
+                }
+
+                string isNodeLeaf = await _sqlDAO.IsNodeLeaf(nodeIDToPasteTo, cancellationToken).ConfigureAwait(false);
+
+                if(!isNodeLeaf.Equals(await _messageBank.GetMessage(IMessageBank.Responses.isLeaf).ConfigureAwait(false)))
+                {
+                    return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.isNotLeaf).ConfigureAwait(false), null, 400, false);
+                }
+
+                IResponse<string> response = await _sqlDAO.PasteNodeAsync(currentUserHash, nodeIDToPasteTo, nodes, cancellationToken).ConfigureAwait(false);
+
+                if (!response.IsSuccess)
+                {
+                    return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.pasteNodeFailure).ConfigureAwait(false), null, 500, false);
+                }
+
+                return response;
+
 
             }
+
+
             catch (OperationCanceledException)
             {
-                //ROLL BACK NECESSARY
-
-                // Operation cancelled threw exception no rollback necessary
-                string cancellationMessage = await _messageBank.GetMessage(IMessageBank.Responses.operationCancelled).ConfigureAwait(false);
-                return cancellationMessage;
+                //return code for operationCancelled is 500
+                return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
             }
             catch (Exception ex)
             {
-                string exceptionMessage = await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
-                return exceptionMessage;
+                //return code for unhandledException is 500
+                return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
 
             }
         }

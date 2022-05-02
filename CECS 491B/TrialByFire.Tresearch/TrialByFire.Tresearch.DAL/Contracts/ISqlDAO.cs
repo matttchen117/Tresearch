@@ -216,15 +216,10 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         public Task<IResponse<IEnumerable<Node>>> CopyNodeAsync(List<long> nodesCopy, CancellationToken cancellationToken = default(CancellationToken));
 
-        //public Task<Tuple<List<INode>, string>> CopyNodeAsync(List<INode> nodesCopy, CancellationToken cancellationToken = default(CancellationToken));
 
-        /*
+        public Task<IResponse<string>> PasteNodeAsync(string userHash, long nodeIDPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken));
 
-        public Task<string> PasteNodeAsync(List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken));
-
-        public Task<string> IsNodeLeaf(INode nodeToPaste, CancellationToken cancellationToken = default(CancellationToken));
-
-        */
+        public Task<string> IsNodeLeaf(long nodeIDToPasteTo, CancellationToken cancellationToken = default(CancellationToken));
 
     }
 }

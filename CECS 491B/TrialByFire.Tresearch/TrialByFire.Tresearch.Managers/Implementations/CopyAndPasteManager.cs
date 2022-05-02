@@ -60,7 +60,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                //IResponse<IEnumerable<Node>> response = await _copyAndPasteService.CopyNodeAsync(nodesCopy, cancellationToken);
 
                 // Get user's role
                 string role = "";
@@ -73,9 +72,10 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     role = _buildSettingsOptions.Admin;
                 }
 
-
+                
                 IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
 
+                // Calling verifyAccountAsync to authenticate account
                 string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken).ConfigureAwait(false);
 
                 if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false)))
@@ -84,11 +84,13 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     return new CopyResponse<IEnumerable<Node>>(resultVerifyAccount, null, 401, false);
                 }
 
+                //checking of list of nodes passed in to copy is empty
                 if(nodesCopy == null || nodesCopy.Count <= 0)
                 {
                     return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false), null, 400, false);
                 }
 
+                // Starts service layer to copy node 
                 IResponse<IEnumerable<Node>> response = await _copyAndPasteService.CopyNodeAsync(nodesCopy, cancellationToken).ConfigureAwait(false);
 
 
@@ -116,17 +118,12 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         }
 
 
-        public async Task<string> PasteNodeAsync(INode nodeToPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<string>> PasteNodeAsync(long nodeIDToPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-
-                if (Thread.CurrentPrincipal == null || Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
-                {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.verificationFailure).ConfigureAwait(false);
-                }
 
                 // Get user's role
                 string role = "";
@@ -134,68 +131,87 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 {
                     role = _buildSettingsOptions.User;
                 }
-                else if (Thread.CurrentPrincipal.IsInRole(_buildSettingsOptions.Admin))
+                else
                 {
                     role = _buildSettingsOptions.Admin;
                 }
-                else
-                {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.unknownRole).ConfigureAwait(false);
-                }
 
-                //getting userhash to change the data for pasting in new nodes
-                string userHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
 
                 IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
-
 
                 string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken).ConfigureAwait(false);
 
                 if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false)))
                 {
-                    return resultVerifyAccount;
+
+                    return new PasteResponse<string>(resultVerifyAccount, null, 401, false);
                 }
 
-                //need to check if node pasting to is a leaf, doing the check here
-
-
-
-
-
-
-
-
-                string resultPaste;
-
+                //getting userhash to change the data for pasting in new nodes
+                string currentUserHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
 
 
                 if (nodes == null || nodes.Count <= 0)
                 {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.pasteNodeEmptyError).ConfigureAwait(false);
+                    return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.pasteNodeEmptyError).ConfigureAwait(false), null, 400, false);
                 }
-                else
+
+
+
+
+
+                IResponse<string> response = await _copyAndPasteService.PasteNodeAsync(account, currentUserHash, nodeIDToPasteTo, nodes, cancellationToken).ConfigureAwait(false);
+
+
+
+                if (!response.IsSuccess)
                 {
-                    resultPaste = await _copyAndPasteService.PasteNodeAsync(nodeToPasteTo, nodes, cancellationToken).ConfigureAwait(false);
-                    return resultPaste;
+                    //might need to return a more meaningful statuscode or message indicating what went wrong
+                    return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeFailure).ConfigureAwait(false), null, 400, false);
                 }
 
-
-
-
-
+                return response;
 
             }
-
 
             catch (OperationCanceledException)
             {
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+                //return code for operationCancelled is 500
+                return new CopyResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
             }
             catch (Exception ex)
             {
-                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                //return code for unhandledException is 500
+                return new CopyResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
 
             }
+
+
+
+
+
+            /*
+
+            if (nodes == null || nodes.Count <= 0)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.pasteNodeEmptyError).ConfigureAwait(false);
+            }
+            else
+            {
+                resultPaste = await _copyAndPasteService.PasteNodeAsync(nodeToPasteTo, nodes, cancellationToken).ConfigureAwait(false);
+                return resultPaste;
+            }
+
+            */
+
+
+
+
+
+      
+
+
+
         }
 
     }

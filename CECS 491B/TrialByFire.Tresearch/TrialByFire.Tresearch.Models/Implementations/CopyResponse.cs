@@ -11,7 +11,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
     ///     CopyResponse: Default response object that represents the response information of copy and paste methods
     /// </summary>
     /// <typeparam name="T">The type of the Data that the response will store</typeparam>
-    public class CopyResponse<T> : IResponse<T> 
+    public class CopyResponse<T> : IResponse<T>
     {
         public string ErrorMessage { get; set; }
         public T? Data { get; set; }
@@ -27,5 +27,21 @@ namespace TrialByFire.Tresearch.Models.Implementations
             StatusCode = statusCode;
             IsSuccess = isSuccess;
         }
+
+
+        public override bool Equals(object? obj)
+        {
+            if(!(obj == null))
+            {
+                if(obj is CopyResponse<T>)
+                {
+                    CopyResponse<T> response = (CopyResponse<T>)obj;
+                    return ErrorMessage.Equals(response.ErrorMessage) && (Data != null) ? Data.Equals(response.Data) : true && StatusCode == response.StatusCode && IsSuccess == response.IsSuccess;
+                }
+            }
+            return false;
+        }
+
+
     }
 }
