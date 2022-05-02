@@ -107,8 +107,9 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         //*/
 
         //Rating
-        public Task<string> RateNodeAsync(string userhash, long nodeID, int rating, CancellationToken cancellationToken = default(CancellationToken));
-        public Task<Tuple<List<double>, string>> GetNodeRatingAsync(List<long> nodeID, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<IResponse<NodeRating>> RateNodeAsync(NodeRating rating, CancellationToken cancellationToken = default(CancellationToken));
+        
+        public Task<IResponse<double>> GetNodeRatingAsync(long nodeID, CancellationToken cancellationToken = default(CancellationToken));
 
 
         /**

@@ -1378,17 +1378,17 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             throw new NotImplementedException();
         }
 
-        public async Task<string> RateNodeAsync(string userHash, long nodeID, int rating, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<NodeRating>> RateNodeAsync(NodeRating rating, CancellationToken cancellationToken = default(CancellationToken))
         {
-            InMemoryDatabase.NodeRatings.Add(new NodeRating(userHash, nodeID, rating));
-            return await _messageBank.GetMessage(IMessageBank.Responses.userRateSuccess);
+            InMemoryDatabase.NodeRatings.Add(rating);
+            return new RateResponse<NodeRating>("", rating, 200, true);
         }
 
-        public async Task<Tuple<List<double>, string>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<double>> GetNodeRatingAsync(long nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             List<double> ratings = new List<double>();
             
-            return Tuple.Create(ratings, await _messageBank.GetMessage(IMessageBank.Responses.getRateSuccess));
+            return new RateResponse<double>("", 1.0, 200, true);
         }
 
         public async Task<string> UpdateAccountAsync(IAccount account, IAccount updatedAccount, CancellationToken cancellationToken = default(CancellationToken))

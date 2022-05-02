@@ -126,6 +126,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "502: Server: Unable rate node.";
                 case Responses.getRateFail:
                     return "502: Server: Unable to get rating data.";
+                case Responses.invalidRating:
+                    return "422: Servre: Invalid rating.";
+
 
 
                 case Responses.createNodeSuccess:

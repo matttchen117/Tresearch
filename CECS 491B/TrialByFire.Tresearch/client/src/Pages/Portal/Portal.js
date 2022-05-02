@@ -51,8 +51,7 @@ class Portal extends React.PureComponent{
         const nodes = this.setup(res.data);
         this.setState({nodes});
       });
-    }
-    
+    }  
   }
 
   // Check JWT Token

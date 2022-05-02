@@ -28,7 +28,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _options = options.Value;
         }
 
-        public async Task<string> RateNodeAsync(long nodeID, int rating, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<NodeRating>> RateNodeAsync(long nodeID, int rating, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -43,7 +43,9 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     else if (Thread.CurrentPrincipal.IsInRole(_options.Admin))
                         role = _options.Admin;
                     else
-                        return await _messageBank.GetMessage(IMessageBank.Responses.unknownRole);
+                        return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.unknownRole), new NodeRating(), 500, false);
+
+                    string userHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
 
                     //UserAccount with user's username and role
                     IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
@@ -53,26 +55,32 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
                     //Check if account is enabled and confirme, if not return error
                     if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
-                        return resultVerifyAccount;
+                        return new RateResponse<NodeRating>(resultVerifyAccount, new NodeRating(), 500, false);
 
-                    //Check if account can rate here
+                    //Verify if account can rate here
+                    string resultAuthorized = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(new List<long> { nodeID } , userHash, cancellationToken);
 
+                    //Check if allowed to rate
+                    if(resultAuthorized.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess))) 
+                    { 
+                        return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized), new NodeRating(), 401, false);
+                    }
 
                     //Rate Node
-                    string result = await _rateService.RateNodeAsync(account, nodeID, rating, cancellationToken);
+                    IResponse<NodeRating> result = await _rateService.RateNodeAsync(userHash, nodeID, rating, cancellationToken);
 
                     return result;
                 }
                 else
-                    return await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated);
+                    return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated), new NodeRating(), 500, false);
             }
             catch (Exception ex)
             {
-                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), new NodeRating(), 500, false);
             }
         }
 
-        public async Task<Tuple<List<double>, string>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<double>> GetNodeRatingAsync(long nodeID, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             { 
@@ -86,7 +94,8 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     else if (Thread.CurrentPrincipal.IsInRole(_options.Admin))
                         role = _options.Admin;
                     else
-                        return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.unknownRole));
+
+                        return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.unknownRole), 0, 500, false);
 
                     //UserAccount with user's username and role
                     IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
@@ -96,20 +105,18 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
                     //Check if account is enabled and confirme, if not return error
                     if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
-                        return Tuple.Create(new List<double>(), resultVerifyAccount);
+                        return new RateResponse<double>(resultVerifyAccount, 0, 500, false);
 
-                    Tuple<List<double>, string> results = await _rateService.GetNodeRatingAsync(nodeIDs, cancellationToken);
+                    IResponse<double> results = await _rateService.GetNodeRatingAsync(nodeID, cancellationToken);
 
                     return results;
                 }
                 else
-                    return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated));
-
-
+                    return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated), 0, 401, false);
             }
             catch (Exception ex)
             {
-                return  Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
+                return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, 0, 500, false);
             }
         }
     }

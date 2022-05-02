@@ -29,6 +29,8 @@ import FAQ from "./Pages/FAQ/FAQ";
 import Features from "./Pages/Features/Features";
 import Search from "./Features/Search/NodeSearch";
 import SearchPage from "./Features/Search/SearchPage";
+import NodeView from "./UI/Components/NodeView/NodeView";
+import Rating from "./UI/Rating/Rating";
 
 class App extends React.Component {
   constructor(props){
@@ -38,7 +40,7 @@ class App extends React.Component {
       confirmationGuid: Confirm,
       inactiveLinkGuid: InactiveLink,
       recoveryConfirm: RecoveryConfirm,
-      nodeID: Tagger
+      nodeID: NodeView,
     };
   }
 
@@ -79,6 +81,8 @@ class App extends React.Component {
             <Route path = "/Tagger" element = {<Tagger/>} exact/>
             <Route path = "/Search" element = {<Search/>} exact/>
             <Route path = "/SearchPage" element = {<SearchPage/>} exact/>
+
+            <Route path = "/Rating" element = {<Rating/>}/>
           </Routes>
         </Router>
       </div>

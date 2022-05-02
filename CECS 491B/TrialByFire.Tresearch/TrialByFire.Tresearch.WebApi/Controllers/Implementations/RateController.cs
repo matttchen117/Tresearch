@@ -5,6 +5,7 @@ using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
@@ -30,28 +31,28 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _options = options.Value;
         }
 
-        [HttpGet]
-        [Route("rateNode")]
+        [HttpPost("rateNode")]
         public async Task<IActionResult> RateNodeAsync(long nodeID, int rating)
         {
             try
             {
                 if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
-                    string result = await _rateManager.RateNodeAsync(nodeID, rating, _cancellationTokenSource.Token);
-                    string[] split;
-                    split = result.Split(":");
-
-                    if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
+                    IResponse<NodeRating> result = await _rateManager.RateNodeAsync(nodeID, rating, _cancellationTokenSource.Token);
+                    
+                    if(result.StatusCode == 200)
                     {
                         _logManager.StoreAnalyticLogAsync(DateTime.Now, ILogManager.Levels.Info, ILogManager.Categories.Server, "Rate: Account rated.");
-                    }
-                    else
+                        return new OkObjectResult(result.Data);
+                    } else
                     {
+                        string[] split;
+                        split = result.ErrorMessage.Split(":");
                         Enum.TryParse(split[1], out ILogManager.Categories category);
                         _logManager.StoreArchiveLogAsync(DateTime.Now, ILogManager.Levels.Error, category, split[2]);
+                        return StatusCode(Convert.ToInt32(split[0]), split[2]);
                     }
-                    return StatusCode(Convert.ToInt32(split[0]), split[2]);
+                    
                 }
                 else
                 {
@@ -73,33 +74,28 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 return StatusCode(Convert.ToInt32(errorSplit[0]), errorSplit[2]);
             }
         }
-
-        [HttpGet]
-        [Route("getRating")]
-        public async Task<IActionResult> GetNodeRatingAsync(List<long> nodeIDs)
+        [HttpPost("getRating")]
+        public async Task<IActionResult> GetNodeRatingAsync(long nodeID)
         {
             try
             {
                 if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
-                    Tuple<List<double>, string> results = await _rateManager.GetNodeRatingAsync(nodeIDs, _cancellationTokenSource.Token);
-                    string result = results.Item2;
-
-                    string[] split;
-                    split = result.Split(":");
-
-                    if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.generic)))
+                    IResponse<double> results = await _rateManager.GetNodeRatingAsync(nodeID, _cancellationTokenSource.Token);
+                    
+                    if(results.StatusCode == 200)
                     {
                         _logManager.StoreAnalyticLogAsync(DateTime.Now, ILogManager.Levels.Info, ILogManager.Categories.Server, "Rating: Ratings retrieved.");
-                        return StatusCode(Convert.ToInt32(split[0]), results.Item1);
+                        return new OkObjectResult(results.Data);
                     }
                     else
                     {
+                        string[] split;
+                        split = results.ErrorMessage.Split(":");
                         Enum.TryParse(split[1], out ILogManager.Categories category);
                         _logManager.StoreArchiveLogAsync(DateTime.Now, ILogManager.Levels.Error, category, split[2]);
                         return StatusCode(Convert.ToInt32(split[0]), split[2]);
                     }
-                    
                 }
                 else
                 {

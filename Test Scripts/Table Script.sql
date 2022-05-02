@@ -1326,3 +1326,20 @@ as
 begin
 	UPDATE Accounts SET Confirmed = 0 WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel
 end
+
+-- =============================================
+-- Author:		Pammy Poor
+-- Description:	Get Node's Ratings
+-- =============================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetNodeRating]    
+(
+	@NodeID BIGINT
+)
+as
+begin
+	SELECT Avg(Rating) FROM NodeRatings Where NodeID = @NodeID
+end

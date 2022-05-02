@@ -96,6 +96,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             userRateFail,
             getRateSuccess,
             getRateFail,
+            invalidRating,
 
             jwtValidationSuccess,
             jwtValidationFail,

@@ -2,6 +2,7 @@
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
 
 namespace TrialByFire.Tresearch.Services.Implementations
@@ -22,16 +23,23 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _messageBank = messageBank;
             _options = options.Value;
         }
-
-        public async Task<string> RateNodeAsync(IAccount account, long nodeID, int rating, CancellationToken cancellationToken = default(CancellationToken))
+        /// <summary>
+        ///  
+        /// </summary>
+        /// <param name="userHash">User hash of user rating</param>
+        /// <param name="nodeID">Node id to rate</param>
+        /// <param name="rating">Rate (1-5)</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns></returns>
+        public async Task<IResponse<NodeRating>> RateNodeAsync(string userHash, long nodeID, int rating, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                string userHash = await _sqlDAO.GetUserHashAsync(account, cancellationToken);
+                NodeRating nodeRating = new NodeRating(userHash, nodeID, rating);
 
-                string result = await _sqlDAO.RateNodeAsync(userHash, nodeID, rating);
+                IResponse<NodeRating> result = await _sqlDAO.RateNodeAsync(nodeRating, cancellationToken);
 
                 return result;
 
@@ -39,22 +47,22 @@ namespace TrialByFire.Tresearch.Services.Implementations
             catch (OperationCanceledException)
             {
                 //rollback not necessary
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), new NodeRating(), 408, false);
             }
             catch (Exception ex)
             {
-                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), new NodeRating(), 500, false);
             }
         }
 
 
-        public async Task<Tuple<List<double>, string>> GetNodeRatingAsync(List<long> nodeID, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<double>> GetNodeRatingAsync(long nodeID, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                Tuple<List<double>, string> result = await _sqlDAO.GetNodeRatingAsync(nodeID, cancellationToken);
+                IResponse<double> result = await _sqlDAO.GetNodeRatingAsync(nodeID, cancellationToken);
 
                 return result;
 
@@ -62,11 +70,11 @@ namespace TrialByFire.Tresearch.Services.Implementations
             catch (OperationCanceledException)
             {
                 //rollback not necessary
-                return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+                return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), 0, 408, false);
             }
             catch (Exception ex)
             {
-                return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
+                return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, 0, 500, false);
             }
         }
     }

@@ -6,8 +6,11 @@ using TrialByFire.Tresearch.Models.Contracts;
 using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 using Xunit;
+using Dapper;
+using System.Data;
+using TrialByFire.Tresearch.Models.Implementations;
 
-namespace TrialByFire.Tresearch.Tests.IntegrationTests.Rating
+namespace TrialByFire.Tresearch.Tests.IntegrationTests.Rate
 {
     public class SqlDAOShould: TestBaseClass, IClassFixture<RateSqlDatabaseFixture>
     {
@@ -15,21 +18,93 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Rating
         public SqlDAOShould(RateSqlDatabaseFixture fixture) : base(new string[] { })
         {
             this.fixture = fixture;
+            NodeIDs = fixture.nodeIDs;
             TestProvider = TestServices.BuildServiceProvider();
+        }
+
+        private static List<long> nodeids = new List<long>();
+        public static List<long> NodeIDs
+        {
+            get { return nodeids; }
+            set { nodeids = value; }
+        }
+
+        /// <summary>
+        /// Retrieves list of nodeids matching indices.
+        /// </summary>
+        /// <param name="indexes">Indices of return nodeIDs</param>
+        /// <returns></returns>
+        public long GetNode(int id)
+        {
+            return nodeids[id];
+        }
+
+        public List<long> GetNodes(List<int> indexes)
+        {
+            List<long> ids = new List<long>();
+            foreach (int index in indexes)
+                ids.Add(NodeIDs[index]);
+            return ids;
         }
 
         [Theory]
         [MemberData(nameof(RateData))]
-        public async Task RateNode(string userHash, long nodeID, int rating, IMessageBank.Responses response)
+        public async Task RateNode(string userHash, int nodeID, int rating, IMessageBank.Responses response)
         {
             //Arrange
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            string expected = await messageBank.GetMessage(response);
+            string ex = await messageBank.GetMessage(response);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
+            NodeRating r = new NodeRating(userHash, GetNode(nodeID), rating);
+            
+            string[] split;
+            split = ex.Split(":");
+
+            IResponse<NodeRating> expected;
+
+            if(Convert.ToInt32(split[0]) == 200)
+            {
+                expected = new RateResponse<NodeRating>("", r, 200, true);
+            }
+            else
+            {
+                expected = new RateResponse<NodeRating>(ex, r, Convert.ToInt32(split[0]), false);
+            }
             //Act
-            string result = await sqlDAO.RateNodeAsync(userHash, nodeID, rating, cancellationTokenSource.Token);
+            IResponse<NodeRating> result = await sqlDAO.RateNodeAsync(r, cancellationTokenSource.Token);
+
+            //Assert
+            Assert.Equal(expected, result);
+        }
+
+
+        [Theory]
+        [MemberData(nameof(GetRatingsData))]
+        public async Task GetRatings(int node, double ratings, IMessageBank.Responses response)
+        {
+            //Arrange
+            ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
+            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
+            string ex = await messageBank.GetMessage(response);
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
+            string[] split;
+            split = ex.Split(":");
+
+            IResponse<double> expected;
+
+            if (Convert.ToInt32(split[0]) == 200)
+            {
+                expected = new RateResponse<double>("", ratings, 200, true);
+            }
+            else
+            {
+                expected = new RateResponse<double>(ex, ratings, Convert.ToInt32(split[0]), false);
+            }
+            //Act
+            IResponse<double> result = await sqlDAO.GetNodeRatingAsync(GetNode(node), cancellationTokenSource.Token);
 
             //Assert
             Assert.Equal(expected, result);
@@ -49,43 +124,51 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Rating
              * 
              */
             string userHash0 = "a4adfe7c09a5ff48c6d9ad3a0e5b783d8cf566a335ac012a31d8ff605e3c34dcb471fef37457d1e13071d7cbc93242d9e5220a9ee3d880bd25c9a514b0bb0834";
-            long nodeID0 = 5091676250;
+            int nodeID0 = 0;
             int rating0 = 1;
             IMessageBank.Responses messageBankResponse0 =  IMessageBank.Responses.userRateSuccess;
 
+
+            return new[]
+            {
+                new object[] { userHash0, nodeID0, rating0, messageBankResponse0 }
+            };
+        }
+
+        public static IEnumerable<object[]> GetRatingsData()
+        {
             /**
-             *  Case 1: Rating invalid node. Account and user hash exists. 
+             *  Case 0: Rating valid node.Account and user hash exists.
              *      Username:                   "RateDAOUser1@gmail.com"
              *      AuthorizationLevel:         "user"
              *      User Hash:                  "a4adfe7c09a5ff48c6d9ad3a0e5b783d8cf566a335ac012a31d8ff605e3c34dcb471fef37457d1e13071d7cbc93242d9e5220a9ee3d880bd25c9a514b0bb0834"
-             *      NodeID:                     5091676249
+             *      NodeID:                     5091676250
              *      Rating:                     1
              *      
              *      Result:                     "200: Server: User rating added."
              * 
              */
-            string userHash1 = "a4adfe7c09a5ff48c6d9ad3a0e5b783d8cf566a335ac012a31d8ff605e3c34dcb471fef37457d1e13071d7cbc93242d9e5220a9ee3d880bd25c9a514b0bb0834";
-            long nodeID1 = 5091676249;
-            int rating1 = 1;
-            IMessageBank.Responses messageBankResponse1 = IMessageBank.Responses.userRateFail;
+            var nodeID0 = 1;
+            var ratings0 = 1.0;
+            IMessageBank.Responses messageBankResponse0 = IMessageBank.Responses.getRateSuccess;
 
             return new[]
             {
-                new object[] { userHash0, nodeID0, rating0, messageBankResponse0 },
-                new object[] { userHash1, nodeID1, rating1, messageBankResponse1 }
+                new object[] { nodeID0, ratings0, messageBankResponse0 }
             };
         }
     }
 
     public class RateSqlDatabaseFixture : TestBaseClass, IDisposable
     {
+        public List<long> nodeIDs { get; set; }
         public RateSqlDatabaseFixture() : base(new string[] { })
         {
             TestProvider = TestServices.BuildServiceProvider();
             IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
             BuildSettingsOptions optionsValue = options.Value;
 
-            string script = File.ReadAllText("../../../IntegrationTests/Rating/SetupAndCleanup/DAOIntegrationSetup.sql");
+            string script = File.ReadAllText("../../../IntegrationTests/Rate/SetupAndCleanup/DAOIntegrationSetup.sql");
 
             IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
@@ -97,6 +180,15 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Rating
                         using (var com = new SqlCommand(command, connection))
                             com.ExecuteNonQuery();
             }
+
+            // Initialize list of nodes. 
+            using (var connection = new SqlConnection(optionsValue.SqlConnectionString))
+            {
+                connection.Open();
+                var procedure = "dbo.[DAOIntegrationRateInitializeProcedure]";                        // Name of store procedure
+                var value = new { };                                                                 // Parameters of stored procedure
+                nodeIDs = connection.Query<long>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure)).ToList();
+            }
         }
 
         public void Dispose()
@@ -104,7 +196,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Rating
             IOptionsSnapshot<BuildSettingsOptions> options = TestProvider.GetService<IOptionsSnapshot<BuildSettingsOptions>>();
             BuildSettingsOptions optionsValue = options.Value;
 
-            string script = File.ReadAllText("../../../IntegrationTests/Rating/SetupAndCleanup/DAOIntegrationCleanup.sql");
+            string script = File.ReadAllText("../../../IntegrationTests/Rate/SetupAndCleanup/DAOIntegrationCleanup.sql");
 
             IEnumerable<string> commands = Regex.Split(script, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase);
 

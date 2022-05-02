@@ -2,6 +2,7 @@ import React from "react";
 import Tree from "react-d3-tree";
 import Popup from "../../Popup/Popup";
 import TagPopup from "../../Popup/TagPopup";
+import NodePopup from "../../Popup/NodePopup";
 import "./TreeView.css";
 
 class TreeView extends React.Component{
@@ -45,6 +46,8 @@ class TreeView extends React.Component{
 
         // Initial state of tree view
         this.state = {
+            isPopupOpen: false,
+            isNodeViewOpen: false,
             isTaggerOpen: false,
             isPopupOpen: false,
             nodeSelect: -1,
@@ -106,7 +109,7 @@ class TreeView extends React.Component{
     EditTags = (e) => {
         e.stopPropagation();
         const currentState = Array.from(new Set(this.state.nodeSelect));
-        this.setState( { nodeSelect: currentState, isTaggerOpen: true, isShown: false,  x: e.pageX, y: e.pageY}) 
+        this.setState( { nodeSelect: currentState, isTaggerOpen: true, isPopupOpen: true, isShown: false,  x: e.pageX, y: e.pageY}) 
         this.unhighlight();
     }
 
@@ -114,8 +117,13 @@ class TreeView extends React.Component{
         const  ToggleTagger = () => {
             
             this.setState({
-                isTaggerOpen: false
+                isTaggerOpen: false, isPopupOpen: false
             })     
+        }
+
+        const ToggleNodePopup = () => {
+            this.setState({ isNodeViewOpen: false, isPopupOpen: false});
+            this.unhighlight();
         }
 
         // User left clicks a node
@@ -135,8 +143,9 @@ class TreeView extends React.Component{
                     handleHighLight(e, nodeData.nodeID);
                 }
             } else{
-                this.setState({ shiftCollection: []});
+                this.setState({ shiftCollection: [], nodeSelect: nodeData});
                 // Up to you but may want to navigate to view node
+                this.setState({ isNodeViewOpen: true, isPopupOpen: true});
             }
         }
 
@@ -179,7 +188,7 @@ class TreeView extends React.Component{
         // Render user's tree
         const renderTree = (
             <div className = "tree-portal-container">
-                <div className= {`${this.state.isTaggerOpen ? "taggerOpen" : "base"}`} onClick = {resetShiftCollection} >
+                <div className= {`${this.state.isPopupOpen ? "taggerOpen" : "base"}`} onClick = {resetShiftCollection} >
                     {this.treeData.length != 0 ? (
                         <Tree 
                         data = {this.treeData} 
@@ -218,6 +227,9 @@ class TreeView extends React.Component{
                 </div>
                 <div className = "tree-tagger-wrapper">
                     {this.state.isTaggerOpen ? <Popup content = {<TagPopup onClick = {ToggleTagger} nodes = {this.state.nodeSelect}/>}/> : null}
+                </div>
+                <div className = "node-popup-wrapper">
+                    {this.state.isNodeViewOpen ? <Popup content = {<NodePopup onClick={ToggleNodePopup} node = {this.state.nodeSelect}/>}/> : null }
                 </div>
             </div>
         );

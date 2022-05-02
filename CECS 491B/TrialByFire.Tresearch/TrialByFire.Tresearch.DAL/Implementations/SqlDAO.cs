@@ -2535,12 +2535,16 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> RateNodeAsync(string userHash, long nodeID, int rating, CancellationToken cancellationToken)
+        public async Task<IResponse<NodeRating>> RateNodeAsync(NodeRating rating, CancellationToken cancellationToken)
         {
             try
             {
                 //Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
+
+                if(rating == null)
+                    return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.invalidRating), rating, 422, false);
+
                 // Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
@@ -2549,20 +2553,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var procedure = "dbo.[RateNode]";
                     var parameters = new
                     {
-                        UserHash = userHash,
-                        NodeID = nodeID,
-                        Rating = rating
+                        UserHash = rating.UserHash,
+                        NodeID = rating.NodeID,
+                        Rating = rating.Rating
                     };
                     //Execute command
                     var executed = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    //Check if cancellation token requests cancellation
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        //Perform rollback
-                        
-                    }
-                    //Tag has been added, return success
-                    return await _messageBank.GetMessage(IMessageBank.Responses.userRateSuccess);
+                    return new RateResponse<NodeRating>("", rating, 200, true);
                 }
             }
             catch (SqlException ex)
@@ -2572,51 +2569,46 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //Unable to connect to database
                     case -1:
-                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
+                        return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail), rating, 503, false);
                     case 547:   //Adding rating violates foreign key constraint (AKA NO ACCOUNT)
-                        return _messageBank.GetMessage(IMessageBank.Responses.userRateFail).Result;
+                        return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound), rating, 500, false);
                     default:
-                        return  _options.UnhandledExceptionMessage + ex.Message;
+                        return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), rating, 500, false);
                 }
             }
             catch (OperationCanceledException)
             {
                 // Rollback already handled
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), rating, 408, false);
             }
             catch (Exception ex)
             {
-                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), rating, 500, false);
             }
         }
 
-        public async Task<Tuple<List<double>, string>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<double>> GetNodeRatingAsync(long nodeID, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 //Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
+
+                if(nodeID < 0)
+                    return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound), 0, 404, false);
+
                 // Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     //Open connection
                     await connection.OpenAsync();
-                    List<double> ratings = new List<double>();
-                    foreach (var nodeId in nodeIDs)
-                    {
-                        var procedure = "dbo.[GetNodeRating]";
-                        var parameters = new { NodeID = nodeId };
+                    var procedure = "dbo.[GetNodeRating]";
+                    var parameters = new { NodeID = nodeID };
 
-                        var result = await connection.ExecuteScalarAsync<double>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                        
-                        ratings.Add(result);
-                    }
-                    
-                    //Execute command
-                    
+                    double result = await connection.ExecuteScalarAsync<double>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                     //Tag has been added, return success
-                    return Tuple.Create(ratings, await _messageBank.GetMessage(IMessageBank.Responses.getRateSuccess));
+                    return new RateResponse<double>("", result, 200, true);
                 }
             }
             catch (SqlException ex)
@@ -2626,19 +2618,19 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //Unable to connect to database
                     case -1:
-                        return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail));
+                        return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail), 0, 503, false);
                     default:
-                        return Tuple.Create(new List<double>(), _options.UnhandledExceptionMessage + ex.Message);
+                        return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, 0, 500, false);
                 }
             }
             catch (OperationCanceledException)
             {
                 // Rollback already handled
-                return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+                return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), 0, 408, false);
             }
             catch (Exception ex)
             {
-                return Tuple.Create(new List<double>(), _options.UnhandledExceptionMessage + ex.Message);
+                return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, 0, 500, false);
             }
         }
 
