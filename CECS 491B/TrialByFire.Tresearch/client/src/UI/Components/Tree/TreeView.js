@@ -168,7 +168,7 @@ class TreeView extends React.Component{
         
 
 
-        axios.post("http://localhost:7010/CopyAndPaste/Paste?nodeIDToPasteTo"+this.state.nodeSelect+"?nodes"+nodes)
+        axios.post("https://localhost:7010/CopyAndPaste/Paste?nodeIDToPasteTo"+this.state.nodeSelect+"?nodes"+nodes)
         .then(response=> {
             const responseData = Object.values(response.data);
             this.setState({pastedNodes: responseData});
