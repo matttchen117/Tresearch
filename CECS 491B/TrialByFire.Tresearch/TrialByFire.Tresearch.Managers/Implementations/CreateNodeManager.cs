@@ -27,7 +27,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private IMessageBank _messageBank { get; }
 
         /// <summary>
-        /// Constructor for creating the manager
+        ///     Constructor for creating the manager
         /// </summary>
         /// <param name="sqlDAO"></param>
         /// <param name="logService"></param>
@@ -57,6 +57,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             {
                 IResponse<string> response = await _createNodeService.CreateNodeAsync(node, cancellationToken).ConfigureAwait(false);
 
+                // Set error message if operation is cancelled
                 if (cancellationToken.IsCancellationRequested)
                 {
                     MethodBase? m = MethodBase.GetCurrentMethod();

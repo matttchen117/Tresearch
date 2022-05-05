@@ -1294,8 +1294,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     throw new OperationCanceledException();
                 }
 
-                return new CreateNodeResponse<string>(_messageBank.GetMessage(
-                    IMessageBank.Responses.createNodeSuccess).Result, null, 200, true);
+                return new CreateNodeResponse<string>("", _messageBank.GetMessage(
+                    IMessageBank.Responses.createNodeSuccess).Result, 200, true);
             }
             catch (OperationCanceledException)
             {

@@ -33,8 +33,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.CreateNode
         }
         
         [Theory]
-        [InlineData("51549CF94E96FED6DB3B43BD4B3A989B77CC44E481D40BF86A262D081B029C9CEBE4E4D228A288301408797DD30CC094B7814ACB87695D0ACCE0A28C5FA9B126",
-            14, "OHP", "OHP for ORM", "jelazo@live.com", "user", "200: Server: Create Node Success")]
+        [InlineData("75250943621632BA2A2B7BF4FAC0C05F2AC9D5FB5109A6B3E242177B6DE1B23571B134A3DEAD2C45C00D997862A206650A2ADC01881E2E03D80942EF5D6608F6",
+            1702, "Over-head Press", "OHP for ORM", "jelazo@live.com", "user", "200: Server: Create Node Success")]
         public async Task CreateTheNodeAsync(string userhash, long parentID, string nodeTitle, string summary, string username, string role, string expected)
         {
             // Arrange

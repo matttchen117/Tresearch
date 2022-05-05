@@ -12,7 +12,8 @@ using System.Text;
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
     /// <summary>
-    /// Controller class for creating Nodes.
+    /// CreateNodeController: Class that is part of the Controller layer that handles receiving and returning 
+    ///     HTTP response and requests
     /// </summary>
     [ApiController]
     [EnableCors]
@@ -22,7 +23,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         private ILogManager _logManager { get; }
         private ICreateNodeManager _createNodeManager { get; }
         private IMessageBank _messageBank { get; }
-        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         /// <summary>
         /// Constructing for creating the Controller
         /// </summary>
@@ -40,7 +40,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         /// Entry point for node creation requests that forwards the given input to the CreateNodeManager for the opration to be performed.
         /// </summary>
         /// <param name="userhash"></param>
-        /// <param name="node"></param>
+        /// <param name="parentNodeID"></param>
+        /// <param name="nodeTitle"
         /// <returns></returns>
         [HttpPost]
         [Route("createNode")]
