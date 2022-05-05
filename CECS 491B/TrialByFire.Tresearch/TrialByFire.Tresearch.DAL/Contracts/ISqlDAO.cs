@@ -10,7 +10,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 {
     public interface ISqlDAO
     {
-        public Task<IResponse<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput); 
+        public Task<IResponse<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput);
         public Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> CreateUserHashAsync(int ID, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default);
@@ -108,7 +108,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         //Rating
         public Task<IResponse<NodeRating>> RateNodeAsync(NodeRating rating, CancellationToken cancellationToken = default(CancellationToken));
-        
+
         public Task<IResponse<IEnumerable<Node>>> GetNodeRatingAsync(List<long> nodeID, CancellationToken cancellationToken = default(CancellationToken));
 
 
@@ -123,15 +123,16 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         public Task<string> UpdateAccountAsync(IAccount account, IAccount updatedAccount, CancellationToken cancellationToken = default(CancellationToken));
 
-        
 
-        public Task<string> CreateNodeAsync(INode node, CancellationToken cancellationToken = default);
-        public Task<string> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default);
+
+        public Task<IResponse<string>> CreateNodeAsync(INode node, CancellationToken cancellationToken = default);
+        public Task<IResponse<string>> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default);
+        public Task<IResponse<string>> EditParentNodeAsync(long nodeID, string nodeIDs, CancellationToken cancellationToken = default);
         public Task<string> UpdateNodeAsync(INode updatedNode, INode previousNode, CancellationToken cancellationToken = default);
         public Task<Tuple<INode, string>> GetNodeAsync(long nID, CancellationToken cancellationToken = default);
         public Task<Tuple<List<INode>, string>> GetNodesAsync(string userHash, string acccountHash, CancellationToken cancellationToken = default);
         public Task<Tuple<List<INode>, string>> GetNodeChildren(long nID, CancellationToken cancellationToken = default);
-        
+
         public string CreateNodesCreated(INodesCreated nodesCreated);
 
         public Task<List<NodesCreated>> GetNodesCreatedAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
@@ -210,6 +211,17 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         /// <returns>List of tags and string status result</returns>
         public Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken));
 
+
+
         public Task<string> VerifyAuthorizedToView(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default);
+
+
+        public Task<IResponse<IEnumerable<Node>>> CopyNodeAsync(List<long> nodesCopy, CancellationToken cancellationToken = default(CancellationToken));
+
+
+        public Task<IResponse<string>> PasteNodeAsync(string userHash, long nodeIDPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<string> IsNodeLeaf(long nodeIDToPasteTo, CancellationToken cancellationToken = default(CancellationToken));
+
     }
 }

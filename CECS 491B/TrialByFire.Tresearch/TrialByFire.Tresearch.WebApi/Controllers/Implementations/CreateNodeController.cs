@@ -7,34 +7,31 @@ using TrialByFire.Tresearch.Managers.Implementations;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
+using System.Text;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
     /// <summary>
-    /// Controller class for creating Nodes.
+    /// CreateNodeController: Class that is part of the Controller layer that handles receiving and returning 
+    ///     HTTP response and requests
     /// </summary>
     [ApiController]
     [EnableCors]
     [Route("[controller]")]
     public class CreateNodeController : Controller, ICreateNodeController
     {
-        private ISqlDAO _sqlDAO { get; }
-        private ILogService _logService { get; }
+        private ILogManager _logManager { get; }
         private ICreateNodeManager _createNodeManager { get; }
         private IMessageBank _messageBank { get; }
-        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         /// <summary>
         /// Constructing for creating the Controller
         /// </summary>
-        /// <param name="sqlDAO"></param>
-        /// <param name="logService"></param>
+        /// <param name="logManager"></param>
         /// <param name="createNodeManager"></param>
         /// <param name="messageBank"></param>
-        public CreateNodeController(ISqlDAO sqlDAO, ILogService logService, 
-            ICreateNodeManager createNodeManager, IMessageBank messageBank)
+        public CreateNodeController(ILogManager logManager, ICreateNodeManager createNodeManager, IMessageBank messageBank)
         {
-            _sqlDAO = sqlDAO;
-            _logService = logService;
+            _logManager = logManager;
             _createNodeManager = createNodeManager;
             _messageBank = messageBank;
         }
@@ -42,34 +39,58 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         /// <summary>
         /// Entry point for node creation requests that forwards the given input to the CreateNodeManager for the opration to be performed.
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="node"></param>
+        /// <param name="userhash"></param>
+        /// <param name="parentNodeID"></param>
+        /// <param name="nodeTitle"
         /// <returns></returns>
         [HttpPost]
         [Route("createNode")]
-        public async Task<IActionResult> CreateNodeAsync(System.Collections.ArrayList paramList)
+        public async Task<ActionResult<string>> CreateNodeAsync(string userhash, long parentNodeID, string nodeTitle, string summary)
         {
+            StringBuilder stringBuilder = new StringBuilder();
             try
             {
-                string[] split;
-                IAccount account = Newtonsoft.Json.JsonConvert.DeserializeObject<IAccount>(paramList[0].ToString());
-                INode node = Newtonsoft.Json.JsonConvert.DeserializeObject<INode>(paramList[1].ToString());
-                string result = await _createNodeManager.CreateNodeAsync(account, node, _cancellationTokenSource.Token).ConfigureAwait(false);
-                if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.createNodeSuccess).ConfigureAwait(false)))
+                Node node = new Node(userhash, 0, parentNodeID, nodeTitle, summary, DateTime.UtcNow, true, false);
+                CancellationToken cancellationToken = new CancellationToken();
+                IResponse<string> response = await _createNodeManager.CreateNodeAsync(userhash, node, cancellationToken).ConfigureAwait(false);
+                if (response.Data != null && response.IsSuccess && response.StatusCode == 200)
                 {
-                    split = result.Split(": ");
-                    return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
+                    // Check if time was exceeded
+                    if (response.ErrorMessage.Equals(""))
+                    {
+                        await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Info, ILogManager.Categories.Server,
+                            stringBuilder.ToString());
+                    }
+                    else
+                    {
+                        await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server,
+                            response.ErrorMessage);
+                    }
+                    return response.Data;
                 }
-                split = result.Split(": ");
-                return StatusCode(Convert.ToInt32(split[0]), split[2]);
+                else if (response.StatusCode >= 500)
+                {
+                    stringBuilder.AppendFormat(response.ErrorMessage, userhash, node.ToString());
+                    await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Data,
+                        stringBuilder.ToString());
+                    return StatusCode(response.StatusCode, response.ErrorMessage);
+                }
+                else
+                {
+                    stringBuilder.AppendFormat(response.ErrorMessage, userhash, node.ToString());
+                    await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Data,
+                        stringBuilder.ToString());
+                    return new BadRequestObjectResult(response.ErrorMessage) { StatusCode = response.StatusCode };
+                }
             }
-            catch (OperationCanceledException tce)
+            catch (Exception ex)
             {
-                return StatusCode(400, tce.Message);
-            }
-            catch(Exception ex)
-            {
-                return StatusCode(400, ex.Message);
+                stringBuilder.AppendFormat(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false),
+                    ex.Message, stringBuilder.AppendFormat("UserHash: {0}",
+                    userhash));
+                await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server,
+                    stringBuilder.ToString());
+                return BadRequest();
             }
         }
     }

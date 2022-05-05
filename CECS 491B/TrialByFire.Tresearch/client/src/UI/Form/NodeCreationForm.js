@@ -1,58 +1,68 @@
 import React, { useState } from "react";
 import {useNavigate} from "react-router-dom";
 import axios, {AxiosResponse, AxiosError} from 'axios';
-import { pbkdf2 } from "pbkdf2/lib/sync";
 
-import ".NodeCreationForm.css";
+import "./NodeCreationForm.css";
 import Button from "../Button/ButtonComponent";
 
 class NodeCreationForm extends React.Component{
     state = {
-        email: '',
+        userhash: '',
         nodeParentID: 0,
         nodeTitle: '',
-        summary: '',
-        visibility: true,
+        summary: ''
     }
 
     handleInput() {
-        var regexEmail = new RegExp("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{3}$");
-
-        if(!regexEmail.test(this.state.email)){
-            this.setState({errorMessage: 'Invalid email'});
-            return false;
-        }
-
         return true;
     }
 
-    inputEmailHandler = (e) => {
-        let updatedEmail = e.target.value;
-        this.setState({ email: updatedEmail});
+    inputUserHashHandler = (e) => {
+        let updatedHash = e.target.value;
+        this.setState({ userhash: updatedHash});
     }
 
-    inputTitleHandler = (event) => {
-        let updatedTitle = event.target.value;
+    inputParentNodeIDHandler = (e) => {
+        let updateParentID = e.target.value;
+        this.setState({nodeParentID: updateParentID});
+    }
+ 
+    inputTitleHandler = (e) => {
+        let updatedTitle = e.target.value;
         this.setState({nodeTitle: updatedTitle});
     }
     
-    inputSummaryHandler = (event) => {
-        let updatedSummary = event.target.value;
+    inputSummaryHandler = (e) => {
+        let updatedSummary = e.target.value;
         this.setState({summary: updatedSummary});
     }
 
-    onSubmitHanlder = (event) => {
+    onSubmitHandler = (e) => {
         e.preventDefault();
+        console.log(this.state.userhash, this.state.nodeParentID, this.state.nodeTitle, this.state.summary)
 
         if(this.handleInput()){
             this.setState({errorMessage: ''})
-            axios.post('https://trialbyfiretresearchwebapi.azurewebsites.jet/CreateNode/createNode?email=' + this.state.email.toLowerCase() + 
-            this.state.nodeParentID + this.state.nodeTitle + this.state.summary).then(res => {
-                window.location = 'CreateNode/NodeCreated';
+            axios.post('https://localhost:7010/CreateNode/createNode?userhash=' + this.state.userhash + '&parentNodeID=' + 
+            this.state.nodeParentID + '&nodeTitle=' + this.state.nodeTitle + '&summary=' + this.state.summary).
+            then(response => {
+                const responseData = Object.values(response.data);
+                console.log(responseData);
+                window.location.reload();
             })
-            .catch( err => {
-                this.setState({errorMessage: 'Unable to create node'});
-            })
+            .catch(function (error) {
+                if (error.response) {
+                  // Request made and server responded
+                  console.log(error.response.data);
+                  console.log(error.response.status);
+                  console.log(error.response.headers);
+                } else if (error.request) {
+                  // The request was made but no response was received
+                  console.log(error.request);
+                } else {
+                  // Something happened in setting up the request that triggered an Error
+                  console.log('Error', error.message);}
+                })
         }
     }
 
@@ -61,14 +71,20 @@ class NodeCreationForm extends React.Component{
             <div className="form-createNode-container">
                 <form className="createNode-form" onSubmit={this.onSubmitHandler}>
                     <div className="input-container">
-                        <input type="text" value={this.state.nodeTitle} required placeholder="Email Address" on onChange={this.inputEmailHandler}/>
+                        <input type="text" value={this.state.userhash} required placeholder="Userhash" on onChange={this.inputUserHashHandler}/>
                     </div>
                     <div className="input-container">
                         <input type="text" value={this.state.nodeTitle} required placeholder="Node Title" on onChange={this.inputTitleHandler}/>
+                    </div>
+                    <div className="input-container">
+                        <input type="number" value={this.state.nodeParentID} required placeholder="Node Parent ID" on onChange={this.inputParentNodeIDHandler}/>
                     </div>    
                     <div className="input-container">
-                        <input type="text" value={this.state.nodeTitle} required placeholder="Node Summary" on onChange={this.inputSummaryHandler}/>
-                    </div>  
+                        <input type="text" value={this.state.summary} required placeholder="Node Summary" on onChange={this.inputSummaryHandler}/>
+                    </div>
+                    <div className="create-button-container">
+                            <Button type="button" color="green" name="Create"/>
+                        </div>
                     {this.state.errorMessage && <div className="error-createNode"> {this.state.errorMessage} </div>}
                 </form>
             </div>
@@ -77,8 +93,9 @@ class NodeCreationForm extends React.Component{
         return (
             <div className="form-createNode-wrapper">
                 <div className="container-createNode-text">
-                    <h1 className="createNode-title">Create Node</h1>
+                    <h1 className="createNode-title">NodeCreation</h1>
                 </div>    
+                {renderForm}
             </div>
         );
     }

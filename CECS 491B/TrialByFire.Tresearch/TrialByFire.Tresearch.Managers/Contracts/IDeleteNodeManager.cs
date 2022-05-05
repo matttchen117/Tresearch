@@ -9,6 +9,6 @@ namespace TrialByFire.Tresearch.Managers.Contracts
 {
     public interface IDeleteNodeManager
     {
-        Task<string> DeleteNodeAsync(IAccount account, long nodeID, long parentID, CancellationToken cancellation = default);
+        Task<IResponse<string>> DeleteNodeAsync(string userhash, long nodeID, long parentID, CancellationToken cancellationToken = default);
     }
 }
