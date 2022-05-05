@@ -83,5 +83,26 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
+
+        public async Task<string> VerifyAuthorizedToView(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                string result = await _sqlDAO.VerifyAuthorizedToView(nodeIDs, userHash, cancellationToken);
+
+                return result;
+            } 
+            catch(InvalidOperationException)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.notFoundOrAuthorized).ConfigureAwait(false);
+            }
+            catch(Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+            }
+        }
+
     }
 }

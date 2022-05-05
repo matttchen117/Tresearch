@@ -23,6 +23,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _messageBank = messageBank;
             _options = options.Value;
         }
+
         /// <summary>
         ///  
         /// </summary>
@@ -56,25 +57,31 @@ namespace TrialByFire.Tresearch.Services.Implementations
         }
 
 
-        public async Task<IResponse<double>> GetNodeRatingAsync(long nodeID, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<IEnumerable<Node>>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                IResponse<double> result = await _sqlDAO.GetNodeRatingAsync(nodeID, cancellationToken);
+                // Check if list of node IDs is null or empty
+                if(nodeIDs == null || nodeIDs.Count.Equals(0))
+                {
+                    return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound), new List<Node>(), 404, false);
+                }
+
+                // Get Rating of Nodes
+                IResponse<IEnumerable<Node>> result = await _sqlDAO.GetNodeRatingAsync( nodeIDs , cancellationToken);
 
                 return result;
 
             }
             catch (OperationCanceledException)
             {
-                //rollback not necessary
-                return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), 0, 408, false);
+                return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), new List<Node>(), 408, false);
             }
             catch (Exception ex)
             {
-                return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, 0, 500, false);
+                return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, new List<Node>(), 500, false);
             }
         }
     }

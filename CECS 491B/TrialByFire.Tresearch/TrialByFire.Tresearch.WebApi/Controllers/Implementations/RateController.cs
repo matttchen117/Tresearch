@@ -75,36 +75,24 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             }
         }
         [HttpPost("getRating")]
-        public async Task<IActionResult> GetNodeRatingAsync(long nodeID)
+        public async Task<IActionResult> GetNodeRatingAsync(List<long> nodeIDs)
         {
             try
             {
-                if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
+                IResponse<IEnumerable<Node>> results = await _rateManager.GetNodeRatingAsync(nodeIDs);
+
+                if (results.StatusCode == 200)
                 {
-                    IResponse<double> results = await _rateManager.GetNodeRatingAsync(nodeID, _cancellationTokenSource.Token);
-                    
-                    if(results.StatusCode == 200)
-                    {
-                        _logManager.StoreAnalyticLogAsync(DateTime.Now, ILogManager.Levels.Info, ILogManager.Categories.Server, "Rating: Ratings retrieved.");
-                        return new OkObjectResult(results.Data);
-                    }
-                    else
-                    {
-                        string[] split;
-                        split = results.ErrorMessage.Split(":");
-                        Enum.TryParse(split[1], out ILogManager.Categories category);
-                        _logManager.StoreArchiveLogAsync(DateTime.Now, ILogManager.Levels.Error, category, split[2]);
-                        return StatusCode(Convert.ToInt32(split[0]), split[2]);
-                    }
+                    _logManager.StoreAnalyticLogAsync(DateTime.Now, ILogManager.Levels.Info, ILogManager.Categories.Server, "Rating: Ratings retrieved.");
+                    return new OkObjectResult(results.Data);
                 }
                 else
                 {
-                    string errorResult = await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated);
-                    string[] errorSplit;
-                    errorSplit = errorResult.Split(":");
-                    Enum.TryParse(errorSplit[0], out ILogManager.Categories category);
-                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Error, category, errorSplit[2]);
-                    return StatusCode(Convert.ToInt32(errorSplit[0]), errorSplit[2]);
+                    string[] split;
+                    split = results.ErrorMessage.Split(":");
+                    Enum.TryParse(split[1], out ILogManager.Categories category);
+                    _logManager.StoreArchiveLogAsync(DateTime.Now, ILogManager.Levels.Error, category, split[2]);
+                    return StatusCode(Convert.ToInt32(split[0]), split[2]);
                 }
             }
             catch (Exception ex)
@@ -114,7 +102,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 errorSplit = errorResult.Split(":");
                 Enum.TryParse(errorSplit[0], out ILogManager.Categories category);
                 _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Error, category, errorSplit[2]);
-                return StatusCode(Convert.ToInt32(errorSplit[0]), errorSplit[2]);
+                return StatusCode(Convert.ToInt32(errorSplit[0]), ex.Message);
             }
         }
 

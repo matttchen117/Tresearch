@@ -33,7 +33,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                //Check if user is authenticated
+                // Check if user is authenticated
                 if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
                     //Get user's role
@@ -80,11 +80,13 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             }
         }
 
-        public async Task<IResponse<double>> GetNodeRatingAsync(long nodeID, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<IEnumerable<Node>>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             { 
                 cancellationToken.ThrowIfCancellationRequested();
+                string userHash = _options.GuestHash;
+
                 if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
                     //Get user's role
@@ -94,29 +96,36 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     else if (Thread.CurrentPrincipal.IsInRole(_options.Admin))
                         role = _options.Admin;
                     else
+                        return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unknownRole), new List<Node>(), 500, false);
 
-                        return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.unknownRole), 0, 500, false);
-
-                    //UserAccount with user's username and role
                     IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
+                    
+                    userHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
 
-                    //Verify if account is enabled and confirmed
+
+                    // Verify if account is enabled and confirmed, if not return error
                     string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken);
-
-                    //Check if account is enabled and confirme, if not return error
                     if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
-                        return new RateResponse<double>(resultVerifyAccount, 0, 500, false);
-
-                    IResponse<double> results = await _rateService.GetNodeRatingAsync(nodeID, cancellationToken);
-
-                    return results;
+                    {
+                        return new RateResponse<IEnumerable<Node>>(resultVerifyAccount, new List<Node>(), 500, false);
+                    }
                 }
-                else
-                    return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated), 0, 401, false);
+
+                // User is authorized to view node data (Check for public, if nodes are private check if user owns them)
+                string resultVerifyViewable = await _accountVerificationService.VerifyAuthorizedToView(nodeIDs, userHash, cancellationToken);
+                if(!resultVerifyViewable.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
+                {
+                    return new  RateResponse<IEnumerable<Node>>(resultVerifyViewable, new List<Node>(), 500, false);
+                }
+
+                // Get Ratings of Nodes
+                IResponse<IEnumerable<Node>> results = await _rateService.GetNodeRatingAsync(nodeIDs, cancellationToken);
+
+                return results;
             }
             catch (Exception ex)
             {
-                return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, 0, 500, false);
+                return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, new List<Node>(), 500, false);
             }
         }
     }

@@ -82,29 +82,38 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Rate
 
         [Theory]
         [MemberData(nameof(GetRatingsData))]
-        public async Task GetRatings(int node, double ratings, IMessageBank.Responses response)
+        public async Task GetRatings(List<int> ids, double ratings, IEnumerable<Node> nodes, IMessageBank.Responses response)
         {
             //Arrange
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            string ex = await messageBank.GetMessage(response);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
+            List<long> nodeIDs = GetNodes(ids);
+
+            for(int i = 0; i < nodes.Count(); i++)
+            {
+                nodes.ElementAt(i).NodeID = nodeIDs[i];
+            }
+
+            string ex = await messageBank.GetMessage(response);
             string[] split;
             split = ex.Split(":");
 
-            IResponse<double> expected;
+            IResponse<IEnumerable<Node>> expected;
 
-            if (Convert.ToInt32(split[0]) == 200)
+            if (response.Equals(IMessageBank.Responses.getRateSuccess))
             {
-                expected = new RateResponse<double>("", ratings, 200, true);
+                expected = new RateResponse<IEnumerable<Node>>("", nodes, 200, true);
             }
             else
             {
-                expected = new RateResponse<double>(ex, ratings, Convert.ToInt32(split[0]), false);
+                expected = new RateResponse<IEnumerable<Node>>(ex, nodes, Convert.ToInt32(split[0]), false);
             }
+
+
             //Act
-            IResponse<double> result = await sqlDAO.GetNodeRatingAsync(GetNode(node), cancellationTokenSource.Token);
+            IResponse<IEnumerable<Node>> result = await sqlDAO.GetNodeRatingAsync(nodeIDs);
 
             //Assert
             Assert.Equal(expected, result);
@@ -124,8 +133,8 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Rate
              * 
              */
             string userHash0 = "a4adfe7c09a5ff48c6d9ad3a0e5b783d8cf566a335ac012a31d8ff605e3c34dcb471fef37457d1e13071d7cbc93242d9e5220a9ee3d880bd25c9a514b0bb0834";
-            int nodeID0 = 0;
-            int rating0 = 1;
+            var nodeID0 = 0;
+            var rating0 = 1;
             IMessageBank.Responses messageBankResponse0 =  IMessageBank.Responses.userRateSuccess;
 
 
@@ -148,7 +157,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Rate
              *      Result:                     "200: Server: User rating added."
              * 
              */
-            var nodeID0 = 1;
+            var nodeID0 = new List<int> { 0, 1 };
             var ratings0 = 1.0;
             IMessageBank.Responses messageBankResponse0 = IMessageBank.Responses.getRateSuccess;
 

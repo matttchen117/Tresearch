@@ -31,6 +31,7 @@ class TreeView extends React.Component{
             stroke: 'black',
             strokeWidth: "1",
             pathFunc: 'diagonal'
+            
         }
 
         this.treeOnHighlight = {

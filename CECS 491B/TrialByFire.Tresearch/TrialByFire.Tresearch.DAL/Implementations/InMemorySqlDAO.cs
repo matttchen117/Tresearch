@@ -1384,11 +1384,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return new RateResponse<NodeRating>("", rating, 200, true);
         }
 
-        public async Task<IResponse<double>> GetNodeRatingAsync(long nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<IEnumerable<Node>>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             List<double> ratings = new List<double>();
             
-            return new RateResponse<double>("", 1.0, 200, true);
+            return new RateResponse<IEnumerable<Node>>("", new List<Node>(), 200, true);
         }
 
         public async Task<string> UpdateAccountAsync(IAccount account, IAccount updatedAccount, CancellationToken cancellationToken = default(CancellationToken))
@@ -1422,6 +1422,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
+        }
+
+        public async Task<string> VerifyAuthorizedToView(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default)
+        {
+            return "";
         }
     }
 }

@@ -2587,14 +2587,71 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<IResponse<double>> GetNodeRatingAsync(long nodeID, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<IEnumerable<Node>>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if node list is null or empty
+                if(nodeIDs == null || nodeIDs.Count.Equals(0))
+                {
+                    return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound), new List<Node>(), 404, false);
+                }
+
+                string nodeCSV = "";
+
+                // Create Comma Seperated Values
+                foreach(long node in nodeIDs)
+                {
+                    nodeCSV += node + ",";
+                }
+
+                // Establish connection to database
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    // Open connection
+                    await connection.OpenAsync();
+                    var procedure = "dbo.[GetNodesRatings]";
+                    var parameters = new { InNodes = nodeCSV };
+
+                    List<Node> result = new List<Node>(await connection.QueryAsync<Node>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false));
+
+                    // Tag has been added, return success
+                    return new RateResponse<IEnumerable<Node>>("", result , 200, true);
+                }
+            }
+            catch (SqlException ex)
+            {
+                // Check sql exception
+                switch (ex.Number)
+                {
+                    // Unable to connect to database
+                    case -1:
+                        return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail), new List<Node>(), 503, false);
+                    default:
+                        return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, new List<Node>(), 500, false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // bubble up
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, new List<Node>(), 500, false);
+            }
+        }
+
+        public async Task<IResponse<double>> GetUserNodeRatingAsync(long nodeID, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 //Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
 
-                if(nodeID < 0)
+                if (nodeID < 0)
                     return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound), 0, 404, false);
 
                 // Establish connection to database
@@ -2602,7 +2659,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //Open connection
                     await connection.OpenAsync();
-                    var procedure = "dbo.[GetNodeRating]";
+                    var procedure = "dbo.[GetUserNodeRating]";
                     var parameters = new { NodeID = nodeID };
 
                     double result = await connection.ExecuteScalarAsync<double>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
@@ -2631,6 +2688,63 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             catch (Exception ex)
             {
                 return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, 0, 500, false);
+            }
+        }
+
+        public async Task<string> VerifyAuthorizedToView(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                //Throw Cancellation Exception if token requests cancellation
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (nodeIDs == null || nodeIDs.Count <= 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+
+                string nodeCSV = "";
+
+                // Create Comma Seperated Values
+                foreach (long node in nodeIDs)
+                {
+                    nodeCSV += node + ",";
+                }
+
+                // Establish connection to database
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Open connection
+                    await connection.OpenAsync();
+                    var procedure = "dbo.[VerifyAuthorizedToView]";
+                    var parameters = new { InNodes = nodeCSV, UserHash = userHash};
+
+                    var result = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    if (result == 0)
+                        return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
+
+                    return await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false);
+                }
+            }
+            catch (SqlException ex)
+            {
+                //Check sql exception
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
+                    default:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback already handled
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+            }
+            catch (Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message;
             }
         }
 

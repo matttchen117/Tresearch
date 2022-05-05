@@ -63,6 +63,10 @@ DROP PROCEDURE IF EXISTS GetUserHash
 DROP PROCEDURE IF EXISTS SearchNodes
 DROP PROCEDURE IF EXISTS RefreshSession
 DROP PROCEDURE IF EXISTS GetNodes
+DROP PROCEDURE IF EXISTS GetNodeRating
+DROP PROCEDURE IF EXISTS GetUserNodeRating
+DROP PROCEDURE IF EXISTS GetNodesRatings
+DROP PROCEDURE IF EXISTS GetUserNodesRatings
 
 CREATE TABLE [dbo].Accounts(
 	UserID INT IDENTITY(1,1) NOT NULL,
@@ -1342,4 +1346,85 @@ CREATE PROCEDURE [dbo].[GetNodeRating]
 as
 begin
 	SELECT Avg(Rating) FROM NodeRatings Where NodeID = @NodeID
+end
+
+
+-- =============================================
+-- Author:		Pammy Poor
+-- Description:	Get Node's Ratings
+-- =============================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetUserNodeRating]    
+(
+	@NodeID BIGINT,
+	@UserHash VARCHAR(128)
+)
+as
+begin
+	SELECT Avg(Rating) FROM NodeRatings Where NodeID = @NodeID AND UserHash = @UserHash
+end
+
+DROP PROCEDURE IF EXISTS GetNodesRatings
+-- =============================================
+-- Author:		Pammy Poor
+-- Description:	Get Nodes Ratings
+-- =============================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetNodesRatings](@InNodes VARCHAR(MAX))
+as
+begin
+
+	SELECT Nodes.UserHash, Nodes.NodeID, NodeTitle, COALESCE(AVG(Rating),0) AS Rating
+        FROM Nodes LEFT JOIN NodeRatings ON Nodes.NodeID = NodeRatings.NodeID
+        WHERE Nodes.NodeID IN (SELECT Value from STRING_SPLIT(@InNodes, ','))
+		GROUP BY Nodes.UserHash, Nodes.NodeID, NodeTitle
+end
+
+-- =============================================
+-- Author:		Pammy Poor
+-- Description:	Get Nodes Ratings
+-- =============================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetUserNodesRatings]    
+(
+	@InNodes VARCHAR(MAX),
+	@UserHash VARCHAR(128)
+)
+as
+begin
+	SELECT Nodes.UserHash, Nodes.NodeID, NodeTitle, Rating FROM Nodes LEFT JOIN NodeRatings on Nodes.NodeID = NodeRatings.NodeID 
+	WHERE Nodes.NodeID IN (SELECT Value from STRING_SPLIT(@InNodes, ',')) AND NodeRatings.UserHash = @UserHash
+
+end
+
+
+
+-- =============================================
+-- Author:		Pammy Poor
+-- Description:	Verify nodes are public or owned by user
+-- =============================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[VerifyAuthorizedToView]    
+(
+	@InNodes VARCHAR(MAX),
+	@UserHash VARCHAR(128)
+)
+as
+begin
+	SELECT CASE WHEN (SELECT COUNT(*) FROM Nodes WHERE NodeID IN (SELECT Value from STRING_SPLIT(@InNodes, ',')) AND (Visibility = 1 OR UserHash = @UserHash)) = (SELECT Count(*) from STRING_SPLIT(@InNodes, ','))
+	  THEN CAST(1 AS BIT)
+	  ELSE CAST(0 AS BIT)
+	END
 end

@@ -109,7 +109,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         //Rating
         public Task<IResponse<NodeRating>> RateNodeAsync(NodeRating rating, CancellationToken cancellationToken = default(CancellationToken));
         
-        public Task<IResponse<double>> GetNodeRatingAsync(long nodeID, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<IResponse<IEnumerable<Node>>> GetNodeRatingAsync(List<long> nodeID, CancellationToken cancellationToken = default(CancellationToken));
 
 
         /**
@@ -209,5 +209,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns>List of tags and string status result</returns>
         public Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<string> VerifyAuthorizedToView(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default);
     }
 }
