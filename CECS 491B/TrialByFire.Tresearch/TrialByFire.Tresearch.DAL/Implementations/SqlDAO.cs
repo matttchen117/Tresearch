@@ -86,6 +86,52 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     IMessageBank.Responses.noSearchInput).ConfigureAwait(false), null, 400, false);
             }
         }
+
+        public async Task<IResponse<string>> EditParentNodeAsync(long nodeID, string nodeIDs, CancellationToken cancellationToken = default)
+        {
+            if(nodeIDs != null)
+            {
+                try
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    using(var connection = new SqlConnection(_options.SqlConnectionString))
+                    {
+                        var procedure = "[EditParents]";
+                        var parameters = new
+                        {
+                            NodeID = nodeID,
+                            NodeIDs = nodeIDs
+                        };
+                        var result = await connection.QueryAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                        return new EditParentResponse<string>("", 
+                            await _messageBank.GetMessage(IMessageBank.Responses.editParentSuccess).ConfigureAwait(false), 200, true);
+                    }
+                }
+                catch(SqlException ex)
+                {
+                    switch (ex.Number)
+                    {
+                        // Unable to connect to database
+                        case -1:
+                            return new EditParentResponse<string>(await _messageBank.GetMessage(
+                                IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false), null, 400, false);
+                        default:
+                            return new EditParentResponse<string>("500: Database: " + ex.Message, null, 400, false);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    return new EditParentResponse<string>(await _messageBank.GetMessage(
+                        IMessageBank.Responses.unhandledException).ConfigureAwait(false), null, 400, false);
+                }
+            }
+            else
+            {
+                return new EditParentResponse<string>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.noEditParentNodeInput).ConfigureAwait(false), null, 400, false);
+            }
+        }
+
         public async Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -2274,72 +2320,63 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> CreateNodeAsync(INode node, CancellationToken cancellationToken = default)
+        public async Task<IResponse<string>> CreateNodeAsync(INode node, CancellationToken cancellationToken = default)
         {
             try
             {
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    //node.accountOwner = "27a285fe87f1d0afb44f2310824f49bbf1aaea02b856d314412119142ecfbb46ece7dcadc6c516c4d3918532df9375bd9f377e395143f0a29aed88654bff1c95";
                     var procedure = "dbo.[CreateNode]";
                     var values = new
                     {
                         UserHash = node.UserHash,
-                        NodeParentID = node.ParentNodeID,
+                        ParentNodeID = node.ParentNodeID,
                         NodeTitle = node.NodeTitle,
                         Summary = node.Summary,
                         TimeModified = node.TimeModified,
                         Visibility = node.Visibility,
-                        Deleted = false,
+                        //Deleted = false,
                     };
                     int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, values, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                     if(affectedRows == 1)
                     {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.createNodeSuccess).ConfigureAwait(false);
+                        return new CreateNodeResponse<string>("", await _messageBank.GetMessage(IMessageBank.Responses.createNodeSuccess).ConfigureAwait(false), 200, true);
                     }
                     else
                     {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.createNodeFail).ConfigureAwait(false);
+                        return new CreateNodeResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.createNodeFail).ConfigureAwait(false), null, 500, false);
                     }
                 }
             }
-            catch(OperationCanceledException)
-            {
-                return _messageBank.ErrorMessages["cancellationRequested"];
-            }
             catch(Exception ex)
             {
-                return "500: Database: " + ex.Message;
+                return new CreateNodeResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
             }
         }
 
-        public async Task<string> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default)
+        public async Task<IResponse<string>> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default)
         {
             try
             {
                 int affectedRows;
                 cancellationToken.ThrowIfCancellationRequested();
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
-                }
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var procedure = "dbo.[DeleteNode]";
                     var parameters = new
                     {
                         NodeID = nodeID,
-                        NodeParentID = parentID
+                        ParentNodeID = parentID
                     };
                     affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     if (affectedRows == 0)
                     {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.deleteNodeSuccess).ConfigureAwait(false);
+                        return new DeleteNodeResponse<string>("", await _messageBank.GetMessage(IMessageBank.Responses.deleteNodeSuccess).ConfigureAwait(false), 200, true);
                     }
                     else
                     {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.deleteNodeFail).ConfigureAwait(false);
+                        return new DeleteNodeResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.deleteNodeFail).ConfigureAwait(false), null, 500, false);
                     }
                 }
             }
@@ -2349,7 +2386,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch(Exception ex)
             {
-                return ("500: Database: " + ex.Message);
+                return new DeleteNodeResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
             }
         }
 

@@ -27,19 +27,18 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.DeleteNode
         }
 
         [Theory]
-        [InlineData(69420, 69419, "200: Server: Delete Node Success")]
-        [InlineData(80085, 80084, "504: Database: The node was not found.")]
+        [InlineData(13, 12, "200: Server: Delete Node Success")]
         public async Task DeleteTheNode(long nodeID, long parentID, string expected)
         {
-            //Arrange
+            // Arrange
             IDeleteNodeService deleteNodeService = TestProvider.GetService<IDeleteNodeService>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             
-            //Act
-            string result = await deleteNodeService.DeleteNodeAsync(nodeID, parentID, cancellationTokenSource.Token);
+            // Act
+            IResponse<string> result = await deleteNodeService.DeleteNodeAsync(nodeID, parentID, cancellationTokenSource.Token).ConfigureAwait(false);
 
-            //Assert
-            Assert.Equal(expected, result);
+            // Assert
+            Assert.Equal(expected, result.Data);
         }
     }
 }

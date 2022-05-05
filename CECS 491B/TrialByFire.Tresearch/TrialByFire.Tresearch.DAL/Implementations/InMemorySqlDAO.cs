@@ -59,6 +59,30 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return null;
         }
 
+        public async Task<IResponse<string>> EditParentNodeAsync(long nodeID, string nodeIDs, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                string[] splitString = nodeIDs.Split(',');
+                foreach(Node n in InMemoryDatabase.Nodes)
+                {
+                    for(int i = 0; i < splitString.Length; i++)
+                    {
+                        if(n.NodeID == long.Parse(splitString[i]))
+                        {
+                            n.ParentNodeID = nodeID;
+                        }
+                    }
+                }
+                return new EditParentResponse<string>("", null, 200, true);
+            }
+            catch(Exception ex)
+            {
+                return new EditParentResponse<string>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 400, false);
+            }
+        }
+
         public async Task<int> StoreLogAsync(ILog log, string destination, CancellationToken cancellationToken = default)
         {
             switch(destination)
@@ -1244,7 +1268,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return "200";
         }
 
-        public async Task<string> CreateNodeAsync(INode node, CancellationToken cancellationToken = default)
+        public async Task<IResponse<string>> CreateNodeAsync(INode node, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -1259,7 +1283,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 }
                 if (nodeExists)
                 {
-                    return _messageBank.GetMessage(IMessageBank.Responses.nodeAlreadyExists).Result;
+                    return new CreateNodeResponse<string>(_messageBank.GetMessage(
+                        IMessageBank.Responses.nodeAlreadyExists).Result, null, 500, false);
                 }
 
                 InMemoryDatabase.Nodes.Add(node);
@@ -1269,7 +1294,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     throw new OperationCanceledException();
                 }
 
-                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                return new CreateNodeResponse<string>("", _messageBank.GetMessage(
+                    IMessageBank.Responses.createNodeSuccess).Result, 200, true);
             }
             catch (OperationCanceledException)
             {
@@ -1277,11 +1303,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return _messageBank.GetMessage(IMessageBank.Responses.createNodeFail).Result;
+                return new CreateNodeResponse<string>(_messageBank.GetMessage(
+                    IMessageBank.Responses.unhandledException).Result, null, 500, false);
             }
         }
 
-        public async Task<string> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default)
+        public async Task<IResponse<string>> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -1298,7 +1325,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                 if (!nodeExists)
                 {
-                    return _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).Result;
+                    return new DeleteNodeResponse<string>(_messageBank.GetMessage(
+                        IMessageBank.Responses.nodeNotFound).Result, null, 500, false);
                 }
 
                 List<Node> children = new List<Node>();
@@ -1321,7 +1349,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         n.Deleted = true;
                     }
                 }
-                return _messageBank.GetMessage(IMessageBank.Responses.deleteNodeSuccess).Result;
+                return new DeleteNodeResponse<string>("", _messageBank.GetMessage(
+                    IMessageBank.Responses.deleteNodeSuccess).Result, 200, true);
 
             }
             catch (OperationCanceledException)
@@ -1330,7 +1359,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return "500: Database: " + ex.Message;
+                return new DeleteNodeResponse<string>(_messageBank.GetMessage(
+                    IMessageBank.Responses.unhandledException).Result, null, 500, false);
             }
         }
 

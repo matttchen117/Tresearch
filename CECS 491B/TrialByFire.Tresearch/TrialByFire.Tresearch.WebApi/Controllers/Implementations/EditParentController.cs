@@ -1,59 +1,41 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
-using TrialByFire.Tresearch.DAL.Contracts;
-using TrialByFire.Tresearch.Managers.Contracts;
-using TrialByFire.Tresearch.Managers.Implementations;
-using TrialByFire.Tresearch.Models.Implementations;
-using TrialByFire.Tresearch.Models.Contracts;
-using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 using System.Text;
+using System.Web.Http.Results;
+using TrialByFire.Tresearch.Managers.Contracts;
+using TrialByFire.Tresearch.Models.Contracts;
+using TrialByFire.Tresearch.Models.Implementations;
+using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
-    /// <summary>
-    /// CreateNodeController: Class that is part of the Controller layer that handles receiving and returning 
-    ///     HTTP response and requests
-    /// </summary>
     [ApiController]
     [EnableCors]
     [Route("[controller]")]
-    public class CreateNodeController : Controller, ICreateNodeController
+    public class EditParentController : Controller, IEditParentController
     {
-        private ILogManager _logManager { get; }
-        private ICreateNodeManager _createNodeManager { get; }
-        private IMessageBank _messageBank { get; }
-        /// <summary>
-        /// Constructing for creating the Controller
-        /// </summary>
-        /// <param name="logManager"></param>
-        /// <param name="createNodeManager"></param>
-        /// <param name="messageBank"></param>
-        public CreateNodeController(ILogManager logManager, ICreateNodeManager createNodeManager, IMessageBank messageBank)
+        private ILogManager _logManager;
+        private IEditParentManager _editParentManager;
+        private IMessageBank _messageBank;
+
+        public EditParentController(ILogManager logManager, IEditParentManager editParentManager, IMessageBank messageBank)
         {
             _logManager = logManager;
-            _createNodeManager = createNodeManager;
+            _editParentManager = editParentManager;
             _messageBank = messageBank;
         }
-        
-        /// <summary>
-        /// Entry point for node creation requests that forwards the given input to the CreateNodeManager for the opration to be performed.
-        /// </summary>
-        /// <param name="userhash"></param>
-        /// <param name="parentNodeID"></param>
-        /// <param name="nodeTitle"
-        /// <returns></returns>
+
         [HttpPost]
-        [Route("createNode")]
-        public async Task<ActionResult<string>> CreateNodeAsync(string userhash, long parentNodeID, string nodeTitle, string summary)
+        [Route("editParent")]
+
+        public async Task<ActionResult<string>> EditParentNodeAsync(string userhash, long nodeID, string nodeIDs)
         {
             StringBuilder stringBuilder = new StringBuilder();
             try
             {
-                Node node = new Node(userhash, 0, parentNodeID, nodeTitle, summary, DateTime.UtcNow, true, false);
                 CancellationToken cancellationToken = new CancellationToken();
-                IResponse<string> response = await _createNodeManager.CreateNodeAsync(userhash, node, cancellationToken).ConfigureAwait(false);
-                if (response.Data != null && response.IsSuccess && response.StatusCode == 200)
+                IResponse<string> response = await _editParentManager.EditParentNodeAsync(userhash, nodeID, nodeIDs, cancellationToken).ConfigureAwait(false);
+                if(response.Data != null && response.IsSuccess && response.StatusCode == 200)
                 {
                     // Check if time was exceeded
                     if (response.ErrorMessage.Equals(""))
@@ -68,16 +50,16 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                     }
                     return response.Data;
                 }
-                else if (response.StatusCode >= 500)
+                else if(response.StatusCode >= 500)
                 {
-                    stringBuilder.AppendFormat(response.ErrorMessage, userhash, node.ToString());
+                    stringBuilder.AppendFormat(response.ErrorMessage, userhash, nodeID, nodeIDs);
                     await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Data,
                         stringBuilder.ToString());
                     return StatusCode(response.StatusCode, response.ErrorMessage);
                 }
                 else
                 {
-                    stringBuilder.AppendFormat(response.ErrorMessage, userhash, node.ToString());
+                    stringBuilder.AppendFormat(response.ErrorMessage, userhash, nodeID, nodeIDs);
                     await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Data,
                         stringBuilder.ToString());
                     return new BadRequestObjectResult(response.ErrorMessage) { StatusCode = response.StatusCode };
@@ -86,8 +68,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             catch (Exception ex)
             {
                 stringBuilder.AppendFormat(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false),
-                    ex.Message, stringBuilder.AppendFormat("UserHash: {0}",
-                    userhash));
+                    ex.Message, stringBuilder.AppendFormat("UserHash: {0}, NodeID: {1}, NodeIDs: {3}",
+                    userhash, nodeID, nodeIDs).ToString());
                 await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server,
                     stringBuilder.ToString());
                 return BadRequest();
