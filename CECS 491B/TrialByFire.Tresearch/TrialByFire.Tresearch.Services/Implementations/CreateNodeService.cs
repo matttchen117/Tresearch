@@ -40,22 +40,25 @@ namespace TrialByFire.Tresearch.Services.Implementations
         /// <param name="cancellationToken"></param>
         /// <returns>The result of the operation.</returns>
         /// <returns>The result of the operation with any status codes if applicable</returns>
-        public async Task<string> CreateNodeAsync(IAccount account, INode node, CancellationToken cancellationToken = default)
+        public async Task<IResponse<string>> CreateNodeAsync(INode node, CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            string result;
-            try
+            if (node != null)
             {
-                result = await _sqlDAO.CreateNodeAsync(node, cancellationToken).ConfigureAwait(false);
-                return result;
+                try
+                {
+                    IResponse<string> response = await _sqlDAO.CreateNodeAsync(node, cancellationToken).ConfigureAwait(false);
+                    return response;
+                }
+                catch (Exception ex)
+                {
+                    return new CreateNodeResponse<string>(await _messageBank.GetMessage(
+                        IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 400, false);
+                }
             }
-            catch (OperationCanceledException ece)
+            else
             {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                return ("500: Server: " + ex.Message);
+                return new CreateNodeResponse<string>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.noNodeInput).ConfigureAwait(false), null, 400, false);
             }
         }
     }

@@ -2,7 +2,9 @@ import React from "react";
 import Tree from "react-d3-tree";
 import Popup from "../../Popup/Popup";
 import TagPopup from "../../Popup/TagPopup";
+import CreateNodePopup from "../../Popup/CreateNodePopup";
 import "./TreeView.css";
+import axios from "axios";
 
 class TreeView extends React.Component{
     constructor(props) {
@@ -46,6 +48,7 @@ class TreeView extends React.Component{
         // Initial state of tree view
         this.state = {
             isTaggerOpen: false,
+            isCreateNodeOpen: false,
             isPopupOpen: false,
             nodeSelect: -1,
             shiftDown: false,
@@ -102,11 +105,41 @@ class TreeView extends React.Component{
         }
     }
 
+    //User clicks Add Child
+    CreateNode = (e) => {
+        e.stopPropagation();
+        const currentState = Array.from(new Set(this.state.nodeSelect));
+        this.setState( { nodeSelect: currentState, isCreateNodeOpen: true, isPopupOpen: true, isShown: false,  x: e.pageX, y: e.pageY}) 
+    }
+
+    DeleteNode = (e) => {
+        e.stopPropagation();
+        //console.log(this.state.nodeSelect[0])
+        const n = {userHash: this.state.nodeSelect[0].userHash,
+                        nodeID: this.state.nodeSelect[0].nodeID,
+                        parentNodeID: this.state.nodeSelect[0].parentNodeID,
+                        nodeTitle: "",
+                        summary: "",
+                        timeModified: "2022-05-04T21:08:21.714Z",//temp value
+                        visibility: true,
+                        deleted: false,
+                        exactMatch: false,
+                        tagScore: 0,
+                        ratingScore: 0}
+        console.log(n)
+        axios.post("https://localhost:7010/DeleteNode/deleteNode",n)
+        .then(response=> {
+            const responseData = Object.values(response.data);
+            console.log(responseData);
+            window.location.reload();
+        })
+    }
+
     // User clicks edit 
     EditTags = (e) => {
         e.stopPropagation();
         const currentState = Array.from(new Set(this.state.nodeSelect));
-        this.setState( { nodeSelect: currentState, isTaggerOpen: true, isShown: false,  x: e.pageX, y: e.pageY}) 
+        this.setState( { nodeSelect: currentState, isTaggerOpen: true, isPopupOpen: true, isShown: false,  x: e.pageX, y: e.pageY}) 
         this.unhighlight();
     }
 
@@ -114,8 +147,16 @@ class TreeView extends React.Component{
         const  ToggleTagger = () => {
             
             this.setState({
-                isTaggerOpen: false
+                isTaggerOpen: false,
+                isPopupOpen: false
             })     
+        }
+
+        const ToggleCreate = () => {
+            this.setState({
+                isCreateNodeOpen: false,
+                isPopupOpen: false
+            })
         }
 
         // User left clicks a node
@@ -154,7 +195,7 @@ class TreeView extends React.Component{
 
         // Right click node, open context menu
         const rightClickNode = (e, nodeData) => {
-            this.setState({ nodeSelect: [...this.state.shiftCollection, nodeData.nodeID], shiftCollection: []});
+            this.setState({ nodeSelect: [...this.state.shiftCollection, nodeData], shiftCollection: []});
             this.setState( { isShown: true, x: e.pageX, y: e.pageY})
         }
 
@@ -176,10 +217,12 @@ class TreeView extends React.Component{
             </g>
         );
 
+        
+
         // Render user's tree
         const renderTree = (
             <div className = "tree-portal-container">
-                <div className= {`${this.state.isTaggerOpen ? "taggerOpen" : "base"}`} onClick = {resetShiftCollection} >
+                <div className= {`${this.state.isPopupOpen ? "taggerOpen" : "base"}`} onClick = {resetShiftCollection} >
                     {this.treeData.length != 0 ? (
                         <Tree 
                         data = {this.treeData} 
@@ -193,16 +236,16 @@ class TreeView extends React.Component{
                     ): null}
                     {this.state.isShown && (
                         <div style={{ top: this.state.y, left: this.state.x}}  className="tag-context-menu" >
-                            <div className="option" >
+                            <div className="option" onClick = {this.CreateNode}>
                                 Add Child
                             </div>
-                            <div className="option" >
+                            <div className="option">
                                 Edit Node
                             </div>
                             <div className="option" onClick = {this.EditTags}>
                                 Edit Tags
                             </div>
-                            <div className="option">
+                            <div className="option" onClick = {this.DeleteNode}>
                                 Delete Node(s)
                             </div>
                         </div>
@@ -218,6 +261,7 @@ class TreeView extends React.Component{
                 </div>
                 <div className = "tree-tagger-wrapper">
                     {this.state.isTaggerOpen ? <Popup content = {<TagPopup onClick = {ToggleTagger} nodes = {this.state.nodeSelect}/>}/> : null}
+                    {this.state.isCreateNodeOpen ? <Popup content = {<CreateNodePopup onClick = {ToggleCreate} node = {this.state.nodeSelect}/>}/> : null}
                 </div>
             </div>
         );
