@@ -309,7 +309,17 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "503: Database: Mismatched amount of nodes pasted";
                 case Responses.notAuthorizedToPasteTo:
                     return "400: Server: Cannot paste to another user's tree";
-                
+
+
+                case Responses.privateNodeSuccess:
+                    return "200: Server: Private Node Success";
+                case Responses.privateNodeFailure:
+                    return "400: Server: Private Node Failure";
+
+                case Responses.publicNodeSuccess:
+                    return "200: Server: Public Node Success";
+                case Responses.publicNodeFailure:
+                    return "400: Server: Private Node Failure";
 
 
                 default:

@@ -2726,6 +2726,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     using (var connection = new SqlConnection(_options.SqlConnectionString))
                     {
 
+                        //dont use datatable for one column
                         //creating a DataTable to pass into the query as a table valued parameter
                         var workTable = new DataTable();
                         DataColumn workCol = workTable.Columns.Add("NodeIDsColumn", typeof(long));
@@ -2774,6 +2775,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             return new CopyResponse<IEnumerable<Node>>(_options.UnhandledExceptionMessage + ex.Message, null, 400, false);
                     }
                 }
+                //let bubble up one layer, dont catch here
                 catch (OperationCanceledException)
                 {
                     //return code for operationCancelled is 500
@@ -2796,6 +2798,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         }
 
+
+        //only need paste, copy kind of redundant
+        //document based db, represents data better
+        //openXML, XML rowset, send data as xml format, or csv format, it can load data into temp memtable, and do ops there,
+        //turn list<inode> into csv and load it into db, extensible longterm, csv can be loaded into any db, 
+        //DOING DESIGN, see if changing state or storing state then backend really needed, retriveing state, then backend just to read,
+        //think of document, doing actiosn in dcoument, ex closing document without saving: data lost, vs typing no need to involve backend
 
 
 

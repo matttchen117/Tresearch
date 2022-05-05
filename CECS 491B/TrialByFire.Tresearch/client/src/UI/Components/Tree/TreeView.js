@@ -149,32 +149,39 @@ class TreeView extends React.Component{
         if(parsedData.includes('+')){
             parsedData = parsedData.replaceAll('+', '%2B');
         }
-        if(parsedData.includes('[')){
-            parsedData = parsedData.replaceAll('[', '%5B')
-        }
-        if(parsedData.includes(']')){
-            parsedData = parsedData.replaceAll(']', '%5D')
-        }
+
+
         return parsedData;
     }
 
+    PrivatizeNodes = (e) => {
+        e.stopPropagation();
+        console.log(this.state.node)
+    }
+
+
     PasteNodes = (e) => {
         e.stopPropagation();
-        const copiedNodes = this.state.nodeSelect
-        console.log(copiedNodes)
+        console.log(e)
+        //console.log(this.state.nodeSelect)
+        //do nodeSelect is nodeDatum?
 
-        var nodes = this.handleEncoded(sessionStorage.getItem("nodes"))
+
+        const nodes = JSON.parse(sessionStorage.getItem("nodes"))
+
         console.log(nodes)
         
 
-
-        axios.post("https://localhost:7010/CopyAndPaste/Paste?nodeIDToPasteTo"+this.state.nodeSelect+"?nodes"+nodes)
+axios.post("https://localhost:7010/CopyAndPaste/Paste?nodeIDToPasteTo=" + this.state.nodeSelect,nodes)
         .then(response=> {
             const responseData = Object.values(response.data);
             this.setState({pastedNodes: responseData});
             sessionStorage.setItem("pastednodes", JSON.stringify(this.state.pastedNodes))
         })
     }
+
+
+    
 
      render() {
         const  ToggleTagger = () => {
@@ -192,13 +199,13 @@ class TreeView extends React.Component{
             // Check if user is trying to select multiple
             if(this.state.shiftDown){
                 var currentState = this.state.shiftCollection;
-                if(!currentState.includes(nodeData.nodeID)){
-                    handleHighLight(e, nodeData.nodeID);
-                    this.setState({shiftCollection: [...currentState, nodeData.nodeID]})
+                if(!currentState.includes(nodeData)){
+                    handleHighLight(e, nodeData);
+                    this.setState({shiftCollection: [...currentState, nodeData]})
                 } else{
                     // Douible click (remove from shift collection)
-                    this.setState({shiftCollection: this.state.shiftCollection.filter(x => x != nodeData.nodeID) });
-                    handleHighLight(e, nodeData.nodeID);
+                    this.setState({shiftCollection: this.state.shiftCollection.filter(x => x != nodeData) });
+                    handleHighLight(e, nodeData);
                 }
             } else{
                 this.setState({ shiftCollection: []});
@@ -220,7 +227,9 @@ class TreeView extends React.Component{
 
         // Right click node, open context menu
         const rightClickNode = (e, nodeData) => {
-            this.setState({ nodeSelect: [...this.state.shiftCollection, nodeData.nodeID], shiftCollection: []});
+            // this.setState({ nodeSelect: [...this.state.shiftCollection, nodeData.nodeID], shiftCollection: []});
+
+            this.setState({ nodeSelect: [...this.state.shiftCollection, nodeData], shiftCollection: []});
             this.setState( { isShown: true, x: e.pageX, y: e.pageY})
         }
 
