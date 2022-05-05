@@ -7,8 +7,8 @@ using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Services.Contracts
 {
-    public interface ICreateNodeService
+    public interface IEditParentService
     {
-        Task<IResponse<string>> CreateNodeAsync(INode node, CancellationToken cancellationToken = default);
+        Task<IResponse<string>> EditParentNodeAsync(long nodeID, string nodeIDs, CancellationToken cancellationToken);
     }
 }

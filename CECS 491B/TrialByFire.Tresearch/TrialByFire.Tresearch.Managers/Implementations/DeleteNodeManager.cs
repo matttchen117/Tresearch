@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Text;
+using System.Reflection;
 using System.Threading.Tasks;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Exceptions;
@@ -50,40 +51,34 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         /// <param name="cancellationToken"></param>
         /// <returns>The result of the operation.</returns>
         /// <exception cref="OperationCanceledException"></exception>
-        public async Task<string> DeleteNodeAsync(IAccount account, long nodeID, long parentID, CancellationToken cancellationToken)
+        public async Task<IResponse<string>> DeleteNodeAsync(string userhash, long nodeID, long parentID, CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            string deleteResult;
-            try
+            if(userhash == (Thread.CurrentPrincipal.Identity as RoleIdentity).UserHash)
             {
-                if (Thread.CurrentPrincipal.Identity.Name != "guest")
+                try
                 {
-                    if (account.Username == Thread.CurrentPrincipal.Identity.Name)
+                    IResponse<string> response = await _deleteNodeService.DeleteNodeAsync(nodeID, parentID, cancellationToken).ConfigureAwait(false);
+                    if (cancellationToken.IsCancellationRequested)
                     {
-                        bool verificationResult = await _authorizationService.VerifyAuthorizedAsync(account.AuthorizationLevel, account.Username, cancellationToken).ConfigureAwait(false);
-                        if (verificationResult)
+                        MethodBase? m = MethodBase.GetCurrentMethod();
+                        if (m != null)
                         {
-                            deleteResult = await _deleteNodeService.DeleteNodeAsync(nodeID, parentID, cancellationToken).ConfigureAwait(false);
+                            response.ErrorMessage = await _messageBank.GetMessage(IMessageBank.Responses.operationTimeExceeded).
+                                ConfigureAwait(false) + m.Name;
                         }
-                        else
-                        {
-                            deleteResult = await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
-                        }
-                        return deleteResult;
                     }
-                    else
-                    {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
-                    }
+                    return response;
                 }
-                else
+                catch (Exception ex)
                 {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
+                    return new DeleteNodeResponse<string>(await _messageBank.GetMessage(
+                        IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 400, false);
                 }
             }
-            catch (DeleteNodeFailedException cnfe)
+            else
             {
-                return cnfe.Message;
+                return new DeleteNodeResponse<string>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.notAuthenticated).ConfigureAwait(false), null, 400, false);
             }
         }
     }

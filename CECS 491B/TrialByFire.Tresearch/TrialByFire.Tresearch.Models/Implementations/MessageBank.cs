@@ -97,6 +97,16 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.noSearchInput:
                     return "400: Data: No search input provided.";
 
+                case Responses.noNodeInput:
+                    return "400: Data: No Node input provided.";
+
+                case Responses.editParentSuccess:
+                    return "200: Server: Edit Node Parent success";
+                case Responses.noEditParentNodeInput:
+                    return "400: Data: No NodeID's provided to edit";
+                case Responses.noTargetParent:
+                    return "500: Database: The Node targeted for Parent assignment does not exist";
+
                 case Responses.tagAddSuccess:
                     return "200: Server: Tag added to node(s).";
                 case Responses.tagRemoveSuccess:
