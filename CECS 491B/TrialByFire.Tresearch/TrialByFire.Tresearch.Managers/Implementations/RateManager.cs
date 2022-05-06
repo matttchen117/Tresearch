@@ -28,7 +28,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _options = options.Value;
         }
 
-        public async Task<IResponse<NodeRating>> RateNodeAsync(long nodeID, int rating, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<int>> RateNodeAsync(List<long> nodeIDs, int rating, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -43,7 +43,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     else if (Thread.CurrentPrincipal.IsInRole(_options.Admin))
                         role = _options.Admin;
                     else
-                        return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.unknownRole), new NodeRating(), 500, false);
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unknownRole), rating, 500, false);
 
                     string userHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
 
@@ -55,28 +55,26 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
                     //Check if account is enabled and confirme, if not return error
                     if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
-                        return new RateResponse<NodeRating>(resultVerifyAccount, new NodeRating(), 500, false);
+                        return new RateResponse<int>(resultVerifyAccount, rating, 500, false);
 
                     //Verify if account can rate here
-                    string resultAuthorized = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(new List<long> { nodeID } , userHash, cancellationToken);
-
-                    //Check if allowed to rate
+                    string resultAuthorized = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(nodeIDs , userHash, cancellationToken);
                     if(resultAuthorized.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess))) 
                     { 
-                        return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized), new NodeRating(), 401, false);
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized),rating, 401, false);
                     }
 
                     //Rate Node
-                    IResponse<NodeRating> result = await _rateService.RateNodeAsync(userHash, nodeID, rating, cancellationToken);
+                    IResponse<int> result = await _rateService.RateNodeAsync(userHash, nodeIDs, rating, cancellationToken);
 
                     return result;
                 }
                 else
-                    return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated), new NodeRating(), 500, false);
+                    return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated), rating, 500, false);
             }
             catch (Exception ex)
             {
-                return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), new NodeRating(), 500, false);
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), rating, 500, false);
             }
         }
 
@@ -126,6 +124,49 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             catch (Exception ex)
             {
                 return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, new List<Node>(), 500, false);
+            }
+        }
+
+        public async Task<IResponse<int>> GetUserNodeRatingAsync(long nodeID, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                // Check if user is authenticated
+                if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
+                {
+                    //Get user's role
+                    string role = "";
+                    if (Thread.CurrentPrincipal.IsInRole(_options.User))
+                        role = _options.User;
+                    else if (Thread.CurrentPrincipal.IsInRole(_options.Admin))
+                        role = _options.Admin;
+                    else
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unknownRole), 0, 500, false);
+
+                    string userHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
+
+                    //UserAccount with user's username and role
+                    IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
+
+                    //Verify if account is enabled and confirmed
+                    string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken);
+
+                    //Check if account is enabled and confirmed, if not return error
+                    if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
+                        return new RateResponse<int>(resultVerifyAccount, 0, 500, false);
+
+                    //Rate Node
+                    IResponse<int> result = await _rateService.GetUserNodeRatingAsync(nodeID, userHash, cancellationToken);
+
+                    return result;
+                }
+                else
+                    return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated), 0, 500, false);
+            }
+            catch (Exception ex)
+            {
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), 0, 500, false);
             }
         }
     }

@@ -2575,31 +2575,45 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<IResponse<NodeRating>> RateNodeAsync(NodeRating rating, CancellationToken cancellationToken)
+        public async Task<IResponse<int>> RateNodeAsync(List<long> nodeIDs, int rating, string userHash, CancellationToken cancellationToken)
         {
             try
             {
                 //Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
 
-                if(rating == null)
-                    return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.invalidRating), rating, 422, false);
+                // Check if node list is null or empty
+                if (nodeIDs == null || nodeIDs.Count.Equals(0))
+                {
+                    return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound), rating, 404, false);
+                }
+
+                if (rating <= 0)
+                    return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.invalidRating), rating, 422, false);
+
+                string nodeCSV = "";
+
+                // Create Comma Seperated Values
+                foreach (long node in nodeIDs)
+                {
+                    nodeCSV += node + ",";
+                }
 
                 // Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     //Open connection
                     await connection.OpenAsync();
-                    var procedure = "dbo.[RateNode]";
+                    var procedure = "dbo.[RateNodes]";
                     var parameters = new
                     {
-                        UserHash = rating.UserHash,
-                        NodeID = rating.NodeID,
-                        Rating = rating.Rating
+                        @UserHash = userHash,
+                        @InNodes = nodeCSV,
+                        @Rating = rating
                     };
                     //Execute command
                     var executed = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    return new RateResponse<NodeRating>("", rating, 200, true);
+                    return new RateResponse<int>("", rating, 200, true);
                 }
             }
             catch (SqlException ex)
@@ -2609,21 +2623,21 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //Unable to connect to database
                     case -1:
-                        return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail), rating, 503, false);
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail), rating, 503, false);
                     case 547:   //Adding rating violates foreign key constraint (AKA NO ACCOUNT)
-                        return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound), rating, 500, false);
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound), rating, 500, false);
                     default:
-                        return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), rating, 500, false);
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), rating, 500, false);
                 }
             }
             catch (OperationCanceledException)
             {
                 // Rollback already handled
-                return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), rating, 408, false);
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), rating, 408, false);
             }
             catch (Exception ex)
             {
-                return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), rating, 500, false);
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), rating, 500, false);
             }
         }
 
@@ -2653,12 +2667,15 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     // Open connection
                     await connection.OpenAsync();
                     var procedure = "dbo.[GetNodesRatings]";
-                    var parameters = new { InNodes = nodeCSV };
+                    var parameters = new DynamicParameters();
+                    parameters.Add("InNodes", nodeCSV);
 
-                    List<Node> result = new List<Node>(await connection.QueryAsync<Node>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false));
+                    var result = await connection.QueryAsync<Node>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken));
+
+                    List<Node> nodeResult = new List<Node>(result.ToList());
 
                     // Tag has been added, return success
-                    return new RateResponse<IEnumerable<Node>>("", result , 200, true);
+                    return new RateResponse<IEnumerable<Node>>("", nodeResult , 200, true);
                 }
             }
             catch (SqlException ex)
@@ -2684,7 +2701,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<IResponse<double>> GetUserNodeRatingAsync(long nodeID, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<int>> GetUserNodeRatingAsync(long nodeID, string userHash, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -2692,7 +2709,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
 
                 if (nodeID < 0)
-                    return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound), 0, 404, false);
+                    return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound), 0, 404, false);
 
                 // Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
@@ -2700,12 +2717,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Open connection
                     await connection.OpenAsync();
                     var procedure = "dbo.[GetUserNodeRating]";
-                    var parameters = new { NodeID = nodeID };
+                    var parameters = new { @NodeID = nodeID, @UserHash = userHash };
 
-                    double result = await connection.ExecuteScalarAsync<double>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                    int result = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                     //Tag has been added, return success
-                    return new RateResponse<double>("", result, 200, true);
+                    return new RateResponse<int>("", result, 200, true);
                 }
             }
             catch (SqlException ex)
@@ -2715,19 +2732,19 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //Unable to connect to database
                     case -1:
-                        return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail), 0, 503, false);
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail), 0, 503, false);
                     default:
-                        return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, 0, 500, false);
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, 0, 500, false);
                 }
             }
             catch (OperationCanceledException)
             {
                 // Rollback already handled
-                return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), 0, 408, false);
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), 0, 408, false);
             }
             catch (Exception ex)
             {
-                return new RateResponse<double>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, 0, 500, false);
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, 0, 500, false);
             }
         }
 
@@ -2744,9 +2761,16 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 string nodeCSV = "";
 
                 // Create Comma Seperated Values
-                foreach (long node in nodeIDs)
+                if(nodeIDs.Count > 1)
                 {
-                    nodeCSV += node + ",";
+                    foreach (long node in nodeIDs)
+                    {
+                        nodeCSV += node + ",";
+                    }
+                }
+                else
+                {
+                    nodeCSV  += nodeIDs[0];
                 }
 
                 // Establish connection to database

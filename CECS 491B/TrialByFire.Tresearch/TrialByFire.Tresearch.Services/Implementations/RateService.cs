@@ -32,15 +32,18 @@ namespace TrialByFire.Tresearch.Services.Implementations
         /// <param name="rating">Rate (1-5)</param>
         /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns></returns>
-        public async Task<IResponse<NodeRating>> RateNodeAsync(string userHash, long nodeID, int rating, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IResponse<int>> RateNodeAsync(string userHash, List<long> nodeIDs, int rating, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                NodeRating nodeRating = new NodeRating(userHash, nodeID, rating);
+                if(nodeIDs == null || nodeIDs.Count.Equals(0))
+                    return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound), rating, 404, false);
+                if(rating <= 0)
+                    return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.invalidRating), rating, 422, false);
 
-                IResponse<NodeRating> result = await _sqlDAO.RateNodeAsync(nodeRating, cancellationToken);
+                IResponse<int> result = await _sqlDAO.RateNodeAsync(nodeIDs, rating, userHash, cancellationToken);
 
                 return result;
 
@@ -48,11 +51,11 @@ namespace TrialByFire.Tresearch.Services.Implementations
             catch (OperationCanceledException)
             {
                 //rollback not necessary
-                return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), new NodeRating(), 408, false);
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), rating, 408, false);
             }
             catch (Exception ex)
             {
-                return new RateResponse<NodeRating>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), new NodeRating(), 500, false);
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), rating, 500, false);
             }
         }
 
@@ -84,5 +87,31 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, new List<Node>(), 500, false);
             }
         }
+
+        public async Task<IResponse<int>> GetUserNodeRatingAsync(long nodeID, string userHash, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if(nodeID <= 0)
+                    return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound), 0, 404, false);
+
+                // Get Rating of Nodes
+                IResponse<int> result = await _sqlDAO.GetUserNodeRatingAsync(nodeID, userHash, cancellationToken);
+
+                return result;
+
+            }
+            catch (OperationCanceledException)
+            {
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), 0, 408, false);
+            }
+            catch (Exception ex)
+            {
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message,0, 500, false);
+            }
+        }
+
     }
 }

@@ -6,11 +6,8 @@ import TagPopup from "../../Popup/TagPopup";
 import NodePopup from "../../Popup/NodePopup";
 import CreateNodePopup from "../../Popup/CreateNodePopup";
 import "./TreeView.css";
-import axios from "axios";
 
 class TreeView extends React.Component{
-
-
     constructor(props) {
         super(props);
 
@@ -197,13 +194,9 @@ class TreeView extends React.Component{
 
     PasteNodes = (e) => {
         e.stopPropagation();
-        const copiedNodes = this.state.nodeSelect
-        console.log(copiedNodes)
+        const copiedNodes = this.state.nodeSelect;
 
-        var nodes = this.handleEncoded(sessionStorage.getItem("nodes"))
-        console.log(nodes)
-
-
+        var nodes = this.handleEncoded(sessionStorage.getItem("nodes"));
 
         axios.post("http://localhost:7010/CopyAndPaste/Paste?nodeIDToPasteTo"+this.state.nodeSelect+"?nodes"+nodes)
         .then(response=> {
@@ -271,7 +264,7 @@ class TreeView extends React.Component{
 
         // Right click node, open context menu
         const rightClickNode = (e, nodeData) => {
-            this.setState({ nodeSelect: [...this.state.shiftCollection, nodeData], shiftCollection: []});
+            this.setState({ nodeSelect: [...this.state.shiftCollection, nodeData.nodeID], shiftCollection: []});
             this.setState( { isShown: true, x: e.pageX, y: e.pageY})
         }
 

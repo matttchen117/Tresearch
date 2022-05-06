@@ -32,13 +32,13 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         }
 
         [HttpPost("rateNode")]
-        public async Task<IActionResult> RateNodeAsync(long nodeID, int rating)
+        public async Task<IActionResult> RateNodeAsync(List<long> nodeIDs, int rating)
         {
             try
             {
                 if (!Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
-                    IResponse<NodeRating> result = await _rateManager.RateNodeAsync(nodeID, rating, _cancellationTokenSource.Token);
+                    IResponse<int> result = await _rateManager.RateNodeAsync(nodeIDs, rating);
                     
                     if(result.StatusCode == 200)
                     {
@@ -80,6 +80,38 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             try
             {
                 IResponse<IEnumerable<Node>> results = await _rateManager.GetNodeRatingAsync(nodeIDs);
+
+                if (results.StatusCode == 200)
+                {
+                    _logManager.StoreAnalyticLogAsync(DateTime.Now, ILogManager.Levels.Info, ILogManager.Categories.Server, "Rating: Ratings retrieved.");
+                    return new OkObjectResult(results.Data);
+                }
+                else
+                {
+                    string[] split;
+                    split = results.ErrorMessage.Split(":");
+                    Enum.TryParse(split[1], out ILogManager.Categories category);
+                    _logManager.StoreArchiveLogAsync(DateTime.Now, ILogManager.Levels.Error, category, split[2]);
+                    return StatusCode(Convert.ToInt32(split[0]), split[2]);
+                }
+            }
+            catch (Exception ex)
+            {
+                string errorResult = await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message;
+                string[] errorSplit;
+                errorSplit = errorResult.Split(":");
+                Enum.TryParse(errorSplit[0], out ILogManager.Categories category);
+                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Error, category, errorSplit[2]);
+                return StatusCode(Convert.ToInt32(errorSplit[0]), ex.Message);
+            }
+        }
+
+        [HttpPost("getUserNodeRating")]
+        public async Task<IActionResult> GetUserNodeRatingAsync(long nodeID)
+        {
+            try
+            {
+                IResponse<int> results = await _rateManager.GetUserNodeRatingAsync(nodeID);
 
                 if (results.StatusCode == 200)
                 {

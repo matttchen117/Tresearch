@@ -1,4 +1,4 @@
-.star-container button {
+.star-rating-container button {
   background-color: transparent;
   border: none;
   outline: none;
@@ -6,9 +6,9 @@
   font-size: 35px;
 }
 
-.on {
-    color: #000;
+.filled {
+    color: #344e41;
   }
-.off {
+.unfilled {
   color: #ccc;
 }

@@ -62,18 +62,18 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Rate
             string[] split;
             split = ex.Split(":");
 
-            IResponse<NodeRating> expected;
+            IResponse<int> expected;
 
             if(Convert.ToInt32(split[0]) == 200)
             {
-                expected = new RateResponse<NodeRating>("", r, 200, true);
+                expected = new RateResponse<int>("", rating, 200, true);
             }
             else
             {
-                expected = new RateResponse<NodeRating>(ex, r, Convert.ToInt32(split[0]), false);
+                expected = new RateResponse<int>(ex, rating, Convert.ToInt32(split[0]), false);
             }
             //Act
-            IResponse<NodeRating> result = await sqlDAO.RateNodeAsync(r, cancellationTokenSource.Token);
+            IResponse<int> result = await sqlDAO.RateNodeAsync(new List<long> { nodeID }, rating, userHash, cancellationTokenSource.Token);
 
             //Assert
             Assert.Equal(expected, result);

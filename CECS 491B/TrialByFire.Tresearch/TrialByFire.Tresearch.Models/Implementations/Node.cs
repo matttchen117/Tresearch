@@ -34,7 +34,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public Node()
         {
-            RatingScore = 1;
+            RatingScore = 0;
             Tags = new List<INodeTag>();
         }
 
@@ -81,6 +81,15 @@ namespace TrialByFire.Tresearch.Models.Implementations
             TagScore = 0;
             RatingScore = ratingScore;
             Tags = new List<INodeTag>();
+        }
+
+        public Node(string UserHash,long NodeID, string NodeTitle, double Rating)
+        {
+            this.NodeID = NodeID;
+            this.UserHash = UserHash;
+            this.NodeTitle = NodeTitle;
+            RatingScore = Rating;
+
         }
 
         public override bool Equals(object? obj)

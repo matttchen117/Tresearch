@@ -4,6 +4,7 @@ import React, {useState, useEffect } from "react";          // Usestate to initi
 import NavBar from "../../Navigation/NavBar";
 import Rating from "../../Rating/Rating";
 import jwt_decode from "jwt-decode";  
+import Tag from "../../Tag/Tag";
 import "./NodeView.css";
 
 class NodeView extends React.PureComponent {
@@ -12,14 +13,18 @@ class NodeView extends React.PureComponent {
         this.state = {
             node: props.node,
             rating: null,
+            userRating: null,
             canMakeChanges: false,
-            token: null
+            token: null,
+            tags: []
         }
     }
 
     componentDidMount() {
         this.GetRatings();
         this.state.token = this.checkToken();
+        
+        
     }
 
     checkToken = () => {
@@ -38,16 +43,35 @@ class NodeView extends React.PureComponent {
                 window.location = '/';
             }
 
-            if(userHash != this.props.node.userHash)
+            if(userHash != this.props.node.userHash){
+                this.GetUserRating();
                 this.setState({canMakeChanges: true})
+            } else{
+                this.GetTags();
+            }
+               
 
             return decoded;
         }else{
             // Token doesn't exist or not valid
             localStorage.removeItem('authorization');
-            window.location.assign(window.location.origin);
-            window.location = '/';
+            if(this.state.node.visibility == false){
+                window.location.assign(window.location.origin);
+                window.location = '/';
+            }
         }
+    }
+
+    GetTags = async() => {
+        await axios.post("https://localhost:7010/Tag/nodeTagList", [this.state.node.nodeID])
+        .then(response => {
+            const responseData = Object.values(response.data);
+            // Set state to list of node tags
+            this.setState( {tags: responseData});
+        })
+        .catch(err => {
+            console.log("TEST")
+        })
     }
 
     GetRatings = async () => {
@@ -55,36 +79,44 @@ class NodeView extends React.PureComponent {
         const ID = [this.state.node.nodeID]
         await axios.post("https://localhost:7010/Rate/getRating?", ID)
         .then(response => {
-            console.log(response.data);
-            this.setState({rating: response.data})
+            const r = Math.round(response.data[0].ratingScore * 100) / 100;
+            this.setState({rating: r })
+            document.getElementById("my-node-rating-id").innerHTML = "Rating: " + r;
         })
         .catch((err => {
+        }))
+    }
+
+    GetUserRating = async() => {
+        axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
+        const ID = [this.state.node.nodeID]
+        await axios.post("https://localhost:7010/Rate/getUserNodeRating?nodeID="+ID)
+        .then(response => {
+            this.setState({userRating: response.data})
+            
+            console.log(response.data)
+        })
+        .catch((err => {
+            console.log("TEST")
         }))
     }
 
     SetRating = async (rating) => {
         axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
         console.log(this.state.node);
-        await axios.post("https://localhost:7010/Rate/rateNode?nodeID=" + this.state.node.nodeID + "&rating=" + rating)
+        await axios.post("https://localhost:7010/Rate/rateNode?rating=" + rating, [this.state.node.nodeID])
         .then(response => {
+            this.GetRatings()
+
             console.log("rated");
-            return true;
         })
         .catch(err => {
             console.log(err.response);
-            return false;
         })
     }
 
 
    render() {
-    
-    const renderTitle = (
-        <div>
-            {this.state.node.nodeTitle}
-        </div>
-    )
-
     const renderSummary = (
         <div>
             {this.state.node.summary}
@@ -92,15 +124,46 @@ class NodeView extends React.PureComponent {
     )
 
     const renderTags = (
-        <div>
+        <div className="node-view-tagger-container">
+            {!this.state.canMakeChanges ? 
+                <div>
+                    <p>Tags:</p>
+                    <ul>
+                    {this.state.tags.sort().map(item => 
+                        <span key={item}><Tag name = {item}/></span>
+                        )}
+                    </ul>
+                </div>
+            : null}
+
+        </div>
+    )
+
+    const RenderRatings = () => (
+        <div className="rating-container">
+            {this.state.rating == 0 ? <div className = "node-view-no-ratings"> no ratings </div>: <div id = "my-node-rating-id"> Rating: {this.state.rating} </div>}
+        </div>
+    )
+    const renderTitle = (
+        <div className = "node-title">
+            <p>{this.state.node.nodeTitle}
+                {this.state.rating != null && <RenderRatings/>}
+            </p>
             
         </div>
     )
 
-    const renderRatings = (
+
+    const renderSetRatings = (
         <div>
-            {this.state.token && 
-                <Rating rating={this.state.rating} SetRating={this.SetRating} IsEnabled = {this.state.canMakeChanges}/>
+            
+            {this.state.canMakeChanges && 
+                <div>
+                    <p>How would you rate this node?
+                    <Rating rating={this.state.userRating} SetRating={this.SetRating} IsEnabled = {this.state.canMakeChanges}/>
+                    </p>
+                    
+                </div>
             }
         </div>
     )
@@ -113,11 +176,15 @@ class NodeView extends React.PureComponent {
                         {renderTitle}
                     </div>
                     {renderTags}
-                    <div className="node-rating-container">
-                        {renderRatings}
-                    </div>
+                    
                     <div className="node-summary-container">
                         {renderSummary}
+                    </div>
+                    <div className="node-rating-container">
+                        {this.state.token && this.state.userRating != null && <div>
+                            
+                            {renderSetRatings}
+                        </div>}
                     </div>
                </div>          
             </div>
