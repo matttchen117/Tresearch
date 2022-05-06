@@ -37,6 +37,7 @@ builder.Services.AddScoped<ITreeManagementService, TreeManagementService>();
 builder.Services.AddScoped<IRateService, RateService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 builder.Services.AddScoped<ICopyAndPasteService, CopyAndPasteService>();
+builder.Services.AddScoped<IPrivateAndPublicService, PrivateAndPublicService>();
 
 
 builder.Services.AddScoped<INodeSearchService, NodeSearchService>();
@@ -59,6 +60,7 @@ builder.Services.AddScoped<IUADManager, UADManager>();
 builder.Services.AddScoped<IRateManager, RateManager>();
 builder.Services.AddScoped<IUserManagementManager, UserManagementManager>();
 builder.Services.AddScoped<ICopyAndPasteManager, CopyAndPasteManager>();
+builder.Services.AddScoped<IPrivateAndPublicManager, PrivateAndPublicManager>();
 
 
 

@@ -222,5 +222,10 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         public Task<string> IsNodeLeaf(long nodeIDToPasteTo, CancellationToken cancellationToken = default(CancellationToken));
 
+        public Task<IResponse<string>> PrivateNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<IResponse<string>> PublicNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken));
+
+
     }
 }
