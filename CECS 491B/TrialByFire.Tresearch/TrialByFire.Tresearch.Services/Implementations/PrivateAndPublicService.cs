@@ -30,23 +30,80 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 try
                 {
                     cancellationToken.ThrowIfCancellationRequested();
+                    IResponse<string> response;
+
 
                     //IResponse<string> response = await _sqlDAO.PrivateNodeAsync(nodes, cancellationtoken).ConfigureAwait(false);
-
+                    response = await _sqlDAO.PrivateNodeAsync(nodes, cancellationToken).ConfigureAwait(false);
                     //return response;
+
+                    if(response.Equals(null) || response.IsSuccess == false)
+                    {
+                        return response;
+                    }
+
+                    //error check here
+                    return response;
                 }
-                catch (OperationCanceledException ece)
+                catch (OperationCanceledException)
                 {
-                    throw;
+                    //return code for operationCancelled is 500
+                    return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
+
                 }
                 catch (Exception ex)
                 {
-                    //return ("500: Server: " + ex.Message);
+                    //return code for unhandledException is 500
+                    return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+
                 }
 
 
             }
+
+            return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.privateNodeFailure).ConfigureAwait(false), null, 400, false);
         }
+
+
+        
+        public async Task<IResponse<string>> PublicNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (nodes.Count != 0 || nodes != null)
+            {
+                try
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    IResponse<string> response;
+
+
+                    //IResponse<string> response = await _sqlDAO.PrivateNodeAsync(nodes, cancellationtoken).ConfigureAwait(false);
+                    response = await _sqlDAO.PublicNodeAsync(nodes, cancellationToken).ConfigureAwait(false);
+                    //return response;
+
+
+
+                    //error check here
+                    return response;
+                }
+                catch (OperationCanceledException)
+                {
+                    //return code for operationCancelled is 500
+                    return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
+
+                }
+                catch (Exception ex)
+                {
+                    //return code for unhandledException is 500
+                    return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+
+                }
+
+
+            }
+
+            return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.privateNodeFailure).ConfigureAwait(false), null, 400, false);
+        }
+        
 
     }
 }

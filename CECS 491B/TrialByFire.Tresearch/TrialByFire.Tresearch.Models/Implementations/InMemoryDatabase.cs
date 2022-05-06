@@ -284,7 +284,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 109, 106, "Sql DAO Copy Test", "COPYING NODE 109", DateTime.UtcNow, true, false));
             nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 110, 108, "Sql DAO Copy Test", "COPYING NODE 110", DateTime.UtcNow, true, false));
 
-
+            //adding nodes for privating
+            //nodes.Add(new Node(""));
 
 
 

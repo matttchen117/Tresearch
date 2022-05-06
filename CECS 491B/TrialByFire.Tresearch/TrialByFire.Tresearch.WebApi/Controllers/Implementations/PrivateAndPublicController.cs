@@ -53,16 +53,22 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _buildSettingsOptions = buildSettingsOptions.Value;
         }
 
-
+        /// <summary>
+        ///     private method for privatizing node(s) from user's own tree
+        /// </summary>
+        /// <param name="nodes"></param>
+        /// <returns></returns>
         [HttpPost("Private")]
         public async Task<ActionResult<string>> PrivateNodeAsync(List<long> nodes)
         {
             StringBuilder stringBuilder = new StringBuilder();
+            
+
 
             try
             {
 
-
+                //i will turn this into a method to optimize the code and make it look less clunky
                 if (Thread.CurrentPrincipal == null || Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
                     // User identity not known, log error and return
@@ -73,7 +79,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                     return new BadRequestObjectResult(errorSplit[2]);
                 }
 
-
+                //calling manager here
                 IResponse<string> response = await _privateAndPublicNodeManager.PrivateNodeAsync(nodes).ConfigureAwait(false);
 
                 // Checks if response  
@@ -137,8 +143,12 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
 
 
-        /*
-
+        
+        /// <summary>
+        ///     public for publicizng nodes that have been privated on user's tree
+        /// </summary>
+        /// <param name="nodes"></param>
+        /// <returns></returns>
         [HttpPost("Public")]
         public async Task<ActionResult<string>> PublicNodeAsync(List<long> nodes)
         {
@@ -219,7 +229,9 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             }
         }
 
-        */
+        
+
+        
 
 
 

@@ -1475,29 +1475,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 IList<Node> copiedNodes = new List<Node>();
 
 
-                //List<INode> copiedNodes = new List<INode>();
-
-                /*
-                Dictionary<long, Node> myDictionary = new System.Collections.Generic.Dictionary<long, Node>(); 
-
-
-                for()
-
-                for(int i = 0; i <)
-
-                foreach(int n in nodeIDs)
-                {
-                            Node r = InMemoryDatabase.Nodes.Where(INode => INode.NodeID == n);
-                    Node r = InMemoryDatabase.Nodes.Where(INode => INode.NodeID == n).FirstOrDefault;
-
-                    //Node r = InMemoryDatabase.Nodes.
-                            copiedNodes.Add(r);
-                    //INode n = InMemoryDatabase.Nodes.
-                }
-                */
-
-
-
                 
                 for (int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
                 {
@@ -1510,6 +1487,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     }
                 }
                 
+
 
                 if (copiedNodes == null || copiedNodes.Count <= 0)
                 {
@@ -1573,5 +1551,98 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             return await _messageBank.GetMessage(IMessageBank.Responses.isLeaf).ConfigureAwait(false);
         }
+
+
+
+        public async Task<IResponse<string>> PrivateNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken))
+        {
+
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                int counter = 0;
+
+                for (int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
+                {
+                    for (int j = 0; j < nodes.Count; j++)
+                    {
+                        if (nodes[j].Equals(InMemoryDatabase.Nodes[i].NodeID))
+                        {
+                            InMemoryDatabase.Nodes[i].Visibility = false;
+                            counter++;
+                        }
+                    }
+                }
+
+                if (counter != nodes.Count)
+                {
+                    return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.privateNodeFailure).ConfigureAwait(false), null, 500, false);
+
+                }
+
+                return new PrivateResponse<string>("", null, 200, true);
+
+
+            }
+            catch (OperationCanceledException)
+            {
+                //return code for operationCancelled is 500
+                return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
+            }
+            catch (Exception ex)
+            {
+                //return code for unhandledException is 500
+                return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+            }
+
+        }
+
+
+        //goes thru and sets all visibility of nodes to true
+        public async Task<IResponse<string>> PublicNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken))
+        {
+
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                int counter = 0;
+
+                for (int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
+                {
+                    for (int j = 0; j < nodes.Count; j++)
+                    {
+                        if (nodes[j].Equals(InMemoryDatabase.Nodes[i].NodeID))
+                        {
+                            InMemoryDatabase.Nodes[i].Visibility = true;
+                            counter++;
+                        }
+                    }
+                }
+
+                if (counter != nodes.Count)
+                {
+                    return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.publicNodeFailure).ConfigureAwait(false), null, 500, false);
+
+                }
+
+                return new PublicResponse<string>("", null, 200, true);
+
+
+            }
+            catch (OperationCanceledException)
+            {
+                //return code for operationCancelled is 500
+                return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
+            }
+            catch (Exception ex)
+            {
+                //return code for unhandledException is 500
+                return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+            }
+
+        }
+
     }
 }

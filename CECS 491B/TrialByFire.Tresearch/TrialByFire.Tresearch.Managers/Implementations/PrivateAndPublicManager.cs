@@ -64,13 +64,18 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
                 IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
 
-                // Calling verifyAccountAsync to authenticate account
-                string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken).ConfigureAwait(false);
+
+                string currentUserHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
+
+                // Calling verifyAccountAuthorizedNodeChanges to verify if account is valid to make changes to node
+                string resultVerifyAccount = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(nodes, currentUserHash, cancellationToken);
+
 
                 if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false)))
                 {
 
-                    return new PrivateResponse<string>(resultVerifyAccount, null, 401, false);
+                    return new PrivateResponse<string>(resultVerifyAccount, null, 403, false);
+
                 }
 
                 IResponse<string> response = await _privateAndPublicService.PrivateNodeAsync(nodes, cancellationToken).ConfigureAwait(false);
@@ -78,7 +83,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 if (!response.IsSuccess)
                 {
                     //might need to return a more meaningful statuscode or message indicating what went wrong
-                    return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeFailure).ConfigureAwait(false), null, 400, false);
+                    return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.privateNodeFailure).ConfigureAwait(false), null, 400, false);
                 }
 
                 return response;
@@ -101,9 +106,9 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         }
 
 
-        /*
+        
 
-
+        
         public async Task<IResponse<string>> PublicNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -123,14 +128,28 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
                 IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
 
+
+                string currentUserHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
+
                 // Calling verifyAccountAsync to authenticate account
-                string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken).ConfigureAwait(false);
+                string resultVerifyAccount = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(nodes, currentUserHash, cancellationToken);
+
 
                 if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false)))
                 {
-
-                    return new PublicResponse<string>(resultVerifyAccount, null, 401, false);
+                    return new PublicResponse<string>(resultVerifyAccount, null, 403, false);
                 }
+
+                //publicizing nodes that were previously prviate
+                IResponse<string> response = await _privateAndPublicService.PublicNodeAsync(nodes, cancellationToken).ConfigureAwait(false);
+
+                if (!response.IsSuccess)
+                {
+                    //will need to return a more meaningful statuscode or message indicating what went wrong
+                    return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.publicNodeFailure).ConfigureAwait(false), null, 400, false);
+                }
+
+                return response;
 
 
 
@@ -151,7 +170,9 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
         }
 
-        */
+        
+
+        
 
 
     }

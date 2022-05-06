@@ -11,7 +11,7 @@ namespace TrialByFire.Tresearch.Services.Contracts
     {
         public Task<IResponse<string>> PrivateNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken));
 
-        //public Task<IResponse<string>> PublicNodeAsync();
+        public Task<IResponse<string>> PublicNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken));
 
     }
 }
