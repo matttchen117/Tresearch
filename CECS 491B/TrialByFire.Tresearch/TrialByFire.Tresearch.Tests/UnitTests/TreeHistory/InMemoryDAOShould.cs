@@ -31,7 +31,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.TreeHistory
             string expected = await messageBank.GetMessage(response);
 
             // Act
-            string result = await sqlDAO.CreateTreeHistoryAuditAsync(nodeHistories, creationTime, versionNumber, rootNodeID, cancellationTokenSource.Token);
+            string result = await sqlDAO.CreateTreeHistoryAsync(nodeHistories, creationTime, versionNumber, rootNodeID, response);
 
             // Assert
             Assert.NotNull(result);
