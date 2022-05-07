@@ -90,7 +90,7 @@ class AdminLogin extends React.Component  {
         if(this.handleInput()){
             this.setState({errorMessage: ''})
             {this.state.verified ? 
-                axios.post('https://localhost:7010/Authentication/authenticate?username=' + this.state.username.toLowerCase() + 
+                axios.post('http://trialbyfiretresearchwebapi.azurewebsites.net//Authentication/authenticate?username=' + this.state.username.toLowerCase() + 
                 '&otp=' + this.hashInput(this.state.otp) + '&authorizationLevel=admin')
                 .then(response => {
                         sessionStorage.setItem('authorization', response.headers['authorization']);
@@ -100,7 +100,7 @@ class AdminLogin extends React.Component  {
                         //sessionStorage.setItem('authorization', err.headers['authorization']);
                     })
                 :
-                axios.post('https://localhost:7010/OTPRequest/requestotp?username=' + this.state.username.toLowerCase() + 
+                axios.post('http://trialbyfiretresearchwebapi.azurewebsites.net//OTPRequest/requestotp?username=' + this.state.username.toLowerCase() + 
                 '&passphrase=' + this.hashInput(this.state.passphrase) + '&authorizationLevel=admin')
                 .then(response => {
                         this.setState({verified: true});

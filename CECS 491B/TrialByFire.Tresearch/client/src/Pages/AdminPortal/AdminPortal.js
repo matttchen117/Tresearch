@@ -7,7 +7,7 @@ function AdminPortal() {
     const handleLogout = (e) => {
         e.preventDefault();
         axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
-        axios.post('https://localhost:7010/Logout/logout', {})
+        axios.post('http://trialbyfiretresearchwebapi.azurewebsites.net//Logout/logout', {})
         .then(response => {
             console.log(response.data);
             

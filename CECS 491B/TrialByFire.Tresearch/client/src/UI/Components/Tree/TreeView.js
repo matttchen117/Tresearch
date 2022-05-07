@@ -133,7 +133,7 @@ class TreeView extends React.Component{
                         tagScore: 0,
                         ratingScore: 0}
         console.log(n)
-        axios.post("https://localhost:7010/DeleteNode/deleteNode",n)
+        axios.post("http://trialbyfiretresearchwebapi.azurewebsites.net//DeleteNode/deleteNode",n)
         .then(response=> {
             const responseData = Object.values(response.data);
             console.log(responseData);
@@ -186,7 +186,7 @@ class TreeView extends React.Component{
         e.stopPropagation();
         const shiftClickedNodes = Array.from(new Set(this.state.nodeSelect));
         console.log(shiftClickedNodes)
-        axios.post("https://localhost:7010/CopyAndPaste/Copy", shiftClickedNodes)
+        axios.post("http://trialbyfiretresearchwebapi.azurewebsites.net//CopyAndPaste/Copy", shiftClickedNodes)
         .then(response => {
             const responseData = Object.values(response.data);
             this.setState({copiedNodes: responseData});
@@ -206,7 +206,7 @@ class TreeView extends React.Component{
 
 
 
-        axios.post("https://localhost:7010/CopyAndPaste/Paste?nodeIDToPasteTo"+this.state.nodeSelect+"?nodes"+nodes)
+        axios.post("http://trialbyfiretresearchwebapi.azurewebsites.net//CopyAndPaste/Paste?nodeIDToPasteTo"+this.state.nodeSelect+"?nodes"+nodes)
         .then(response=> {
             const responseData = Object.values(response.data);
             this.setState({pastedNodes: responseData});
@@ -218,7 +218,7 @@ class TreeView extends React.Component{
         e.stopPropagation();
         const nodesToPrivate = Array.from(new Set(this.state.nodeSelect));
         console.log(nodesToPrivate)
-        axios.post("https://localhost:7010/PrivateAndPublic/Private", nodesToPrivate)
+        axios.post("http://trialbyfiretresearchwebapi.azurewebsites.net//PrivateAndPublic/Private", nodesToPrivate)
         .then(response => {
             const responseDate = Object.values(response.data);
             this.setState({privateNodes: responseDate});
@@ -232,7 +232,7 @@ class TreeView extends React.Component{
         e.stopPropagation();
         const nodesToPublic = Array.from(new Set(this.state.nodeSelect));
         console.log(nodesToPublic)
-        axios.post("https://localhost:7010/PrivateAndPublic/Public", nodesToPublic)
+        axios.post("http://trialbyfiretresearchwebapi.azurewebsites.net//PrivateAndPublic/Public", nodesToPublic)
         .then(response => {
             const responseDate = Object.values(response.data);
             this.setState({publicNodes: responseDate});

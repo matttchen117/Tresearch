@@ -60,7 +60,7 @@ function Search() {
         event.preventDefault();
         //axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
         var parsedData = handleEncoded(query);
-        var request = "https://localhost:7010/NodeSearch/search?search=" + parsedData + "&filterByRating=" + filterByRating + 
+        var request = "http://trialbyfiretresearchwebapi.azurewebsites.net//NodeSearch/search?search=" + parsedData + "&filterByRating=" + filterByRating + 
         "&filterByTime=" + filterByTime;
         for(var i=0; i<tagData.length; i++)
         {
@@ -81,7 +81,7 @@ function Search() {
 
     const fetchTableData = () => {
         async function fetchData() {
-            const response = await axios.get("https://localhost:7010/Tag/taglist");
+            const response = await axios.get("http://trialbyfiretresearchwebapi.azurewebsites.net//Tag/taglist");
             if(response !== null && response !== undefined)
             {
                 setTagOptions(Object.values(response.data));

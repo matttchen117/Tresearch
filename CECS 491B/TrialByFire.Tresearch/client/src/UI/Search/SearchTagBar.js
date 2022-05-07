@@ -22,7 +22,7 @@ class SearchTagBar extends React.Component  {
 
 
     async getTags() {
-        const res = await axios.get("https://localhost:7010/Tag/taglist")
+        const res = await axios.get("http://trialbyfiretresearchwebapi.azurewebsites.net//Tag/taglist")
         const data = res.data
 
         const options = data.map(d=> ({

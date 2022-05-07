@@ -62,7 +62,7 @@ function TagDashboard() {
         axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
 
         // Delete tag
-        axios.post("https://localhost:7010/Tag/deleteTag?tagName=" + parsedData)
+        axios.post("http://trialbyfiretresearchwebapi.azurewebsites.net//Tag/deleteTag?tagName=" + parsedData)
         .then((response => {
             fetchTableData();
         }))
@@ -108,7 +108,7 @@ function TagDashboard() {
             axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
 
             // Retrieve tag list
-            await axios.get("https://localhost:7010/Tag/taglist")
+            await axios.get("http://trialbyfiretresearchwebapi.azurewebsites.net//Tag/taglist")
             .then((response => {
                 setTagData(response.data); 
                 return true;
@@ -192,7 +192,7 @@ function TagDashboard() {
         // Set token headers before post
         axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
         
-        axios.post("https://localhost:7010/Tag/createTag?tagName=" + parsedData)
+        axios.post("http://trialbyfiretresearchwebapi.azurewebsites.net//Tag/createTag?tagName=" + parsedData)
         .then((response => {
 
             // Reset input field
