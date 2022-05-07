@@ -128,6 +128,15 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.tagNameInvalid:
                     return "422: Data: Invalid tag name.";
 
+                    
+                case Responses.treeHistoryCreatedSuccess:
+                    return "200: Server: Tree history audit created in database";
+                case Responses.treeHistoryDuplicate:
+                    return "409: Data: Tree history audit already exists.";
+                case Responses.treeHistoryGetSuccess:
+                    return "200: Server: Tree history audits retrieved.";
+
+
                 case Responses.userRateSuccess:
                     return "200: Server: User rating added.";
                 case Responses.getRateSuccess:
