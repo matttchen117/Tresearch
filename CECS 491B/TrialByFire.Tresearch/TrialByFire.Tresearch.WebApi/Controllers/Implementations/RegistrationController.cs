@@ -50,14 +50,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         /// <param name="passphrase">string passphrase of user</param>
         /// <returns>Status code and value</returns>
         [HttpPost("register")]
-<<<<<<< HEAD
         public async Task<IActionResult> RegisterAccountAsync(string email, string passphrase)
         {
-=======
-        public string RegisterAccount(string email, string passphrase)
-        {
-            List<string> results = new List<string>();
->>>>>>> Working
             try
             {
                 string result = await _registrationManager.CreateAndSendConfirmationAsync(email, passphrase, "user").ConfigureAwait(false);

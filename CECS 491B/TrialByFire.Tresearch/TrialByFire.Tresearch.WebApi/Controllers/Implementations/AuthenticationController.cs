@@ -13,14 +13,10 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
-<<<<<<< HEAD
     // Summary:
     //     A controller class for Authenticating the User.
     [ApiController]
     [EnableCors]
-=======
-    [ApiController]
->>>>>>> Working
     [Route("[controller]")]
     public class AuthenticationController : Controller, IAuthenticationController
     {
@@ -36,55 +32,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _logManager = logManager;
             _authenticationManager = authenticationManager;
             _messageBank = messageBank;
-<<<<<<< HEAD
             _buildSettingsOptions = buildSettingsOptions.Value;
-=======
-            _username = "guest";
-        }
-
-        // IEnumerable may be faster than using lists, gives compiler chance to defer work to later, possibly optimizing in the process
-        [HttpPost]
-        [Route("authenticate")]
-        public string Authenticate(string username, string otp, string authorizationLevel)
-        {
-            _username = username;
-            List<string> results = _authenticationManager.Authenticate(username, otp, authorizationLevel, DateTime.Now);
-            string result = results[0];
-            if(result.Equals(_messageBank.SuccessMessages["generic"]))
-            {
-                result = CreateCookie(results[1]);
-                if(result.Equals(_messageBank.SuccessMessages["generic"]))
-                {
-                    //_logService.CreateLog(DateTime.Now, "Server", username, "Info", "Authentication Succeeded");
-                    return result;
-                }
-            }
-            // {category}: {error message}
-            string[] error = result.Split(": ");
-            //_logService.CreateLog(DateTime.Now, "Error", username, error[0], error[1]);
-            return result;
-        }
-
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public string Authenticate(string username, string otp, string authorizationLevel, DateTime now)
-        {
-            _username = username;
-            List<string> results = _authenticationManager.Authenticate(username, otp, authorizationLevel, now);
-            string result = results[0];
-            if (result.Equals(_messageBank.SuccessMessages["generic"]))
-            {
-                result = CreateCookie(results[1]);
-                if (result.Equals(_messageBank.SuccessMessages["generic"]))
-                {
-                    //_logService.CreateLog(DateTime.Now, "Server", username, "Info", "Authentication Succeeded");
-                    return result;
-                }
-            }
-            // {category}: {error message}
-            string[] error = result.Split(": ");
-            //_logService.CreateLog(DateTime.Now, "Error", username, error[0], error[1]);
-            return result;
->>>>>>> Working
         }
 
         //
@@ -102,14 +50,9 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         // Returns:
         //     The result of the operation with any status codes if applicable.
         [HttpPost]
-<<<<<<< HEAD
         [Route("authenticate")]
         public async Task<IActionResult> AuthenticateAsync(string username, string otp, 
             string authorizationLevel, CancellationToken cancellationToken = default)
-=======
-        [ApiExplorerSettings(IgnoreApi = true)]
-        private string CreateCookie(string jwtToken)
->>>>>>> Working
         {
             string[] split;
             string result;
