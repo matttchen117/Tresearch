@@ -4,7 +4,6 @@ using System.Linq;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
-using System.Reflection;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Exceptions;
 using TrialByFire.Tresearch.Managers.Contracts;
@@ -27,7 +26,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private IMessageBank _messageBank { get; }
 
         /// <summary>
-        ///     Constructor for creating the manager
+        /// Constructor for creating the manager
         /// </summary>
         /// <param name="sqlDAO"></param>
         /// <param name="logService"></param>
@@ -46,33 +45,45 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         /// <summary>
         /// Checks that the User attempting to create a Node is the same as the onwer of the tree.
         /// </summary>
-        /// <param name="userhash">The userHash attempting to create a Node</param>
+        /// <param name="username">The username attempting to create a Node</param>
         /// <param name="node">Node object for creation</param>
         /// <param name="cancellationToken"></param>
         /// <returns>The result of the operation.</returns>
         /// <exception cref="OperationCanceledException"></exception>
-        public async Task<IResponse<string>> CreateNodeAsync(string userhash, Node node, CancellationToken cancellationToken = default)
+        public async Task<string> CreateNodeAsync(IAccount account, INode node, CancellationToken cancellationToken)
         {
-            if(userhash == (Thread.CurrentPrincipal.Identity as RoleIdentity).UserHash)
+            cancellationToken.ThrowIfCancellationRequested();
+            string createResult;
+            try
             {
-                IResponse<string> response = await _createNodeService.CreateNodeAsync(node, cancellationToken).ConfigureAwait(false);
-
-                // Set error message if operation is cancelled
-                if (cancellationToken.IsCancellationRequested)
+                if (Thread.CurrentPrincipal.Identity.Name != "guest")
                 {
-                    MethodBase? m = MethodBase.GetCurrentMethod();
-                    if(m != null)
+                    if (account.Username == Thread.CurrentPrincipal.Identity.Name && account.AuthorizationLevel != "guest")
                     {
-                        response.ErrorMessage = await _messageBank.GetMessage(IMessageBank.Responses.operationTimeExceeded).ConfigureAwait(false) + m.Name;
+                        bool verificationResult = await _authorizationService.VerifyAuthorizedAsync(account.AuthorizationLevel, account.Username, cancellationToken).ConfigureAwait(false);
+                        if (verificationResult)
+                        {
+                            createResult = await _createNodeService.CreateNodeAsync(account, node, cancellationToken).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            createResult = await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
+                        }
+                        return createResult;
+                    }
+                    else
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
                     }
                 }
-
-                return response;
+                else
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
+                }
             }
-            else
+            catch (CreateNodeFailedException cnfe)
             {
-                return new CreateNodeResponse<string>(await _messageBank.GetMessage(
-                    IMessageBank.Responses.notAuthorized).ConfigureAwait(false), null, 400, false);
+                return cnfe.Message;
             }
         }
     }

@@ -29,7 +29,6 @@ import FAQ from "./Pages/FAQ/FAQ";
 import Features from "./Pages/Features/Features";
 import Search from "./Features/Search/NodeSearch";
 import SearchPage from "./Features/Search/SearchPage";
-import CreateNode from "./Features/CreateNode/CreateNode"
 
 class App extends React.Component {
   constructor(props){

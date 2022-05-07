@@ -18,7 +18,7 @@ const AccountDeleted = () => {
     return (
         <div className="component-container">
             <div className="title-text">
-                <h1 className="deleted-title">Account Deleted</h1>
+                <h1 className="deleted-title">Accound Deleted</h1>
             </div>
             {renderBody}
         </div>

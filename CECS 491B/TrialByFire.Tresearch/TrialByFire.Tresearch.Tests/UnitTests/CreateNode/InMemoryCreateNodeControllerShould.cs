@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -31,26 +31,39 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CreateNode
             TestProvider = TestServices.BuildServiceProvider();
         }
 
-
+        /*
         [Theory]
-        [InlineData("51549CF94E96FED6DB3B43BD4B3A989B77CC44E481D40BF86A262D081B029C9CEBE4E4D228A288301408797DD30CC094B7814ACB87695D0ACCE0A28C5FA9B126",
-            14, "OHP", "OHP for ORM", "jelazo@live.com", "user", "200: Server: Create Node Success")]
-        public async Task CreateTheNodeAsync(string userhash, long parentID, string nodeTitle, string summary, string username, string role, string expected)
+        [InlineData("jessie@gmail.com", 69422, 69420, "Sauteeing ", "Preparing food on a stove", true, "jessie@gmail.com", "jessie@gmail.com", "user", "200: Server: success")]
+        [InlineData("larry@gmail.com", 100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com", "larry@gmail.com", "guest", "403: Database: You are not authorized to perform this operation.")]
+        public async Task CreateTheNode(string username, long nodeID, long parentID, string nodeTitle, string summary, bool visibility,
+            string accountOwner, string currentIdentity, string currentRole, string expected)
         {
-            // Arrange
-            IRoleIdentity roleIdentity = new RoleIdentity(true, username, role, userhash);
+            //Arrange
+            IRoleIdentity roleIdentity = new RoleIdentity(true, currentIdentity, currentRole);
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-            Thread.CurrentPrincipal = rolePrincipal;
+            if (!currentIdentity.Equals("guest"))
+            {
+                Thread.CurrentPrincipal = rolePrincipal;
+            }
+            ICreateNodeController createNodeController = TestProvider.GetService<ICreateNodeController>();
+            string[] expects = expected.Split(": ");
+            ObjectResult expectedResult = new ObjectResult(expects[2])
+            {
+                StatusCode = Convert.ToInt32(expects[0])
+            };
+            Node node = new Node(nodeID, parentID, nodeTitle, summary, visibility, false, accountOwner);
+            Account account = new Account(username, "jessie123", "user");
 
-            ICreateNodeController _createNodeController = TestProvider.GetService<ICreateNodeController>();
+            //Act
+            IActionResult result = await createNodeController.CreateNodeAsync(account, node).ConfigureAwait(false);
+            var objectResult = result as ObjectResult;
 
-            // Act
-            ActionResult<string> response = await _createNodeController.CreateNodeAsync(userhash, parentID, nodeTitle, summary);
-
-            // Assert
-            Assert.Equal(expected, response.Value);
+            //Assert
+            Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);
+            Assert.Equal(expectedResult.Value, objectResult.Value);
         }
         
     }
 }
 
+*/

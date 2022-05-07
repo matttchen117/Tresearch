@@ -16,6 +16,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
     public class CreateNodeService : ICreateNodeService
     {
         private ISqlDAO _sqlDAO { get; }
+        private ILogService _logService { get; }
         private IMessageBank _messageBank { get; }
 
         /// <summary>
@@ -27,35 +28,47 @@ namespace TrialByFire.Tresearch.Services.Implementations
         public CreateNodeService(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
+            _logService = logService;
             _messageBank = messageBank;
         }
 
         /// <summary>
         /// Checks that the User attempting to create a Node is the same as the onwer of the tree.
         /// </summary>
+        /// <param name="account">The username attempting to create a Node</param>
         /// <param name="node">Node object for creation</param>
         /// <param name="cancellationToken"></param>
         /// <returns>The result of the operation.</returns>
         /// <returns>The result of the operation with any status codes if applicable</returns>
-        public async Task<IResponse<string>> CreateNodeAsync(INode node, CancellationToken cancellationToken = default)
+        public async Task<string> CreateNodeAsync(IAccount account, INode node, CancellationToken cancellationToken = default)
         {
-            if (node != null)
+            cancellationToken.ThrowIfCancellationRequested();
+            string result;
+            try
             {
-                try
+                //node.accountOwner = (Thread.CurrentPrincipal.Identity as RoleIdentity).UserHash;
+                result = await _sqlDAO.CreateNodeAsync(node, cancellationToken).ConfigureAwait(false);
+                /*if (cancellationToken.IsCancellationRequested && result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
                 {
-                    IResponse<string> response = await _sqlDAO.CreateNodeAsync(node, cancellationToken).ConfigureAwait(false);
-                    return response;
-                }
-                catch (Exception ex)
-                {
-                    return new CreateNodeResponse<string>(await _messageBank.GetMessage(
-                        IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 400, false);
-                }
+                    string rollbackResult = "Delete Node Success";
+                    if (rollbackResult != "Delete Node Success")
+                    {
+                        return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        throw new OperationCanceledException();
+                    }
+                }*/
+                return result;
             }
-            else
+            catch (OperationCanceledException ece)
             {
-                return new CreateNodeResponse<string>(await _messageBank.GetMessage(
-                    IMessageBank.Responses.noNodeInput).ConfigureAwait(false), null, 400, false);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return ("500: Server: " + ex.Message);
             }
         }
     }

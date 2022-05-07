@@ -9,6 +9,6 @@ namespace TrialByFire.Tresearch.Services.Contracts
 {
     public interface ICreateNodeService
     {
-        Task<IResponse<string>> CreateNodeAsync(INode node, CancellationToken cancellationToken = default);
+        Task<string> CreateNodeAsync(IAccount account, INode node, CancellationToken cancellationToken = default);
     }
 }

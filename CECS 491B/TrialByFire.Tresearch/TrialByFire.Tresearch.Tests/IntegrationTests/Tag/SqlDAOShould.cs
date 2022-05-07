@@ -60,7 +60,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
+            string expected = await messageBank.GetMessage(response);
 
             List<long> nodeIDs;
             if (index == null)
@@ -69,7 +69,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
                 nodeIDs = GetNodes(index);
 
             //Act
-            string result = await sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationTokenSource.Token).ConfigureAwait(false);
+            string result = await sqlDAO.AddTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
 
             //Assert
             Assert.NotNull(result);                         
@@ -90,11 +90,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             //Arrange
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
+            string expected = await messageBank.GetMessage(response);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await sqlDAO.CreateTagAsync(tagName, count, cancellationTokenSource.Token).ConfigureAwait(false);
+            string result = await sqlDAO.CreateTagAsync(tagName, count, cancellationTokenSource.Token);
 
             //Assert
             Assert.NotNull(result);
@@ -114,11 +114,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             //Arrange
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
+            string expected = await messageBank.GetMessage(response);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await sqlDAO.RemoveTagAsync(tagName, cancellationTokenSource.Token).ConfigureAwait(false);
+            string result = await sqlDAO.RemoveTagAsync(tagName, cancellationTokenSource.Token);
 
             //Assert
             Assert.NotNull(result);
@@ -140,7 +140,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
+            string expected = await messageBank.GetMessage(response);
 
             List<long> nodeIDs;
             if (index == null)
@@ -149,7 +149,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
                 nodeIDs = GetNodes(index);
 
             //Act
-            Tuple<List<string>, string> result = await sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationTokenSource.Token).ConfigureAwait(false);
+            Tuple<List<string>, string> result = await sqlDAO.GetNodeTagsAsync(nodeIDs, cancellationTokenSource.Token);
 
             //Assert
             Assert.NotNull(result);         
@@ -168,11 +168,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             //Arrange
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
-            string expected = await messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess).ConfigureAwait(false);
+            string expected = await messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            Tuple<List<ITag>, string> resultTags = await sqlDAO.GetTagsAsync(cancellationTokenSource.Token).ConfigureAwait(false);
+            Tuple<List<ITag>, string> resultTags = await sqlDAO.GetTagsAsync(cancellationTokenSource.Token);
             string result = resultTags.Item2;
 
             //Assert
@@ -195,7 +195,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             ISqlDAO sqlDAO = TestProvider.GetService<ISqlDAO>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
+            string expected = await messageBank.GetMessage(response);
 
             List<long> nodeIDs;
             if (index == null)
@@ -204,7 +204,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
                 nodeIDs = GetNodes(index);
 
             //Act
-            string result = await sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationTokenSource.Token).ConfigureAwait(false);
+            string result = await sqlDAO.RemoveTagAsync(nodeIDs, tagName, cancellationTokenSource.Token);
 
             //Arrange
             Assert.NotNull(result);

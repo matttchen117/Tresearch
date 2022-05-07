@@ -40,7 +40,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 // Check if user is authenticated
                 if (Thread.CurrentPrincipal == null || Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated).ConfigureAwait(false);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated);
                 }
 
                 // Check if tag name is null, empty string or all space
@@ -67,7 +67,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 }
                 else
                 {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.unknownRole).ConfigureAwait(false);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.unknownRole);
                 }
                     
                 string userHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
@@ -75,32 +75,28 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
 
                 // Verify if account is enabled and confirmed
-                string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken).ConfigureAwait(false);
+                string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken);
 
                 // Check if account is enabled and confirme, if not return error
-                if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false)))
+                if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
                 {
                     return resultVerifyAccount;
                 }
 
                 // Verify if account is authorized to make changes to Nodes
-                string resultVerifyAuthorized = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(nodeIDs, userHash, cancellationToken).ConfigureAwait(false);
+                string resultVerifyAuthorized = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(nodeIDs, userHash, cancellationToken);
 
                 // Check status if account is authorized to make changes
-                if (!resultVerifyAuthorized.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false)))
+                if (!resultVerifyAuthorized.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
                 {
                     return resultVerifyAuthorized;
                 } 
 
-                string result = await _tagService.AddTagToNodesAsync(nodeIDs, tagName, cancellationToken).ConfigureAwait(false);
+                string result = await _tagService.AddTagToNodesAsync(nodeIDs, tagName, cancellationToken);
 
                 return result;
             }
-            catch (OperationCanceledException)
-            {
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
-            }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
@@ -124,7 +120,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 // Check if the user is authenticated
                 if (Thread.CurrentPrincipal == null || Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated).ConfigureAwait(false);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated);
                 }
                     
 
@@ -153,7 +149,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 }
                 else
                 {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.unknownRole).ConfigureAwait(false);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.unknownRole);
                 }
 
                 string userHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
@@ -162,27 +158,27 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
 
                 // Verify if account is enabled and confirmed
-                string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken).ConfigureAwait(false);
+                string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken);
 
                 // Check status of account verification, if not return error
                 if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
                     return resultVerifyAccount;
 
                 // Verify if account is authorized to make changes to Nodes
-                string resultVerifyAuthorized = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(nodeIDs, userHash, cancellationToken).ConfigureAwait(false);
+                string resultVerifyAuthorized = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(nodeIDs, userHash, cancellationToken);
 
                 // Check status of authorization verification, if not return error
-                if (!resultVerifyAuthorized.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false)))
+                if (!resultVerifyAuthorized.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
                     return resultVerifyAuthorized;
 
                 // Remove tag from node(s)
-                string result = await _tagService.RemoveTagFromNodesAsync(nodeIDs, tagName, cancellationToken).ConfigureAwait(false);
+                string result = await _tagService.RemoveTagFromNodesAsync(nodeIDs, tagName, cancellationToken);
 
                 return result;
             }
             catch (OperationCanceledException)
             {
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
             }
             catch (Exception ex)
             {
@@ -206,7 +202,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 // Check if the user is authenticated
                 if (Thread.CurrentPrincipal == null || Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
-                    return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated).ConfigureAwait(false));
+                    return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated));
                 }
 
                 // Check if node list is null or empty
@@ -228,7 +224,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 else
                 {
                     // User's role is unknown
-                    return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.unknownRole).ConfigureAwait(false));
+                    return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.unknownRole));
                 }
 
                 string userHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
@@ -237,30 +233,30 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
 
                 // Verify if account is enabled and confirmed
-                string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken).ConfigureAwait(false);
+                string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken);
 
                 // Check account verification status, if not return error
-                if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false)))
+                if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
                 {
                     return Tuple.Create(new List<string>(), resultVerifyAccount);
                 }
 
                 // Verify if account is authorized to make changes to Nodes
-                string resultVerifyAuthorized = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(nodeIDs, userHash, cancellationToken).ConfigureAwait(false);
+                string resultVerifyAuthorized = await _accountVerificationService.VerifyAccountAuthorizedNodeChangesAsync(nodeIDs, userHash, cancellationToken);
 
                 // Check account verified to make changes status, if not return error
-                if (!resultVerifyAuthorized.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false)))
+                if (!resultVerifyAuthorized.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
                 {
                     return Tuple.Create(new List<string>(), resultVerifyAuthorized);
                 }
 
-                Tuple<List<string>, string> result = await _tagService.GetNodeTagsAsync(nodeIDs, cancellationToken).ConfigureAwait(false);
+                Tuple<List<string>, string> result = await _tagService.GetNodeTagsAsync(nodeIDs, cancellationToken);
 
                 return result;
             }
             catch (OperationCanceledException)
             {
-                return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false));
+                return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
             }
             catch (Exception ex)
             {
@@ -284,7 +280,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 // Check if the user is authenticated
                 if (Thread.CurrentPrincipal == null || Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated).ConfigureAwait(false);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.notAuthenticated);
                 } 
 
                 // Check if tag name is null, empty string or all space
@@ -298,7 +294,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 if (Thread.CurrentPrincipal.IsInRole(_options.User))
                 {
                     // User must be an admin to perform changes to tag bank
-                    return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized);
                 }
                 else if (Thread.CurrentPrincipal.IsInRole(_options.Admin))
                 {
@@ -315,7 +311,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                 IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
 
                 // Verify if account is enabled and confirmed
-                string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken).ConfigureAwait(false);
+                string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken);
 
                 // Check if account is enabled and confirmed, if not return error
                 if (!resultVerifyAccount.Equals(await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess)))
@@ -323,7 +319,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     return resultVerifyAccount;
                 }
 
-                string result = await _tagService.CreateTagAsync(tagName, 0, cancellationToken).ConfigureAwait(false);
+                string result = await _tagService.CreateTagAsync(tagName, 0, cancellationToken);
                 
                 return result;
             }

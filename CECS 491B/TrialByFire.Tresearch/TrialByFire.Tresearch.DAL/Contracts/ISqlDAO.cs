@@ -124,9 +124,8 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         
 
-        public Task<IResponse<string>> CreateNodeAsync(INode node, CancellationToken cancellationToken = default);
-        public Task<IResponse<string>> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default);
-        public Task<IResponse<string>> EditParentNodeAsync(long nodeID, string nodeIDs, CancellationToken cancellationToken = default);
+        public Task<string> CreateNodeAsync(INode node, CancellationToken cancellationToken = default);
+        public Task<string> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default);
         public Task<string> UpdateNodeAsync(INode updatedNode, INode previousNode, CancellationToken cancellationToken = default);
         public Task<Tuple<INode, string>> GetNodeAsync(long nID, CancellationToken cancellationToken = default);
         public Task<Tuple<List<INode>, string>> GetNodesAsync(string userHash, string acccountHash, CancellationToken cancellationToken = default);
@@ -210,22 +209,11 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         /// <returns>List of tags and string status result</returns>
         public Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken));
 
+        public async Task<> CreateTreeHistory();
 
+        public async Task<> DeleteTreeHistory();
 
-
-
-
-        public Task<IResponse<IEnumerable<Node>>> CopyNodeAsync(List<long> nodesCopy, CancellationToken cancellationToken = default(CancellationToken));
-
-
-        public Task<IResponse<string>> PasteNodeAsync(string userHash, long nodeIDPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken));
-
-        public Task<string> IsNodeLeaf(long nodeIDToPasteTo, CancellationToken cancellationToken = default(CancellationToken));
-
-        public Task<IResponse<string>> PrivateNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken));
-
-        public Task<IResponse<string>> PublicNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken));
-
-
+        public async Task<> GetTreeHistory();
+        
     }
 }

@@ -1,29 +1,52 @@
-// import React, { pPropTypes, useState } from "react";
-// import axios from "axios";
-// //import Tree from 'react-d3-tree';
-// //import "/.CreateNode.css";
-// import CreateNodeForm from "c:/Users/jeslaz/source/repos/Drakat7/Tresearch/CECS 491B/TrialByFire.Tresearch/client/src/UI/Form/LoginForm";
+import React, { pPropTypes, useState } from "react";
+import axios from "axios";
+import Tree from 'react-d3-tree';
 
-// const CreateNode = () => {
-//   //States
-//   const [errorMessages, setErrorMessages] = useState({});
 
-//   //const navigate = useNavigate();
+import './App.css';
+import NavBar from "./NavBar.js";
 
-//   const errors = {
-      
-//   };
-
-//   const renderErrorMessage = (name) =>
-//     name == errorMessages.name && (
-//       <div className="error">{errorMessages.message}</div>
-//     );
-
-//   const handleSubmit = (event) => {
-//     event.preventDefault();
-//     //let account = {username:"jessie.lazo@student.csulb.edu", authLevel:token.authLevel};
-//     let node = {}
-//   }
-// }
-
-// export default CreateNode;
+const orgChart = {
+    name: 'CEO',
+    children: [
+      {
+        name: 'Manager',
+        attributes: {
+          department: 'Production',
+        },
+        children: [
+          {
+            name: 'Foreman',
+            attributes: {
+              department: 'Fabrication',
+            },
+            children: [
+              {
+                name: 'Worker',
+              },
+            ],
+          },
+          {
+            name: 'Foreman',
+            attributes: {
+              department: 'Assembly',
+            },
+            children: [
+              {
+                name: 'Worker',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+  
+  export default function OrgChartTree() {
+    return (
+      // `<Tree />` will fill width/height of its container; in this case `#treeWrapper`.
+      <div id="treeWrapper" style={{ width: '50em', height: '20em' }}>
+        <Tree data={orgChart} />
+      </div>
+    );
+  }

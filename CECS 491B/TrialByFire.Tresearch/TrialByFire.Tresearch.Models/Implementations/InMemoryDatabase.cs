@@ -216,9 +216,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodes.Add(new Node("CB3C47AD9DCEFA2CAC50D472CAFA954F00476EA58B11E8F2CD32E46F4C3DC1C990867A78D484BB25E8FF2FB44CE9F99F356E275E7E2684FFF714BAC11B663FBF", 10, 1, "Cooking", "This is a test node.", new DateTime(2022, 4, 19), false, false));
             nodes.Add(new Node("E5D6801551E6079FCAF2B10403FA86F9B9EC40B0D7A70256EDA0A9988ABAB4CC250681D5054D18E224DCF0CADB730BCF6E07546F2B775A0E31D64C3DC41BC159", 11, 1, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 19), false, true));
             nodes.Add(new Node("CB3C47AD9DCEFA2CAC50D472CAFA954F00476EA58B11E8F2CD32E46F4C3DC1C990867A78D484BB25E8FF2FB44CE9F99F356E275E7E2684FFF714BAC11B663FBF", 12, 1, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 19), true, true));
-            nodes.Add(new Node("51549CF94E96FED6DB3B43BD4B3A989B77CC44E481D40BF86A262D081B029C9CEBE4E4D228A288301408797DD30CC094B7814ACB87695D0ACCE0A28C5FA9B126", 13, 12, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 19), true, true));
-            nodes.Add(new Node("51549CF94E96FED6DB3B43BD4B3A989B77CC44E481D40BF86A262D081B029C9CEBE4E4D228A288301408797DD30CC094B7814ACB87695D0ACCE0A28C5FA9B126", 14, 12, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 19), true, true));
-            nodes.Add(new Node("51549CF94E96FED6DB3B43BD4B3A989B77CC44E481D40BF86A262D081B029C9CEBE4E4D228A288301408797DD30CC094B7814ACB87695D0ACCE0A28C5FA9B126", 15, 12, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 19), true, true));
 
             nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 55, 55, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
             nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2022030533, 2022030533, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
@@ -271,25 +268,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
 
 
-            //adding nodes for copying
-            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 100, 100, "Sql DAO Copy Test", "COPYING NODE 100", DateTime.UtcNow, true, false));
-            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 101, 100, "Sql DAO Copy Test", "COPYING NODE 101", DateTime.UtcNow, true, false));
-            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 102, 100, "Sql DAO Copy Test", "COPYING NODE 102", DateTime.UtcNow, true, false));
-            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 103, 100, "Sql DAO Copy Test", "COPYING NODE 103", DateTime.UtcNow, true, false));
-            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 104, 101, "Sql DAO Copy Test", "COPYING NODE 104", DateTime.UtcNow, true, false));
-            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 105, 102, "Sql DAO Copy Test", "COPYING NODE 105", DateTime.UtcNow, true, false));
-            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 106, 103, "Sql DAO Copy Test", "COPYING NODE 106", DateTime.UtcNow, true, false));
-            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 107, 104, "Sql DAO Copy Test", "COPYING NODE 107", DateTime.UtcNow, true, false));
-            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 108, 105, "Sql DAO Copy Test", "COPYING NODE 108", DateTime.UtcNow, true, false));
-            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 109, 106, "Sql DAO Copy Test", "COPYING NODE 109", DateTime.UtcNow, true, false));
-            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 110, 108, "Sql DAO Copy Test", "COPYING NODE 110", DateTime.UtcNow, true, false));
-
-            //adding nodes for privating
-            //nodes.Add(new Node(""));
-
-
-
-
             return nodes;
         }
 
@@ -323,7 +301,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
             tags.Add(new Tag("Tresearch Service Create tag2"));
             tags.Add(new Tag("Tresearch Service Delete tag1"));
             tags.Add(new Tag("Tresearch Service Delete tag3"));
-            tags.Add(new Tag("Tresearch Service Delete tag4"));
 
             tags.Add(new Tag("Tresearch Manager Add Tag1", 0));
             tags.Add(new Tag("Tresearch Manager Add Tag2"));
@@ -1006,25 +983,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
             userHashObjects.Add(new UserHashObject("tagManagerIntegration3@tresearch.system", "user", "571510127f69c2e3dee263541e8551d8339dc1d98c4b253b5feb5202b41d420dd55c172818feeb5fd7bf85c067c5af142cb930fac9d776b644428adb4b9c4f7b"));
 
             return userHashObjects;
-        }
-
-        private List<long> NodeIDsList()
-        {
-            List<long> nodeIDsList = new List<long>();
-            nodeIDsList.Add(1);
-            nodeIDsList.Add(2);
-            nodeIDsList.Add(3);
-            nodeIDsList.Add(4);
-            nodeIDsList.Add(5);
-            nodeIDsList.Add(6);
-            nodeIDsList.Add(7);
-            nodeIDsList.Add(8);
-            nodeIDsList.Add(9);
-            nodeIDsList.Add(10);
-            nodeIDsList.Add(11);
-            nodeIDsList.Add(12);
-
-            return nodeIDsList;
         }
     }
 }

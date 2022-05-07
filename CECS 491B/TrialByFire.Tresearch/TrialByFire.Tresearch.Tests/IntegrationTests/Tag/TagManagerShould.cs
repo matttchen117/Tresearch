@@ -61,10 +61,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             ITagManager tagManager = TestProvider.GetService<ITagManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
+            string expected = await messageBank.GetMessage(response);
 
             //Act
-            string result = await tagManager.AddTagToNodesAsync(GetNodes(index), tagName, cancellationTokenSource.Token).ConfigureAwait(false);
+            string result = await tagManager.AddTagToNodesAsync(GetNodes(index), tagName, cancellationTokenSource.Token);
 
             //Arrange
             Assert.NotNull(result);
@@ -81,10 +81,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             ITagManager tagManager = TestProvider.GetService<ITagManager>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
+            string expected = await messageBank.GetMessage(response);
 
             //Act
-            string result = await tagManager.CreateTagAsync(tagName, cancellationTokenSource.Token).ConfigureAwait(false);
+            string result = await tagManager.CreateTagAsync(tagName, cancellationTokenSource.Token);
 
             //Arrange
             Assert.NotNull(result);
@@ -102,10 +102,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             ITagManager tagManager = TestProvider.GetService<ITagManager>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
+            string expected = await messageBank.GetMessage(response);
 
             //Act
-            string result = await tagManager.RemoveTagAsync(tagName, cancellationTokenSource.Token).ConfigureAwait(false);
+            string result = await tagManager.RemoveTagAsync(tagName, cancellationTokenSource.Token);
 
             //Arrange
             Assert.NotNull(result);
@@ -123,10 +123,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             ITagManager tagManager = TestProvider.GetService<ITagManager>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
+            string expected = await messageBank.GetMessage(response);
 
             //Act
-            Tuple<List<string>, string> results = await tagManager.GetNodeTagsAsync(GetNodes(nodeIDs), cancellationTokenSource.Token).ConfigureAwait(false);
+            Tuple<List<string>, string> results = await tagManager.GetNodeTagsAsync(GetNodes(nodeIDs), cancellationTokenSource.Token);
             List<string> resultTags = results.Item1;
             string result = results.Item2;
 
@@ -147,10 +147,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             ITagManager tagManager = TestProvider.GetService<ITagManager>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
+            string expected = await messageBank.GetMessage(response);
 
             //Act
-            Tuple<List<ITag>, string> resultTags = await tagManager.GetTagsAsync(cancellationTokenSource.Token).ConfigureAwait(false);
+            Tuple<List<ITag>, string> resultTags = await tagManager.GetTagsAsync(cancellationTokenSource.Token);
             string result = resultTags.Item2;
 
             //Arrange
@@ -168,10 +168,10 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             ITagManager tagManager = TestProvider.GetService<ITagManager>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
+            string expected = await messageBank.GetMessage(response);
 
             //Act
-            string result = await tagManager.RemoveTagFromNodesAsync(GetNodes(nodeIDs), tagName, cancellationTokenSource.Token).ConfigureAwait(false);
+            string result = await tagManager.RemoveTagFromNodesAsync(GetNodes(nodeIDs), tagName, cancellationTokenSource.Token);
 
             //Arrange
             Assert.NotNull(result);

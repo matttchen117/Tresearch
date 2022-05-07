@@ -48,11 +48,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
             try
             {
-                if (Thread.CurrentPrincipal.Equals(null))
-                {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
-                }
-
                 cancellationToken.ThrowIfCancellationRequested();
                 string userName = Thread.CurrentPrincipal.Identity.Name;
                 string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";

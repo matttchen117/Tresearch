@@ -97,16 +97,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.noSearchInput:
                     return "400: Data: No search input provided.";
 
-                case Responses.noNodeInput:
-                    return "400: Data: No Node input provided.";
-
-                case Responses.editParentSuccess:
-                    return "200: Server: Edit Node Parent success";
-                case Responses.noEditParentNodeInput:
-                    return "400: Data: No NodeID's provided to edit";
-                case Responses.noTargetParent:
-                    return "500: Database: The Node targeted for Parent assignment does not exist";
-
                 case Responses.tagAddSuccess:
                     return "200: Server: Tag added to node(s).";
                 case Responses.tagRemoveSuccess:
@@ -288,48 +278,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.verificationFailure:
                     return "401: Server: Failure to authenticate and verify user for deletion.";
 
-
-                case Responses.copyNodeSuccess:
-                    return "200: Server: Copy Node Successful";
-                case Responses.copyNodeFailure:
-                    return "401: Server: Copy Node failure";
-                case Responses.copyNodeError:
-                    return "503: Database: Copy Node ERROR";
-                case Responses.copyNodeEmptyError:
-                    return "400: Server: No nodes to copy failure";
-                case Responses.copyNodeMistmatchError:
-                    return "503: Database: Mismatched amount of nodes returned";
-
-
-                case Responses.isLeaf:
-                    return "200: Server: Is a leaf";
-                case Responses.isNotLeaf:
-                    return "400: Server: Not a leaf";
-
-
-                case Responses.pasteNodeSuccess:
-                    return "200: Server: Paste Node successful";
-                case Responses.pasteNodeFailure:
-                    return "401: Server: Paste Node failure";
-                case Responses.pasteNodeError:
-                    return "503: Database: Paste Node ERROR";
-                case Responses.pasteNodeEmptyError:
-                    return "400: Server: No nodes to paste failure";
-                case Responses.pasteNodeMistmatchError:
-                    return "503: Database: Mismatched amount of nodes pasted";
-                case Responses.notAuthorizedToPasteTo:
-                    return "400: Server: Cannot paste to another user's tree";
-
-
-                case Responses.privateNodeSuccess:
-                    return "200: Server: Private Node Success";
-                case Responses.privateNodeFailure:
-                    return "400: Server: Private Node Failure";
-
-                case Responses.publicNodeSuccess:
-                    return "200: Server: Public Node Success";
-                case Responses.publicNodeFailure:
-                    return "400: Server: Private Node Failure";
 
 
                 default:

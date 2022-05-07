@@ -12,12 +12,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
         ///     String holding name of tag
         /// </summary>
         public string tagName { get; set; }
-
         /// <summary>
         /// Long holding number of nodes that contain this tag
         /// </summary>
         public long tagCount { get; set; }
-
         /// <summary>
         /// Constructor. Tag name is passed in and count is initialized to 0
         /// </summary>
@@ -27,7 +25,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
             this.tagName = tagName;
             tagCount = 0;
         }
-
         /// <summary>
         /// Constructor. Tag name and count are passed in.
         /// </summary>
@@ -40,7 +37,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
         }
 
         /// <summary>
-        ///     Checks if tags are equal
+        ///     Checks to see if tags are equal
         /// </summary>
         /// <param name="obj">Object to be compared</param>
         /// <returns>If tags are equal</returns>
@@ -57,11 +54,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
             return false;
         }
 
-        /// <summary>
-        ///     Checks if tags are equal
-        /// </summary>
-        /// <param name="t">Tag</param>
-        /// <returns>If tags are equal</returns>
         public bool Equals(Tag t)
         {
             return (tagName == t.tagName);

@@ -69,20 +69,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
             Tags = new List<INodeTag>();
         }
 
-        public Node(long nodeID, long nodeParentID, string nodeTitle, string summary, bool visibility, bool deleted, string userhash, double ratingScore)
-        {
-            NodeID = nodeID;
-            ParentNodeID = nodeParentID;
-            NodeTitle = nodeTitle;
-            Summary = summary;
-            Visibility = visibility;
-            Deleted = deleted;
-            UserHash = userhash;
-            TagScore = 0;
-            RatingScore = ratingScore;
-            Tags = new List<INodeTag>();
-        }
-
         public override bool Equals(object? obj)
         {
             if (!(obj == null))
@@ -95,6 +81,5 @@ namespace TrialByFire.Tresearch.Models.Implementations
             }
             return false;
         }
-
     }
 }

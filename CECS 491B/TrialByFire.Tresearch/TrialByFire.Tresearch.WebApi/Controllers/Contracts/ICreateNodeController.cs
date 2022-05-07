@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TrialByFire.Tresearch.Models.Implementations;
+using TrialByFire.Tresearch.Models.Contracts;
 namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
 {
     public interface ICreateNodeController
     {
-        public Task<ActionResult<string>> CreateNodeAsync(string userhash, long parentNode, string nodeTitle, string summary);
+        public Task<IActionResult> CreateNodeAsync(System.Collections.ArrayList paramList);
     }
 }

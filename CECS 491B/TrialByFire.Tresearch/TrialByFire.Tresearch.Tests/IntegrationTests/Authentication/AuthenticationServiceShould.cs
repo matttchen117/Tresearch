@@ -80,7 +80,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Authentication
                 new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             // Act
-            List<string> results = await authenticationService.AuthenticateAsync(authenticationInput,
+            List<string> results = await authenticationService.AuthenticateAsync(authenticationInput, 
                 cancellationTokenSource.Token).ConfigureAwait(false);
 
             // Assert

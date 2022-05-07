@@ -29,7 +29,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await tagService.AddTagToNodesAsync(nodeIDs, tagName, cancellationTokenSource.Token).ConfigureAwait(false);
+            string result = await tagService.AddTagToNodesAsync(nodeIDs, tagName, cancellationTokenSource.Token);
 
             //Assert
             Assert.Equal(expected, result);
@@ -46,7 +46,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await tagService.CreateTagAsync(tagName, count, cancellationTokenSource.Token).ConfigureAwait(false);
+            string result = await tagService.CreateTagAsync(tagName, count, cancellationTokenSource.Token);
 
             //Assert
             Assert.Equal(expected, result);
@@ -63,7 +63,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await tagService.RemoveTagAsync(tagName, cancellationTokenSource.Token).ConfigureAwait(false);
+            string result = await tagService.RemoveTagAsync(tagName, cancellationTokenSource.Token);
 
             //Assert
             Assert.Equal(expected, result);
@@ -79,25 +79,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            Tuple<List<ITag>, string> results = await tagService.GetTagsAsync(cancellationTokenSource.Token).ConfigureAwait(false);
+            Tuple<List<ITag>, string> results = await tagService.GetTagsAsync(cancellationTokenSource.Token);
             string result = results.Item2;
-
-            //Assert
-            Assert.Equal(expected, result);
-        }
-
-        [Theory]
-        [MemberData(nameof(RemoveTagData))]
-        public async Task RemoveNodeTagAsync(List<long> nodeIDs, string tagName, IMessageBank.Responses response)
-        {
-            //Arrange
-            IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            ITagService tagService = TestProvider.GetService<ITagService>();
-            string expected = await messageBank.GetMessage(response);
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-
-            //Act
-            string result = await tagService.RemoveTagFromNodesAsync(nodeIDs, tagName, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
             Assert.Equal(expected, result);
@@ -195,45 +178,6 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
                 new object[] { tagName0, expected0 },
                 new object[] { tagName1, expected1 },
                 new object[] { tagName2, expected2 }
-            };
-        }
-
-        /// <summary>
-        ///  Test data to remove tag from node(s).
-        ///  <br>Case 0: Nodes already have tag.</br>
-        ///  <br>Case 1: Nodes do not contain these tags already</br>
-        ///  <br>Case 2: Node does not contain tag</br>
-        ///  <br>Case 3: Node has tag.</br>
-        /// </summary>
-        /// <returns></returns>
-        public static IEnumerable<object[]> RemoveTagData()
-        {
-            //nodes already have tag
-            var tagNameCase0 = "Tresearch Service Delete Tag1";
-            var nodeListCase0 = new List<long> { 2072942630, 2072942631, 2072942632 };
-            var resultCase0 = IMessageBank.Responses.tagRemoveSuccess;
-
-            //nodes do not contain these tags already
-            var tagNameCase1 = "Tresearch Service Delete Tag2";
-            var nodeListCase1 = new List<long> { 2072942630, 2072942631, 2072942632 };
-            var resultCase1 = IMessageBank.Responses.tagRemoveSuccess;
-
-            // node doesn't already contain tag
-            var tagNameCase2 = "Tresearch Service Delete Tag3";
-            var nodeListCase2 = new List<long> { 2072942630 };
-            var resultCase2 = IMessageBank.Responses.tagRemoveSuccess;
-
-            //Node already has tag
-            var tagNameCase3 = "Tresearch Service Delete Tag4";
-            var nodeListCase3 = new List<long> { };
-            var resultCase3 = IMessageBank.Responses.nodeNotFound;
-
-            return new[]
-            {
-                new object[] { nodeListCase0, tagNameCase0, resultCase0 },
-                new object[] { nodeListCase1, tagNameCase1, resultCase1 },
-                new object[] { nodeListCase2, tagNameCase2, resultCase2 },
-                new object[] { nodeListCase3, tagNameCase3, resultCase3 }
             };
         }
     }
