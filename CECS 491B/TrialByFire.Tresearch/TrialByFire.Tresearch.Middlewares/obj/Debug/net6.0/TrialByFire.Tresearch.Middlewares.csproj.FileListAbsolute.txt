@@ -1,0 +1,17 @@
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\bin\Debug\net6.0\TrialByFire.Tresearch.Middlewares.deps.json
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\bin\Debug\net6.0\TrialByFire.Tresearch.Middlewares.dll
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\bin\Debug\net6.0\TrialByFire.Tresearch.Middlewares.pdb
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\bin\Debug\net6.0\TrialByFire.Tresearch.Exceptions.dll
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\bin\Debug\net6.0\TrialByFire.Tresearch.Models.dll
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\bin\Debug\net6.0\TrialByFire.Tresearch.Models.pdb
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\bin\Debug\net6.0\TrialByFire.Tresearch.Exceptions.pdb
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\obj\Debug\net6.0\TrialByFire.Tresearch.Middlewares.csproj.AssemblyReference.cache
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\obj\Debug\net6.0\TrialByFire.Tresearch.Middlewares.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\obj\Debug\net6.0\TrialByFire.Tresearch.Middlewares.AssemblyInfoInputs.cache
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\obj\Debug\net6.0\TrialByFire.Tresearch.Middlewares.AssemblyInfo.cs
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\obj\Debug\net6.0\TrialByFire.Tresearch.Middlewares.csproj.CoreCompileInputs.cache
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\obj\Debug\net6.0\TrialByFire.Tresearch.Middlewares.csproj.CopyComplete
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\obj\Debug\net6.0\TrialByFire.Tresearch.Middlewares.dll
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\obj\Debug\net6.0\refint\TrialByFire.Tresearch.Middlewares.dll
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\obj\Debug\net6.0\TrialByFire.Tresearch.Middlewares.pdb
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Middlewares\obj\Debug\net6.0\ref\TrialByFire.Tresearch.Middlewares.dll

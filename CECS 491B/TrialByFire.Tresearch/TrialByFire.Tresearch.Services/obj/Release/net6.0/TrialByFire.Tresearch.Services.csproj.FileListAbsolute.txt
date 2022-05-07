@@ -1,0 +1,5 @@
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Release\net6.0\TrialByFire.Tresearch.Services.csproj.AssemblyReference.cache
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Release\net6.0\TrialByFire.Tresearch.Services.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Release\net6.0\TrialByFire.Tresearch.Services.AssemblyInfoInputs.cache
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Release\net6.0\TrialByFire.Tresearch.Services.AssemblyInfo.cs
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Services\obj\Release\net6.0\TrialByFire.Tresearch.Services.csproj.CoreCompileInputs.cache

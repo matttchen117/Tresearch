@@ -1,0 +1,6 @@
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Tests\obj\Release\net6.0\TrialByFire.Tresearch.Tests.csproj.AssemblyReference.cache
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Tests\obj\Release\net6.0\MvcTestingAppManifest.json
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Tests\obj\Release\net6.0\TrialByFire.Tresearch.Tests.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Tests\obj\Release\net6.0\TrialByFire.Tresearch.Tests.AssemblyInfoInputs.cache
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Tests\obj\Release\net6.0\TrialByFire.Tresearch.Tests.AssemblyInfo.cs
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Tests\obj\Release\net6.0\TrialByFire.Tresearch.Tests.csproj.CoreCompileInputs.cache
