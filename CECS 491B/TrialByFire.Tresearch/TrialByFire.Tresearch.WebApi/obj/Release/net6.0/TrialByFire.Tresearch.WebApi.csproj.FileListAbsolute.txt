@@ -1,6 +1,0 @@
-C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Release\net6.0\TrialByFire.Tresearch.WebApi.csproj.AssemblyReference.cache
-C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Release\net6.0\TrialByFire.Tresearch.WebApi.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Release\net6.0\TrialByFire.Tresearch.WebApi.AssemblyInfoInputs.cache
-C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Release\net6.0\TrialByFire.Tresearch.WebApi.AssemblyInfo.cs
-C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Release\net6.0\TrialByFire.Tresearch.WebApi.csproj.CoreCompileInputs.cache
-C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.WebApi\obj\Release\net6.0\TrialByFire.Tresearch.WebApi.MvcApplicationPartsAssemblyInfo.cache
