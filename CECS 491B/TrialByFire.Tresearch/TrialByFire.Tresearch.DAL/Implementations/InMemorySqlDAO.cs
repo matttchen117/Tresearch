@@ -226,6 +226,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
 
             return await _messageBank.GetMessage(IMessageBank.Responses.lastAdminFail).ConfigureAwait(false);
+
+            
+
         }
 
         //Can optimize all the for loops
@@ -357,6 +360,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false);
             }
+
         }
 
 
@@ -394,6 +398,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 return Tuple.Create(-1,_messageBank.GetMessage(IMessageBank.Responses.accountCreateFail).Result);
             }
+
         }
 
         public async Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
@@ -561,9 +566,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             kpiList.Add(GetNodeKPI(now));
             kpiList.Add(GetLoginKPI(now));
             kpiList.Add(GetRegistrationKPI(now));
-            kpiList.Add(GetSearchKPI(now));
+            kpiList.Add(GetSearchKPI(now));*/
             return kpiList;
-        }*/
+        }
         /*
         //1
         public async Task<IViewKPI> GetViewKPIAsync(CancellationToken cancellationToken = default)
@@ -755,7 +760,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 foreach (INodesCreated nodesCreated in InMemoryDatabase.NodesCreated)
                 {
-                    if (nodeCreationDate <= nodesCreated.nodesCreatedDate && nodeCreationDate >= nodeCreationDate.Date.AddDays(-30))
+                    if (nodeCreationDate <= nodesCreated.nodeCreationDate && nodeCreationDate >= nodeCreationDate.Date.AddDays(-30))
                     {
                         nodeResult.Add((NodesCreated)nodesCreated);
                     }
@@ -941,7 +946,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
 
             return _messageBank.ErrorMessages["dailyRegistrationsNotExists"];
-        }*/
+        }
 
 
         public string CreateView(IView view)
