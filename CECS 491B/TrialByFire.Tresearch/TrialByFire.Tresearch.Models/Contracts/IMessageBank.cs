@@ -210,6 +210,12 @@ namespace TrialByFire.Tresearch.Models.Contracts
             pasteNodeMistmatchError,
             notAuthorizedToPasteTo,
 
+            privateNodeSuccess,
+            privateNodeFailure,
+
+            publicNodeSuccess,
+            publicNodeFailure,
+
 
         }
         public Task<string> GetMessage(Responses response);

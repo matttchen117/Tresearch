@@ -158,8 +158,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 
 
 
-
-
                 IResponse<string> response = await _copyAndPasteService.PasteNodeAsync(account, currentUserHash, nodeIDToPasteTo, nodes, cancellationToken).ConfigureAwait(false);
 
 

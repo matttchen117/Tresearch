@@ -151,17 +151,7 @@ class TreeView extends React.Component{
     }
 
 
-    CopyNodes = (e) => {
-        e.stopPropagation();
-        const shiftClickedNodes = Array.from(new Set(this.state.nodeSelect));
-        console.log(shiftClickedNodes)
-        axios.post("https://localhost:7010/CopyAndPaste/Copy", shiftClickedNodes)
-        .then(response => {
-            const responseData = Object.values(response.data);
-            this.setState({copiedNodes: responseData});
-            sessionStorage.setItem("nodes", JSON.stringify(this.state.copiedNodes));
-        })
-    }
+
 
     handleEncoded = (e) => {
         var parsedData = e.toString();
@@ -192,19 +182,69 @@ class TreeView extends React.Component{
         return parsedData;
     }
 
+
+    CopyNodes = (e) => {
+        e.stopPropagation();
+        const shiftClickedNodes = Array.from(new Set(this.state.nodeSelect));
+        console.log(shiftClickedNodes)
+        axios.post("https://localhost:7010/CopyAndPaste/Copy", shiftClickedNodes)
+        .then(response => {
+            const responseData = Object.values(response.data);
+            this.setState({copiedNodes: responseData});
+            sessionStorage.setItem("nodes", JSON.stringify(this.state.copiedNodes));
+        })
+    }
+
+
+
     PasteNodes = (e) => {
         e.stopPropagation();
-        const copiedNodes = this.state.nodeSelect;
+        const shiftClickedNodes = Array.from(new Set(this.state.nodeSelect));
+        console.log(shiftClickedNodes)
+
+        var nodes = this.handleEncoded(sessionStorage.getItem("nodes"))
+        console.log(nodes)
+
 
         var nodes = this.handleEncoded(sessionStorage.getItem("nodes"));
 
-        axios.post("http://localhost:7010/CopyAndPaste/Paste?nodeIDToPasteTo"+this.state.nodeSelect+"?nodes"+nodes)
+        axios.post("https://localhost:7010/CopyAndPaste/Paste?nodeIDToPasteTo"+this.state.nodeSelect+"?nodes"+nodes)
         .then(response=> {
             const responseData = Object.values(response.data);
             this.setState({pastedNodes: responseData});
             sessionStorage.setItem("pastednodes", JSON.stringify(this.state.pastedNodes))
         })
     }
+
+    PrivateNodes = (e) => {
+        e.stopPropagation();
+        const nodesToPrivate = Array.from(new Set(this.state.nodeSelect));
+        console.log(nodesToPrivate)
+        axios.post("https://localhost:7010/PrivateAndPublic/Private", nodesToPrivate)
+        .then(response => {
+            const responseDate = Object.values(response.data);
+            this.setState({privateNodes: responseDate});
+            sessionStorage.setItem("privatedNodes", this.state.privateNodes);
+        }
+        )
+    }
+
+
+    PublicNodes = (e) => {
+        e.stopPropagation();
+        const nodesToPublic = Array.from(new Set(this.state.nodeSelect));
+        console.log(nodesToPublic)
+        axios.post("https://localhost:7010/PrivateAndPublic/Public", nodesToPublic)
+        .then(response => {
+            const responseDate = Object.values(response.data);
+            this.setState({publicNodes: responseDate});
+            sessionStorage.setItem("privatedNodes", this.state.publicNodes);
+        }
+        )
+    }
+
+
+
 
      render() {
         const  ToggleTagger = () => {
@@ -279,12 +319,14 @@ class TreeView extends React.Component{
             nodeDatum
         }) => (
             <g data-item = {nodeDatum.nodeID} id = {nodeDatum.nodeID}>
-                <circle className = "circle" fill = {this.treeConfiguration.color} stroke = "black" strokeWidth = "1" r = "20" onClick = {(e) => leftClickNode(e, nodeDatum) }  data-item = {nodeDatum.nodeID} onContextMenu = {(e) => rightClickNode(e, nodeDatum) }/>
+                <circle className = "circle" fill= {nodeDatum.visibility ? "#344e41 ": "gray"} stroke = "black" strokeWidth = "1" r = "20" onClick = {(e) => leftClickNode(e, nodeDatum) }  data-item = {nodeDatum.nodeID} onContextMenu = {(e) => rightClickNode(e, nodeDatum) }/>
                 <text fill = "black" x = "20" dy = "20" data-item = {nodeDatum.nodeID}>
                     {nodeDatum.nodeTitle}
                 </text>
             </g>
         );
+
+
 
 
 
@@ -322,6 +364,12 @@ class TreeView extends React.Component{
                             </div>
                             <div className="option" onClick = {this.PasteNodes}>
                                 Paste Node(s)
+                            </div>
+                            <div className="option" onClick = {this.PrivateNodes}>
+                                Privatize Node(s)
+                            </div>
+                            <div className="option" onClick = {this.PublicNodes}>
+                                Publicize Node(s)
                             </div>
                         </div>
                     )}

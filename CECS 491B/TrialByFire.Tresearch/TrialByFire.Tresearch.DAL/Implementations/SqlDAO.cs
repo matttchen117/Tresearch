@@ -2893,6 +2893,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     using (var connection = new SqlConnection(_options.SqlConnectionString))
                     {
 
+                        //dont use datatable for one column
                         //creating a DataTable to pass into the query as a table valued parameter
                         var workTable = new DataTable();
                         DataColumn workCol = workTable.Columns.Add("NodeIDsColumn", typeof(long));
@@ -2941,6 +2942,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                             return new CopyResponse<IEnumerable<Node>>(_options.UnhandledExceptionMessage + ex.Message, null, 400, false);
                     }
                 }
+                //let bubble up one layer, dont catch here
                 catch (OperationCanceledException)
                 {
                     //return code for operationCancelled is 500
@@ -2963,6 +2965,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         }
 
+
+        //only need paste, copy kind of redundant
+        //document based db, represents data better
+        //openXML, XML rowset, send data as xml format, or csv format, it can load data into temp memtable, and do ops there,
+        //turn list<inode> into csv and load it into db, extensible longterm, csv can be loaded into any db, 
+        //DOING DESIGN, see if changing state or storing state then backend really needed, retriveing state, then backend just to read,
+        //think of document, doing actiosn in dcoument, ex closing document without saving: data lost, vs typing no need to involve backend
 
 
 
@@ -3102,7 +3111,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //return code for unhandledException is 500
                     return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false);
-
                 }
             }
             else
@@ -3110,6 +3118,132 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false);
             }
         }
+
+
+        public async Task<IResponse<string>> PrivateNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if(nodes != null || nodes.Count != 0)
+            {
+
+                try
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    int privatizedNodes;
+
+                    using (var connection = new SqlConnection(_options.SqlConnectionString))
+                    {
+                        var procedure = "dbo.PrivatizeNodeS";
+
+                        string nodeCSV = "";
+
+                        foreach(long node in nodes)
+                        {
+                            nodeCSV += node + ",";
+                        }
+
+                        var parameters = new { @NodeIDS = nodeCSV };
+
+                        await connection.OpenAsync();
+
+                        privatizedNodes = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                        if(privatizedNodes <= 0 || privatizedNodes != nodes.Count)
+                        {
+                            return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.privateNodeFailure).ConfigureAwait(false), null, 400, false);
+                        }
+
+                        return new PrivateResponse<string>("", await _messageBank.GetMessage(IMessageBank.Responses.privateNodeSuccess).ConfigureAwait(false), 200, true);
+
+
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    //return code for operationCancelled is 500
+                    return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
+
+                }
+                catch (Exception ex)
+                {
+                    //return code for unhandledException is 500
+                    return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+
+                }
+
+            }
+
+            //if there was nothing to copy, should not have happened
+            return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.privateNodeFailure).ConfigureAwait(false), null, 400, false);
+
+
+        }
+
+
+
+
+        
+        public async Task<IResponse<string>> PublicNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (nodes != null || nodes.Count != 0)
+            {
+
+                try
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    int privatizedNodes;
+
+                    using (var connection = new SqlConnection(_options.SqlConnectionString))
+                    {
+                        var procedure = "dbo.PublicizeNodeS";
+
+                        string nodeCSV = "";
+
+                        foreach (long node in nodes)
+                        {
+                            nodeCSV += node + ",";
+                        }
+
+                        var parameters = new { @NodeIDS = nodeCSV };
+
+                        await connection.OpenAsync();
+
+                        privatizedNodes = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                        if (privatizedNodes <= 0 || privatizedNodes != nodes.Count)
+                        {
+                            return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.publicNodeFailure).ConfigureAwait(false), null, 400, false);
+                        }
+
+                        return new PublicResponse<string>("", await _messageBank.GetMessage(IMessageBank.Responses.publicNodeSuccess).ConfigureAwait(false), 200, true);
+
+
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    //return code for operationCancelled is 500
+                    return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
+
+                }
+                catch (Exception ex)
+                {
+                    //return code for unhandledException is 500
+                    return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+
+                }
+
+            }
+
+            //if there was nothing to copy, should not have happened
+            return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.publicNodeFailure).ConfigureAwait(false), null, 400, false);
+
+
+        }
+
+        
+
 
 
 

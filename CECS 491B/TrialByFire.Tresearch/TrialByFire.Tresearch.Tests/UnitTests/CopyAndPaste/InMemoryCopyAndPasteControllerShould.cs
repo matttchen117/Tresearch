@@ -37,8 +37,6 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CopyAndPaste
 
         
         
-        
-        
 
         [Theory]
         [MemberData(nameof(CopyNodeData))]
@@ -60,7 +58,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CopyAndPaste
 
 
         
-
+        /*
         
         [Theory]
         [MemberData(nameof(PasteNodeData))]
@@ -80,6 +78,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CopyAndPaste
             Assert.Equal(expected.Data, response.Value);
 
         }
+
+        */
         
 
 
@@ -88,7 +88,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CopyAndPaste
 
 
 
-
+        //separate tests up into different tests
         public static IEnumerable<object[]> CopyNodeData()
         {
 
@@ -96,6 +96,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CopyAndPaste
             Node node1 = new Node("0B1CC9CFB7380E8E7A80726D12CB997C936D95B514E7F921187119FD80996BBACA103C08EFCC39553EFF5DFC368D4D8D197C9080C7015AE4DA2E87884E7DE9A6", 1, 1, "Cooking", "This is a test node.", new DateTime(2022, 4, 17), true, false);
             Node node2 = new Node("0B1CC9CFB7380E8E7A80726D12CB997C936D95B514E7F921187119FD80996BBACA103C08EFCC39553EFF5DFC368D4D8D197C9080C7015AE4DA2E87884E7DE9A6", 2, 1, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 18), true, false);
             Node node3 = new Node("0B1CC9CFB7380E8E7A80726D12CB997C936D95B514E7F921187119FD80996BBACA103C08EFCC39553EFF5DFC368D4D8D197C9080C7015AE4DA2E87884E7DE9A6", 3, 1, "Cooking Rice", "This is a test node.", new DateTime(2022, 4, 19), true, false);
+            
+            
             Node node4 = new Node("D8FC97AC79D370FC43BE4528C72B02AD7B560DC707956B77D5892504754E6C2484C07BF28243FF3CD1A2EA6F778BBBF924B384A34975D6A7D590A40CEE455A32", 4, 1, "Cooking", "This is a test node.", new DateTime(2022, 4, 17), true, false);
             Node node5 = new Node("D8FC97AC79D370FC43BE4528C72B02AD7B560DC707956B77D5892504754E6C2484C07BF28243FF3CD1A2EA6F778BBBF924B384A34975D6A7D590A40CEE455A32", 5, 1, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 18), true, false);
             Node node6 = new Node("D8FC97AC79D370FC43BE4528C72B02AD7B560DC707956B77D5892504754E6C2484C07BF28243FF3CD1A2EA6F778BBBF924B384A34975D6A7D590A40CEE455A32", 6, 1, "Cooking Rice", "This is a test node.", new DateTime(2022, 4, 19), true, false);
@@ -162,7 +164,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CopyAndPaste
 
 
         
-
+        /*
         public static IEnumerable<object[]> PasteNodeData()
         {
             return new[]
@@ -171,6 +173,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CopyAndPaste
             };
         }
         
+        */
 
 
         
