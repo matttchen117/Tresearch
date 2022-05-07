@@ -1212,18 +1212,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        /*public List<IKPI> LoadKPI(DateTime now)
-        {
-            List<IKPI> kpiList = new List<IKPI>();
-            kpiList.Add(GetViewKPI());
-            kpiList.Add(GetViewDurationKPI());
-            kpiList.Add(GetNodeKPI(now));
-            kpiList.Add(GetLoginKPI(now));
-            kpiList.Add(GetRegistrationKPI(now));
-            kpiList.Add(GetSearchKPI(now));
-            return kpiList;
-        }*/
-
 
         //1/6
         public async Task<IViewKPI> GetViewKPIAsync(CancellationToken cancellationToken = default)
@@ -1279,43 +1267,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        /*public INodeKPI GetNodeKPI(DateTime now)
-        {
-            INodeKPI nodeKPI = new NodeKPI();
-            IList<INodesCreated> nC = GetNodesCreated(now);
-            if (nC.Count == 0)
-            {
-                nodeKPI.result = "Error";
-                return nodeKPI;
-            }
-            for (int i = 1; i < nC.Count; i++)
-            {
-                nodeKPI.nodesCreated.Add(nC[(nC.Count - 1)]);
-            }
-            nodeKPI.result = "success";
-            return nodeKPI;
-        }*/
-
-        /*public INodeKPI GetNodeKPI(DateTime now)
-        {
-            INodeKPI nodeKPI = new NodeKPI();
-            int counter = 1;
-            INodesCreated nCreated = GetNodesCreated(now);
-            if (nCreated.nodeCreationCount == -1)
-            {
-                nodeKPI.result = "Error";
-                return nodeKPI;
-            }
-            while((counter < 29) && (nCreated.nodeCreationCount != -1))
-            {
-                nodeKPI.nodesCreated.Add(nCreated);
-                DateTime past = now.AddDays((counter * -1));
-                nCreated = GetNodesCreated(past);
-                counter++;
-            }
-            nodeKPI.result = "success";
-            return nodeKPI;
-        }*/
 
         //3/6
         public async Task<INodeKPI> GetNodeKPIAsync(DateTime now, CancellationToken cancellationToken = default)
@@ -1343,28 +1294,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return nKPI;
             }
         }
-
-        /*//4/6
-        public async Task<ILoginKPI> GetLoginKPI(DateTime now)
-        {
-            ILoginKPI loginKPI = new LoginKPI();
-            int counter = 1;
-            IList<IailyLogin> dLogin = GetDailyLogin(now);
-            if (dLogin.loginCount == -1)
-            {
-                loginKPI.result = "Error";
-                return loginKPI;
-            }
-            while ((counter <= 90) && (dLogin.loginCount != -1))
-            {
-                loginKPI.dailyLogins.Add(dLogin);
-                DateTime past = now.AddDays((counter * -1));
-                dLogin = GetDailyLogin(past);
-                counter++;
-            }
-            loginKPI.result = "success";
-            return loginKPI;
-        }*/
 
         //4/6
         public async Task<ILoginKPI> GetLoginKPIAsync(DateTime now, CancellationToken cancellationToken = default)
@@ -1394,26 +1323,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        /*public IRegistrationKPI GetRegistrationKPI(DateTime now)
-        {
-            IRegistrationKPI registrationKPI = new RegistrationKPI();
-            int counter = 1;
-            IDailyRegistration dRegistration = GetDailyRegistration(now);
-            if (dRegistration.registrationCount == -1)
-            {
-                registrationKPI.result = "Error";
-                return registrationKPI;
-            }
-            while ((counter <= 90) && (dRegistration.registrationCount != -1))
-            {
-                registrationKPI.dailyRegistrations.Add(dRegistration);
-                DateTime past = now.AddDays((counter * -1));
-                dRegistration = GetDailyRegistration(past);
-                counter++;
-            }
-            registrationKPI.result = "success";
-            return registrationKPI;
-        }*/
         //5/6
         public async Task<IRegistrationKPI> GetRegistrationKPIAsync(DateTime now, CancellationToken cancellationToken = default)
         {
@@ -1441,38 +1350,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return rKPI;
             }
         }
-
-        /*//6/6
-        public ISearchKPI GetSearchKPI(DateTime now)
-        {
-            ISearchKPI searchKPI = new SearchKPI();
-            int counter = 1;
-            ITopSearch sCreated = GetTopSearch(now);//Initial Check to see if InMemoryDatabase is not empty
-            List<ITopSearch> preSort = new List<ITopSearch>();
-            if (sCreated.searchCount == -1)
-            {
-                searchKPI.result = "Error";
-                return searchKPI;
-            }
-
-            while ((counter <= 28) && (sCreated.searchCount != -1))
-            {
-                preSort.Add(sCreated);
-                DateTime past = now.AddDays((counter * -1));
-                sCreated = GetTopSearch(past);
-                counter++;
-            }
-
-            List<ITopSearch> afterSort = preSort.OrderBy(x => x.searchCount).ToList();
-            int n = (afterSort.Count);
-            for (int i = 1; i <= 5 || i < n; i++)
-            {
-                Console.WriteLine(n);
-                searchKPI.topSearches.Add(afterSort[(n - i)]);
-            }
-            searchKPI.result = "success";
-            return searchKPI;
-        }*/
 
         //6/6
         public async Task<ISearchKPI> GetSearchKPIAsync(DateTime now, CancellationToken cancellationToken = default)
@@ -1569,8 +1446,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     int affectedRows = connection.Execute(selectQuery,
                                     new
                                     {
-                                        nodesCreatedDate = nodesCreated.nodeCreationDate,
-                                        nodesCreatedCount = nodesCreated.nodeCreationCount
+                                        nodesCreatedDate = nodesCreated.nodesCreatedDate,
+                                        nodesCreatedCount = nodesCreated.nodesCreatedCount
                                     });
                 }
                 return _messageBank.SuccessMessages["generic"];
@@ -1609,8 +1486,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 int rowsAffected = connection.Execute(updateQuery,
                             new
                             {
-                                nodesCreatedDate = nodesCreated.nodeCreationDate,
-                                nodesCreatedCount = nodesCreated.nodeCreationCount
+                                nodesCreatedDate = nodesCreated.nodesCreatedDate,
+                                nodesCreatedCount = nodesCreated.nodesCreatedCount
                             }
                             );
                 if (rowsAffected == 1)
@@ -1772,7 +1649,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var insertQuery = @"INSERT INTO tresearchStudentServer.dbo.dailyRegistrations (registrationDate, registrationCount) VALUES (@registrationDate, @registrationCount)";
-                    affectedRows = connection.Execute(insertQuery,
+                    int affectedRows = connection.Execute(insertQuery,
                                      new
                                      {
                                          registrationDate = dailyRegistration.registrationDate,
@@ -1828,6 +1705,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 }
             }
         }
+
         /// <summary>
         ///         Adds a tag to list of node(s) passed in. 
         /// </summary>
@@ -1968,6 +1846,45 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
+        }
+
+
+        /// <summary>
+        ///     Creates tree history from a list of nodes and 
+        /// </summary>
+        public async Task<string> CreateTreeHistoryAsync(List<INode> nodes, DateTime creationTime,  CancellationToken cancellation = default(CancellationToken))
+        {
+            try
+            {
+                cancellation.ThrowIfCancellationRequested();
+            }
+            catch (SqlException ex)
+            {
+                //Check sql exception
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false);
+                    //Adding tag to node violates foreign key constraint (AKA tag doesn't exist in bank)
+                    case 547:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.tagNotFound).ConfigureAwait(false);
+                    default:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+            }
+        }
+
+        public async Task<string> GetTreeHistoryAsync() { 
+        
         }
 
         /// <summary>

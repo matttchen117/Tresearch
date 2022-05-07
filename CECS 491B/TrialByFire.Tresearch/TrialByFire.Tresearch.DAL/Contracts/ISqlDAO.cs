@@ -208,5 +208,12 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns>List of tags and string status result</returns>
         public Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken));
+
+        public async Task<> CreateTreeHistory();
+
+        public async Task<> DeleteTreeHistory();
+
+        public async Task<> GetTreeHistory();
+        
     }
 }
