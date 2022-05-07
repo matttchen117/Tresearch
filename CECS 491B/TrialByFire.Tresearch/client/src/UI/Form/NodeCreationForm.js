@@ -43,7 +43,7 @@ class NodeCreationForm extends React.Component{
 
         if(this.handleInput()){
             this.setState({errorMessage: ''})
-            axios.post('http://trialbyfiretresearchwebapi.azurewebsites.net//CreateNode/createNode?userhash=' + this.state.userhash + '&parentNodeID=' + 
+            axios.post('https://localhost:7010/CreateNode/createNode?userhash=' + this.state.userhash + '&parentNodeID=' + 
             this.state.nodeParentID + '&nodeTitle=' + this.state.nodeTitle + '&summary=' + this.state.summary).
             then(response => {
                 const responseData = Object.values(response.data);

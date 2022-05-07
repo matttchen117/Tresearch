@@ -1640,42 +1640,5 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         }
 
-        public async Task<string> CreateTreeHistoryAsync(List<INodeHistory> nodeHistories, DateTime creationTime, int versionNumber, long rootNodeID, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            try
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                // Check if there is a duplicate
-                foreach (IVersionAudit versionAudit in InMemoryDatabase.TreeHistories)
-                {
-                    if (versionAudit.CreationTime == creationTime && versionAudit.VersionNumber == versionNumber && versionAudit.RootNodeID == rootNodeID)
-                    {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.treeHistoryDuplicate);
-                    }
-
-                }
-
-                return await _messageBank.GetMessage(IMessageBank.Responses.treeHistoryCreatedSuccess);
-            }
-            catch (Exception ex)
-            {
-                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
-            }
-        }
-
-        public async Task<Tuple<List<IVersionAudit>, string>> GetTreeHistoryAsync(DateTime creationTime, int versionNumber, int rootNodeID, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            List<IVersionAudit> audit = new List<IVersionAudit>();
-            foreach(IVersionAudit versionAudit in InMemoryDatabase.TreeHistories)
-            {
-                if(versionAudit.CreationTime == creationTime && versionAudit.VersionNumber==versionNumber && versionAudit.RootNodeID == rootNodeID)
-                {
-                    audit.Add(versionAudit);
-                }
-            }
-
-            return Tuple.Create(audit, await _messageBank.GetMessage(IMessageBank.Responses.treeHistoryGetSuccess));
-        }
     }
 }

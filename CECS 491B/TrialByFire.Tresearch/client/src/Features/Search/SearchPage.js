@@ -38,7 +38,7 @@ class SearchPage extends React.PureComponent{
 
   async componentDidMount() {
     //axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
-    const response = await axios.get("http://trialbyfiretresearchwebapi.azurewebsites.net//TreeManagement/getNodes?owner=" + this.state.page)
+    const response = await axios.get("https://localhost:7010/TreeManagement/getNodes?owner=" + this.state.page)
     if(response !== null && response !== undefined)
     {
       const nodes = this.setup(response.data);

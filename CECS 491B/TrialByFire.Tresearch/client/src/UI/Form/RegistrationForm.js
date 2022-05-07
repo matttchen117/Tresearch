@@ -76,7 +76,7 @@ class RegistrationForm extends React.Component  {
 
         if(this.handleInput()){
             this.setState({errorMessage: ''})
-            axios.post('http://trialbyfiretresearchwebapi.azurewebsites.net//Registration/register?email=' + this.state.email.toLowerCase() + '&passphrase=' + this.hashInput(this.state.passphrase))
+            axios.post('https://localhost:7010/Registration/register?email=' + this.state.email.toLowerCase() + '&passphrase=' + this.hashInput(this.state.passphrase))
             .then(res => {
                 window.location = '/Register/ConfirmationSent';
             })

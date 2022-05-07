@@ -1897,6 +1897,45 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+
+        /// <summary>
+        ///     Creates tree history from a list of nodes and 
+        /// </summary>
+        public async Task<string> CreateTreeHistoryAsync(List<INode> nodes, DateTime creationTime,  CancellationToken cancellation = default(CancellationToken))
+        {
+            try
+            {
+                cancellation.ThrowIfCancellationRequested();
+            }
+            catch (SqlException ex)
+            {
+                //Check sql exception
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false);
+                    //Adding tag to node violates foreign key constraint (AKA tag doesn't exist in bank)
+                    case 547:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.tagNotFound).ConfigureAwait(false);
+                    default:
+                        return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+            }
+        }
+
+        public async Task<string> GetTreeHistoryAsync() { 
+        
+        }
+
         /// <summary>
         ///     Retreives a list of shared tags from a list of node(s). List with single node will return all tags.
         /// </summary>
@@ -2721,6 +2760,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         //think of document, doing actiosn in dcoument, ex closing document without saving: data lost, vs typing no need to involve backend
 
 
+
         public async Task<IResponse<string>> PasteNodeAsync(string userHash, long nodeIDPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -2803,6 +2843,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+
+
         public async Task<string> IsNodeLeaf(long nodeIDToPasteTo, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!nodeIDToPasteTo.Equals(null))
@@ -2863,6 +2905,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+
         public async Task<IResponse<string>> PrivateNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken))
         {
             if(nodes != null || nodes.Count != 0)
@@ -2921,7 +2964,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
 
         }
- 
+
+
+
+
+        
         public async Task<IResponse<string>> PublicNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (nodes != null || nodes.Count != 0)
@@ -2977,132 +3024,17 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
             //if there was nothing to copy, should not have happened
             return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.publicNodeFailure).ConfigureAwait(false), null, 400, false);
+
+
         }
 
-        /// <summary>
-        ///      Creaes a tag in bank with a count of tags
-        /// </summary>
-        /// <param name="tagName">Tag name</param>
-        /// <param name="count">Number of nodes tagged</param>
-        /// <param name="cancellationToken">Cancellation Token</param>
-        /// <returns>String status result</returns>
-        public async Task<string> CreateTreeHistoryAsync(List<INode> nodes, DateTime creationTime, int versionNumber, long rootNodeID, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            try
-            {
-                cancellationToken.ThrowIfCancellationRequested();
+        
 
-                //Check version number input
-                if (versionNumber < 0 )
-                {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
-                }
 
-                // Check nodes
-                if (nodes == null || nodes.Count() <= 0)
-                {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid).ConfigureAwait(false);
-                }
 
-                using (var connection = new SqlConnection(_options.SqlConnectionString))
-                {
-                    await connection.OpenAsync();
-                    foreach (INode node in nodes) { 
-                        //Set up Statement
-                        var procedure = "dbo.[CreateTreeHistory]";
-                        var value = new
-                        {
-                            VersionNumber = versionNumber,
-                            CreationTime = creationTime,
-                            RootNodeID = rootNodeID,
-                            NodeID = node.NodeID,
-                            ParentNodeID = node.ParentNodeID,
-                            NodeTitle = node.NodeTitle,
-                            Summary = node.Summary,
-                            TimeModified = node.TimeModified,
-                            Visibility = node.Visibility,
-                            Deleted = node.Deleted
-                        };
 
-                        //Execute statement
-                        var execute = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    }
 
-                    //Tree history created, return success
-                    return await _messageBank.GetMessage(IMessageBank.Responses.treeHistoryCreatedSuccess).ConfigureAwait(false);
-                }
-            }
-            catch (SqlException ex)
-            {
-                switch (ex.Number)
-                {
-                    //Unable to connect to database
-                    case -1:
-                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false);
-                    //Adding tree history violates primary key constraint. 
-                    case 2627:
-                        return await _messageBank.GetMessage(IMessageBank.Responses.tagDuplicate).ConfigureAwait(false);
-                    default:
-                        return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                // Rollback handled
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
-            }
-        }
 
-        public async Task<Tuple<List<IVersionAudit>, string>> GetTreeHistoryAsync(int versionNumber, long rootNodeID, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            try
-            {
-                cancellationToken.ThrowIfCancellationRequested();
 
-                //Establish connection
-                using (var connection = new SqlConnection(_options.SqlConnectionString))
-                {
-                    //Open connection
-                    await connection.OpenAsync();
-                    
-                    //Setup statement
-                    var procedure = "dbo.[GetTreeHistory]";
-                    var value = new { 
-                        VersionNumber = versionNumber,
-                        RootNodeID = rootNodeID
-                    };
-
-                    //Execute statement
-                    List<IVersionAudit> results = new List<IVersionAudit>(await connection.QueryAsync<VersionAudit>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
-                    
-                    //Tree history retrieved, return success
-                    return Tuple.Create(results, await _messageBank.GetMessage(IMessageBank.Responses.treeHistoryGetSuccess).ConfigureAwait(false));
-                }
-            }
-            catch (SqlException ex)
-            {
-                switch (ex.Number)
-                {
-                    //Unable to connect to database
-                    case -1:
-                        return Tuple.Create(new List<IVersionAudit>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false));
-                    default:
-                        return Tuple.Create(new List<IVersionAudit>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                // Rollback handled
-                return Tuple.Create(new List<IVersionAudit>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false));
-            }
-            catch (Exception ex)
-            {
-                return Tuple.Create(new List<IVersionAudit>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
-            }
-        }
     }
 }

@@ -13,7 +13,7 @@ class LogoutForm extends React.Component  {
     onSubmitHandler = (e) => {
         e.preventDefault();
         axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
-        axios.post('http://trialbyfiretresearchwebapi.azurewebsites.net//Logout/logout', {})
+        axios.post('https://localhost:7010/Logout/logout', {})
         .then(response => {
             console.log(response.data);
             sessionStorage.removeItem('authorization');
