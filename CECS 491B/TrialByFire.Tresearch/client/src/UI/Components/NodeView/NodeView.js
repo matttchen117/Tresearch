@@ -62,18 +62,6 @@ class NodeView extends React.PureComponent {
         }
     }
 
-    GetTags = async() => {
-        await axios.post("https://localhost:7010/Tag/nodeTagList", [this.state.node.nodeID])
-        .then(response => {
-            const responseData = Object.values(response.data);
-            // Set state to list of node tags
-            this.setState( {tags: responseData});
-        })
-        .catch(err => {
-            console.log("TEST")
-        })
-    }
-
     GetRatings = async () => {
         axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
         const ID = [this.state.node.nodeID]
@@ -82,6 +70,7 @@ class NodeView extends React.PureComponent {
             const r = Math.round(response.data[0].ratingScore * 100) / 100;
             this.setState({rating: r })
             document.getElementById("my-node-rating-id").innerHTML = "Rating: " + r;
+            sessionStorage.setItem('authorization', response.headers['authorization']);
         })
         .catch((err => {
         }))
@@ -93,11 +82,10 @@ class NodeView extends React.PureComponent {
         await axios.post("https://localhost:7010/Rate/getUserNodeRating?nodeID="+ID)
         .then(response => {
             this.setState({userRating: response.data})
-            
-            console.log(response.data)
+            sessionStorage.setItem('authorization', response.headers['authorization']);
         })
         .catch((err => {
-            console.log("TEST")
+
         }))
     }
 
@@ -106,9 +94,8 @@ class NodeView extends React.PureComponent {
         console.log(this.state.node);
         await axios.post("https://localhost:7010/Rate/rateNode?rating=" + rating, [this.state.node.nodeID])
         .then(response => {
-            this.GetRatings()
-
-            console.log("rated");
+            this.GetRatings();
+            sessionStorage.setItem('authorization', response.headers['authorization']);
         })
         .catch(err => {
             console.log(err.response);

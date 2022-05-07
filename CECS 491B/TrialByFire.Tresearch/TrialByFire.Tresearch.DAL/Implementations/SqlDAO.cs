@@ -9,6 +9,7 @@ using TrialByFire.Tresearch.Exceptions;
 using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
+using System.Text;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
@@ -2591,12 +2592,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 if (rating <= 0)
                     return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.invalidRating), rating, 422, false);
 
-                string nodeCSV = "";
+                StringBuilder nodeCSV = new StringBuilder();
 
                 // Create Comma Seperated Values
                 foreach (long node in nodeIDs)
                 {
-                    nodeCSV += node + ",";
+                    nodeCSV.Append(node + ",");
                 }
 
                 // Establish connection to database
@@ -2608,7 +2609,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     var parameters = new
                     {
                         @UserHash = userHash,
-                        @InNodes = nodeCSV,
+                        @InNodes = nodeCSV.ToString(),
                         @Rating = rating
                     };
                     //Execute command
@@ -2653,12 +2654,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound), new List<Node>(), 404, false);
                 }
 
-                string nodeCSV = "";
+                StringBuilder nodeCSV = new StringBuilder();
 
                 // Create Comma Seperated Values
                 foreach(long node in nodeIDs)
                 {
-                    nodeCSV += node + ",";
+                    nodeCSV.Append(node + ",");
                 }
 
                 // Establish connection to database
@@ -2668,7 +2669,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     await connection.OpenAsync();
                     var procedure = "dbo.[GetNodesRatings]";
                     var parameters = new DynamicParameters();
-                    parameters.Add("InNodes", nodeCSV);
+                    parameters.Add("InNodes", nodeCSV.ToString());
 
                     var result = await connection.QueryAsync<Node>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken));
 
@@ -2693,7 +2694,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             catch (OperationCanceledException)
             {
                 // bubble up
-                throw;
+                return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), new List<Node>(), 408, false);
             }
             catch (Exception ex)
             {

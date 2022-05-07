@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.Text;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Models;
@@ -83,7 +84,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
                 if (results.StatusCode == 200)
                 {
-                    _logManager.StoreAnalyticLogAsync(DateTime.Now, ILogManager.Levels.Info, ILogManager.Categories.Server, "Rating: Ratings retrieved.");
+                    CreateAnalyticLog(await _messageBank.GetMessage(IMessageBank.Responses.getRateSuccess).ConfigureAwait(false));
                     return new OkObjectResult(results.Data);
                 }
                 else
@@ -113,18 +114,15 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             {
                 IResponse<int> results = await _rateManager.GetUserNodeRatingAsync(nodeID);
 
-                if (results.StatusCode == 200)
+                if(results.Data != null && results.IsSuccess && results.StatusCode == 200)
                 {
-                    _logManager.StoreAnalyticLogAsync(DateTime.Now, ILogManager.Levels.Info, ILogManager.Categories.Server, "Rating: Ratings retrieved.");
+                    await CreateAnalyticLog(await _messageBank.GetMessage(IMessageBank.Responses.getRateSuccess).ConfigureAwait(false));
                     return new OkObjectResult(results.Data);
                 }
                 else
                 {
-                    string[] split;
-                    split = results.ErrorMessage.Split(":");
-                    Enum.TryParse(split[1], out ILogManager.Categories category);
-                    _logManager.StoreArchiveLogAsync(DateTime.Now, ILogManager.Levels.Error, category, split[2]);
-                    return StatusCode(Convert.ToInt32(split[0]), split[2]);
+                    string errorMessage = await CreateArchiveLogAsync(results.ErrorMessage);
+                    return StatusCode(Convert.ToInt32(results.StatusCode), results.Data);
                 }
             }
             catch (Exception ex)
@@ -136,6 +134,23 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), ILogManager.Levels.Error, category, errorSplit[2]);
                 return StatusCode(Convert.ToInt32(errorSplit[0]), ex.Message);
             }
+        }
+
+        private async Task<string> CreateArchiveLogAsync(string error)
+        {
+            string[] split;
+            split = error.Split(":");
+            Enum.TryParse(split[1], out ILogManager.Categories category);
+            await _logManager.StoreArchiveLogAsync(DateTime.Now, ILogManager.Levels.Error, category, split[2]);
+            return split[2];
+        }
+
+        private async Task<string> CreateAnalyticLog(string success)
+        {
+            string[] successSplit;
+            successSplit = success.Split(":");
+            await _logManager.StoreAnalyticLogAsync(DateTime.Now, ILogManager.Levels.Info, ILogManager.Categories.Server, successSplit[2]);
+            return successSplit[2];
         }
 
 
