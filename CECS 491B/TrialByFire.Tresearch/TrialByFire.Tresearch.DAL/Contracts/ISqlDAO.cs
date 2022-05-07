@@ -67,6 +67,24 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         /*
             Ian's Methods
          */
+        /*
+        public string CreateNode();
+        public INode GetNode();
+        public string UpdateNode();
+        public string DeleteNode();
+        public string CreateTag();
+        public ITag GetTag();
+        public string UpdateTag();
+        public string DeleteTag();
+        public string CreateNodeTag();
+        public INodeTag GetNodeTag();
+        public string UpdateNodeTag();
+        public string DeleteNodeTag();
+        public string CreateRating();
+        public IRating GetRating();
+        public string UpdateRating();
+        public string DeleteRating();
+        */
 
         /*
         public string CreateNode();
@@ -134,7 +152,11 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         
         public string CreateNodesCreated(INodesCreated nodesCreated);
 
+<<<<<<< HEAD
         public Task<List<NodesCreated>> GetNodesCreatedAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
+=======
+        public IList<INodesCreated> GetNodesCreated(DateTime nodeCreationDate);
+>>>>>>> Working
 
         public string UpdateNodesCreated(INodesCreated nodesCreated);
 
@@ -142,21 +164,33 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         public string CreateDailyLogin(IDailyLogin dailyLogin);
 
+<<<<<<< HEAD
         public Task<List<DailyLogin>> GetDailyLoginAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
+=======
+        public IList<IDailyLogin> GetDailyLogin(DateTime nodeCreationDate);
+>>>>>>> Working
 
         public string UpdateDailyLogin(IDailyLogin dailyLogin);
 
 
         public string CreateTopSearch(ITopSearch topSearch);
 
+<<<<<<< HEAD
         public Task<List<TopSearch>> GetTopSearchAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
+=======
+        public IList<ITopSearch> GetTopSearch(DateTime nodeCreationDate);
+>>>>>>> Working
 
         public string UpdateTopSearch(ITopSearch topSearch);
 
 
         public string CreateDailyRegistration(IDailyRegistration dailyRegistration);
 
+<<<<<<< HEAD
         public Task<List<DailyRegistration>> GetDailyRegistrationAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
+=======
+        public IList<IDailyRegistration> GetDailyRegistration(DateTime nodeCreationDate);
+>>>>>>> Working
 
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration);
 

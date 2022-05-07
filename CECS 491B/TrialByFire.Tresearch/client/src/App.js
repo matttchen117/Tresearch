@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import axios, {AxiosResponse, AxiosError} from 'axios';
@@ -85,6 +86,33 @@ class App extends React.Component {
       </div>
     );
   }
+=======
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route
+} from "react-router-dom";
+import './App.css';
+import RegistrationForm from './Features/Registration/RegistrationForm';
+import ConfirmationSent from './Features/Registration/ConfirmationSent';
+import InactiveLink from './Features/Registration/InactiveLink';
+import LoginForm from './Features/Authentication/LoginForm';
+
+function App() {
+  return (
+    <div className="App">
+      <Router>
+        <header></header>
+        <Routes>
+          <Route path="/Authentication/Login" element = {<LoginForm />}/>
+          <Route path="/Registration" element = {<RegistrationForm />}/>
+          <Route path="/Registration/ConfirmationSent" element = {<ConfirmationSent />}/>
+          <Route path="/Registration/InactiveLink" element = {<InactiveLink />}/>
+        </Routes>
+      </Router>
+    </div>
+  );
+>>>>>>> Working
 }
 
 export default App;
