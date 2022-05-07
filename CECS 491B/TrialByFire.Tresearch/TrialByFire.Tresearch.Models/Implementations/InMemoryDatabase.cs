@@ -19,7 +19,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public IList<ITag> Tags { get; set; }
         public IList<INodeTag> NodeTags { get; set; }
         public IList<INodeRating> NodeRatings { get; set; }
-
+        /*        public IList<ITreeHistory> TreeHistories { get; set; }
+                public IList<IWebPageKPI> WebPageKPIs { get; set; }
+                public IList<IDailyRegistrationKPI> DailyRegistrationKPIs { get; set; }*/
         public IList<IDailyLogin> DailyLogins { get; set; }
         public IList<ITopSearch> TopSearches { get; set; }
         public IList<INodesCreated> NodesCreated { get; set; }
@@ -29,8 +31,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public IList<ILog> AnalyticLogs { get; set; }
         public IList<ILog> ArchiveLogs { get; set; }
         public IList<IUserHashObject> UserHashTable { get; set; }
-
-        public IList<IVersionAudit> TreeHistories { get; set; }
 
         public InMemoryDatabase()
         {
@@ -50,7 +50,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
             ArchiveLogs = InitializeArchiveLogs();
             UserHashTable = InitializeUserHashTable();
             RecoveryLinks = InitializeRecoveryLinks();
-            TreeHistories = InitializeTreeHistories();
         }
 
         /*
@@ -1026,34 +1025,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodeIDsList.Add(12);
 
             return nodeIDsList;
-        }
-
-        private List<IVersionAudit> InitializeTreeHistories() { 
-            List<IVersionAudit> treeHistories = new List<IVersionAudit>();
-            List<INodeHistory> ver1NodeHistories = new List<INodeHistory>();
-            List<INodeHistory> ver2NodeHistories = new List<INodeHistory>();
-            List<INodeHistory> ver3NodeHistories = new List<INodeHistory>();
-
-
-            ver1NodeHistories.Add(new NodeHistory(1, 1, "Node1", "Test1", new DateTime(2022, 5, 3, 0, 19, 15), true, false));
-            ver1NodeHistories.Add(new NodeHistory(2, 1, "Node2", "Test2", new DateTime(2022, 5, 3, 0, 19, 10), true, false));
-            ver1NodeHistories.Add(new NodeHistory(3, 1, "Node3", "Test3", new DateTime(2022, 5, 3, 0, 19, 5), true, false));
-
-            treeHistories.Add(new VersionAudit(1, new DateTime(2022, 5, 3, 0, 19, 15), 1, ver1NodeHistories));
-
-            ver2NodeHistories.Add(new NodeHistory(1, 1, "Node1", "Test1", new DateTime(2022, 5, 3, 0, 19, 30), true, false));
-            ver2NodeHistories.Add(new NodeHistory(2, 1, "Node2", "Test2", new DateTime(2022, 5, 3, 0, 19, 25), true, false));
-            ver2NodeHistories.Add(new NodeHistory(3, 1, "Node3", "Test4", new DateTime(2022, 5, 3, 0, 19, 20), true, false));
-
-            treeHistories.Add(new VersionAudit(2, new DateTime(2022, 5, 3, 0, 19, 30), 1, ver2NodeHistories));
-
-
-            ver3NodeHistories.Add(new NodeHistory(1, 1, "Node1", "Test1", new DateTime(2022, 5, 3, 0, 19, 30), true, false));
-            ver3NodeHistories.Add(new NodeHistory(2, 1, "Node2", "Test2", new DateTime(2022, 5, 3, 0, 19, 25), true, false));
-
-            treeHistories.Add(new VersionAudit(3, new DateTime(2022, 5, 3, 0, 19, 45), 1, ver3NodeHistories));
-
-            return treeHistories;
         }
     }
 }

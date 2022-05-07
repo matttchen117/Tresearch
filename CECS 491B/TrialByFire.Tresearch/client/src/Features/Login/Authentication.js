@@ -23,7 +23,7 @@ const Authentication = () => {
         event.preventDefault();
         var { username, otp } = document.forms[1];
         var authorizationLevel = "user";
-        axios.post('http://trialbyfiretresearchwebapi.azurewebsites.net//Authentication/authenticate?username=' + username + '&otp=' + otp 
+        axios.post('https://localhost:7010/Authentication/authenticate?username=' + username + '&otp=' + otp 
         + '&authorizationLevel=' + authorizationLevel)
         .then(
             console.log("success")

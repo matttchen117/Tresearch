@@ -46,7 +46,7 @@ class Portal extends React.PureComponent{
     if(token != null){
       // Set token header when sending post
       axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
-      axios.get("http://trialbyfiretresearchwebapi.azurewebsites.net//TreeManagement/getNodes?owner=" + token.userHash)
+      axios.get("https://localhost:7010/TreeManagement/getNodes?owner=" + token.userHash)
       .then( res => {
         const nodes = this.setup(res.data);
         this.setState({nodes});
@@ -84,9 +84,6 @@ class Portal extends React.PureComponent{
     return (
       <div className="Portal-wrapper"> 
         {<NavBar/>}
-        <div className = "portal-tree-history-wrapper">
-          Hello world
-        </div>
         <div className = "portal-tree-wrapper">
           {this.state.nodes && (
             <TreeView nodes = {this.state.nodes} />

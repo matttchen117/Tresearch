@@ -3,3 +3,6 @@ C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresear
 C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Models\obj\Release\net6.0\TrialByFire.Tresearch.Models.AssemblyInfoInputs.cache
 C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Models\obj\Release\net6.0\TrialByFire.Tresearch.Models.AssemblyInfo.cs
 C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Models\obj\Release\net6.0\TrialByFire.Tresearch.Models.csproj.CoreCompileInputs.cache
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Models\obj\Release\net6.0\TrialByFire.Tresearch.Models.dll
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Models\obj\Release\net6.0\refint\TrialByFire.Tresearch.Models.dll
+C:\Users\ianho\OneDrive\Documents\GitHub\Tresearch\CECS 491B\TrialByFire.Tresearch\TrialByFire.Tresearch.Models\obj\Release\net6.0\TrialByFire.Tresearch.Models.pdb

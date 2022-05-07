@@ -215,9 +215,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             publicNodeSuccess,
             publicNodeFailure,
 
-            treeHistoryDuplicate,
-            treeHistoryCreatedSuccess,
-            treeHistoryGetSuccess
+
         }
         public Task<string> GetMessage(Responses response);
     }
