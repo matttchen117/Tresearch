@@ -37,7 +37,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.operationCancelled:
                     return "500: Server: Operation Cancelled Exception: ";
                 case Responses.operationTimeExceeded:
-                    return "500: Server: Operation Exceeded Time Limiet Exception: ";
+                    return "500: Server: Operation Exceeded Time Limit Exception: ";
+                case Responses.principalNotSet:
+                    return "500: Server: Principal was not set correctly.";
 
                 case Responses.databaseConnectionFail:
                     return "503: Database: Unable to connect to database.";
@@ -96,6 +98,17 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "200: Server: Node search success. Search: {0}, Tags: {1}, FilterByRating: {2}, FilterByTime: {3}";
                 case Responses.noSearchInput:
                     return "400: Data: No search input provided.";
+
+                case Responses.updateNodeContentSuccess:
+                    return "200: Server: Update node content success.";
+                case Responses.updateNodeContentRollback:
+                    return "500: Database: Update node content rollback occurred.";
+                case Responses.updateNodeContentTimeExceeded:
+                    return "500: Server: Update Node Content exceeded time.";
+                case Responses.nodeTitleLengthExceeded:
+                    return "400: Server: Node title length exceeded max.";
+                case Responses.nodeSummaryLengthExceeded:
+                    return "400: Server: Node summary length exceeded max.";
 
                 case Responses.tagAddSuccess:
                     return "200: Server: Tag added to node(s).";

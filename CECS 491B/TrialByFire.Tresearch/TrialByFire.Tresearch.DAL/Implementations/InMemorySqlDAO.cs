@@ -20,6 +20,36 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = new MessageBank();
         }
 
+        public async Task<IResponse<string>> UpdateNodeContentAsync(INodeContentInput nodeContentInput)
+        {
+            // Check if search input null
+            if (nodeContentInput == null)
+            {
+                return new NodeContentResponse<string>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.noSearchInput).ConfigureAwait(false), null, 400, false);
+            }
+            try
+            {
+                var nodes = InMemoryDatabase.Nodes.Where(n => n.NodeID == nodeContentInput.NodeID);
+                if (nodes.Count() == 1)
+                {
+                    var node = nodes.ElementAt(0);
+                    node.NodeTitle = nodeContentInput.NodeTitle;
+                    node.Summary = nodeContentInput.Summary;
+                    return new NodeContentResponse<string>("", "1", 200, true);
+                }
+                else
+                {
+                    return new NodeContentResponse<string>("", "0", 200, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new NodeContentResponse<string>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+            }
+        }
+
         public async Task<IResponse<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput)
         {
             try

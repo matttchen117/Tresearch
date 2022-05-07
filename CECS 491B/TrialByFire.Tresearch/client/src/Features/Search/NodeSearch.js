@@ -5,6 +5,7 @@ import { useParams} from "react-router-dom";
 
 import "./NodeSearch.css";
 import userEvent from "@testing-library/user-event";
+import jwtVerification from "../JwtVerification/JwtVerification";
 
 function Search() {
     // Holds array of nodes result
@@ -291,6 +292,7 @@ function Search() {
                             onChange={handleChangeFilterByTime}
                         />
                         <button value={reverseList} onClick={handleReverseList}>Reverse Result List</button>
+                        <button onClick={jwtVerification}>Verify Token</button>
                     </div>
                 </form>
                 <div>

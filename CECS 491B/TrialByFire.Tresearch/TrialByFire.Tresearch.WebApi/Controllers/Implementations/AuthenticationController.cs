@@ -13,8 +13,10 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
-    // Summary:
-    //     A controller class for Authenticating the User.
+    /// <summary>
+    ///     AuthenticationController: Class that is part of the Controller abstraction layer that handles receiving and returning
+    ///         HTTP response and requests for Authentication
+    /// </summary>
     [ApiController]
     [EnableCors]
     [Route("[controller]")]
@@ -26,6 +28,14 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         private BuildSettingsOptions _buildSettingsOptions { get; }
 
+        /// <summary>
+        ///     public AuthenticationController():
+        ///         Constructor for AuthenticationController class
+        /// </summary>
+        /// <param name="logManager">Manager object for Manager abstraction layer to handle business rules related to Logging</param>
+        /// <param name="authenticationManager">Manager object for Manager abstraction layer to handle business rules related to Authentication</param>
+        /// <param name="messageBank">Object that contains error and success messages</param>
+        /// <param name="buildSettingsOptions">The settings/options</param>
         public AuthenticationController(ILogManager logManager, 
             IAuthenticationManager authenticationManager, IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> buildSettingsOptions)
         {
@@ -35,20 +45,15 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _buildSettingsOptions = buildSettingsOptions.Value;
         }
 
-        //
-        // Summary:
-        //     Entry point for Authentication requests and creates the Cookie for the User on success.
-        //
-        // Parameters:
-        //   username:
-        //     The username entered by the User attempting to Authenticate.
-        //   otp:
-        //     The otp entered by the User attempting to Authenticate.
-        //   authorizationLevel:
-        //     The selected authorization level for the UserAccount that the User is trying Authenticate for.
-        //
-        // Returns:
-        //     The result of the operation with any status codes if applicable.
+        /// <summary>
+        ///     AuthenticateAsync:
+        ///     
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="otp"></param>
+        /// <param name="authorizationLevel"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("authenticate")]
         public async Task<IActionResult> AuthenticateAsync(string username, string otp, 

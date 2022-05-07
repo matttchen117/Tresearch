@@ -21,7 +21,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         ///     public NodeSearchService():
         ///         Constructor for NodeSearchService class
         /// </summary>
-        /// <param name="sqlDAO">Data Access Object to interact with the database</param>
+        /// <param name="sqlDAO">SQL Data Access Object to interact with the database</param>
         /// <param name="messageBank">Object that contains error and success messages</param>
         public NodeSearchService(ISqlDAO sqlDAO, IMessageBank messageBank)
         {

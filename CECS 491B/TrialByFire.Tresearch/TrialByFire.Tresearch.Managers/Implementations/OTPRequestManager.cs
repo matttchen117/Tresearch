@@ -28,17 +28,21 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private IMailService _mailService { get; }
         private BuildSettingsOptions _options { get; }
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
-            TimeSpan.FromSeconds(5));
+            /*TimeSpan.FromSeconds(5)*/);
+
+        // For Testing Only
+        private ILogManager _logManager;
 
         public OTPRequestManager(IOTPRequestService otpRequestService, 
             IAccountVerificationService accountVerificationService, IMessageBank messageBank, 
-            IMailService mailService, IOptionsSnapshot<BuildSettingsOptions> options)
+            IMailService mailService, IOptionsSnapshot<BuildSettingsOptions> options, ILogManager logManager)
         {
             _otpRequestService = otpRequestService;
             _accountVerificationService = accountVerificationService;
             _messageBank = messageBank;
             _mailService = mailService;
             _options = options.Value;
+            _logManager = logManager;
         }
 
         //
@@ -69,13 +73,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             {
                 if(Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
                 {
-                    // Basic input validation will be done at client side
-                    /*Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-                    keyValuePairs.Add("username", username);
-                    keyValuePairs.Add("passphrase", passphrase);
-                    result = await _validationService.ValidateInputAsync(keyValuePairs);
-                    if (result.Equals(_messageBank.SuccessMessages["generic"]))
-                    {*/
                     IAccount account = new UserAccount(username, passphrase, authorizationLevel);
                     string otp = await GenerateRandomOTPAsync(_cancellationTokenSource.Token).ConfigureAwait(false);
                     byte[] salt = new byte[0];
@@ -95,11 +92,10 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                             // No API Key right now
                             if (!_options.Environment.Equals("Test"))
                             {
-                                result = await _mailService.SendOTPAsync(account.Username, otp,
-                                    otp, otp, _cancellationTokenSource.Token).ConfigureAwait(false);
-                                // FOR TESTING ONLY
-                                /*_logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
-                                 category: ILogManager.Categories.Server, otp);*/
+                                /*result = await _mailService.SendOTPAsync(account.Username, otp,
+                                    otp, otp, _cancellationTokenSource.Token).ConfigureAwait(false);*/
+                                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
+                                 category: ILogManager.Categories.Server, otp);
                             }
                         }
                     }

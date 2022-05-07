@@ -63,6 +63,7 @@ DROP PROCEDURE IF EXISTS GetUserHash
 DROP PROCEDURE IF EXISTS SearchNodes
 DROP PROCEDURE IF EXISTS RefreshSession
 DROP PROCEDURE IF EXISTS GetNodes
+DROP PROCEDURE IF EXISTS UpdateNodeContent
 
 CREATE TABLE [dbo].Accounts(
 	UserID INT IDENTITY(1,1) NOT NULL,
@@ -216,6 +217,61 @@ CREATE TABLE [dbo].Searches(
 	Search VARCHAR(100) PRIMARY KEY,
 	Times INT
 );
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Matthew Chen
+-- Create date: 5/6/22
+-- Description:	Changes the content and/or title of the specified Node
+-- =============================================
+CREATE PROCEDURE UpdateNodeContent 
+	-- Add the parameters for the stored procedure here
+	@NodeID BIGINT,
+	@NodeTitle VARCHAR(100),
+	@Summary VARCHAR(750),
+	@Result INT OUTPUT
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+	DECLARE @TranCounter int;
+	SET @TranCounter = @@TRANCOUNT;
+	IF @TranCounter > 0
+		SAVE TRANSACTION ProcedureSave
+	ELSE
+		BEGIN TRAN
+			BEGIN TRY;
+				-- Insert statements for procedure here
+
+				-- 1 = success, 2 = Rollback occurred
+				UPDATE Nodes SET NodeTitle = @NodeTitle, Summary = @Summary WHERE NodeID = @NodeID;
+
+				SET @Result = 1
+
+				COMMIT TRANSACTION
+			END TRY
+			BEGIN CATCH
+			IF @TranCounter = 0
+				BEGIN
+					SET @Result = 2
+					ROLLBACK TRANSACTION
+				END
+			ELSE
+				IF XACT_STATE() <> -1
+					BEGIN
+						SET @Result = 2
+						ROLLBACK TRANSACTION ProcedureSave
+					END
+			END CATCH
+	RETURN;
+END
+GO
 
 SET ANSI_NULLS ON
 GO
@@ -636,7 +692,7 @@ BEGIN
 			INSERT INTO Searches(Search, Times) VALUES (@Search, 1)
 		END
 	
-	SELECT Nodes.UserHash, Nodes.NodeID, NodeTitle, TimeModified, TagName, COALESCE(SUM(Rating),0) AS Rating
+	SELECT Nodes.UserHash, Nodes.NodeID, NodeTitle, TimeModified, TagName, COALESCE(AVG(Rating),0) AS Rating
 		FROM (Nodes LEFT JOIN NodeTags ON Nodes.NodeID = NodeTags.NodeID) LEFT JOIN NodeRatings ON Nodes.NodeID = NodeRatings.NodeID
 		WHERE (UPPER(NodeTitle) LIKE ('%' + UPPER(@Search) + '%') OR LOWER(NodeTitle) LIKE ('%' + LOWER(@Search) + '%')) AND Visibility = 1 AND Deleted = 0
 		GROUP BY Nodes.UserHash, Nodes.NodeID, NodeTitle, TimeModified, TagName
