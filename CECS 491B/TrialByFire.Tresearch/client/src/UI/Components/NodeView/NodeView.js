@@ -182,7 +182,6 @@ class NodeView extends React.PureComponent {
                     </div>
                     <div className="node-rating-container">
                         {this.state.token && this.state.userRating != null && <div>
-                            
                             {renderSetRatings}
                         </div>}
                     </div>

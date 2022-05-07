@@ -33,4 +33,13 @@
     text-align: left;
 }
 
+.nonowner-context-menu {
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    padding: 5px 10px 5px 10px;
+    position: fixed;
+    text-align: left;
+}
+
   

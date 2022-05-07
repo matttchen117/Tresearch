@@ -1,11 +1,13 @@
 import axios from "axios";
 import React from "react";
 import Tree from "react-d3-tree";
+import jwt_decode from "jwt-decode";  
 import Popup from "../../Popup/Popup";
 import TagPopup from "../../Popup/TagPopup";
 import NodePopup from "../../Popup/NodePopup";
 import CreateNodePopup from "../../Popup/CreateNodePopup";
 import "./TreeView.css";
+import RateNodePopup from "../../Popup/RateNodePopup";
 
 class TreeView extends React.Component{
     constructor(props) {
@@ -51,6 +53,7 @@ class TreeView extends React.Component{
         this.state = {
             isPopupOpen: false,
             isNodeViewOpen: false,
+            isRateViewOpen: false,
             copiedNodes: [],
             isTaggerOpen: false,
             isCreateNodeOpen: false,
@@ -59,11 +62,37 @@ class TreeView extends React.Component{
             shiftDown: false,
             shiftCollection: [],
             isShown: false,
+            isGuest: true,
+            isOwner: false,
             x: 0,
             y: 0
         }
-    }
 
+        const token = sessionStorage.getItem('authorization');
+        
+        if(token){
+            const decoded = jwt_decode(token);
+            const tokenExpiration = decoded.tokenExpiration;
+            const now = new Date();
+
+            // Check if expired
+            if(now.getTime() > tokenExpiration * 1000){
+                localStorage.removeItem('authorization');
+                window.location.assign(window.location.origin);
+                window.location = '/';
+                
+            }
+
+            if(decoded.userHash === props.nodes.userHash){
+                this.state.isOwner = true;
+            } 
+
+            this.state.isGuest = false;
+
+        } else{
+            this.state.isGuest = true;
+        }
+    }
 
 
     // Change state when shift key is pressed down
@@ -147,6 +176,13 @@ class TreeView extends React.Component{
         e.stopPropagation();
         const currentState = Array.from(new Set(this.state.nodeSelect));
         this.setState( { nodeSelect: currentState, isTaggerOpen: true, isPopupOpen: true, isShown: false,  x: e.pageX, y: e.pageY})
+        this.unhighlight();
+    }
+
+    RateNodes = (e) => {
+        e.stopPropagation();
+        const currentState = Array.from(new Set(this.state.nodeSelect));
+        this.setState({nodeSelect: currentState, isRateViewOpen: true, isPopupOpen: true, isShown: false, x: e.pageX, y: e.pageY})
         this.unhighlight();
     }
 
@@ -246,6 +282,7 @@ class TreeView extends React.Component{
 
 
 
+
      render() {
         const  ToggleTagger = () => {
 
@@ -260,6 +297,11 @@ class TreeView extends React.Component{
                 isCreateNodeOpen: false,
                 isPopupOpen: false
             })
+        }
+
+        const ToggleRatePopup = () => {
+            this.setState( {isRateViewOpen: false, isPopupOpen: false})
+            this.unhighlight();
         }
 
         const ToggleNodePopup = () => {
@@ -326,10 +368,6 @@ class TreeView extends React.Component{
             </g>
         );
 
-
-
-
-
         // Render user's tree
         const renderTree = (
             <div className = "tree-portal-container">
@@ -345,7 +383,7 @@ class TreeView extends React.Component{
                         pathFunc = {this.treeConfiguration.pathFunc}
                        />
                     ): null}
-                    {this.state.isShown && (
+                    {this.state.isShown && this.state.isOwner && (
                         <div style={{ top: this.state.y, left: this.state.x}}  className="tag-context-menu" >
                             <div className="option" onClick = {this.CreateNode}>
                                 Add Child
@@ -356,9 +394,7 @@ class TreeView extends React.Component{
                             <div className="option" onClick = {this.EditTags}>
                                 Edit Tags
                             </div>
-                            <div className="option" onClick = {this.DeleteNode}>
-                                Delete Node(s)
-                            </div>
+                            
                             <div className="option" onClick = {this.CopyNodes}>
                                 Copy Node(s)
                             </div>
@@ -370,6 +406,19 @@ class TreeView extends React.Component{
                             </div>
                             <div className="option" onClick = {this.PublicNodes}>
                                 Publicize Node(s)
+                            </div>
+                            <div className="option" onClick = {this.DeleteNode}>
+                                Delete Node(s)
+                            </div>
+                        </div>
+                    )}
+                    {this.state.isShown && !this.state.isOwner && this.state.isGuest == false &&  (
+                        <div style={{top: this.state.y, left: this.state.x}} className="nonowner-context-menu">
+                            <div className="option" onClick={this.CopyNodes}>
+                                Copy Nodes
+                            </div>
+                            <div className="option" onClick={this.RateNodes}>
+                                Rate Nodes
                             </div>
                         </div>
                     )}
@@ -388,6 +437,9 @@ class TreeView extends React.Component{
                 </div>
                 <div className = "node-popup-wrapper">
                     {this.state.isNodeViewOpen ? <Popup content = {<NodePopup onClick={ToggleNodePopup} node = {this.state.nodeSelect}/>}/> : null }
+                </div>
+                <div className = "node-rate-wrapper">
+                    {this.state.isRateViewOpen ? <Popup content = {<RateNodePopup onClick= {ToggleRatePopup} nodes = {this.state.nodeSelect} />} /> : null }
                 </div>
             </div>
         );
