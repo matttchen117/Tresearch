@@ -60,7 +60,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             ITagService recoveryService = TestProvider.GetService<ITagService>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            string expected = await messageBank.GetMessage(response);
+            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
 
             List<long> nodeIDs;
             if (index == null)
@@ -91,7 +91,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             ITagService recoveryService = TestProvider.GetService<ITagService>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            string expected = await messageBank.GetMessage(response);
+            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
 
             List<long> nodeIDs;
             if (index == null)
@@ -115,7 +115,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             //Arrange
             ITagService tagService = TestProvider.GetService<ITagService>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            string expected = await messageBank.GetMessage(response);
+            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             List<long> nodeIDs;
@@ -148,10 +148,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             //Arrange
             ITagService recoveryService = TestProvider.GetService<ITagService>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            string expected = await messageBank.GetMessage(response);
+            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await recoveryService.CreateTagAsync(tagName, count).ConfigureAwait(false);
+            string result = await recoveryService.CreateTagAsync(tagName, count, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
             Assert.NotNull(result);
@@ -171,10 +172,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             //Arrange
             ITagService recoveryService = TestProvider.GetService<ITagService>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            string expected = await messageBank.GetMessage(response);
+            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await recoveryService.RemoveTagAsync(tagName).ConfigureAwait(false);
+            string result = await recoveryService.RemoveTagAsync(tagName, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
             Assert.NotNull(result);
@@ -191,10 +193,11 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             //Arrange
             ITagService tagService = TestProvider.GetService<ITagService>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            string expected = await messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess);
+            string expected = await messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess).ConfigureAwait(false);
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            Tuple<List<ITag>, string> results = await tagService.GetTagsAsync();
+            Tuple<List<ITag>, string> results = await tagService.GetTagsAsync(cancellationTokenSource.Token).ConfigureAwait(false);
             string result = results.Item2;
 
             //Assert

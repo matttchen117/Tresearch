@@ -79,13 +79,13 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             }
                 
 
-            string expected = await messageBank.GetMessage(response);
+            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
             string[] exps = expected.Split(":");
             ObjectResult expectedResult = new ObjectResult(exps[2])
             { StatusCode = Convert.ToInt32(exps[0]) };
 
             // Act
-            IActionResult aResult = await tagController.AddTagToNodesAsync(nodeIDs, tagName);
+            IActionResult aResult = await tagController.AddTagToNodesAsync(nodeIDs, tagName).ConfigureAwait(false);
             var result = aResult as ObjectResult;
 
             // Assert
@@ -109,7 +109,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            string expected = await messageBank.GetMessage(response);
+            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
             string[] exps = expected.Split(":");
             ObjectResult expectedResult = new ObjectResult(exps[2])
             { StatusCode = Convert.ToInt32(exps[0]) };
@@ -117,7 +117,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             ITagController tagController = TestProvider.GetService<ITagController>();
 
             // Act
-            IActionResult results = await tagController.CreateTagAsync(tagName);
+            IActionResult results = await tagController.CreateTagAsync(tagName).ConfigureAwait(false);
             var result = results as ObjectResult;
 
             // Arrange
@@ -136,7 +136,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            string expected = await messageBank.GetMessage(response);
+            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
             string[] exps = expected.Split(":");
             ObjectResult expectedResult = new ObjectResult(exps[2])
             { StatusCode = Convert.ToInt32(exps[0]) };
@@ -144,7 +144,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             ITagController tagController = TestProvider.GetService<ITagController>();
 
             // Act
-            IActionResult results = await tagController.DeleteTagAsync(tagName);
+            IActionResult results = await tagController.DeleteTagAsync(tagName).ConfigureAwait(false);
             var result = results as ObjectResult;
 
             // Arrange
@@ -169,7 +169,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            string expected = await messageBank.GetMessage(response);
+            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
             string[] exps = expected.Split(":");
             ObjectResult expectedResult = new ObjectResult(exps[2])
             { StatusCode = Convert.ToInt32(exps[0]) };
@@ -187,7 +187,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             ITagController tagController = TestProvider.GetService<ITagController>();
 
             // Act
-            IActionResult results = await tagController.GetNodeTagsAsync(nodeIDs);
+            IActionResult results = await tagController.GetNodeTagsAsync(nodeIDs).ConfigureAwait(false);
             var result = results as ObjectResult;
 
             // Arrange
@@ -210,7 +210,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
             Thread.CurrentPrincipal = rolePrincipal;
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            string expected = await messageBank.GetMessage(response);
+            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
             string[] exps = expected.Split(":");
             ObjectResult expectedResult = new ObjectResult(exps[2])
             { StatusCode = Convert.ToInt32(exps[0]) };
@@ -218,7 +218,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             ITagController tagController = TestProvider.GetService<ITagController>();
 
             // Act
-            IActionResult resultTags = await tagController.GetTagsAsync();
+            IActionResult resultTags = await tagController.GetTagsAsync().ConfigureAwait(false);
             var result = resultTags as ObjectResult;
 
             // Arrange
@@ -243,7 +243,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             Thread.CurrentPrincipal = rolePrincipal;
             ITagController tagController = TestProvider.GetService<ITagController>();
             IMessageBank messageBank = TestProvider.GetService<IMessageBank>();
-            string expected = await messageBank.GetMessage(response);
+            string expected = await messageBank.GetMessage(response).ConfigureAwait(false);
             string[] exps = expected.Split(":");
             ObjectResult expectedResult = new ObjectResult(exps[2])
             { StatusCode = Convert.ToInt32(exps[0]) };
@@ -259,7 +259,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Tag
             }
                 
             // Act
-            IActionResult aResult = await tagController.RemoveTagFromNodesAsync(nodeIDs, tagName);
+            IActionResult aResult = await tagController.RemoveTagFromNodesAsync(nodeIDs, tagName).ConfigureAwait(false);
             var result = aResult as ObjectResult;
 
             // Assert
