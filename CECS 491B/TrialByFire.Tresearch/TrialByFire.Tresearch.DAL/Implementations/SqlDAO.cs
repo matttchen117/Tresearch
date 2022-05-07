@@ -12,13 +12,10 @@ using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
-<<<<<<< HEAD
     /// <summary>
     ///     SqlDAO: Data Access Object abstraction to interact with Sql (relational) databases
     /// </summary>
-=======
 
->>>>>>> Working
     public class SqlDAO : ISqlDAO
     {
         private BuildSettingsOptions _options { get; }
@@ -3671,7 +3668,7 @@ Values (@node_creation_date, @node_creation_count)";
         /// <param name="count">Number of nodes tagged</param>
         /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns>String status result</returns>
-        public async Task<string> CreateTreeHistoryAsync(List<INode> nodes, DateTime creationTime, int versionNumber, long rootNodeID, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> CreateTreeHistoryAuditAsync(List<INodeHistory> nodes, DateTime creationTime, int versionNumber, long rootNodeID, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -3742,7 +3739,7 @@ Values (@node_creation_date, @node_creation_count)";
             }
         }
 
-        public async Task<Tuple<List<IVersionAudit>, string>> GetTreeHistoryAsync(int versionNumber, long rootNodeID, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Tuple<List<IVersionAudit>, string>> GetTreeHistoryAuditAsync(int versionNumber, long rootNodeID, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -3788,33 +3785,6 @@ Values (@node_creation_date, @node_creation_count)";
             {
                 return Tuple.Create(new List<IVersionAudit>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
             }
-=======
-            try
-            {
-                using (var connection = new SqlConnection(_sqlConnectionString))
-                {
-                    var updateQuery = @"UPDATE Tresearch.daily_registrations (registration_date, registration_count)" +
-                                        "VALUES (@registration_date, @registration_count)";
-
-                    var result = connection.Execute(updateQuery,
-                                    new { registration_date = dailyRegistration.registrationDate });
-
-                    if (result == 1)
-                    {
-                        return _messageBank.SuccessMessages["generic"];
-                    }
-                    else
-                    {
-                        return _messageBank.ErrorMessages["dailyRegistrationNotExist"];
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
-            }
->>>>>>> Working
         }
     }
 }

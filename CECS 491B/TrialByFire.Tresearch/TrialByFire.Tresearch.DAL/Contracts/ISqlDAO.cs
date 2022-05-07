@@ -152,45 +152,44 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         
         public string CreateNodesCreated(INodesCreated nodesCreated);
 
-<<<<<<< HEAD
+
         public Task<List<NodesCreated>> GetNodesCreatedAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
-=======
-        public IList<INodesCreated> GetNodesCreated(DateTime nodeCreationDate);
->>>>>>> Working
+
+        //public IList<INodesCreated> GetNodesCreated(DateTime nodeCreationDate);
+
 
         public string UpdateNodesCreated(INodesCreated nodesCreated);
 
 
 
-        public string CreateDailyLogin(IDailyLogin dailyLogin);
+        //public string CreateDailyLogin(IDailyLogin dailyLogin);
 
-<<<<<<< HEAD
+
         public Task<List<DailyLogin>> GetDailyLoginAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
-=======
-        public IList<IDailyLogin> GetDailyLogin(DateTime nodeCreationDate);
->>>>>>> Working
+
+        //public IList<IDailyLogin> GetDailyLogin(DateTime nodeCreationDate);
+
 
         public string UpdateDailyLogin(IDailyLogin dailyLogin);
 
 
         public string CreateTopSearch(ITopSearch topSearch);
 
-<<<<<<< HEAD
+
         public Task<List<TopSearch>> GetTopSearchAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
-=======
-        public IList<ITopSearch> GetTopSearch(DateTime nodeCreationDate);
->>>>>>> Working
+
+        //public IList<ITopSearch> GetTopSearch(DateTime nodeCreationDate);
+
 
         public string UpdateTopSearch(ITopSearch topSearch);
 
 
         public string CreateDailyRegistration(IDailyRegistration dailyRegistration);
 
-<<<<<<< HEAD
         public Task<List<DailyRegistration>> GetDailyRegistrationAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
-=======
-        public IList<IDailyRegistration> GetDailyRegistration(DateTime nodeCreationDate);
->>>>>>> Working
+
+        //public IList<IDailyRegistration> GetDailyRegistration(DateTime nodeCreationDate);
+
 
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration);
 
@@ -259,6 +258,11 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public Task<IResponse<string>> PrivateNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken));
 
         public Task<IResponse<string>> PublicNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<string> CreateTreeHistoryAuditAsync(List<INodeHistory> nodes, DateTime creationTime, int versionNumber, long rootNodeID, CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<Tuple<List<IVersionAudit>, string>> GetTreeHistoryAuditAsync(int versionNumber, long rootNodeID, CancellationToken cancellationToken = default(CancellationToken));
+       
 
 
     }
