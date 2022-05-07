@@ -1,0 +1,111 @@
+:root {
+    --app-background-color: white;
+    --app-title-color: #788770;
+    --input-container-background-color: white;
+    --input-container-focused-border-color: red;
+    --input-container-border-color: black;
+    --input-container-placeholder-color: #9FB08D;
+    --input-container-focused-placeholder-color: red;
+    --checkbox-container-color: #788770;
+    --create-button-background-color: #788770;
+    --create-button-hover-background-color: #9FB08D;
+    --create-button-color: white;
+}
+
+.form-close-btn {
+    position: absolute;
+    right: 15%;
+    top: 45px;
+    width: 32px;
+    height: 32px;
+    opacity: 0.3;
+}
+
+.title-text {
+    display: flex;
+    width: 200%;
+}
+
+.login-title {
+    width: 50%;
+    text-align: center;
+    font-size: 45px;
+    font-weight: 500;
+    color: var(--app-title-color);
+}
+
+.form-container {
+    width: 80%;
+    overflow: hidden;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0px 20px 20px rgba(0,0,0,0.1);
+}
+
+.form-components {
+    display: flex;
+    width: 190%;
+}
+
+.form-components form {
+    margin-left: 1%;
+    width: 50%;
+}
+
+.input-container {
+    height: 50px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.input-container input {
+    height: 100%;
+    width: 100%;
+    outline: none;
+    border-radius: 5px;
+    border: 1px solid var(--input-container-border-color);
+    border-bottom-width: 2px;
+    font-size: 15px;
+}
+
+.input-container input:focus {
+    box-shadow: inset 0 0 5px var(--input-container-focused-background-color);
+}
+
+.input-container input::placeholder {
+    color: var(--input-container-placeholder-color);
+}
+
+.input-container inputh:focus::placeholder {
+    color: var(--input-container-focused-placeholder-color);
+}
+
+.checkbox-container {
+    display: block;
+    margin: 15px 0 15px 0;
+    color: var(--checkbox-container-color);
+}
+
+.create-button-container {
+    height: 50px;
+    width: 100%;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.create-button-container input[type="submit"] {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    font-size: 20px;
+    font-weight: 500;
+    background: var(--create-button-background-color);
+    border-color: var(--create-button-background-color);
+    color: var(--create-button-color);
+    border-radius: 5px;
+}
+
+.create-button-container input[type="submit"]:hover {
+    background: var(--create-button-hover-background-color);
+}

@@ -3,6 +3,7 @@
     "",
     "\\CECS 491B",
     "\\CECS 491B\\TrialByFire.Tresearch",
+<<<<<<< HEAD
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\Implementations",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests",
@@ -22,5 +23,11 @@
   "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\IntegrationTests\\OTPRequest\\OTPRequestServiceShould.cs",
 =======
 >>>>>>> main
+=======
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\Implementations"
+  ],
+  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Models\\Implementations\\MessageBank.cs",
+>>>>>>> Working
   "PreviewInSolutionExplorer": false
 }

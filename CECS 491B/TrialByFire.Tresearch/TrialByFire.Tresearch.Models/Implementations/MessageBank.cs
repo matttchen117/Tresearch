@@ -360,6 +360,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("notFoundOrEnabled", "404: Database: The account was not found or it has been disabled.");
             errorMessages.Add("notFoundOrAuthorized", "404: Database: UserAccount not found or not authorized to perform the " +
                 "operation.");
+<<<<<<< HEAD
             errorMessages.Add("nodeNotFound", "404: Database: The node was not found.");
             errorMessages.Add("recoveryLinkNotFound", "404: Database: The recovery link was not found");
             // 408 Errors - Server side timeout
@@ -381,6 +382,14 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
 
 
+=======
+            errorMessages.Add("otpFail", "Database: Failed to create OTP.");
+            errorMessages.Add("databaseFail", "Database: The database is down. Please try again later.");
+
+            /*
+                Ian's messages
+             */
+>>>>>>> Working
 
             errorMessages.Add("createdNodesExists", "Fail - Created Nodes Already Exists");
             errorMessages.Add("createdNodeNotExist", "Fail - Created Nodes to Update Does Not Exist in Database");
@@ -397,7 +406,10 @@ namespace TrialByFire.Tresearch.Models.Implementations
             errorMessages.Add("dailyRegistrationExists", "Fail - Daily Registration Already Exists");
             errorMessages.Add("dailyRegistrationNotInserted", "Fail - Daily Registration Not Inserted");
             errorMessages.Add("dailyRegistrationNotExist", "Fail - Daily Registration to Update Does Not Exist");
+<<<<<<< HEAD
 
+=======
+>>>>>>> Working
             return errorMessages;
         }
     }
