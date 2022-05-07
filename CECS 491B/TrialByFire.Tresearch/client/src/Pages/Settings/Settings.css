@@ -1,0 +1,36 @@
+.form-settings-wrapper {
+    position: relative;
+    
+    margin: 0 auto 100px;
+    text-align:center;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.25);
+    padding: 30px;
+    border-radius: 5px;
+    --form-container-bkg-color: white;
+    --form-container-input-color: #f2f2f2;
+    background-color: var(--form-container-bkg-color);
+}
+
+
+.error-settings{
+    color: red;
+    padding-top: 10px;
+    white-space: pre-line; 
+}
+
+.settings-title {
+    font-size: 45px;
+    font-weight: 500;
+    color: #788770;
+}
+
+.form-settings-wrapper input[type='checkbox']{
+    cursor: pointer;
+}
+
+.form-settings-wrapper label {
+    float: center;
+    margin-right: 150px;
+    width: 200px;
+    color: #788770;
+}

@@ -1,0 +1,98 @@
+.tag-dashboard-wrapper{
+    position: relative;
+}
+
+.tag-dashboard-table-container {
+    border: 1px  solid #f3f3f3;
+    border-collapse: collapse;
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+    width: 500px;
+    color: #283618;
+}
+
+
+.tag-dashboard-table th{
+    table-layout: fixed;
+    font-size: 30px;
+    background: #f3f3f3;
+}
+
+.tag-dashboard-table-container table {
+    width: 100%;
+}
+
+.tag-dashboard-table tbody {
+    display: block;
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    margin-right: 20px;
+    
+}
+
+
+::-webkit-scrollbar {
+    width: 0;    
+}
+
+.tag-dashboard-table tbody tr:nth-of-type(even){
+    background-color: #f3f3f3;
+}
+
+.table-item-name {
+    float: left;
+}
+
+.tag-dashboard-table td {
+    font-size: 20px;
+    text-align: left;
+    width: 100%;
+}
+
+
+.tag-dashboard-create-form {
+    display: inline-block;
+    margin-top: 25px;
+}
+
+.tag-dashboard-create-input-container {
+    display: block; 
+    float: left;
+}
+
+.tag-dashboard-create-input-container input{
+    background-color: #f2f2f2;
+    border: 0;
+    box-sizing: border-box;
+    outline: 0;
+    padding: 15px 15px 15px 15px;
+    
+    
+}
+
+.tag-dashboard-create-button {
+    
+    display: block;
+    float: right;
+
+}
+
+.delete-icon-tag-table {
+    cursor: pointer;
+}
+
+.tag-dashboard-back-container{
+    text-align: left;
+    margin-top: 15px;
+    margin-left: 15px;
+}
+
+.tag-dashboard-back-container a {
+    text-decoration: none;
+    font-size: 1em;
+    color: #283618;
+}
+

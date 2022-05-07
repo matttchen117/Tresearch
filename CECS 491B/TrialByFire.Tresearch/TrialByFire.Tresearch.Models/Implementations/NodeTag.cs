@@ -1,17 +1,35 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Models.Implementations
 {
     public class NodeTag : INodeTag
     {
-        public long nodeID { get; set; }
-        public string tagName { get; set; }
+        public long NodeID { get; set; }
+        public string TagName { get; set; }
+
+        public NodeTag()
+        {
+        }
 
         public NodeTag(long nodeID, string tagName)
         {
-            this.nodeID = nodeID;
-            this.tagName = tagName;
+            NodeID = nodeID;
+            TagName = tagName;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (!(obj == null))
+            {
+                if (obj is NodeTag)
+                {
+                    NodeTag nodeTag = (NodeTag)obj;
+                    return NodeID.Equals(nodeTag.NodeID) && TagName.Equals(nodeTag.TagName);
+                }
+            }
+            return false;
         }
     }
 }

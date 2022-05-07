@@ -12,138 +12,123 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
+
+    /// <summary>
+    ///     Controller class for registration. Handles posts, gets etc. from client
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class RegistrationController : Controller, IRegistrationController
+    public class RegistrationController : ControllerBase, IRegistrationController
     {
         private ISqlDAO _sqlDAO { get; }
         private ILogService _logService { get; }
-        private IMailService _mailService { get; set; }
-        private IRegistrationService _registrationService { get; }
-
-        private IValidationService _validationService { get; }
-
+        private IRegistrationManager _registrationManager { get; }
         private IMessageBank _messageBank { get; }
+        
 
-        public IRegistrationManager _registrationManager { get; }
-
-        public RegistrationController(ISqlDAO sqlDAO, ILogService logService, IRegistrationService registrationService, IMailService mailService,
-                                      IMessageBank messageBank, IValidationService validation, IRegistrationManager registrationManager)
+        /// <summary>
+        ///     Class constructor
+        /// </summary>
+        /// <param name="sqlDAO"> Sqldao performs database functions</param>
+        /// <param name="logService">log service</param>
+        /// <param name="registrationManager">Manager</param>
+        /// <param name="messageBank">Message bank holds error and success enums</param>
+        public RegistrationController(ISqlDAO sqlDAO, ILogService logService, IRegistrationManager registrationManager, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
             _logService = logService;
-            _registrationService = registrationService;
-            _mailService = mailService;
-            _messageBank = messageBank;
-            _validationService = validation;
             _registrationManager = registrationManager;
+            _messageBank = messageBank;
         }
 
 
-
+        /// <summary>
+        ///     RegisterAccountAsync(email, passphrase)
+        ///         Post request registering account. 
+        /// </summary>
+        /// <param name="email">string email of user</param>
+        /// <param name="passphrase">string passphrase of user</param>
+        /// <returns>Status code and value</returns>
         [HttpPost("register")]
-        public string RegisterAccount(string email, string passphrase)
+        public async Task<IActionResult> RegisterAccountAsync(string email, string passphrase)
         {
-            List<string> results = new List<string>();
             try
             {
-                results.AddRange(_registrationManager.CreatePreConfirmedAccount(email, passphrase));
-                if (results.Last() == "Success - Registration Manager created account")
-                    results.Add("Success - Registration Controller created account");
-                else
-                    results.Add("Failed - Registration Controller could not create account");
-            }
-            catch (Exception ex)
-            {
-                results.Add("Failed - Registration Manager " + ex);
-            }
-            string r = "";
-            for (int i = 0; i < results.Count(); i++)
-            {
-                r += "\t" + results[i];
-            }
-
-            results.Add(r);
-            //SendConfirmation(email);
-
-            _logService.CreateLog(DateTime.Now, "Info", email, "Business", results.Last());
-            return results.Last();
-        }
-
-        [HttpPost("confirmation")]
-        public string SendConfirmation(string email)
-        {
-            IAccount account = new Account();
-            account.Email = email;
-            account.Username = email;
-            List<string> results = new List<string>();
-            bool error = false;
-            string baseUrl = "https://localhost:7010/Registration/confirmation?";
-            try
-            {
-                results.AddRange(_registrationManager.SendConfirmation(account.Email, baseUrl));
-                if (results.Last() == "Success - Registration Manager sent email confirmation")
-                    results.Add("Success - Registration Controller sent email confirmation");
-                else
+                string result = await _registrationManager.CreateAndSendConfirmationAsync(email, passphrase, "user").ConfigureAwait(false);
+                string[] split;
+                split = result.Split(":");
+                if(result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
                 {
-                    error = true;
-                    results.Add("Failed - Registration Controller could not create account");
-
+                    split = result.Split(":");
+                    return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                 }
-
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
             catch (Exception ex)
             {
-                error = true;
-                results.Add("Failed - Registration Controller " + ex);
+                return StatusCode(500, ex.Message);
             }
-            string r = "";
-            for (int i = 0; i < results.Count(); i++)
-            {
-                r += "\t" + results[i];
-            }
-
-            results.Add(r);
-
-            if (!error)
-                _logService.CreateLog(DateTime.Now, "Info", email, "Business", results.Last());
-            else
-                _logService.CreateLog(DateTime.Now, "Info", email, "Error", results.Last());
-            return results.Last();
-
         }
 
+        /// <summary>
+        ///  ConfirmAccountAsync(guid)
+        ///     Post request confirming account based on guid passed in
+        /// </summary>
+        /// <param name="guid">Unique identifier to each confirmation link</param>
+        /// <returns>Status scode and value</returns>
         [HttpPost("confirm")]
-        public string ConfirmAccount(string url)
+        public async Task<IActionResult> ConfirmAccountAsync(string guid)
         {
-            List<string> results = new List<string>();
-            bool error = false;
             try
             {
-                results.AddRange(_registrationManager.ConfirmAccount(url));
-                if (results.Last() == "Success - Registration Manager confirmed account")
-                    results.Add("Success - Registration Controller confirmed account");
-                else
+                string result = await _registrationManager.ConfirmAccountAsync(guid).ConfigureAwait(false);
+                string[] split;
+                split = result.Split(":");
+                if (result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
                 {
-                    error = true;
-                    results.Add("Failed - Registration Controller could not confirm account");
+                    split = result.Split(":");
+                    return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                 }
-
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
             catch (Exception ex)
             {
-                error = true;
-                results.Add("Failed - Registration Controller " + ex);
+                return StatusCode(500, ex.Message);
             }
-            for (int i = 0; i < results.Count(); i++)
+        }
+
+        /// <summary>
+        ///     ResendConfirmationLinkAsync(guid)
+        ///         Post request resending confirmation link. Used when inactive link was used
+        /// </summary>
+        /// <param name="guid">Unique identifier for confirmation link</param>
+        /// <returns>Statuscode and value</returns>
+        [HttpPost("resend")]
+        public async Task<IActionResult> ResendConfirmationLinkAsync(string guid)
+        {
+            try
             {
-                Console.WriteLine(results[i]);
+                string result = await _registrationManager.ResendConfirmation(guid).ConfigureAwait(false);
+                string[] split;
+                split = result.Split(":");
+                if (result.Equals(_messageBank.GetMessage(IMessageBank.Responses.generic).Result))
+                {
+                    split = result.Split(":");
+                    return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
+                }
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
-            if (!error)
-                _logService.CreateLog(DateTime.Now, "Info", results.First(), "Business", results.Last());
-            else
-                _logService.CreateLog(DateTime.Now, "Info", results.First(), "Error", results.Last());
-            return results.Last();
+            catch(OperationCanceledException)
+            {
+                string result = await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                string[] split;
+                split = result.Split(":");
+                return StatusCode(Convert.ToInt32(split[0]), split[2]);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
     }
 }

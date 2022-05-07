@@ -1,0 +1,44 @@
+.form-recover-wrapper {
+    position: relative;
+    max-width: 650px;
+    margin: 0 auto 100px;
+    text-align:center;
+    padding: 30px;
+    border-radius: 5px;
+    --form-container-bkg-color: white;
+    --form-container-input-color: #f2f2f2;
+    background-color: var(--form-container-bkg-color);
+}
+
+.error-recover{
+    color: red;
+}
+
+.recover-title {
+    font-size: 30px;
+    font-weight: 500;
+    color: #788770;
+    text-align: center;
+}
+
+.recover-text {
+    font-size: 15px;
+    color: #788770;
+    text-align: center;
+    
+}
+
+.form-recover-wrapper input[type='text'] {
+    outline: 0;
+    border: 0;
+    background: var(--form-input-color);
+    width: 100%;
+    margin: 0 0 15px;
+    padding: 15px;
+    box-sizing: border-box;
+    background-color: var(--form-container-input-color);
+}
+
+.recover-form .input-container{
+    margin-bottom: 15px;
+}

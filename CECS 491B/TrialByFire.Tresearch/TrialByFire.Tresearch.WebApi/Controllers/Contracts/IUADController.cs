@@ -4,6 +4,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
 {
     public interface IUADController
     {
-        public List<IKPI> LoadKPI(DateTime now);
+        public Task<List<IKPI>> LoadKPIAsync(DateTime now);
     }
 }

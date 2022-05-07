@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Security;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
@@ -21,49 +22,40 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 		private IUADService _uadService { get; }
 		private IAuthenticationService _authenticationService { get; }
 		private IAuthorizationService _authorizationService { get; }
-
-		private IRolePrincipal _rolePrincipal { get; }
 		private IOTPRequestService _otpRequestService { get; }
-		private readonly string _authorizationLevel = "Admin";
+		private IMessageBank _messageBank { get; }
+		//private static readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
 
-		public UADManager(ISqlDAO sqlDAO, ILogService logService, IUADService uadService, IAuthenticationService authenticationService, IAuthorizationService authorizationService)
+
+		public UADManager(ISqlDAO sqlDAO, ILogService logService, IUADService uadService, IAuthenticationService authenticationService, IAuthorizationService authorizationService, IMessageBank messageaBank)
 		{
 			_sqlDAO = sqlDAO;
 			_logService = logService;
 			_uadService = uadService;
 			_authenticationService = authenticationService;
 			_authorizationService = authorizationService;
+			_messageBank = messageaBank;
 		}
 
-		public List<KPI> LoadKPI(DateTime now)
+		public async Task<List<IKPI>> LoadKPIAsync(DateTime now, CancellationToken cancellationToken = default)
 		{
-			//return _uadService.LoadKPI(now);
-			throw new NotImplementedException();
-		}
-
-		public List<KPI> KPIsFetched(DateTime now)
-		{
-			string result;
-			string authorizeResult;
-			authorizeResult = _authorizationService.VerifyAuthorized(_rolePrincipal, _authorizationLevel);
-			if (authorizeResult == "success")
-			{
-				Task t1 = Task.Run(() =>
+			cancellationToken.ThrowIfCancellationRequested();
+			List<IKPI> result = new List<IKPI>();
+			if (Thread.CurrentPrincipal != null)
+            {
+				try
 				{
-					return _uadService.LoadKPI(now);
-				});
-
-				if (!t1.Wait(60000))
+					result = await _uadService.LoadKPIAsync(now, cancellationToken).ConfigureAwait(false);
+					return result;
+				}
+				catch (Exception ex)
 				{
-					List<KPI> results = new List<KPI>();
-					KPI failureKPI = new KPI("Error 504; Timeout Error");
-					results.Add(failureKPI);
-					return results;
+					result.Add(new KPI("400: Server: LoadKPI Error Occurred"));
+					return result;
 				}
 			}
-			List<KPI> resultList = new List<KPI>();
-			resultList.Add(new KPI("Error: Timeout"));
-			return resultList;
+			result.Add(new KPI(_messageBank.ErrorMessages["notAuthenticated"]));
+			return result;
 		}
 	}
 }

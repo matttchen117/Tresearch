@@ -1,36 +1,32 @@
 ﻿using TrialByFire.Tresearch.Services.Contracts;
 using TrialByFire.Tresearch.Services.Implementations;
 using TrialByFire.Tresearch.Models.Contracts;
-using TrialByFire.Tresearch.Models.Implementations;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
 {
-    public class InMemoryMailServiceShould
+    public class InMemoryMailServiceShould : TestBaseClass
     {
-        public IMailService _mailService;
-
-        public IMessageBank _messageBank;
-
-        public InMemoryMailServiceShould()
+        public InMemoryMailServiceShould() : base(new string[] { })
         {
-            
-            _messageBank = new MessageBank();
-            _mailService = new MailService(_messageBank);
+
+            TestServices.AddScoped<IMailService, MailService>();
+            TestProvider = TestServices.BuildServiceProvider();
         }
 
         [Theory]
-        [InlineData("pammypoor@gmail.com", "www.google.com")]
-        [InlineData("pammmmyyyy@gmail.com", "https://github.com/Drakat7/Tresearch")]
-        public void SendEmail(string email, string url)
+        [InlineData("pammypoor+IntRegMailServ@gmail.com", "https://trialbyfiretresearch.azurewebsites.net/", "200: Server: success")]
+        public async Task SendEmail(string email, string url, string expected)
         {
+            //Arrange
+            IMailService mailService = TestProvider.GetService<IMailService>();
             
-
             //Act
-            string result = _mailService.SendConfirmation(email, url);
+            string result = await mailService.SendConfirmationAsync(email, url).ConfigureAwait(false);
 
             //Assert
-            Assert.Equal("Success - Confirmation email sent", result);
+            Assert.Equal(expected, result);
         }
 
     }

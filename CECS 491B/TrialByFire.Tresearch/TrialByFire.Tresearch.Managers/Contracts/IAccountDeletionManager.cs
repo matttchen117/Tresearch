@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Principal;
 using TrialByFire.Tresearch.Models.Contracts;
+using Microsoft.AspNetCore.Mvc;
 
 namespace TrialByFire.Tresearch.Managers.Contracts
 {
     public interface IAccountDeletionManager
     {
-        public string DeleteAccount(IRolePrincipal rolePrincipal);
+        public Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken));
 
     }
 

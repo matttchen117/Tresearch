@@ -1,0 +1,10 @@
+.popup-container {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+}
+
+.container {
+    position: relative;
+    margin-top: 0px;
+}

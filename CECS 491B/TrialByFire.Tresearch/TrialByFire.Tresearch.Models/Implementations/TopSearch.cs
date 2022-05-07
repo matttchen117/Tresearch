@@ -13,7 +13,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public TopSearch()
         {
-            topSearchDate = DateTime.Now;
+            topSearchDate = DateTime.Now.ToUniversalTime();
             searchCount = -1;
             searchString = "";
         }

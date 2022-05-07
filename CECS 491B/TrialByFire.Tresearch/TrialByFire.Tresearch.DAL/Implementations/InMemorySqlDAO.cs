@@ -5,12 +5,13 @@ using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Exceptions;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
     public class InMemorySqlDAO : ISqlDAO
     {
-
         public InMemoryDatabase InMemoryDatabase { get; set; }
         private IMessageBank _messageBank { get; }
 
@@ -20,320 +21,569 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             _messageBank = new MessageBank();
         }
 
-        public string VerifyAccount(IAccount account)
+        public async Task<IResponse<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput)
         {
+            try
+            {
+                IList<Node> nodes = new List<Node>();
+                foreach(Node n in InMemoryDatabase.Nodes)
+                {
+                    if(n.Visibility != false && n.Deleted != true)
+                    {
+                        if (n.NodeTitle.Contains(searchInput.Search, StringComparison.OrdinalIgnoreCase))
+                        {
+                            n.Tags = InMemoryDatabase.NodeTags.Where(nt => nt.NodeID == n.NodeID).ToList();
+                            n.RatingScore = InMemoryDatabase.NodeRatings.Where(nr => nr.NodeID == n.NodeID).Sum(nr => nr.Rating);
+                            nodes.Add(n);
+                        }
+                    }
+                }
+                return new SearchResponse<IEnumerable<Node>>("", nodes, 200, true);
+            }
+            catch (Exception ex)
+            {
+                return new SearchResponse<IEnumerable<Node>>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 400, false);
+            }
+        }
+
+        public async Task<string> GetUserHashAsync(IAccount account, CancellationToken cancellationToken = default)
+        {
+            foreach(UserHashObject u in InMemoryDatabase.UserHashTable)
+            {
+                if(u.UserID.Equals(account.Username) && u.UserRole.Equals(account.AuthorizationLevel))
+                {
+                    return u.UserHash;
+                }
+            }
+            return null;
+        }
+
+        public async Task<IResponse<string>> EditParentNodeAsync(long nodeID, string nodeIDs, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                string[] splitString = nodeIDs.Split(',');
+                foreach(Node n in InMemoryDatabase.Nodes)
+                {
+                    for(int i = 0; i < splitString.Length; i++)
+                    {
+                        if(n.NodeID == long.Parse(splitString[i]))
+                        {
+                            n.ParentNodeID = nodeID;
+                        }
+                    }
+                }
+                return new EditParentResponse<string>("", null, 200, true);
+            }
+            catch(Exception ex)
+            {
+                return new EditParentResponse<string>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 400, false);
+            }
+        }
+
+        public async Task<int> StoreLogAsync(ILog log, string destination, CancellationToken cancellationToken = default)
+        {
+            switch(destination)
+            {
+                case "AnalyticLogs":
+                    InMemoryDatabase.AnalyticLogs.Add(log);
+                    if (InMemoryDatabase.AnalyticLogs.Contains(log))
+                    {
+                        return 1;
+                    }
+                    break;
+                case "ArchiveLogs":
+                    InMemoryDatabase.ArchiveLogs.Add(log);
+                    if (InMemoryDatabase.ArchiveLogs.Contains(log))
+                    {
+                        return 1;
+                    }
+                    break;
+                default:
+                    return 0;
+            };
+            return 0;
+        }
+        public async Task<int> VerifyAccountAsync(IAccount account,
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
             int index = InMemoryDatabase.Accounts.IndexOf(account);
             if (index != -1)
             {
                 IAccount dbAccount = InMemoryDatabase.Accounts[index];
-                if ((account.Passphrase != null) && account.Passphrase.Equals(dbAccount.Passphrase))
+                if (dbAccount.Confirmed != false)
                 {
-                    if (dbAccount.Confirmed != false)
+                    if (dbAccount.AccountStatus != false)
                     {
-                        if (dbAccount.AccountStatus != false)
-                        {
-                            return _messageBank.SuccessMessages["generic"];
-                        }
-                        return _messageBank.ErrorMessages["notFoundOrEnabled"];
+                        return 1;
                     }
-                    return _messageBank.ErrorMessages["notConfirmed"];
+                    return 3;
                 }
-                return _messageBank.ErrorMessages["badNameOrPass"];
+                return 2;
             }
-            return _messageBank.ErrorMessages["notFoundOrEnabled"];
+            return 0;
         }
 
-        public List<string> Authenticate(IOTPClaim otpClaim)
+        public async Task<int> AuthenticateAsync(IAuthenticationInput authenticationInput,
+            CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             List<string> results = new List<string>();
-            try
+            IAccount account = new UserAccount(authenticationInput.OTPClaim.Username, 
+                authenticationInput.OTPClaim.AuthorizationLevel);
+            // Find account in db
+            int index = InMemoryDatabase.Accounts.IndexOf(account);
+            if (index >= 0)
             {
-                IAccount account = new Account(otpClaim.Username, otpClaim.AuthorizationLevel);
-                // Find account in db
-                int index = InMemoryDatabase.Accounts.IndexOf(account);
-                // no account found
-                if (index == -1)
-                {
-                    results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
-                    return results;
-                }
                 IAccount dbAccount = InMemoryDatabase.Accounts[index];
-                // check if confirmed
-                if (dbAccount.Confirmed == false)
-                {
-                    results.Add(_messageBank.ErrorMessages["notConfirmed"]);
-                    return results;
-                }
-                // check if enabled
-                if (dbAccount.AccountStatus == false)
-                {
-                    results.Add(_messageBank.ErrorMessages["notFoundOrEnabled"]);
-                    return results;
-                }
                 // find otp claim in db
-                index = InMemoryDatabase.OTPClaims.IndexOf(otpClaim);
-                // no account found
-                if (index == -1)
-                {
-                    results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
-                    return results;
-                }
+                index = InMemoryDatabase.OTPClaims.IndexOf(authenticationInput.OTPClaim);
                 IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[index];
                 // if otps do not match
-                if (!otpClaim.OTP.Equals(dbOTPClaim.OTP))
+                if (!authenticationInput.OTPClaim.OTP.Equals(dbOTPClaim.OTP))
                 {
                     // increment fail count
-                    ++InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount;
+                    ++InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(authenticationInput.OTPClaim)].FailCount;
                     // if fail count is 5 or more, disable account
-                    if (InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)].FailCount >= 5)
+                    if (InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(authenticationInput.OTPClaim)].FailCount >= 5)
                     {
-                        InMemoryDatabase.Accounts[InMemoryDatabase.Accounts.IndexOf(account)].AccountStatus = false;
-                        results.Add(_messageBank.ErrorMessages["tooManyFails"]);
-                        return results;
+                        return 4;
                     }
                     else
                     {
-                        results.Add(_messageBank.ErrorMessages["badNameOrOTP"]);
-                        return results;
+                        return 3;
                     }
                 }
                 // check that the otp was entered within 2 minutes of being created
-                if ((otpClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (otpClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
+                if ((authenticationInput.OTPClaim.TimeCreated >= dbOTPClaim.TimeCreated) && (authenticationInput.OTPClaim.TimeCreated <= dbOTPClaim.TimeCreated.AddMinutes(2)))
                 {
-                    results.Add(_messageBank.SuccessMessages["generic"]);
-                    results.Add($"username:{dbAccount.Username},authorizationLevel:{dbAccount.AuthorizationLevel}");
-                    return results;
+                    InMemoryDatabase.Accounts[index].Token = authenticationInput.UserAccount.Token;
+                    return 1;
                 }
                 else
                 {
-                    results.Add(_messageBank.ErrorMessages["otpExpired"]);
-                    return results;
+                    return 2;
                 }
             }
-            catch (AccountCreationFailedException acfe)
+            else
             {
-                results.Add(acfe.Message);
-                return results;
-            }
-            catch (OTPClaimCreationFailedException ocfe)
-            {
-                results.Add(ocfe.Message);
-                return results;
+                return 0;
             }
         }
 
-        public string VerifyAuthorized(IRolePrincipal rolePrincipal, string requiredAuthLevel)
+        public async Task<string> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
-                IAccount account = new Account(rolePrincipal.RoleIdentity.Username, rolePrincipal.RoleIdentity.AuthorizationLevel);
-                // Find account in db
-                int index = InMemoryDatabase.Accounts.IndexOf(account);
-                if (index != -1)
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if node exists
+                foreach (long nodeID in nodeIDs)
                 {
-                    IAccount dbAccount = InMemoryDatabase.Accounts[index];
-                    // check if confirmed
-                    if (dbAccount.Confirmed != false)
+                    bool isValid = false;
+                    int count = -1;
+                    foreach(Node node in InMemoryDatabase.Nodes)
                     {
-                        // check if enabled
-                        if (dbAccount.AccountStatus != false)
+                        if (node.NodeID == nodeID)
                         {
-                            if (dbAccount.AuthorizationLevel.Equals("admin") || dbAccount.AuthorizationLevel.Equals(requiredAuthLevel))
-                            {
-                                return _messageBank.SuccessMessages["generic"];
-                            }
-                            else
-                            {
-                                return _messageBank.ErrorMessages["notAuthorized"];
-                            }
-                        }
-                        else
-                        {
-                            return _messageBank.ErrorMessages["notFoundOrEnabled"];
-                        }
+                            isValid = true;
+                            count = InMemoryDatabase.Nodes.IndexOf(node);
+                            if (!node.UserHash.Equals(userHash))
+                                return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized);
+                        }  
                     }
-                    else
-                    {
-                        return _messageBank.ErrorMessages["notConfirmed"];
-                    }
+
+                    if(!isValid)
+                        return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
                 }
-                return _messageBank.ErrorMessages["notFoundOrEnabled"];
+
+                return await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false);
+
             }
-            catch (AccountCreationFailedException acfe)
+            catch(OperationCanceledException ex)
             {
-                return acfe.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false) + ex.Message;
+            }
+            catch (Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
-
-        public IOTPClaim GetOTPClaim(IOTPClaim otpClaim)
+        public async Task<int> StoreOTPAsync(IAccount account, IOTPClaim otpClaim,
+            CancellationToken cancellationToken = default)
         {
-            return InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)];
-        }
-
-        public string StoreOTP(IOTPClaim otpClaim)
-        {
-            string result;
-            int index = InMemoryDatabase.OTPClaims.IndexOf(otpClaim);
+            cancellationToken.ThrowIfCancellationRequested();
+            int index = InMemoryDatabase.Accounts.IndexOf(account);
             if (index >= 0)
             {
-                IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)];
-                IAccount account = new Account(dbOTPClaim.Username, dbOTPClaim.AuthorizationLevel);
-                if (!(otpClaim.TimeCreated >= dbOTPClaim.TimeCreated.AddDays(1)))
+                if(account.Passphrase.Equals(InMemoryDatabase.Accounts[index].Passphrase))
                 {
-                    otpClaim.FailCount = dbOTPClaim.FailCount;
+                    index = InMemoryDatabase.OTPClaims.IndexOf(otpClaim);
+                    if (index >= 0)
+                    {
+                        IOTPClaim dbOTPClaim = InMemoryDatabase.OTPClaims[InMemoryDatabase.OTPClaims.IndexOf(otpClaim)];
+                        if (!(otpClaim.TimeCreated >= dbOTPClaim.TimeCreated.AddDays(1)))
+                        {
+                            otpClaim.FailCount = dbOTPClaim.FailCount;
+                        }
+                        InMemoryDatabase.OTPClaims[index] = otpClaim;
+                        return 1;
+                    }
+                    return 3;
                 }
-                InMemoryDatabase.OTPClaims[index] = otpClaim;
-                return _messageBank.SuccessMessages["generic"];
+                return 2;
             }
-            return _messageBank.ErrorMessages["notFoundOrEnabled"];
+            return 0;
         }
 
 
-        public string DeleteAccount(IRolePrincipal rolePrincipal)
+        public async Task<string> GetAmountOfAdminsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            bool accountExists = false;
-            string accountName = rolePrincipal.RoleIdentity.Username;
-            string accountRole = rolePrincipal.RoleIdentity.AuthorizationLevel;
+            cancellationToken.ThrowIfCancellationRequested();
+
+            int adminsLeft = InMemoryDatabase.Accounts.Count();
+
+            if(adminsLeft > 1)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.getAdminsSuccess).ConfigureAwait(false);
+            }
+
+            return await _messageBank.GetMessage(IMessageBank.Responses.lastAdminFail).ConfigureAwait(false);
+
+            
+
+        }
+
+        //Can optimize all the for loops
+        public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+
+            string accountName = Thread.CurrentPrincipal.Identity.Name;
+            string accountRole = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
+            IAccount account = new UserAccount(accountName, accountRole);
             try
             {
-                for (int i = 0; i < InMemoryDatabase.Accounts.Count; i++)
+                if (InMemoryDatabase.Accounts.Contains(account))
                 {
-                    if ((InMemoryDatabase.Accounts[i].Username.Equals(accountName)) && (InMemoryDatabase.Accounts[i].AuthorizationLevel.Equals(accountRole)))
+                    for (int j = 0; j < InMemoryDatabase.OTPClaims.Count; j++)
                     {
-                        accountExists = true;
-                        InMemoryDatabase.Accounts.RemoveAt(i);
-                        break;
+                        if (InMemoryDatabase.OTPClaims[j].Username.Equals(accountName))
+                        {
+                            InMemoryDatabase.OTPClaims.RemoveAt(j);
+                            break;
+                        }
                     }
-                }
-                if (accountExists)
-                {
-                    for (int i = 0; i < InMemoryDatabase.OTPClaims.Count; i++)
+                    for (int j = 0; j < InMemoryDatabase.Nodes.Count; j++)
                     {
-                        if (InMemoryDatabase.OTPClaims[i].Username.Equals(accountName))
+                        if (InMemoryDatabase.Nodes[j].UserHash.Equals(accountName))
+                        {
+                            if (InMemoryDatabase.NodeTags[j].NodeID.Equals(InMemoryDatabase.Nodes[j].NodeID))
+                            {
+                                InMemoryDatabase.NodeTags.RemoveAt(j);
+                            }
+                            InMemoryDatabase.Nodes.RemoveAt(j);
+                        }
+                    }
+                    for (int j = 0; j < InMemoryDatabase.NodeRatings.Count; j++)
+                    {
+                        if (InMemoryDatabase.NodeRatings[j].UserHash.Equals(accountName))
+                        {
+                            InMemoryDatabase.NodeRatings.RemoveAt(j);
+                        }
+                    }
+                    for (int j = 0; j < InMemoryDatabase.ConfirmationLinks.Count; j++)
+                    {
+                        if (InMemoryDatabase.ConfirmationLinks[j].Username.Equals(accountName))
+                        {
+                            InMemoryDatabase.ConfirmationLinks.RemoveAt(j);
+                            break;
+                        }
+                    }
 
-                        {
-                            InMemoryDatabase.OTPClaims.RemoveAt(i);
-                            break;
-                        }
-                    }
-                    for (int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
-                    {
-                        if (InMemoryDatabase.Nodes[i].accountOwner.Equals(accountName))
-                        {
-                            InMemoryDatabase.Nodes.RemoveAt(i);
-                        }
-                    }
-                    for (int i = 0; i < InMemoryDatabase.Ratings.Count; i++)
-                    {
-                        if (InMemoryDatabase.Ratings[i].username.Equals(accountName))
-                        {
-                            InMemoryDatabase.Ratings.RemoveAt(i);
-                        }
-                    }
-                    for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count; i++)
-                    {
-                        if (InMemoryDatabase.ConfirmationLinks[i].Username.Equals(accountName))
-                        {
-                            InMemoryDatabase.ConfirmationLinks.RemoveAt(i);
-                            break;
-                        }
-                    }
-                    return _messageBank.SuccessMessages["generic"];
+                    InMemoryDatabase.Accounts.Remove(account);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false);
+
                 }
+                
                 else
                 {
-                    return _messageBank.ErrorMessages["accountNotFound"];
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).ConfigureAwait(false);
                 }
+
             }
+
+
             catch (AccountDeletionFailedException adfe)
             {
-                return adfe.Message;
+                return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false);
             }
 
         }
 
-
-
-
-        public List<string> CreateAccount(IAccount account)
+        public async Task<string> DeleteAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> results = new List<string>();
-            int numberOfConfirmationsInDatabase = InMemoryDatabase.Accounts.Count();
-            InMemoryDatabase.Accounts.Add(account);
-            int affectedRows = InMemoryDatabase.Accounts.Count() - numberOfConfirmationsInDatabase;
+            cancellationToken.ThrowIfCancellationRequested();
+            string accountName = account.Username;
 
-            if (affectedRows == 1)
-                results.Add("Success - Account added to in memomry database");
-            else
-                results.Add("Failed - Could not add account to in memory database");
-
-            return results;
-
-        }
-
-        public IAccount GetUnconfirmedAccount(string email)
-        {
-            List<string> results = new List<string>();
-            for (int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
-                if (email.Equals(InMemoryDatabase.Accounts[i].Email))
-                    return InMemoryDatabase.Accounts[i];
-            return null;
-
-        }
-
-        public List<string> RemoveConfirmationLink(IConfirmationLink _confirmationLink)
-        {
-            List<string> results = new List<string>();
-            int numberOfConfirmationsInDatabase = InMemoryDatabase.ConfirmationLinks.Count();
-            InMemoryDatabase.ConfirmationLinks.Remove(_confirmationLink);
-            int affectedRows = InMemoryDatabase.ConfirmationLinks.Count() - numberOfConfirmationsInDatabase;
-            if (affectedRows == -1)
-                results.Add("Success - Confirmation link removed from in memory database");
-            else
-                results.Add("Failed - Confirmation link could not be removed from in memory database");
-            return results;
-        }
-
-        public List<string> ConfirmAccount(IAccount account)
-        {
-            List<string> results = new List<string>();
-            int indexOfAccount = InMemoryDatabase.Accounts.IndexOf(account);
-            if (indexOfAccount == -1)
-                results.Add("Failed - Account not found in database");
-            else
+            try
             {
-                InMemoryDatabase.Accounts[indexOfAccount].Confirmed = true;
-                results.Add("Success - Account confirmed in database");
+                if (InMemoryDatabase.Accounts.Contains(account))
+                {
+                    for (int j = 0; j < InMemoryDatabase.OTPClaims.Count; j++)
+                    {
+                        if (InMemoryDatabase.OTPClaims[j].Username.Equals(accountName))
+                        {
+                            InMemoryDatabase.OTPClaims.RemoveAt(j);
+                            break;
+                        }
+                    }
+                    for (int j = 0; j < InMemoryDatabase.Nodes.Count; j++)
+                    {
+                        if (InMemoryDatabase.Nodes[j].UserHash.Equals(accountName))
+                        {
+                            if (InMemoryDatabase.NodeTags[j].NodeID.Equals(InMemoryDatabase.Nodes[j].NodeID))
+                            {
+                                InMemoryDatabase.NodeTags.RemoveAt(j);
+                            }
+                            InMemoryDatabase.Nodes.RemoveAt(j);
+                        }
+                    }
+                    for (int j = 0; j < InMemoryDatabase.NodeRatings.Count; j++)
+                    {
+                        if (InMemoryDatabase.NodeRatings[j].UserHash.Equals(accountName))
+                        {
+                            InMemoryDatabase.NodeRatings.RemoveAt(j);
+                        }
+                    }
+                    for (int j = 0; j < InMemoryDatabase.ConfirmationLinks.Count; j++)
+                    {
+                        if (InMemoryDatabase.ConfirmationLinks[j].Username.Equals(accountName))
+                        {
+                            InMemoryDatabase.ConfirmationLinks.RemoveAt(j);
+                            break;
+                        }
+                    }
+
+                    InMemoryDatabase.Accounts.Remove(account);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountDeletionSuccess).ConfigureAwait(false);
+
+                }
+
+                else
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).ConfigureAwait(false);
+                }
+
             }
-            return results;
+
+
+            catch (AccountDeletionFailedException adfe)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.accountDeleteFail).ConfigureAwait(false);
+            }
+
         }
-        public List<string> CreateConfirmationLink(IConfirmationLink _confirmationlink)
+
+
+        public async Task<string> CreateOTPAsync(string username, string authorizationLevel, int failCount, CancellationToken cancellationToken = default(CancellationToken))
         {
-            List<string> results = new List<string>();
-
-            int numberOfConfirmationsInDatabase = InMemoryDatabase.ConfirmationLinks.Count();
-            InMemoryDatabase.ConfirmationLinks.Add(_confirmationlink);
-            int affectedRows = InMemoryDatabase.ConfirmationLinks.Count() - numberOfConfirmationsInDatabase;
-
-            if (affectedRows == 1)
-                results.Add("Success - Confirmation link added to in memomry database");
-            else
-                results.Add("Failed - Could not add confirmation link to in memory database");
-
-            return results;
+            return "200";
         }
 
-        public IConfirmationLink GetConfirmationLink(string url)
+
+        public async Task<Tuple<int, string>> CreateAccountAsync(IAccount account, CancellationToken cancellationToken = default(CancellationToken))
         {
-            string guidString = url.Substring(url.LastIndexOf('=') + 1);
-            Guid guid = new Guid(guidString);
-            for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count(); i++)
-                if (guid.Equals(InMemoryDatabase.ConfirmationLinks[i].UniqueIdentifier))
-                    return InMemoryDatabase.ConfirmationLinks[i];
-            return null;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if(InMemoryDatabase.Accounts.Contains(account))
+                    return Tuple.Create(InMemoryDatabase.Accounts.Count-1, await _messageBank.GetMessage(IMessageBank.Responses.accountAlreadyCreated));
+
+                InMemoryDatabase.Accounts.Add(account);
+
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    InMemoryDatabase.Accounts.Remove(account);
+                    throw new OperationCanceledException();
+                }
+
+                return Tuple.Create(-1,await _messageBank.GetMessage(IMessageBank.Responses.generic));
+            }
+            catch (OperationCanceledException)
+            {
+                // No rollback necessary
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return Tuple.Create(-1,_messageBank.GetMessage(IMessageBank.Responses.accountCreateFail).Result);
+            }
+
         }
-        
-        public List<IKPI> LoadKPI(DateTime now)
+
+        public async Task<Tuple<IAccount, string>> GetAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            IAccount nullAccount = null;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                for (int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
+                    if (email.Equals(InMemoryDatabase.Accounts[i].Username))
+                        return Tuple.Create(InMemoryDatabase.Accounts[i], _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
+                if (cancellationToken.IsCancellationRequested)
+                    throw new OperationCanceledException();
+                return Tuple.Create(nullAccount, _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result);
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch(Exception ex)
+            {
+                return Tuple.Create(nullAccount, "500: Database: " + ex.Message);
+            }
+        }
+
+        public async Task<string> RemoveConfirmationLinkAsync(IConfirmationLink confirmationLink, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                InMemoryDatabase.ConfirmationLinks.Remove(confirmationLink);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    string rollbackResult = await CreateConfirmationLinkAsync(confirmationLink);
+                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed).Result;
+                    else
+                        throw new OperationCanceledException();
+                }
+                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+
+        public async Task<string> UpdateAccountToUnconfirmedAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                for (int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
+                {
+                    if (email == InMemoryDatabase.Accounts[i].Username && authorizationLevel == InMemoryDatabase.Accounts[i].AuthorizationLevel)
+                    {
+                        InMemoryDatabase.Accounts[i].Confirmed = false;
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    }
+                }
+                return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+        public async Task<string> UpdateAccountToConfirmedAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                for(int i = 0; i < InMemoryDatabase.Accounts.Count(); i++)
+                {
+                    if (email == InMemoryDatabase.Accounts[i].Username && authorizationLevel == InMemoryDatabase.Accounts[i].AuthorizationLevel)
+                    {
+                        InMemoryDatabase.Accounts[i].Confirmed = true;
+                        return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+                    }
+                }
+                return _messageBank.GetMessage(IMessageBank.Responses.accountNotFound).Result;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+        public async Task<string> CreateConfirmationLinkAsync(IConfirmationLink confirmationLink, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (!InMemoryDatabase.Accounts.Contains(new UserAccount(confirmationLink.Username, "doesnt matter", confirmationLink.AuthorizationLevel, true, false)))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound);
+                if (InMemoryDatabase.ConfirmationLinks.Contains(confirmationLink))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkExists);
+
+                InMemoryDatabase.ConfirmationLinks.Add(confirmationLink);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    string rollbackResult = await RemoveConfirmationLinkAsync(confirmationLink);
+                    if (rollbackResult != _messageBank.GetMessage(IMessageBank.Responses.generic).Result)
+                        return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
+                    else
+                        throw new OperationCanceledException();
+                }
+                return _messageBank.GetMessage(IMessageBank.Responses.generic).Result;
+            }
+            catch (OperationCanceledException)
+            {
+                //No rollback necessary
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return "500: Database: " + ex.Message;
+            }
+        }
+
+        public async Task<Tuple<IConfirmationLink, string>> GetConfirmationLinkAsync(string guid, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            IConfirmationLink nullLink = null;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                string guidString = guid.Substring(guid.LastIndexOf('=') + 1);
+                Guid toFind = new Guid(guidString);
+                for (int i = 0; i < InMemoryDatabase.ConfirmationLinks.Count(); i++)
+                    if (toFind.Equals(InMemoryDatabase.ConfirmationLinks[i].GUIDLink))
+                        return Tuple.Create(InMemoryDatabase.ConfirmationLinks[i], _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
+                if (cancellationToken.IsCancellationRequested)
+                    throw new OperationCanceledException();
+                return Tuple.Create(nullLink, _messageBank.GetMessage(IMessageBank.Responses.confirmationLinkNotFound).Result);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(nullLink, "500: Database: " + ex.Message);
+            }
+        }
+
+        /*public List<IKPI> LoadKPI(DateTime now)
         {
             List<IKPI> kpiList = new List<IKPI>();
             /*
@@ -344,146 +594,172 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             kpiList.Add(GetRegistrationKPI(now));
             kpiList.Add(GetSearchKPI(now));*/
             return kpiList;
-        }
-        /*
+        }*/
+
         //1
-        public IViewKPI GetViewKPI()
+        public async Task<IViewKPI> GetViewKPIAsync(CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             IViewKPI viewKPI = new ViewKPI();
-            List<IView> ordered = InMemoryDatabase.Views.OrderBy(x => x.visits).ToList();
-            if (ordered.Count == 0)
+            try
             {
-                viewKPI.result = "Error";
+                List<IView> ordered = InMemoryDatabase.Views.OrderBy(x => x.visits).ToList();
+                if (ordered.Count == 0)
+                {
+                    viewKPI.result = "No Database Entries";
+                }
+                int n = ordered.Count;
+                for (int i = 1; i <= 5; i++)
+                {
+                    viewKPI.views.Add(ordered[(n - i)]);
+                }
+                viewKPI.result = "success";
+                return viewKPI;
             }
-            int n = ordered.Count;
-            for (int i = 1; i <= 5; i++)
+            catch(Exception ex)
             {
-                viewKPI.views.Add(ordered[(n - i)]);
+                viewKPI.result = ("500: Database: " + ex.Message);
+                return viewKPI;
             }
-            viewKPI.result = "success";
-            return viewKPI;
         }
 
         //2
-        public IViewDurationKPI GetViewDurationKPI()
+        public async Task<IViewDurationKPI> GetViewDurationKPIAsync(CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             IViewDurationKPI viewDurationKPI = new ViewDurationKPI();
-            List<IView> ordered = InMemoryDatabase.Views.OrderBy(x => x.averageDuration).ToList();
-            if (ordered.Count == 0)
+            try
             {
-                viewDurationKPI.result = "Error";
+                List<IView> ordered = InMemoryDatabase.Views.OrderBy(x => x.averageDuration).ToList();
+                if (ordered.Count == 0)
+                {
+                    viewDurationKPI.result = "Error";
+                    return viewDurationKPI;
+                }
+                int n = ordered.Count;
+                for (int i = 1; i < 5; i++)
+                {
+                    viewDurationKPI.views.Add(ordered[(n - 1)]);
+                }
+                viewDurationKPI.result = "success";
                 return viewDurationKPI;
             }
-            int n = ordered.Count;
-            for (int i = 1; i < 5; i++)
+            catch(Exception ex)
             {
-                viewDurationKPI.views.Add(ordered[(n - 1)]);
+                viewDurationKPI.result = ("500: Database: " + ex.Message);
+                return viewDurationKPI;
             }
-            viewDurationKPI.result = "success";
-            return viewDurationKPI;
         }
 
-        //3
-        public INodeKPI GetNodeKPI(DateTime now)
+        public async Task<INodeKPI> GetNodeKPIAsync(DateTime now, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             INodeKPI nodeKPI = new NodeKPI();
-            int counter = 1;
-            INodesCreated nCreated = GetNodesCreated(now);//Initial Check to see if InMemoryDatabase is not empty
-            if (nCreated.nodesCreatedCount == -1)
+            try
             {
-                nodeKPI.result = "Error";
+                List<NodesCreated> nCreated = await GetNodesCreatedAsync(now, cancellationToken).ConfigureAwait(false);//Initial Check to see if InMemoryDatabase is not empty
+                if (nCreated.Count == 0)
+                {
+                    nodeKPI.result = "Error";
+                    return nodeKPI;
+                }
+                foreach (var x in nCreated)
+                {
+                    nodeKPI.nodesCreated.Add(x);
+                }
+                nodeKPI.result = "success";
                 return nodeKPI;
             }
-            while ((counter < 29) && (nCreated.nodesCreatedCount != -1))
+            catch(Exception ex)
             {
-                nodeKPI.nodesCreated.Add(nCreated);
-                DateTime past = now.AddDays((counter * -1));
-                nCreated = GetNodesCreated(past);
-                counter++;
+                nodeKPI.result = ("500: Database: " + ex.Message);
+                return nodeKPI;
             }
-            nodeKPI.result = "success";
-            return nodeKPI;
         }
 
         //4
-        public ILoginKPI GetLoginKPI(DateTime now)
+        public async Task<ILoginKPI> GetLoginKPIAsync(DateTime now, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ILoginKPI loginKPI = new LoginKPI();
-            int counter = 1;
-            IDailyLogin dLogin = GetDailyLogin(now);
-            if (dLogin.loginCount == -1)
+            try
             {
-                loginKPI.result = "Error";
+                List<DailyLogin> dLogin = await GetDailyLoginAsync(now, cancellationToken).ConfigureAwait(false);
+                if (dLogin.Count == 0)
+                {
+                    loginKPI.result = "Error";
+                    return loginKPI;
+                }
+                foreach (var x in dLogin)
+                {
+                    loginKPI.dailyLogins.Add(x);
+                }
+                loginKPI.result = "success";
                 return loginKPI;
             }
-            while ((counter <= 90) && (dLogin.loginCount != -1))
+            catch(Exception ex)
             {
-                loginKPI.dailyLogins.Add(dLogin);
-                DateTime past = now.AddDays((counter * -1));
-                dLogin = GetDailyLogin(past);
-                counter++;
+                loginKPI.result = ("500: Databaes: " + ex.Message);
+                return loginKPI;
             }
-            loginKPI.result = "success";
-            return loginKPI;
         }
 
         //5
-        public IRegistrationKPI GetRegistrationKPI(DateTime now)
+        public async Task<IRegistrationKPI> GetRegistrationKPIAsync(DateTime now, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             IRegistrationKPI registrationKPI = new RegistrationKPI();
-            int counter = 1;
-            IDailyRegistration dRegistration = GetDailyRegistration(now);
-            if (dRegistration.registrationCount == -1)
+            try
             {
-                registrationKPI.result = "Error";
+                List<DailyRegistration> dRegistration = await GetDailyRegistrationAsync(now, cancellationToken).ConfigureAwait(false);
+                if (dRegistration.Count == 0)
+                {
+                    registrationKPI.result = "Error";
+                    return registrationKPI;
+                }
+                foreach (var x in dRegistration)
+                {
+                    registrationKPI.dailyRegistrations.Add(x);
+                }
+                registrationKPI.result = "success";
                 return registrationKPI;
             }
-            while ((counter <= 90) && (dRegistration.registrationCount != -1))
+            catch(Exception ex)
             {
-                registrationKPI.dailyRegistrations.Add(dRegistration);
-                DateTime past = now.AddDays((counter * -1));
-                dRegistration = GetDailyRegistration(past);
-                counter++;
+                registrationKPI.result = ("500: Database: " + ex.Message);
+                return registrationKPI;
             }
-            registrationKPI.result = "success";
-            return registrationKPI;
         }
 
         //6
-        public ISearchKPI GetSearchKPI(DateTime now)
+        public async Task<ISearchKPI> GetSearchKPIAsync(DateTime now, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             ISearchKPI searchKPI = new SearchKPI();
-            int counter = 1;
-            ITopSearch sCreated = GetTopSearch(now);//Initial Check to see if InMemoryDatabase is not empty
-            List<ITopSearch> preSort = new List<ITopSearch>();
-            if (sCreated.searchCount == -1)
+            try
             {
-                searchKPI.result = "Error";
+                List<TopSearch> sCreated = await GetTopSearchAsync(now, cancellationToken).ConfigureAwait(false);//Initial Check to see if InMemoryDatabase is not empty
+                if (sCreated.Count == 0)
+                {
+                    searchKPI.result = "Error";
+                    return searchKPI;
+                }
+                List<TopSearch> sorted = sCreated.OrderBy(x => x.searchCount).ToList();
+                int n = (sorted.Count);
+                for (int i = 1; i <= 5 || i < n; i++)
+                {
+                    Console.WriteLine(n);
+                    searchKPI.topSearches.Add(sorted[(n - i)]);
+                }
+                searchKPI.result = "success";
                 return searchKPI;
             }
-
-            while ((counter <= 28) && (sCreated.searchCount != -1))
+            catch(Exception ex)
             {
-                preSort.Add(sCreated);
-                DateTime past = now.AddDays((counter * -1));
-                sCreated = GetTopSearch(past);
-                counter++;
+                searchKPI.result = ("500: Database: " + ex.Message);
+                return searchKPI;
             }
-
-            List<ITopSearch> afterSort = preSort.OrderBy(x => x.searchCount).ToList();
-            int n = (afterSort.Count);
-            for (int i = 1; i <= 5 || i < n; i++)
-            {
-                Console.WriteLine(n);
-                searchKPI.topSearches.Add(afterSort[(n - i)]);
-            }
-            searchKPI.result = "success";
-            return searchKPI;
         }
-        */
-        /*
-            Ian's Methods
-         */
 
         public string CreateNodesCreated(INodesCreated nodesCreated)
         {
@@ -502,19 +778,25 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         }
 
-        public List<NodesCreated> GetNodesCreated(DateTime nodesCreatedDate)
+        public async Task<List<NodesCreated>> GetNodesCreatedAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             List<NodesCreated> nodeResult = new List<NodesCreated>();
-
-            foreach (NodesCreated nodesCreated in InMemoryDatabase.NodesCreated)
+            try
             {
-                if (nodesCreatedDate <= nodesCreated.nodesCreatedDate && nodesCreatedDate >= nodesCreatedDate.Date.AddDays(-30))
+                foreach (INodesCreated nodesCreated in InMemoryDatabase.NodesCreated)
                 {
-                    nodeResult.Add(nodesCreated);
+                    if (nodeCreationDate <= nodesCreated.nodeCreationDate && nodeCreationDate >= nodeCreationDate.Date.AddDays(-30))
+                    {
+                        nodeResult.Add((NodesCreated)nodesCreated);
+                    }
                 }
+                return nodeResult;
             }
-
-            return nodeResult;
+            catch(Exception ex)
+            {
+                return nodeResult;
+            }
         }
 
         public string UpdateNodesCreated(INodesCreated nodesCreated)
@@ -529,7 +811,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 }
             }
 
-            return _messageBank.ErrorMessages["createdNodesNotExists"];
+            return _messageBank.ErrorMessages["createdNodeNotExist"];
         }
 
 
@@ -550,16 +832,24 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return _messageBank.SuccessMessages["generic"];
         }
 
-        public List<DailyLogin> GetDailyLogin(DateTime loginDate)
+        public async Task<List<DailyLogin>> GetDailyLoginAsync(DateTime loginDate, CancellationToken cancellationToken = default)
         {
-            List<DailyLogin> dailyLoginResults = new List<DailyLogin>();
-
-            foreach (DailyLogin dailyLogin1 in InMemoryDatabase.DailyLogins)
+            cancellationToken.ThrowIfCancellationRequested();
+           List<DailyLogin> dailyLoginResults = new List<DailyLogin>();
+            try
             {
-                if (dailyLogin1.loginDate <= loginDate && dailyLogin1.loginDate >= loginDate.Date.AddDays(-30))
+                foreach (IDailyLogin dailyLogin1 in InMemoryDatabase.DailyLogins)
                 {
-                    dailyLoginResults.Add(dailyLogin1);
+                    if (dailyLogin1.loginDate <= loginDate && dailyLogin1.loginDate >= loginDate.Date.AddDays(-30))
+                    {
+                        dailyLoginResults.Add((DailyLogin)dailyLogin1);
+                    }
                 }
+                return dailyLoginResults;
+            }
+            catch(Exception ex)
+            {
+                return dailyLoginResults;
             }
 
             return dailyLoginResults;
@@ -573,7 +863,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     InMemoryDatabase.DailyLogins[i] = dailyLogin;
 
-                    return _messageBank.SuccessMessages["generic"];
+                    return "success";
                 }
             }
 
@@ -597,16 +887,24 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return _messageBank.SuccessMessages["generic"];
         }
 
-        public List<TopSearch> GetTopSearch(DateTime topSearchDate)
+        public async Task<List<TopSearch>> GetTopSearchAsync(DateTime topSearchDate, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             List<TopSearch> topSearchResult = new List<TopSearch>();
-
-            foreach (TopSearch topSearch in InMemoryDatabase.TopSearches)
+            try
             {
-                if (topSearch.topSearchDate <= topSearchDate && topSearch.topSearchDate >= topSearchDate.Date.AddDays(-30))
+                foreach (ITopSearch topSearch in InMemoryDatabase.TopSearches)
                 {
-                    topSearchResult.Add(topSearch);
+                    if (topSearch.topSearchDate <= topSearchDate && topSearch.topSearchDate >= topSearchDate.Date.AddDays(-30))
+                    {
+                        topSearchResult.Add((TopSearch)topSearch);
+                    }
                 }
+                return topSearchResult;
+            }
+            catch
+            {
+                return topSearchResult;
             }
 
             return topSearchResult;
@@ -644,16 +942,24 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return _messageBank.SuccessMessages["generic"];
         }
 
-        public List<DailyRegistration> GetDailyRegistration(DateTime dailyRegistrationDate)
+        public async Task<List<DailyRegistration>> GetDailyRegistrationAsync(DateTime dailyRegistrationDate, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             List<DailyRegistration> dailyRegistrationResults = new List<DailyRegistration>();
-
-            foreach (DailyRegistration dailyRegistration in InMemoryDatabase.DailyRegistrations)
+            try
             {
-                if (dailyRegistration.registrationDate <= dailyRegistrationDate && dailyRegistration.registrationDate >= dailyRegistrationDate.Date.AddDays(-30))
+                foreach (IDailyRegistration dailyRegistration in InMemoryDatabase.DailyRegistrations)
                 {
-                    dailyRegistrationResults.Add(dailyRegistration);
+                    if (dailyRegistration.registrationDate <= dailyRegistrationDate && dailyRegistration.registrationDate >= dailyRegistrationDate.Date.AddDays(-30))
+                    {
+                        dailyRegistrationResults.Add((DailyRegistration)dailyRegistration);
+                    }
                 }
+                return dailyRegistrationResults;
+            }
+            catch
+            {
+                return dailyRegistrationResults;
             }
 
             return dailyRegistrationResults;
@@ -669,9 +975,684 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                     return _messageBank.SuccessMessages["generic"];
                 }
+                    return _messageBank.SuccessMessages["generic"];
+                }
+            }
+
+            return _messageBank.ErrorMessages["dailyRegistrationNotExist"];
+        }
+
+
+        public string CreateView(IView view)
+        {
+            foreach (IView view1 in InMemoryDatabase.Views)
+            {
+                if(view1.date == view.date)
+                {
+                    return "View Already Exists in the Database";
+                }
+            }
+
+            InMemoryDatabase.Views.Add(view);
+            return "View Successfully Added to the Database";
+        }
+
+        public async Task<List<View>> GetAllViewsAsync(CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            List<View> viewList = new List<View>();
+            return viewList;
+        }
+
+        public async Task<Tuple<IRecoveryLink, string>> GetRecoveryLinkAsync(string guid, CancellationToken cancellationToken)
+        {
+            IRecoveryLink nullLink = null;
+            return Tuple.Create(nullLink, "200");
+        }
+
+        public async Task<Tuple<int, string>> GetTotalRecoveryLinksAsync(string email, string authorizationLevel, CancellationToken cancellationToken)
+        {
+            return Tuple.Create(-1, "500");
+        }
+
+        public async Task<Tuple<int, string>> RemoveAllRecoveryLinksAsync(string email, string authorizationLevel, CancellationToken cancellationToken)
+        {
+            return Tuple.Create(-1, "500");
+        }
+
+        public async Task<string> RemoveRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken)
+        {
+            return "500";
+        }
+
+        public async Task<string> EnableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "500";
+        }
+
+        public async Task<string> DisableAccountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "500";
+        }
+
+        public async Task<string> CreateRecoveryLinkAsync(IRecoveryLink recoveryLink, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "500";
+        }
+
+        public async Task<string> IncrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "500";
+        }
+
+        public async Task<string> DecrementRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "500";
+        }
+
+        public async Task<int> GetRecoveryLinkCountAsync(string email, string authorizationLevel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return -1;
+        }
+
+        /// <summary>
+        ///     Adds tag to list of node(s)
+        /// </summary>
+        /// <param name="nodeIDs">List of node IDs</param>
+        /// <param name="tagName">Tag name</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status result</returns>
+        public async Task<string> AddTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if tag is null or empty
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+
+                // Check if node list is null or empty
+                if (nodeIDs == null || nodeIDs.Count() <= 0 )
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound);
+
+                // Check if tag exists
+                if (!InMemoryDatabase.Tags.Contains(new Tag(tagName, 0)))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagDoesNotExist);
+
+                // Add tag to nodes
+                for (int i = 0; i  < nodeIDs.Count; i++)
+                {
+                    INodeTag nodeTag = new NodeTag(nodeIDs[i], tagName);
+
+                    if (!InMemoryDatabase.NodeTags.Contains(nodeTag))
+                        InMemoryDatabase.NodeTags.Add(nodeTag);
+                }
+
+                return await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess);
+            }
+            catch(OperationCanceledException ex)
+            {
+                // Rollback handled
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+            }
+            catch (Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+            }        
+        }
+
+        /// <summary>
+        ///     Removes a tag from list of node(s)
+        /// </summary>
+        /// <param name="nodeIDs">List of node IDs</param>
+        /// <param name="tagName">Tag name</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status result</returns>
+        public async Task<string> RemoveTagAsync(List<long> nodeIDs, string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            // Check if tag name is null, empty string or all space
+            if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+            // Check if node list is null or empty
+            if (nodeIDs == null || nodeIDs.Count() <= 0)
+                return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+
+            for (int i = 0; i  < nodeIDs.Count; i++)
+            {
+                INodeTag nodeTag = new NodeTag(nodeIDs[i], tagName);
+                if (!InMemoryDatabase.NodeTags.Contains(nodeTag))
+                    InMemoryDatabase.NodeTags.Remove(nodeTag);
+            }
+
+            return await _messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess);
+        }
+
+        /// <summary>
+        ///     Retrieves a list of shared tags from a list of node(s) in in memory database. List with single node will return all tags.
+        /// </summary>
+        /// <param name="nodeIDs">List of node ID(s)</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>List of tags and string status result</returns>
+        public async Task<Tuple<List<string>, string>> GetNodeTagsAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+
+                List<string> tags = new List<string>();
+
+                // Check tag count
+                if (nodeIDs == null ||nodeIDs.Count() <= 0)
+                    return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound));
+
+                for (int i = 0; i < nodeIDs.Count; i++)
+                {
+
+                    List<string> results = new List<string>();
+                    for (int j = 0; j < InMemoryDatabase.NodeTags.Count; j++)
+                    {
+                        if (nodeIDs[i].Equals(InMemoryDatabase.NodeTags[j].NodeID))
+                            results.Add(InMemoryDatabase.NodeTags[j].TagName);
+                    }
+                    if (nodeIDs[i] == nodeIDs.First())
+                    {
+                        tags = results;
+                    }
+                    tags = tags.Intersect(results).ToList();
+                }
+
+                if (cancellationToken.IsCancellationRequested)
+                    return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+
+                return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess));
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback handled
+                return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
+            }
+        }
+
+        /// <summary>
+        ///     Creates a tag in in memory tag bank
+        /// </summary>
+        /// <param name="tagName">Tag name</param>
+        /// <param name="count">Number of nodes tagged</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status result</returns>
+        public async Task<string> CreateTagAsync(string tagName, int count,CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                // Throw if cancellation is requested
+                cancellationToken.ThrowIfCancellationRequested();
+
+                //Check input
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+
+                // Check tag count
+                if (count < 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid);
+
+                ITag tag = new Tag(tagName, count);
+
+                // Check if tag already exists in tag bank
+                if (InMemoryDatabase.Tags.Contains(tag))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagDuplicate);
+               
+                // Add Tag to In Memory Bank
+                InMemoryDatabase.Tags.Add(tag);
+
+                return await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess);
+
+            }
+            catch (Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+            }    
+        }
+
+        /// <summary>
+        ///     Retrieves list of tags from tag bank
+        /// </summary>
+        /// <param name="cancellationToken">Cnacellation Token</param>
+        /// <returns>List of tags and string status result</returns>
+        public async Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            List<ITag> tags = InMemoryDatabase.Tags.AsList<ITag>();
+            return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess));
+        }
+
+
+        /// <summary>
+        ///  Deletes tag from in memory tag bank
+        /// </summary>
+        /// <param name="tagName">Tag name</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>String status code</returns>
+        public async Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                // Throw if cancellation is requested
+                cancellationToken.ThrowIfCancellationRequested();
+                
+                // Check input
+                if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+
+                ITag tag = new Tag(tagName);
+
+                // Remove tag from nodes
+                for (int i = 0; i < InMemoryDatabase.NodeTags.Count(); i++)
+                    if (InMemoryDatabase.NodeTags[i].TagName.Equals(tagName))
+                        InMemoryDatabase.NodeTags.RemoveAt(i);
+
+                // Remove tag from bank
+                if (InMemoryDatabase.Tags.Contains(tag))
+                    InMemoryDatabase.Tags.Remove(tag);
+
+                return await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess);
+
+            }
+            catch (Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+            }        
+        }
+
+        public async Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
+        public async Task<string> CreateUserHashAsync(int ID, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return "200";
+        }
+
+        public async Task<IResponse<string>> CreateNodeAsync(INode node, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                bool nodeExists = false;
+                foreach (var n in InMemoryDatabase.Nodes)
+                {
+                    if(node.NodeID == n.NodeID)
+                    {
+                        nodeExists = true;
+                    }
+                }
+                if (nodeExists)
+                {
+                    return new CreateNodeResponse<string>(_messageBank.GetMessage(
+                        IMessageBank.Responses.nodeAlreadyExists).Result, null, 500, false);
+                }
+
+                InMemoryDatabase.Nodes.Add(node);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    InMemoryDatabase.Nodes.Remove(node);
+                    throw new OperationCanceledException();
+                }
+
+                return new CreateNodeResponse<string>("", _messageBank.GetMessage(
+                    IMessageBank.Responses.createNodeSuccess).Result, 200, true);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return new CreateNodeResponse<string>(_messageBank.GetMessage(
+                    IMessageBank.Responses.unhandledException).Result, null, 500, false);
+            }
+        }
+
+        public async Task<IResponse<string>> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                bool nodeExists = false;
+                Node targetNode;
+                foreach (Node n in InMemoryDatabase.Nodes)
+                {
+                    if (nodeID == n.NodeID)
+                    {
+                        nodeExists = true;
+                    }
+                }
+
+                if (!nodeExists)
+                {
+                    return new DeleteNodeResponse<string>(_messageBank.GetMessage(
+                        IMessageBank.Responses.nodeNotFound).Result, null, 500, false);
+                }
+
+                List<Node> children = new List<Node>();
+                foreach (Node c in InMemoryDatabase.Nodes)
+                {
+                    if (c.ParentNodeID == nodeID)
+                    {
+                        children.Add(c);
+                    }
+                }
+                foreach (Node n in children)
+                {
+                    n.ParentNodeID = parentID;
+                }
+
+                foreach (Node n in InMemoryDatabase.Nodes)
+                {
+                    if (nodeID == n.NodeID)
+                    {
+                        n.Deleted = true;
+                    }
+                }
+                return new DeleteNodeResponse<string>("", _messageBank.GetMessage(
+                    IMessageBank.Responses.deleteNodeSuccess).Result, 200, true);
+
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return new DeleteNodeResponse<string>(_messageBank.GetMessage(
+                    IMessageBank.Responses.unhandledException).Result, null, 500, false);
+            }
+        }
+
+        public async Task<Tuple<INode, string>> GetNodeAsync(long nID, CancellationToken cancellationToken = default)
+        {
+            INode nullNode = null;
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                Node node;
+                foreach(Node n in InMemoryDatabase.Nodes){
+                    if (nID.Equals(n.NodeID))
+                    {
+                        INode temp;
+                        temp = n;
+                        return Tuple.Create(temp, _messageBank.GetMessage(IMessageBank.Responses.generic).Result);
+                    }
+                }
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException();
+                }
+                return Tuple.Create(nullNode, _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).Result);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(nullNode, "500: Database: " + ex.Message);
+            }
+        }
+
+        Task<string> ISqlDAO.UpdateNodeAsync(INode updatedNode, INode previousNode, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<Tuple<List<INode>, string>> ISqlDAO.GetNodeChildren(long nID, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Tuple<List<INode>, string>> GetNodesAsync(string userHash, string accountHash, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<string> RateNodeAsync(string userHash, long nodeID, int rating, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            InMemoryDatabase.NodeRatings.Add(new NodeRating(userHash, nodeID, rating));
+            return await _messageBank.GetMessage(IMessageBank.Responses.userRateSuccess);
+        }
+
+        public async Task<Tuple<List<double>, string>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            List<double> ratings = new List<double>();
+            
+            return Tuple.Create(ratings, await _messageBank.GetMessage(IMessageBank.Responses.getRateSuccess));
+        }
+
+        public async Task<string> UpdateAccountAsync(IAccount account, IAccount updatedAccount, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                //Throw Cancellation Exception if token requests cancellation
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (InMemoryDatabase.Accounts.Contains(account))
+                {
+                    int index = InMemoryDatabase.Accounts.IndexOf(account);
+                    InMemoryDatabase.Accounts[index].Username = updatedAccount.Username;
+                    InMemoryDatabase.Accounts[index].AuthorizationLevel = updatedAccount.AuthorizationLevel;
+                    InMemoryDatabase.Accounts[index].Confirmed = updatedAccount.Confirmed;
+                    InMemoryDatabase.Accounts[index].AccountStatus = updatedAccount.AccountStatus;
+                }
+                else
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound);
+                }
+
+                return await _messageBank.GetMessage(IMessageBank.Responses.accountUpdateSuccess);
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback already handled
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+            }
+            catch (Exception ex)
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
+            }
+        }
+
+
+        public async Task<IResponse<IEnumerable<Node>>> CopyNodeAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+
+        //public async Task<Tuple<List<INode>, string>> CopyNodeAsync(List<INode> nodesCopy, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+
+
+                if(nodeIDs == null || nodeIDs.Count <= 0)
+                {
+                    return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false), null, 400, false);
+                }
+
+                IList<Node> copiedNodes = new List<Node>();
+
+
+                
+                for (int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
+                {
+                    for(int j = 0; j < nodeIDs.Count; j++)
+                    {
+                        if (nodeIDs[j].Equals(InMemoryDatabase.Nodes[i].NodeID))
+                        {
+                            copiedNodes.Add((Node)InMemoryDatabase.Nodes[i]);
+                        }
+                    }
+                }
+                
+
+
+                if (copiedNodes == null || copiedNodes.Count <= 0)
+                {
+                    return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false), null, 400, false);
+                }
+
+                if (!copiedNodes.Count.Equals(nodeIDs.Count))
+                {
+                    return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeMistmatchError).ConfigureAwait(false), null, 400, false);
+                }
+
+
+                // will optimize later
+                /*
+                for(int i = 0; i < nodeIDs.Count; i++)
+                {
+                    if
+                    if(InMemoryDatabase.Nodes)
+
+
+                    copiedNodes.Add(InMemoryDatabase.Nodes.At)
+                }
+                */
+
+
+
+
+
+                return new CopyResponse<IEnumerable<Node>>("", copiedNodes, 200, true);
+
+                //return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeSuccess).ConfigureAwait(false);
+
+
+
+
+
+            }
+            catch (OperationCanceledException)
+            {
+                //return code for operationCancelled is 500
+                return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
+
+            }
+            catch (Exception ex)
+            {
+                //return code for unhandledException is 500
+                return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+
+            }
+        }
+
+
+        //fake inmemorysqldao object
+        public async Task<IResponse<string>> PasteNodeAsync(string userHash, long nodeIDPasteTo, List<INode> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return new CopyResponse<string>("", await _messageBank.GetMessage(IMessageBank.Responses.pasteNodeSuccess).ConfigureAwait(false), 200, true);
+        }
+
+        //fake obj
+        public async Task<string> IsNodeLeaf(long nodeIDToPasteTo, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return await _messageBank.GetMessage(IMessageBank.Responses.isLeaf).ConfigureAwait(false);
+        }
+
+
+
+        public async Task<IResponse<string>> PrivateNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken))
+        {
+
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                int counter = 0;
+
+                for (int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
+                {
+                    for (int j = 0; j < nodes.Count; j++)
+                    {
+                        if (nodes[j].Equals(InMemoryDatabase.Nodes[i].NodeID))
+                        {
+                            InMemoryDatabase.Nodes[i].Visibility = false;
+                            counter++;
+                        }
+                    }
+                }
+
+                if (counter != nodes.Count)
+                {
+                    return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.privateNodeFailure).ConfigureAwait(false), null, 500, false);
+
+                }
+
+                return new PrivateResponse<string>("", null, 200, true);
+
+
+            }
+            catch (OperationCanceledException)
+            {
+                //return code for operationCancelled is 500
+                return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
+            }
+            catch (Exception ex)
+            {
+                //return code for unhandledException is 500
+                return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+            }
+
+        }
+
+
+        //goes thru and sets all visibility of nodes to true
+        public async Task<IResponse<string>> PublicNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken))
+        {
+
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                int counter = 0;
+
+                for (int i = 0; i < InMemoryDatabase.Nodes.Count; i++)
+                {
+                    for (int j = 0; j < nodes.Count; j++)
+                    {
+                        if (nodes[j].Equals(InMemoryDatabase.Nodes[i].NodeID))
+                        {
+                            InMemoryDatabase.Nodes[i].Visibility = true;
+                            counter++;
+                        }
+                    }
+                }
+
+                if (counter != nodes.Count)
+                {
+                    return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.publicNodeFailure).ConfigureAwait(false), null, 500, false);
+
+                }
+
+                return new PublicResponse<string>("", null, 200, true);
+
+
+            }
+            catch (OperationCanceledException)
+            {
+                //return code for operationCancelled is 500
+                return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
+            }
+            catch (Exception ex)
+            {
+                //return code for unhandledException is 500
+                return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
             }
 
             return _messageBank.ErrorMessages["dailyRegistrationsNotExists"];
         }
+
     }
 }
