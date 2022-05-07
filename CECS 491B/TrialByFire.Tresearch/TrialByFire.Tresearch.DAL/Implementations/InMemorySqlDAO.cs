@@ -761,11 +761,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             // Check whether the NodesCreated object exists already
             foreach (INodesCreated nodesCreated1 in InMemoryDatabase.NodesCreated)
             {
-<<<<<<< HEAD
                 if (nodesCreated1.nodesCreatedDate == nodesCreated.nodesCreatedDate)
-=======
-                if (nodesCreated1.nodeCreationDate == nodesCreated.nodeCreationDate)
->>>>>>> Working
                 {
                     return _messageBank.ErrorMessages["createdNodesExists"];
                 }
@@ -777,7 +773,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         }
 
-<<<<<<< HEAD
         public async Task<List<NodesCreated>> GetNodesCreatedAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -790,17 +785,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     {
                         nodeResult.Add((NodesCreated)nodesCreated);
                     }
-=======
-        public IList<INodesCreated> GetNodesCreated(DateTime nodeCreationDate)
-        {
-            List<INodesCreated> nodeResult = new List<INodesCreated>();
-
-            foreach (INodesCreated nodesCreated in InMemoryDatabase.NodesCreated)
-            {
-                if (nodeCreationDate <= nodesCreated.nodeCreationDate && nodeCreationDate >= nodeCreationDate.Date.AddDays(-30))
-                {
-                    nodeResult.Add(nodesCreated);
->>>>>>> Working
                 }
                 return nodeResult;
             }
@@ -814,11 +798,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             for (int i = 0; i < InMemoryDatabase.NodesCreated.Count; i++)
             {
-<<<<<<< HEAD
                 if (InMemoryDatabase.NodesCreated[i].nodesCreatedDate == nodesCreated.nodesCreatedDate)
-=======
-                if (InMemoryDatabase.NodesCreated[i].nodeCreationDate == nodesCreated.nodeCreationDate)
->>>>>>> Working
                 {
                     InMemoryDatabase.NodesCreated[i] = nodesCreated;
 
@@ -826,11 +806,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 }
             }
 
-<<<<<<< HEAD
             return _messageBank.ErrorMessages["createdNodesNotExists"];
-=======
-            return _messageBank.ErrorMessages["createdNodeNotExist"];
->>>>>>> Working
         }
 
 
@@ -851,7 +827,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return _messageBank.SuccessMessages["generic"];
         }
 
-<<<<<<< HEAD
         public async Task<List<DailyLogin>> GetDailyLoginAsync(DateTime loginDate, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -864,17 +839,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     {
                         dailyLoginResults.Add((DailyLogin)dailyLogin1);
                     }
-=======
-        public IList<IDailyLogin> GetDailyLogin(DateTime loginDate)
-        {
-            List<IDailyLogin> dailyLoginResults = new List<IDailyLogin>();
-
-            foreach (IDailyLogin dailyLogin1 in InMemoryDatabase.DailyLogins)
-            {
-                if (dailyLogin1.loginDate <= loginDate && dailyLogin1.loginDate >= loginDate.Date.AddDays(-30))
-                {
-                    dailyLoginResults.Add(dailyLogin1);
->>>>>>> Working
                 }
                 return dailyLoginResults;
             }
@@ -882,11 +846,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 return dailyLoginResults;
             }
-<<<<<<< HEAD
-=======
-
-            return dailyLoginResults;
->>>>>>> Working
         }
 
         public string UpdateDailyLogin(IDailyLogin dailyLogin)
@@ -897,19 +856,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     InMemoryDatabase.DailyLogins[i] = dailyLogin;
 
-<<<<<<< HEAD
                     return _messageBank.SuccessMessages["generic"];
                 }
             }
 
             return _messageBank.ErrorMessages["dailyLoginsNotExists"];
-=======
-                    return "success";
-                }
-            }
-
-            return _messageBank.ErrorMessages["dailyLoginNotExist"];
->>>>>>> Working
         }
 
 
@@ -920,11 +871,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 if (topSearch1.topSearchDate == topSearch.topSearchDate)
                 {
-<<<<<<< HEAD
                     return _messageBank.ErrorMessages["topSearchesExists"];
-=======
-                    return _messageBank.ErrorMessages["topSearchExists"];
->>>>>>> Working
                 }
             }
 
@@ -933,7 +880,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return _messageBank.SuccessMessages["generic"];
         }
 
-<<<<<<< HEAD
         public async Task<List<TopSearch>> GetTopSearchAsync(DateTime topSearchDate, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -946,17 +892,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     {
                         topSearchResult.Add((TopSearch)topSearch);
                     }
-=======
-        public IList<ITopSearch> GetTopSearch(DateTime topSearchDate)
-        {
-            IList<ITopSearch> topSearchResult = new List<ITopSearch>();
-
-            foreach (ITopSearch topSearch in InMemoryDatabase.TopSearches)
-            {
-                if (topSearch.topSearchDate <= topSearchDate && topSearch.topSearchDate >= topSearchDate.Date.AddDays(-30))
-                {
-                    topSearchResult.Add(topSearch);
->>>>>>> Working
                 }
                 return topSearchResult;
             }
@@ -964,11 +899,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 return topSearchResult;
             }
-<<<<<<< HEAD
-=======
-
-            return topSearchResult;
->>>>>>> Working
         }
 
         public string UpdateTopSearch(ITopSearch topSearch)
@@ -983,11 +913,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 }
             }
 
-<<<<<<< HEAD
             return _messageBank.ErrorMessages["topSearchesNotExists"];
-=======
-            return _messageBank.ErrorMessages["topSearchNotExist"];
->>>>>>> Working
         }
 
 
@@ -998,11 +924,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 if (dailyRegistration1.registrationDate == dailyRegistration.registrationDate)
                 {
-<<<<<<< HEAD
                     return _messageBank.ErrorMessages["dailyRegistrationsExists"];
-=======
-                    return _messageBank.ErrorMessages["dailyRegistrationExists"];
->>>>>>> Working
                 }
             }
 
@@ -1011,7 +933,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             return _messageBank.SuccessMessages["generic"];
         }
 
-<<<<<<< HEAD
         public async Task<List<DailyRegistration>> GetDailyRegistrationAsync(DateTime dailyRegistrationDate, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -1024,17 +945,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     {
                         dailyRegistrationResults.Add((DailyRegistration)dailyRegistration);
                     }
-=======
-        public IList<IDailyRegistration> GetDailyRegistration(DateTime dailyRegistrationDate)
-        {
-            IList<IDailyRegistration> dailyRegistrationResults = new List<IDailyRegistration>();
-
-            foreach (IDailyRegistration dailyRegistration in InMemoryDatabase.DailyRegistrations)
-            {
-                if (dailyRegistration.registrationDate <= dailyRegistrationDate && dailyRegistration.registrationDate >= dailyRegistrationDate.Date.AddDays(-30))
-                {
-                    dailyRegistrationResults.Add(dailyRegistration);
->>>>>>> Working
                 }
                 return dailyRegistrationResults;
             }
@@ -1042,11 +952,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 return dailyRegistrationResults;
             }
-<<<<<<< HEAD
-=======
-
-            return dailyRegistrationResults;
->>>>>>> Working
         }
 
         public string UpdateDailyRegistration(IDailyRegistration dailyRegistration)
@@ -1061,7 +966,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 }
             }
 
-<<<<<<< HEAD
             return _messageBank.ErrorMessages["dailyRegistrationsNotExists"];
         }*/
 
@@ -1772,9 +1676,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
 
             return Tuple.Create(audit, await _messageBank.GetMessage(IMessageBank.Responses.treeHistoryGetSuccess));
-=======
-            return _messageBank.ErrorMessages["dailyRegistrationNotExist"];
->>>>>>> Working
         }
     }
 }

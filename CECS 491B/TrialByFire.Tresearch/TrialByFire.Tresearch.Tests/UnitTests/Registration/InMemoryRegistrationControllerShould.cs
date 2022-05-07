@@ -40,12 +40,8 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Registration
             IRegistrationController registrationController = TestProvider.GetService<IRegistrationController>();
             
             //Act
-<<<<<<< HEAD
             IActionResult results = await registrationController.RegisterAccountAsync(email, passphrase).ConfigureAwait(false);
             var objectResult = results as ObjectResult;
-=======
-            string result = _registrationController.RegisterAccount(email, passphrase);
->>>>>>> Working
 
             //Assert
             Assert.Equal(expectedResult.StatusCode, objectResult.StatusCode);

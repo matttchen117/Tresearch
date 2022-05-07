@@ -9,15 +9,11 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
-<<<<<<< HEAD
 
     // Summary:
     //     A controller class for requesting OTPs.
     [ApiController]
     [EnableCors]
-=======
-    [ApiController]
->>>>>>> Working
     [Route("[controller]")]
     public class OTPRequestController : Controller, IOTPRequestController
     {
@@ -33,7 +29,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _messageBank = messageBank;
         }
 
-<<<<<<< HEAD
         //
         // Summary:
         //     Entry point for OTP requests and forwards the User input to the RequestManager to
@@ -53,11 +48,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         [HttpPost]
         [Route("requestotp")]
         public async Task<IActionResult> RequestOTPAsync(string username, string passphrase, string authorizationLevel)
-=======
-        [HttpPost]
-        [Route("requestotp")]
-        public string RequestOTP(string username, string passphrase, string authorizationLevel)
->>>>>>> Working
         {
             try
             {

@@ -2,12 +2,8 @@ using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.DAL.Implementations;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
-<<<<<<< HEAD
 using TrialByFire.Tresearch.Middlewares;
 using TrialByFire.Tresearch.Models;
-=======
-//using TrialByFire.Tresearch.Middlewares;
->>>>>>> Working
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
 using TrialByFire.Tresearch.Services.Contracts;
@@ -19,7 +15,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<BuildSettingsOptions>(
     builder.Configuration.GetSection(nameof(BuildSettingsOptions)));
 // Add services to the container.
-<<<<<<< HEAD
 builder.Services.AddScoped<IMessageBank, MessageBank>();
 builder.Services.AddScoped<ISqlDAO, SqlDAO>();
 // Service
@@ -73,29 +68,10 @@ builder.Services.AddScoped<IUADManager, UADManager>();
 builder.Services.AddScoped<INodeSearchManager, NodeSearchManager>();
 // Unnecessary, only here temporarily for successful build
 
-=======
-builder.Services.AddTransient<IMessageBank, MessageBank>();
-builder.Services.AddTransient<ISqlDAO, SqlDAO>();
-builder.Services.AddTransient<ILogService, SqlLogService>();
-//builder.Services.AddTransient<IAccountDeletionService, AccountDeletionService>();
-builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
-builder.Services.AddTransient<IAuthorizationService, AuthorizationService>();
-builder.Services.AddTransient<IMailService, MailService>();
-builder.Services.AddTransient<IOTPRequestService, OTPRequestService>();
-builder.Services.AddTransient<IRegistrationService, RegistrationService>();
-builder.Services.AddTransient<IUADService, UADService>();
-builder.Services.AddTransient<IValidationService, ValidationService>();
-//builder.Services.AddTransient<IAccountDeletionManager, AccountDeletionManager>();
-builder.Services.AddTransient<IAuthenticationManager, AuthenticationManager>();
-builder.Services.AddTransient<IOTPRequestManager, OTPRequestManager>();
-builder.Services.AddTransient<IRegistrationManager, RegistrationManager>();
-builder.Services.AddScoped<IRolePrincipal, RolePrincipal>();
->>>>>>> Working
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-<<<<<<< HEAD
 
 
 // Invoked during build, not waht we want, want it to be invoked for AuthN process
@@ -103,8 +79,6 @@ builder.Services.AddSwaggerGen();
 // builder.Services.AddScoped<IRolePrincipal, RolePrincipal>((services) => {new RolePrincipal()});
 
 
-=======
->>>>>>> Working
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 builder.Services.AddCors(options =>
@@ -112,7 +86,6 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       builder =>
                       {
-<<<<<<< HEAD
                           builder.WithOrigins("https://trialbyfiretresearch.azurewebsites.net",
                                                 "http://localhost:3000",
                                                 "https://localhost:3000")
@@ -120,11 +93,6 @@ builder.Services.AddCors(options =>
                                               .AllowAnyHeader()
                                               .AllowAnyMethod()
                                               .AllowCredentials();
-=======
-                          builder.WithOrigins("http://localhost:3000")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod();
->>>>>>> Working
                       });
 });
 
@@ -137,25 +105,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-<<<<<<< HEAD
 //app.UseHsts();
 
-=======
->>>>>>> Working
 app.UseHttpsRedirection();
 
 app.UseCors(MyAllowSpecificOrigins);
 
-<<<<<<< HEAD
 app.UseTokenAuthentication();
 
 /*app.Use((context, next) =>
 {
 
 });*/
-=======
-app.UseAuthorization();
->>>>>>> Working
 
 app.MapControllers();
 
@@ -163,22 +124,9 @@ app.Run();
 
 public static class AuthExtensions
 {
-<<<<<<< HEAD
     public static IApplicationBuilder UseTokenAuthentication(this IApplicationBuilder host)
     {
         return host.UseMiddleware<TokenAuthentication>();
-=======
-    public static IApplicationBuilder UseCookieAuthentication(this IApplicationBuilder host)
-    {
-        using(var serviceScope = host.ApplicationServices.CreateScope())
-        {
-            var services = serviceScope.ServiceProvider;
-            var rolePrincipalService = services.GetRequiredService<IRolePrincipal>();
-            rolePrincipalService.RoleIdentity = new RoleIdentity(true, "a", "b");
-        }
-        throw new NotImplementedException();
-        //return host.UseMiddleware<CookieAuthentication>();
->>>>>>> Working
     }
 
 }
