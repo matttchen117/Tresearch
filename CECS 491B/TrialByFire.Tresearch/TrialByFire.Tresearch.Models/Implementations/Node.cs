@@ -34,7 +34,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public Node()
         {
-            RatingScore = 1;
+            RatingScore = 0;
             Tags = new List<INodeTag>();
         }
 
@@ -77,5 +77,6 @@ namespace TrialByFire.Tresearch.Models.Implementations
             }
             return false;
         }
+
     }
 }

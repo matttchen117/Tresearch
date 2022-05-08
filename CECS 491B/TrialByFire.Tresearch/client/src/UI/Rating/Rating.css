@@ -1,0 +1,14 @@
+.star-rating-container button {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 35px;
+}
+
+.filled {
+    color: #344e41;
+  }
+.unfilled {
+  color: #ccc;
+}

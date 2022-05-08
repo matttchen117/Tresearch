@@ -38,7 +38,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await tagManager.AddTagToNodesAsync(nodeIDs, tagName, cancellationTokenSource.Token);
+            string result = await tagManager.AddTagToNodesAsync(nodeIDs, tagName, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
             Assert.Equal(expected, result);
@@ -59,7 +59,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await tagManager.RemoveTagFromNodesAsync(nodeIDs, tagName, cancellationTokenSource.Token);
+            string result = await tagManager.RemoveTagFromNodesAsync(nodeIDs, tagName, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
             Assert.Equal(expected, result);
@@ -80,7 +80,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            Tuple<List<string>, string> results = await tagManager.GetNodeTagsAsync(nodeIDs, cancellationTokenSource.Token);
+            Tuple<List<string>, string> results = await tagManager.GetNodeTagsAsync(nodeIDs, cancellationTokenSource.Token).ConfigureAwait(false);
             List<string> tagsResults = results.Item1;
             string result = results.Item2;
 
@@ -104,7 +104,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await tagManager.CreateTagAsync(tagName, cancellationTokenSource.Token);
+            string result = await tagManager.CreateTagAsync(tagName, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
             Assert.Equal(expected, result);
@@ -125,7 +125,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            string result = await tagManager.RemoveTagAsync(tagName, cancellationTokenSource.Token);
+            string result = await tagManager.RemoveTagAsync(tagName, cancellationTokenSource.Token).ConfigureAwait(false);
 
             //Assert
             Assert.Equal(expected, result);
@@ -146,7 +146,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Tag
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
             //Act
-            Tuple<List<ITag>, string> results = await tagManager.GetTagsAsync(cancellationTokenSource.Token);
+            Tuple<List<ITag>, string> results = await tagManager.GetTagsAsync(cancellationTokenSource.Token).ConfigureAwait(false);
             string result = results.Item2;
 
             //Assert

@@ -1,8 +1,13 @@
+import axios from "axios";
 import React from "react";
 import Tree from "react-d3-tree";
+import jwt_decode from "jwt-decode";  
 import Popup from "../../Popup/Popup";
 import TagPopup from "../../Popup/TagPopup";
+import NodePopup from "../../Popup/NodePopup";
+import CreateNodePopup from "../../Popup/CreateNodePopup";
 import "./TreeView.css";
+import RateNodePopup from "../../Popup/RateNodePopup";
 
 class TreeView extends React.Component{
     constructor(props) {
@@ -26,15 +31,17 @@ class TreeView extends React.Component{
                 x: 200,
                 y: 200
             },
-            stroke: "#344e41", 
+            color: "#344e41",
+            stroke: 'black',
             strokeWidth: "1",
             pathFunc: 'diagonal'
+
         }
 
         this.treeOnHighlight = {
-            stroke: "#ff5714",
-            strokergb : "rgb(255, 87, 20)",
-            strokeWidth: "5"
+            stroke: "#99e2b4",
+            strokergb : "rgb(153, 226, 180)",
+            strokeWidth: "6"
         }
 
         // Configuration ot tree context menu
@@ -44,16 +51,49 @@ class TreeView extends React.Component{
 
         // Initial state of tree view
         this.state = {
+            isPopupOpen: false,
+            isNodeViewOpen: false,
+            isRateViewOpen: false,
+            copiedNodes: [],
             isTaggerOpen: false,
+            isCreateNodeOpen: false,
             isPopupOpen: false,
             nodeSelect: -1,
             shiftDown: false,
             shiftCollection: [],
             isShown: false,
+            isGuest: true,
+            isOwner: false,
             x: 0,
             y: 0
         }
+
+        const token = sessionStorage.getItem('authorization');
+        
+        if(token){
+            const decoded = jwt_decode(token);
+            const tokenExpiration = decoded.tokenExpiration;
+            const now = new Date();
+
+            // Check if expired
+            if(now.getTime() > tokenExpiration * 1000){
+                localStorage.removeItem('authorization');
+                window.location.assign(window.location.origin);
+                window.location = '/';
+                
+            }
+
+            if(decoded.userHash === props.nodes.userHash){
+                this.state.isOwner = true;
+            } 
+
+            this.state.isGuest = false;
+
+        } else{
+            this.state.isGuest = true;
+        }
     }
+
 
     // Change state when shift key is pressed down
     setShiftDown = (e) => {
@@ -67,7 +107,7 @@ class TreeView extends React.Component{
         this.setState( {shiftDown: false});
     }
 
-    // When page load run 
+    // When page load run
     componentDidMount(){
         document.addEventListener('keydown', this.setShiftDown);
         document.addEventListener('keyup', this.setShiftUp);
@@ -93,19 +133,180 @@ class TreeView extends React.Component{
         }
     }
 
-    // User clicks edit 
+    unhighlight = () => {
+        var elements = document.querySelectorAll("*");
+        for (var i = 0; i < elements.length; i++){
+            elements[i].style.stroke = this.treeConfiguration.stroke;
+            elements[i].style.strokeWidth = this.treeConfiguration.strokeWidth;
+        }
+    }
+
+    //User clicks Add Child
+    CreateNode = (e) => {
+        e.stopPropagation();
+        const currentState = Array.from(new Set(this.state.nodeSelect));
+        this.setState( { nodeSelect: currentState, isCreateNodeOpen: true, isPopupOpen: true, isShown: false,  x: e.pageX, y: e.pageY})
+    }
+
+    DeleteNode = (e) => {
+        e.stopPropagation();
+        //console.log(this.state.nodeSelect[0])
+        const n = {userHash: this.state.nodeSelect[0].userHash,
+                        nodeID: this.state.nodeSelect[0].nodeID,
+                        parentNodeID: this.state.nodeSelect[0].parentNodeID,
+                        nodeTitle: "",
+                        summary: "",
+                        timeModified: "2022-05-04T21:08:21.714Z",//temp value
+                        visibility: true,
+                        deleted: false,
+                        exactMatch: false,
+                        tagScore: 0,
+                        ratingScore: 0}
+        console.log(n)
+        axios.post("https://localhost:7010/DeleteNode/deleteNode",n)
+        .then(response=> {
+            const responseData = Object.values(response.data);
+            console.log(responseData);
+            window.location.reload();
+        })
+    }
+
+    // User clicks edit
     EditTags = (e) => {
         e.stopPropagation();
         const currentState = Array.from(new Set(this.state.nodeSelect));
-        this.setState( { nodeSelect: currentState, isTaggerOpen: true, isShown: false,  x: e.pageX, y: e.pageY}) 
+        this.setState( { nodeSelect: currentState, isTaggerOpen: true, isPopupOpen: true, isShown: false,  x: e.pageX, y: e.pageY})
+        this.unhighlight();
     }
+
+    RateNodes = (e) => {
+        e.stopPropagation();
+        const currentState = Array.from(new Set(this.state.nodeSelect));
+        this.setState({nodeSelect: currentState, isRateViewOpen: true, isPopupOpen: true, isShown: false, x: e.pageX, y: e.pageY})
+        this.unhighlight();
+    }
+
+
+
+
+    handleEncoded = (e) => {
+        var parsedData = e.toString();
+        if(parsedData.includes('!')){
+            parsedData = parsedData.replaceAll('!', '%21');
+        }
+        if(parsedData.includes('#')){
+            parsedData = parsedData.replaceAll('#', '%23');
+        }
+        if(parsedData.includes('$')){
+            parsedData = parsedData.replaceAll('$', '%24');
+        }
+
+        // DO NOT DO % SHOULD NOT BE REPLACED
+
+        if(parsedData.includes('&')){
+            parsedData = parsedData.replaceAll('&', '%26');
+        }
+        if(parsedData.includes('+')){
+            parsedData = parsedData.replaceAll('+', '%2B');
+        }
+        if(parsedData.includes('[')){
+            parsedData = parsedData.replaceAll('[', '%5B')
+        }
+        if(parsedData.includes(']')){
+            parsedData = parsedData.replaceAll(']', '%5D')
+        }
+        return parsedData;
+    }
+
+
+    CopyNodes = (e) => {
+        e.stopPropagation();
+        const shiftClickedNodes = Array.from(new Set(this.state.nodeSelect));
+        console.log(shiftClickedNodes)
+        axios.post("https://localhost:7010/CopyAndPaste/Copy", shiftClickedNodes)
+        .then(response => {
+            const responseData = Object.values(response.data);
+            this.setState({copiedNodes: responseData});
+            sessionStorage.setItem("nodes", JSON.stringify(this.state.copiedNodes));
+        })
+    }
+
+
+
+    PasteNodes = (e) => {
+        e.stopPropagation();
+        const shiftClickedNodes = Array.from(new Set(this.state.nodeSelect));
+        console.log(shiftClickedNodes)
+
+        var nodes = this.handleEncoded(sessionStorage.getItem("nodes"))
+        console.log(nodes)
+
+
+        var nodes = this.handleEncoded(sessionStorage.getItem("nodes"));
+
+        axios.post("https://localhost:7010/CopyAndPaste/Paste?nodeIDToPasteTo"+this.state.nodeSelect+"?nodes"+nodes)
+        .then(response=> {
+            const responseData = Object.values(response.data);
+            this.setState({pastedNodes: responseData});
+            sessionStorage.setItem("pastednodes", JSON.stringify(this.state.pastedNodes))
+        })
+    }
+
+    PrivateNodes = (e) => {
+        e.stopPropagation();
+        const nodesToPrivate = Array.from(new Set(this.state.nodeSelect));
+        console.log(nodesToPrivate)
+        axios.post("https://localhost:7010/PrivateAndPublic/Private", nodesToPrivate)
+        .then(response => {
+            const responseDate = Object.values(response.data);
+            this.setState({privateNodes: responseDate});
+            sessionStorage.setItem("privatedNodes", this.state.privateNodes);
+        }
+        )
+    }
+
+
+    PublicNodes = (e) => {
+        e.stopPropagation();
+        const nodesToPublic = Array.from(new Set(this.state.nodeSelect));
+        console.log(nodesToPublic)
+        axios.post("https://localhost:7010/PrivateAndPublic/Public", nodesToPublic)
+        .then(response => {
+            const responseDate = Object.values(response.data);
+            this.setState({publicNodes: responseDate});
+            sessionStorage.setItem("privatedNodes", this.state.publicNodes);
+        }
+        )
+    }
+
+
+
+
 
      render() {
         const  ToggleTagger = () => {
-            
+
             this.setState({
-                isTaggerOpen: false
-            })     
+                isTaggerOpen: false,
+                isPopupOpen: false
+            })
+        }
+
+        const ToggleCreate = () => {
+            this.setState({
+                isCreateNodeOpen: false,
+                isPopupOpen: false
+            })
+        }
+
+        const ToggleRatePopup = () => {
+            this.setState( {isRateViewOpen: false, isPopupOpen: false})
+            this.unhighlight();
+        }
+
+        const ToggleNodePopup = () => {
+            this.setState({ isNodeViewOpen: false, isPopupOpen: false});
+            this.unhighlight();
         }
 
         // User left clicks a node
@@ -125,13 +326,14 @@ class TreeView extends React.Component{
                     handleHighLight(e, nodeData.nodeID);
                 }
             } else{
-                this.setState({ shiftCollection: []});
+                this.setState({ shiftCollection: [], nodeSelect: nodeData});
                 // Up to you but may want to navigate to view node
+                this.setState({ isNodeViewOpen: true, isPopupOpen: true});
             }
         }
 
         // Handle highlight of shift collection
-        const handleHighLight = (e, node) => {   
+        const handleHighLight = (e, node) => {
             var currentState = this.state.highlightCollection;
             if(e.target.style.stroke === this.treeOnHighlight.strokergb){
                 e.target.style.stroke = this.treeConfiguration.stroke;
@@ -139,7 +341,7 @@ class TreeView extends React.Component{
             } else{
                 e.target.style.stroke = this.treeOnHighlight.stroke;
                 e.target.style.strokeWidth = this.treeOnHighlight.strokeWidth;
-            }   
+            }
         }
 
         // Right click node, open context menu
@@ -151,56 +353,79 @@ class TreeView extends React.Component{
         // Clear shift collection
         const resetShiftCollection = (e) => {
             this.setState( { isShown: false, x: e.pageX, y: e.pageYm, nodeSelect: [], shiftCollection: []})
+            this.unhighlight();
         }
 
         // Render individual nodes
         const renderNodeWithCustomEvents = ({
             nodeDatum
         }) => (
-            
-            <g data-item = {nodeDatum.nodeID} id = {nodeDatum.nodeID}>          
-                <circle fill = {this.treeConfiguration.stroke} stroke = "black" strokeWidth = "1" r = "20" onClick = {(e) => leftClickNode(e, nodeDatum) }  data-item = {nodeDatum.nodeID} onContextMenu = {(e) => rightClickNode(e, nodeDatum) }/>
-                <text fill = "black" x = "20" dy = "20" data-item = {nodeDatum.nodeID}> 
+            <g data-item = {nodeDatum.nodeID} id = {nodeDatum.nodeID}>
+                <circle className = "circle" fill= {nodeDatum.visibility ? "#344e41 ": "gray"} stroke = "black" strokeWidth = "1" r = "20" onClick = {(e) => leftClickNode(e, nodeDatum) }  data-item = {nodeDatum.nodeID} onContextMenu = {(e) => rightClickNode(e, nodeDatum) }/>
+                <text fill = "black" x = "20" dy = "20" data-item = {nodeDatum.nodeID}>
                     {nodeDatum.nodeTitle}
-                </text>       
+                </text>
             </g>
         );
 
         // Render user's tree
         const renderTree = (
             <div className = "tree-portal-container">
-                <div className= {`${this.state.isTaggerOpen ? "taggerOpen" : "base"}`} onClick = {resetShiftCollection} >
+                <div className= {`${this.state.isPopupOpen ? "taggerOpen" : "base"}`} onClick = {resetShiftCollection} >
                     {this.treeData.length != 0 ? (
-                        <Tree 
-                        data = {this.treeData} 
+                        <Tree
+                        data = {this.treeData}
                         orientation = {this.treeConfiguration.orientation}
-                        collapsible = {this.treeConfiguration.collapsible} 
+                        collapsible = {this.treeConfiguration.collapsible}
                         translate = {this.treeConfiguration.translate}
                         renderCustomNodeElement = {(nodeInfo) => renderNodeWithCustomEvents({...nodeInfo})}
                         nodeSize = {this.treeConfiguration.nodeSize}
                         pathFunc = {this.treeConfiguration.pathFunc}
                        />
                     ): null}
-                    {this.state.isShown && (
+                    {this.state.isShown && this.state.isOwner && (
                         <div style={{ top: this.state.y, left: this.state.x}}  className="tag-context-menu" >
-                            <div className="option" >
+                            <div className="option" onClick = {this.CreateNode}>
                                 Add Child
                             </div>
-                            <div className="option" >
+                            <div className="option">
                                 Edit Node
                             </div>
                             <div className="option" onClick = {this.EditTags}>
                                 Edit Tags
                             </div>
-                            <div className="option">
+                            
+                            <div className="option" onClick = {this.CopyNodes}>
+                                Copy Node(s)
+                            </div>
+                            <div className="option" onClick = {this.PasteNodes}>
+                                Paste Node(s)
+                            </div>
+                            <div className="option" onClick = {this.PrivateNodes}>
+                                Privatize Node(s)
+                            </div>
+                            <div className="option" onClick = {this.PublicNodes}>
+                                Publicize Node(s)
+                            </div>
+                            <div className="option" onClick = {this.DeleteNode}>
                                 Delete Node(s)
+                            </div>
+                        </div>
+                    )}
+                    {this.state.isShown && !this.state.isOwner && this.state.isGuest == false &&  (
+                        <div style={{top: this.state.y, left: this.state.x}} className="nonowner-context-menu">
+                            <div className="option" onClick={this.CopyNodes}>
+                                Copy Nodes
+                            </div>
+                            <div className="option" onClick={this.RateNodes}>
+                                Rate Nodes
                             </div>
                         </div>
                     )}
                 </div>
             </div>
         );
-                         
+
         return (
             <div className="tree-portal-wrapper">
                 <div className = "tree-wrapper">
@@ -208,6 +433,13 @@ class TreeView extends React.Component{
                 </div>
                 <div className = "tree-tagger-wrapper">
                     {this.state.isTaggerOpen ? <Popup content = {<TagPopup onClick = {ToggleTagger} nodes = {this.state.nodeSelect}/>}/> : null}
+                    {this.state.isCreateNodeOpen ? <Popup content = {<CreateNodePopup onClick = {ToggleCreate} node = {this.state.nodeSelect}/>}/> : null}
+                </div>
+                <div className = "node-popup-wrapper">
+                    {this.state.isNodeViewOpen ? <Popup content = {<NodePopup onClick={ToggleNodePopup} node = {this.state.nodeSelect}/>}/> : null }
+                </div>
+                <div className = "node-rate-wrapper">
+                    {this.state.isRateViewOpen ? <Popup content = {<RateNodePopup onClick= {ToggleRatePopup} nodes = {this.state.nodeSelect} />} /> : null }
                 </div>
             </div>
         );

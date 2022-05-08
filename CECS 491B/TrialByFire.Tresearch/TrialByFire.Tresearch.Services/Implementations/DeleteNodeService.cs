@@ -30,22 +30,18 @@ namespace TrialByFire.Tresearch.Services.Implementations
             _messageBank = messageBank;
         }
 
-        public async Task<string> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default)
+        public async Task<IResponse<string>> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            string deleteResult;
             try
             {
-                deleteResult = await _sqlDAO.DeleteNodeAsync(nodeID, parentID, cancellationToken).ConfigureAwait(false);
-                return deleteResult;
-            }
-            catch(OperationCanceledException ece)
-            {
-                throw;
+                cancellationToken.ThrowIfCancellationRequested();
+                IResponse<string> response = await _sqlDAO.DeleteNodeAsync(nodeID, parentID, cancellationToken).ConfigureAwait(false);
+                return response;
             }
             catch(Exception ex)
             {
-                return ("500: Server: " + ex.Message);
+                return new DeleteNodeResponse<string>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 400, false);
             }
         }
     }

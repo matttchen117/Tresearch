@@ -110,6 +110,16 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.nodeSummaryLengthExceeded:
                     return "400: Server: Node summary length exceeded max.";
 
+                case Responses.noNodeInput:
+                    return "400: Data: No Node input provided.";
+
+                case Responses.editParentSuccess:
+                    return "200: Server: Edit Node Parent success";
+                case Responses.noEditParentNodeInput:
+                    return "400: Data: No NodeID's provided to edit";
+                case Responses.noTargetParent:
+                    return "500: Database: The Node targeted for Parent assignment does not exist";
+
                 case Responses.tagAddSuccess:
                     return "200: Server: Tag added to node(s).";
                 case Responses.tagRemoveSuccess:
@@ -121,16 +131,15 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.tagGetSuccess:
                     return "200: Server: Tag(s) retrieved.";
                 case Responses.tagNotFound:
-                    return "404: Database: Tag not found.";
+                    return "404: Data: Tag not found.";
                 case Responses.tagDuplicate:
-                    return "409: Database: The tag already exists.";
+                    return "409: Data: The tag already exists.";
                 case Responses.tagRetrievalFail:
                     return "502: Server: Unable to get tag data.";
                 case Responses.tagCountInvalid:
-                    return "422: Server: Invalid tag count.";
+                    return "422: Data: Invalid tag count.";
                 case Responses.tagNameInvalid:
-                    return "422: Server: Invalid tag name.";
-
+                    return "422: Data: Invalid tag name.";
 
                 case Responses.userRateSuccess:
                     return "200: Server: User rating added.";
@@ -140,6 +149,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "502: Server: Unable rate node.";
                 case Responses.getRateFail:
                     return "502: Server: Unable to get rating data.";
+                case Responses.invalidRating:
+                    return "422: Servre: Invalid rating.";
+
 
 
                 case Responses.createNodeSuccess:
@@ -198,9 +210,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "404: Database: UserAccount not found or not authorized to perform the " +
                 "operation.";
                 case Responses.nodeNotFound:
-                    return "504: Database: The node was not found.";
+                    return "404: Data: The node was not found.";
                 case Responses.tagDoesNotExist:
-                    return "404: Database: Tag not found.";
+                    return "404: Data: Tag not found.";
                 case Responses.recoveryLinkNotFound:
                     return "404: Database: The recovery link was not found";
                 case Responses.cancellationRequested:
@@ -292,6 +304,48 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.verificationFailure:
                     return "401: Server: Failure to authenticate and verify user for deletion.";
 
+
+                case Responses.copyNodeSuccess:
+                    return "200: Server: Copy Node Successful";
+                case Responses.copyNodeFailure:
+                    return "401: Server: Copy Node failure";
+                case Responses.copyNodeError:
+                    return "503: Database: Copy Node ERROR";
+                case Responses.copyNodeEmptyError:
+                    return "400: Server: No nodes to copy failure";
+                case Responses.copyNodeMistmatchError:
+                    return "503: Database: Mismatched amount of nodes returned";
+
+
+                case Responses.isLeaf:
+                    return "200: Server: Is a leaf";
+                case Responses.isNotLeaf:
+                    return "400: Server: Not a leaf";
+
+
+                case Responses.pasteNodeSuccess:
+                    return "200: Server: Paste Node successful";
+                case Responses.pasteNodeFailure:
+                    return "401: Server: Paste Node failure";
+                case Responses.pasteNodeError:
+                    return "503: Database: Paste Node ERROR";
+                case Responses.pasteNodeEmptyError:
+                    return "400: Server: No nodes to paste failure";
+                case Responses.pasteNodeMistmatchError:
+                    return "503: Database: Mismatched amount of nodes pasted";
+                case Responses.notAuthorizedToPasteTo:
+                    return "400: Server: Cannot paste to another user's tree";
+
+
+                case Responses.privateNodeSuccess:
+                    return "200: Server: Private Node Success";
+                case Responses.privateNodeFailure:
+                    return "400: Server: Private Node Failure";
+
+                case Responses.publicNodeSuccess:
+                    return "200: Server: Public Node Success";
+                case Responses.publicNodeFailure:
+                    return "400: Server: Private Node Failure";
 
 
                 default:

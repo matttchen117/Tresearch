@@ -1,5 +1,7 @@
 ﻿using Dapper;
+using System.Linq;
 using Microsoft.Extensions.Options;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using TrialByFire.Tresearch.DAL.Contracts;
@@ -7,6 +9,7 @@ using TrialByFire.Tresearch.Exceptions;
 using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
+using System.Text;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
@@ -117,6 +120,52 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
             }
         }
+
+        public async Task<IResponse<string>> EditParentNodeAsync(long nodeID, string nodeIDs, CancellationToken cancellationToken = default)
+        {
+            if(nodeIDs != null)
+            {
+                try
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    using(var connection = new SqlConnection(_options.SqlConnectionString))
+                    {
+                        var procedure = "[EditParents]";
+                        var parameters = new
+                        {
+                            NodeID = nodeID,
+                            NodeIDs = nodeIDs
+                        };
+                        var result = await connection.QueryAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                        return new EditParentResponse<string>("", 
+                            await _messageBank.GetMessage(IMessageBank.Responses.editParentSuccess).ConfigureAwait(false), 200, true);
+                    }
+                }
+                catch(SqlException ex)
+                {
+                    switch (ex.Number)
+                    {
+                        // Unable to connect to database
+                        case -1:
+                            return new EditParentResponse<string>(await _messageBank.GetMessage(
+                                IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false), null, 400, false);
+                        default:
+                            return new EditParentResponse<string>("500: Database: " + ex.Message, null, 400, false);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    return new EditParentResponse<string>(await _messageBank.GetMessage(
+                        IMessageBank.Responses.unhandledException).ConfigureAwait(false), null, 400, false);
+                }
+            }
+            else
+            {
+                return new EditParentResponse<string>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.noEditParentNodeInput).ConfigureAwait(false), null, 400, false);
+            }
+        }
+
         public async Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -1080,12 +1129,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public async Task<string> DeleteAccountAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             int affectedRows;
-            if (Thread.CurrentPrincipal.Equals(null))
-            {
-                return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
-            }
-            string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
-            string userName = Thread.CurrentPrincipal.Identity.Name;
+
+
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();                                                      
@@ -1094,6 +1139,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
                 }
+
+                string userAuthLevel = Thread.CurrentPrincipal.IsInRole("admin") ? "admin" : "user";
+                string userName = Thread.CurrentPrincipal.Identity.Name;
+
+
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var parameters = new { Username = userName, AuthorizationLevel = userAuthLevel };
@@ -1873,71 +1923,61 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             try
             {
-                //Throw Cancellation Exception if token requests cancellation
+                // Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Check if tag is null or empty
                 if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
-
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                }
                 // Check if node list is null or empty
                 if (nodeIDs == null || nodeIDs.Count() <= 0)
-                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound);
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+                }
 
                 // Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    //Open connection
+                    // Open connection
                     await connection.OpenAsync();
-                    //Iterate through each tag and add tag to each node
+                    // Iterate through each node and add tag
                     foreach(var nodeId in nodeIDs)
                     {
-                        //Set up command
+                        // Set up command
                         var procedure = "dbo.[AddTagToNode]";
                         var parameters = new
                         {
                             NodeID = nodeId,
                             TagName = tagName
                         };
-                        //Execute command
+                        // Execute command
                         var executed = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                        
-                    }
-                    //Check if cancellation token requests cancellation
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        //Perform rollback
-                        string rollbackResult = await RemoveTagAsync(nodeIDs, tagName);
-                        //Check if rollback was successful
-                        if (rollbackResult.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess)))
-                            return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
-                        else
-                            return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
                     }
 
-                    //Tag has been added, return success
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess);
+                    // Tag(s) has been added, return success
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess).ConfigureAwait(false);
                 }
             }
             catch (SqlException ex)
             {
-                //Check sql exception
+                // Check sql exception
                 switch (ex.Number)
                 {
-                    //Unable to connect to database
+                    // Unable to connect to database
                     case -1:
-                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
-                    //Adding tag to node violates foreign key constraint (AKA tag doesn't exist in bank)
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false);
+                    // Adding tag to node violates foreign key constraint (AKA tag doesn't exist in bank)
                     case 547:   
-                        return _messageBank.GetMessage(IMessageBank.Responses.tagNotFound).Result;
+                        return await _messageBank.GetMessage(IMessageBank.Responses.tagNotFound).ConfigureAwait(false);
                     default: 
                         return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
                 }
             }
             catch (OperationCanceledException)
             {
-                // Rollback already handled
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -1956,47 +1996,41 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             try
             {
-                //Throw Cancellation Exception if token requests cancellation
+                // Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Check if tag name is null, empty string or all space
                 if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
+                {
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                }
+                    
                 // Check if node list is null or empty
                 if (nodeIDs == null || nodeIDs.Count() <= 0)
+                {
                     return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+                }
 
-                //Establish connection to database
+                // Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    //Open connection to database
+                    // Open connection to database
                     await connection.OpenAsync();
-                    //Iterate through each tag and remoe tag from node
+                    // Iterate through each tag and remoe tag from node
                     foreach (var nodeId in nodeIDs)
                     {
-                        //Set up command
+                        // Set up command
                         var procedure = "dbo.[RemoveTagFromNode]";
                         var value = new
                         {
                             NodeID = nodeId,
                             TagName = tagName
                         };
-                        //Execute command
+                        // Execute command
                         var execute = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     }
 
-                    //Check if cancellation token requests cancellation
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        //Perform rollback
-                        string rollbackResult = await AddTagAsync(nodeIDs, tagName);
-                        //Check if rollback was successful
-                        if (rollbackResult.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagAddSuccess)))
-                            return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
-                        else
-                            return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
-                    }
-                    //Tag has been removed, return success message
+                    // Tag has been removed, return success message
                     return await _messageBank.GetMessage(IMessageBank.Responses.tagRemoveSuccess);
                 }
             }
@@ -2004,7 +2038,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 switch (ex.Number)
                 {
-                    //Unable to connect to database
                     case -1:
                         return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
                     default: 
@@ -2013,7 +2046,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (OperationCanceledException)
             {
-                // Rollback handled
                 return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
             }
             catch (Exception ex)
@@ -2033,48 +2065,53 @@ namespace TrialByFire.Tresearch.DAL.Implementations
            
             try
             {
-                //Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
                 
                 // Check if node list is null or empty
                 if (nodeIDs == null || nodeIDs.Count() <= 0)
+                {
                     return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false));
+                }
+                    
 
-                //Establish connection to database
+                // Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    //Open connection to database
+                    // Open connection to database
                     await connection.OpenAsync();
                     
                     List<string> tags = new List<string>();         //List of tags that all node(s) share in common
                     
-                    //Iterate through each node to get list of tags for each node then intersec
+                    // Iterate through each node to get list of tags for each node then intersect
                     foreach (var nodeId in nodeIDs)
                     {
-                        //Set up command
+                        // Set up command
                         var procedure = "dbo.[GetNodeTags]";
                         var value = new
                         {
                             NodeID = nodeId
                         };
-                        //Execute command: Get tags for current node
-                        List<string> results = new List<string>(await connection.QueryAsync<string>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
-                        //Checks if node did not exist
+                        // Execute command: Get tags for current node
+                        List<string> results = new List<string>(await connection.QueryAsync<string>
+                                (new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+                        
+                        // Checks if node did not exist
                         if (results.Contains("-1 invalid"))
+                        {
                             return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound));
-                        //Checks if first node in list
+                        }
+
+                        // Checks if first node in list
                         if (nodeId == nodeIDs.First())
                         {
-                            //set first tag list as base list
+                            // Set first tag list as base list
                             tags = results;
                         }
-                        //Get tags that are shared between all nodes
-                        tags = tags.Intersect(results).ToList();
-                    }
-                    //Tags have been retrieved, return success message
 
-                    if(cancellationToken.IsCancellationRequested)
-                        return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+                        // Get tags that are shared between all nodes
+                        tags = tags.Intersect(results).ToList();
+                    } 
+                    // Tags have been retrieved, return success message
 
                     return Tuple.Create(tags, await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess));
                 }
@@ -2083,7 +2120,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             {
                 switch (ex.Number)
                 {
-                    //Unable to connect to database
+                    // Unable to connect to database
                     case -1:
                         return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail));
                     default: 
@@ -2092,7 +2129,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (OperationCanceledException)
             {
-                // Rollback handled
                 return Tuple.Create(new List<string>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
             }
             catch (Exception ex)
@@ -2112,18 +2148,20 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         {
             try
             {
-                // Throw if cancellation is requested
                 cancellationToken.ThrowIfCancellationRequested();
 
                 //Check tag input
                 if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                }
 
                 // Check tag count
                 if (count < 0)
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid);
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCountInvalid).ConfigureAwait(false);
+                }     
                 
-
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     await connection.OpenAsync();
@@ -2135,22 +2173,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         TagName = tagName,
                         TagCount = count
                     };
+
                     //Execute statement
                     var execute = await connection.ExecuteAsync(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
-                    //Check if cancellationToken requests cancellation
-                    if(cancellationToken.IsCancellationRequested)
-                    {
-                        //Rollback
-                        string resultRollback = await DeleteTagAsync(tagName);
-                        //Check if rollback successfull
-                        if (resultRollback.Equals(await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess)))
-                            return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
-                        else
-                            return await _messageBank.GetMessage(IMessageBank.Responses.rollbackFailed);
-                    }
                     //Tag created, return success
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagCreateSuccess).ConfigureAwait(false);
                 }
             }
             catch (SqlException ex)
@@ -2159,10 +2187,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //Unable to connect to database
                     case -1:
-                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false);
                     //Adding tag violates primary key constraint (AKA tag already exists in database)
                     case 2627: 
-                        return await _messageBank.GetMessage(IMessageBank.Responses.tagDuplicate);
+                        return await _messageBank.GetMessage(IMessageBank.Responses.tagDuplicate).ConfigureAwait(false);
                     default: 
                         return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
                 }
@@ -2170,7 +2198,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             catch (OperationCanceledException)
             {
                 // Rollback handled
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -2185,7 +2213,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         /// <param name="tagName">String tag to delete from bank</param>
         /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns>String status result</returns>
-        public async Task<string> DeleteTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> RemoveTagAsync(string tagName, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -2194,7 +2222,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                 // Check input
                 if (tagName == null || tagName.Equals("") || tagName.Trim().Equals(""))
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid);
+                {
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagNameInvalid).ConfigureAwait(false);
+                }
+                    
 
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
@@ -2209,7 +2240,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Execute command, returns count of tags
                     int count = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     //Tag deleted, return success
-                    return await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.tagDeleteSuccess).ConfigureAwait(false);
                 }
             }
             catch (SqlException ex)
@@ -2218,7 +2249,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //Unable to connect to database
                     case -1:
-                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
+                        return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false);
                     default: 
                         return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
                 }
@@ -2226,7 +2257,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             catch (OperationCanceledException)
             {
                 // Rollback handled
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -2257,7 +2288,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Execute statement
                     List<ITag> results = new List<ITag>(await connection.QueryAsync<Tag>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
                     //tags retrieved, return success
-                    return Tuple.Create(results, await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess));
+                    return Tuple.Create(results, await _messageBank.GetMessage(IMessageBank.Responses.tagGetSuccess).ConfigureAwait(false));
                 }
             }
             catch (SqlException ex)
@@ -2266,7 +2297,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 {
                     //Unable to connect to database
                     case -1:
-                        return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail));
+                        return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false));
                     default: 
                         return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message);
                 }
@@ -2274,7 +2305,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             catch (OperationCanceledException)
             {
                 // Rollback handled
-                return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
+                return Tuple.Create(new List<ITag>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false));
             }
             catch (Exception ex)
             {
@@ -2282,6 +2313,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+        /// <summary>
+        ///     Checks if a user is authorized to make changes to a list of node(s).
+        /// </summary>
+        /// <param name="nodeIDs">List of node ids</param>
+        /// <param name="userHash">Accounts User Hash</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns></returns>
         public async Task<string> IsAuthorizedToMakeNodeChangesAsync(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -2289,6 +2327,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 cancellationToken.ThrowIfCancellationRequested();
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
+                    // Iterate through each node and check
                     foreach (var nodeId in nodeIDs)
                     {
                         var procedure = "dbo.[IsAuthorizedNodeChanges]";
@@ -2300,14 +2339,14 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         var isAuthorized = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, value, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                         if (isAuthorized == 0)
-                            return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized);
+                            return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
                     }
-                    return await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess);
+                    return await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false);
                 }
             }
             catch(OperationCanceledException)
             {
-                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested);
+                return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
             }
             catch(Exception ex)
             {
@@ -2315,72 +2354,63 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> CreateNodeAsync(INode node, CancellationToken cancellationToken = default)
+        public async Task<IResponse<string>> CreateNodeAsync(INode node, CancellationToken cancellationToken = default)
         {
             try
             {
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
-                    //node.accountOwner = "27a285fe87f1d0afb44f2310824f49bbf1aaea02b856d314412119142ecfbb46ece7dcadc6c516c4d3918532df9375bd9f377e395143f0a29aed88654bff1c95";
                     var procedure = "dbo.[CreateNode]";
                     var values = new
                     {
                         UserHash = node.UserHash,
-                        NodeParentID = node.ParentNodeID,
+                        ParentNodeID = node.ParentNodeID,
                         NodeTitle = node.NodeTitle,
                         Summary = node.Summary,
                         TimeModified = node.TimeModified,
                         Visibility = node.Visibility,
-                        Deleted = false,
+                        //Deleted = false,
                     };
                     int affectedRows = await connection.ExecuteAsync(new CommandDefinition(procedure, values, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
 
                     if(affectedRows == 1)
                     {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.createNodeSuccess).ConfigureAwait(false);
+                        return new CreateNodeResponse<string>("", await _messageBank.GetMessage(IMessageBank.Responses.createNodeSuccess).ConfigureAwait(false), 200, true);
                     }
                     else
                     {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.createNodeFail).ConfigureAwait(false);
+                        return new CreateNodeResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.createNodeFail).ConfigureAwait(false), null, 500, false);
                     }
                 }
             }
-            catch(OperationCanceledException)
-            {
-                return _messageBank.ErrorMessages["cancellationRequested"];
-            }
             catch(Exception ex)
             {
-                return "500: Database: " + ex.Message;
+                return new CreateNodeResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
             }
         }
 
-        public async Task<string> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default)
+        public async Task<IResponse<string>> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default)
         {
             try
             {
                 int affectedRows;
                 cancellationToken.ThrowIfCancellationRequested();
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
-                }
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var procedure = "dbo.[DeleteNode]";
                     var parameters = new
                     {
                         NodeID = nodeID,
-                        NodeParentID = parentID
+                        ParentNodeID = parentID
                     };
                     affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
                     if (affectedRows == 0)
                     {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.deleteNodeSuccess).ConfigureAwait(false);
+                        return new DeleteNodeResponse<string>("", await _messageBank.GetMessage(IMessageBank.Responses.deleteNodeSuccess).ConfigureAwait(false), 200, true);
                     }
                     else
                     {
-                        return await _messageBank.GetMessage(IMessageBank.Responses.deleteNodeFail).ConfigureAwait(false);
+                        return new DeleteNodeResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.deleteNodeFail).ConfigureAwait(false), null, 500, false);
                     }
                 }
             }
@@ -2390,7 +2420,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch(Exception ex)
             {
-                return ("500: Database: " + ex.Message);
+                return new DeleteNodeResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
             }
         }
 
@@ -2579,34 +2609,224 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> RateNodeAsync(string userHash, long nodeID, int rating, CancellationToken cancellationToken)
+        public async Task<IResponse<int>> RateNodeAsync(List<long> nodeIDs, int rating, string userHash, CancellationToken cancellationToken)
         {
             try
             {
                 //Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if node list is null or empty
+                if (nodeIDs == null || nodeIDs.Count.Equals(0))
+                {
+                    return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound), rating, 404, false);
+                }
+
+                if (rating <= 0)
+                    return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.invalidRating), rating, 422, false);
+
+                StringBuilder nodeCSV = new StringBuilder();
+
+                // Create Comma Seperated Values
+                foreach (long node in nodeIDs)
+                {
+                    nodeCSV.Append(node + ",");
+                }
+
                 // Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     //Open connection
                     await connection.OpenAsync();
-                    var procedure = "dbo.[RateNode]";
+                    var procedure = "dbo.[RateNodes]";
                     var parameters = new
                     {
-                        UserHash = userHash,
-                        NodeID = nodeID,
-                        Rating = rating
+                        @UserHash = userHash,
+                        @InNodes = nodeCSV.ToString(),
+                        @Rating = rating
                     };
                     //Execute command
                     var executed = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    //Check if cancellation token requests cancellation
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        //Perform rollback
-                        
-                    }
+                    return new RateResponse<int>("", rating, 200, true);
+                }
+            }
+            catch (SqlException ex)
+            {
+                //Check sql exception
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail), rating, 503, false);
+                    case 547:   //Adding rating violates foreign key constraint (AKA NO ACCOUNT)
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound), rating, 500, false);
+                    default:
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), rating, 500, false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback already handled
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), rating, 408, false);
+            }
+            catch (Exception ex)
+            {
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), rating, 500, false);
+            }
+        }
+
+        /// <summary>
+        ///     Returns a list of nodes containing IDs and rating of node
+        /// </summary>
+        /// <param name="nodeIDs">List of Node IDs</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns></returns>
+        public async Task<IResponse<IEnumerable<Node>>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if node list is null or empty
+                if(nodeIDs == null || nodeIDs.Count.Equals(0))
+                {
+                    return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound), new List<Node>(), 404, false);
+                }
+
+                StringBuilder nodeCSV = new StringBuilder();
+
+                // Create Comma Seperated Values
+                foreach(long node in nodeIDs)
+                {
+                    nodeCSV.Append(node + ",");
+                }
+
+                // Establish connection to database
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    // Open connection
+                    await connection.OpenAsync();
+                    var procedure = "dbo.[GetNodesRatings]";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("InNodes", nodeCSV.ToString());
+
+                    var result = await connection.QueryAsync<Node>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken));
+
+                    List<Node> nodeResult = new List<Node>(result.ToList());
+
+                    // Tag has been added, return success
+                    return new RateResponse<IEnumerable<Node>>("", nodeResult , 200, true);
+                }
+            }
+            catch (SqlException ex)
+            {
+                // Check sql exception
+                switch (ex.Number)
+                {
+                    // Unable to connect to database
+                    case -1:
+                        return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail), new List<Node>(), 503, false);
+                    default:
+                        return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, new List<Node>(), 500, false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // bubble up
+                return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), new List<Node>(), 408, false);
+            }
+            catch (Exception ex)
+            {
+                return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, new List<Node>(), 500, false);
+            }
+        }
+
+        public async Task<IResponse<int>> GetUserNodeRatingAsync(long nodeID, string userHash, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                //Throw Cancellation Exception if token requests cancellation
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (nodeID < 0)
+                    return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound), 0, 404, false);
+
+                // Establish connection to database
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Open connection
+                    await connection.OpenAsync();
+                    var procedure = "dbo.[GetUserNodeRating]";
+                    var parameters = new { @NodeID = nodeID, @UserHash = userHash };
+
+                    int result = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
                     //Tag has been added, return success
-                    return await _messageBank.GetMessage(IMessageBank.Responses.userRateSuccess);
+                    return new RateResponse<int>("", result, 200, true);
+                }
+            }
+            catch (SqlException ex)
+            {
+                //Check sql exception
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail), 0, 503, false);
+                    default:
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, 0, 500, false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback already handled
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), 0, 408, false);
+            }
+            catch (Exception ex)
+            {
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, 0, 500, false);
+            }
+        }
+
+        public async Task<string> VerifyAuthorizedToView(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                //Throw Cancellation Exception if token requests cancellation
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (nodeIDs == null || nodeIDs.Count <= 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+
+                string nodeCSV = "";
+
+                // Create Comma Seperated Values
+                if(nodeIDs.Count > 1)
+                {
+                    foreach (long node in nodeIDs)
+                    {
+                        nodeCSV += node + ",";
+                    }
+                }
+                else
+                {
+                    nodeCSV  += nodeIDs[0];
+                }
+
+                // Establish connection to database
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Open connection
+                    await connection.OpenAsync();
+                    var procedure = "dbo.[VerifyAuthorizedToView]";
+                    var parameters = new { InNodes = nodeCSV, UserHash = userHash};
+
+                    var result = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    if (result == 0)
+                        return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
+
+                    return await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false);
                 }
             }
             catch (SqlException ex)
@@ -2617,10 +2837,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Unable to connect to database
                     case -1:
                         return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
-                    case 547:   //Adding rating violates foreign key constraint (AKA NO ACCOUNT)
-                        return _messageBank.GetMessage(IMessageBank.Responses.userRateFail).Result;
                     default:
-                        return  _options.UnhandledExceptionMessage + ex.Message;
+                        return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message;
                 }
             }
             catch (OperationCanceledException)
@@ -2630,59 +2848,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
-            }
-        }
-
-        public async Task<Tuple<List<double>, string>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            try
-            {
-                //Throw Cancellation Exception if token requests cancellation
-                cancellationToken.ThrowIfCancellationRequested();
-                // Establish connection to database
-                using (var connection = new SqlConnection(_options.SqlConnectionString))
-                {
-                    //Open connection
-                    await connection.OpenAsync();
-                    List<double> ratings = new List<double>();
-                    foreach (var nodeId in nodeIDs)
-                    {
-                        var procedure = "dbo.[GetNodeRating]";
-                        var parameters = new { NodeID = nodeId };
-
-                        var result = await connection.ExecuteScalarAsync<double>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                        
-                        ratings.Add(result);
-                    }
-                    
-                    //Execute command
-                    
-
-                    //Tag has been added, return success
-                    return Tuple.Create(ratings, await _messageBank.GetMessage(IMessageBank.Responses.getRateSuccess));
-                }
-            }
-            catch (SqlException ex)
-            {
-                //Check sql exception
-                switch (ex.Number)
-                {
-                    //Unable to connect to database
-                    case -1:
-                        return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail));
-                    default:
-                        return Tuple.Create(new List<double>(), _options.UnhandledExceptionMessage + ex.Message);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                // Rollback already handled
-                return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
-            }
-            catch (Exception ex)
-            {
-                return Tuple.Create(new List<double>(), _options.UnhandledExceptionMessage + ex.Message);
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message;
             }
         }
 
@@ -2746,5 +2912,383 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
+
+
+
+        /// <summary>
+        ///     CopyNodeAsync method 
+        /// </summary>
+        /// <param name="nodesCopy"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<IResponse<IEnumerable<Node>>> CopyNodeAsync(List<long> nodesCopy, CancellationToken cancellationToken = default(CancellationToken))
+
+        {
+            if(nodesCopy != null)
+            {
+                try
+                {
+                    
+                    cancellationToken.ThrowIfCancellationRequested();
+                    using (var connection = new SqlConnection(_options.SqlConnectionString))
+                    {
+
+                        //dont use datatable for one column
+                        //creating a DataTable to pass into the query as a table valued parameter
+                        var workTable = new DataTable();
+                        DataColumn workCol = workTable.Columns.Add("NodeIDsColumn", typeof(long));
+                        workCol.AllowDBNull = false;
+                        workCol.Unique = true;
+
+                        //adding rows of nodeIDs to the DataTable
+                        foreach (var n in nodesCopy)
+                        {
+                            var row = workTable.NewRow();
+                            row[0] = n;
+                            workTable.Rows.Add(row);
+                        }
+
+                        await connection.OpenAsync();
+
+                        var procedure = "dbo.[GetNodesFromNodeID]";
+
+
+                        // Calling stored procedure to get list of nodes from the azure database
+                        List<Node> nodes = new List<Node>(await connection.QueryAsync<Node>(new CommandDefinition(procedure, new { NodeIDs = workTable.AsTableValuedParameter("dbo.NodeIDList") },
+                        commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+
+
+                        // Checking if got correct amount of nodes back from query
+                        if (!nodes.Count.Equals(nodesCopy.Count))
+                        {
+                            return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeMistmatchError).ConfigureAwait(false), null, 400, false);
+                        }
+
+                        return new CopyResponse<IEnumerable<Node>>("", nodes, 200, true);
+
+                    }
+                }
+
+
+                catch (SqlException ex)
+                {
+                    //Check sql exception
+                    switch (ex.Number)
+                    {
+                        //Unable to connect to database
+                        case -1:
+                            return new CopyResponse<IEnumerable<Node>>( await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false), null, 400, false);
+                        default:
+                            return new CopyResponse<IEnumerable<Node>>(_options.UnhandledExceptionMessage + ex.Message, null, 400, false);
+                    }
+                }
+                //let bubble up one layer, dont catch here
+                catch (OperationCanceledException)
+                {
+                    //return code for operationCancelled is 500
+                    return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
+
+                }
+                catch (Exception ex)
+                {
+                    //return code for unhandledException is 500
+                    return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+
+                }
+            }
+
+            else
+            {
+                return new CopyResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false), null, 400, false);
+            }
+
+
+        }
+
+
+        //only need paste, copy kind of redundant
+        //document based db, represents data better
+        //openXML, XML rowset, send data as xml format, or csv format, it can load data into temp memtable, and do ops there,
+        //turn list<inode> into csv and load it into db, extensible longterm, csv can be loaded into any db, 
+        //DOING DESIGN, see if changing state or storing state then backend really needed, retriveing state, then backend just to read,
+        //think of document, doing actiosn in dcoument, ex closing document without saving: data lost, vs typing no need to involve backend
+
+
+
+        public async Task<IResponse<string>> PasteNodeAsync(string userHash, long nodeIDPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+
+
+                    var procedure = "dbo.[PasteNodes]";
+
+                    var workTable = new DataTable();
+                    DataColumn workCol = workTable.Columns.Add("UserHashColumn", typeof(string));
+                    workTable.Columns.Add("NodeIDColumn", typeof(long));
+                    workTable.Columns.Add("ParentNodeIDColumn", typeof(int));
+                    workTable.Columns.Add("NodeTitleColumn", typeof(string));
+                    workTable.Columns.Add("SummaryColumn", typeof(string));
+                    workTable.Columns.Add("TimeModifiedColumn", typeof(DateTime));
+                    workTable.Columns.Add("VisibilityColumn", typeof(int));
+                    workTable.Columns.Add("DeletedColumn", typeof(int));
+                    workCol.AllowDBNull = false;
+                    workCol.Unique = true;
+
+                    foreach (var n in nodes)
+                    {
+                        var row = workTable.NewRow();
+                        row[0] = n.UserHash;
+                        row[1] = n.NodeID;
+                        row[2] = n.ParentNodeID;
+                        row[3] = n.NodeTitle;
+                        row[4] = n.Summary;
+                        row[5] = n.TimeModified;
+                        row[6] = n.Visibility;
+                        row[7] = n.Deleted;
+                        workTable.Rows.Add(row);
+                    }
+
+                    await connection.OpenAsync();
+
+
+                    int affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, new { NodesPaste = workTable.AsTableValuedParameter("dbo.NodesToPaste") }, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    if (affectedRows.Equals(0))
+                    {
+                        return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.pasteNodeEmptyError).ConfigureAwait(false), null, 400, false);
+                    }
+                    else if (!affectedRows.Equals(nodes.Count))
+                    {
+                        return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.pasteNodeMistmatchError).ConfigureAwait(false), null, 400, false);
+                    }
+
+                    return new PasteResponse<string>("", await _messageBank.GetMessage(IMessageBank.Responses.pasteNodeSuccess).ConfigureAwait(false), 200, true);
+
+                }
+            }
+
+            catch (SqlException ex)
+            {
+                //Check sql exception
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false), null, 400, false);
+                    default:
+                        return new PasteResponse<string>(_options.UnhandledExceptionMessage + ex.Message, null, 400, false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                //return code for operationCancelled is 500
+                return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
+
+            }
+            catch (Exception ex)
+            {
+                //return code for unhandledException is 500
+                return new PasteResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+
+            }
+        }
+
+
+
+        public async Task<string> IsNodeLeaf(long nodeIDToPasteTo, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (!nodeIDToPasteTo.Equals(null))
+            {
+                try
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    using (var connection = new SqlConnection(_options.SqlConnectionString))
+                    {
+
+
+                        var procedure = "dbo.[IsNodeLeaf]";
+
+                        await connection.OpenAsync();
+
+                        var parameters = new { nodeIDToPasteTo };
+
+                        int affectedRows = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                        if (!affectedRows.Equals(0))
+                        {
+                            return await _messageBank.GetMessage(IMessageBank.Responses.isNotLeaf).ConfigureAwait(false);
+                        }
+
+                        return await _messageBank.GetMessage(IMessageBank.Responses.isLeaf).ConfigureAwait(false);
+
+                    }
+
+                }
+
+                catch (SqlException ex)
+                {
+                    //Check sql exception
+                    switch (ex.Number)
+                    {
+                        //Unable to connect to database
+                        case -1:
+                            return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail).ConfigureAwait(false);
+                        default:
+                            return _options.UnhandledExceptionMessage + ex.Message;
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    //return code for operationCancelled is 500
+                    return await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false);
+
+                }
+                catch (Exception ex)
+                {
+                    //return code for unhandledException is 500
+                    return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false);
+                }
+            }
+            else
+            {
+                return await _messageBank.GetMessage(IMessageBank.Responses.copyNodeEmptyError).ConfigureAwait(false);
+            }
+        }
+
+
+        public async Task<IResponse<string>> PrivateNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if(nodes != null || nodes.Count != 0)
+            {
+
+                try
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    int privatizedNodes;
+
+                    using (var connection = new SqlConnection(_options.SqlConnectionString))
+                    {
+                        var procedure = "dbo.PrivatizeNodeS";
+
+                        string nodeCSV = "";
+
+                        foreach(long node in nodes)
+                        {
+                            nodeCSV += node + ",";
+                        }
+
+                        var parameters = new { @NodeIDS = nodeCSV };
+
+                        await connection.OpenAsync();
+
+                        privatizedNodes = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                        if(privatizedNodes <= 0 || privatizedNodes != nodes.Count)
+                        {
+                            return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.privateNodeFailure).ConfigureAwait(false), null, 400, false);
+                        }
+
+                        return new PrivateResponse<string>("", await _messageBank.GetMessage(IMessageBank.Responses.privateNodeSuccess).ConfigureAwait(false), 200, true);
+
+
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    //return code for operationCancelled is 500
+                    return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
+
+                }
+                catch (Exception ex)
+                {
+                    //return code for unhandledException is 500
+                    return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+
+                }
+
+            }
+
+            //if there was nothing to copy, should not have happened
+            return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.privateNodeFailure).ConfigureAwait(false), null, 400, false);
+
+
+        }
+
+
+
+
+        
+        public async Task<IResponse<string>> PublicNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (nodes != null || nodes.Count != 0)
+            {
+
+                try
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    int privatizedNodes;
+
+                    using (var connection = new SqlConnection(_options.SqlConnectionString))
+                    {
+                        var procedure = "dbo.PublicizeNodeS";
+
+                        string nodeCSV = "";
+
+                        foreach (long node in nodes)
+                        {
+                            nodeCSV += node + ",";
+                        }
+
+                        var parameters = new { @NodeIDS = nodeCSV };
+
+                        await connection.OpenAsync();
+
+                        privatizedNodes = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                        if (privatizedNodes <= 0 || privatizedNodes != nodes.Count)
+                        {
+                            return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.publicNodeFailure).ConfigureAwait(false), null, 400, false);
+                        }
+
+                        return new PublicResponse<string>("", await _messageBank.GetMessage(IMessageBank.Responses.publicNodeSuccess).ConfigureAwait(false), 200, true);
+
+
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    //return code for operationCancelled is 500
+                    return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested).ConfigureAwait(false), null, 500, false);
+
+                }
+                catch (Exception ex)
+                {
+                    //return code for unhandledException is 500
+                    return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+
+                }
+
+            }
+
+            //if there was nothing to copy, should not have happened
+            return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.publicNodeFailure).ConfigureAwait(false), null, 400, false);
+
+
+        }
+
+        
+
+
+
+
+
+
+
     }
 }

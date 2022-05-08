@@ -21,6 +21,8 @@ function TagDashboard() {
         }
     )
 
+    const [isConnected, setIsConnected] = useState(true);
+
     //Axios doesn't allow certain special characters. This will encode special characters 
     const  handleEncoded = (e) => {
         var parsedData = e.toString();
@@ -97,6 +99,7 @@ function TagDashboard() {
     
     // Fetch tag bank from server
     const fetchTableData = () => {
+        checkToken();
         async function fetchData() {
             // Verify credentials
             checkToken();
@@ -170,7 +173,6 @@ function TagDashboard() {
         fetchTableData();
         //Refresh after every 10 seconds
         const interval = setInterval(() => {
-            checkToken();
             fetchTableData();   
         }, 10000);
         return () => clearInterval(interval);
@@ -238,7 +240,7 @@ function TagDashboard() {
             <table className = "tag-dashboard-table">
                 <thead className = "tag-dashboard-table-thead">
                     <tr>
-                        <th>Tags</th>
+                        <th>Tag Bank</th>
                     </tr>
                 </thead>
                 <tbody>

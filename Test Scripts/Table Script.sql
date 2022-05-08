@@ -63,6 +63,12 @@ DROP PROCEDURE IF EXISTS GetUserHash
 DROP PROCEDURE IF EXISTS SearchNodes
 DROP PROCEDURE IF EXISTS RefreshSession
 DROP PROCEDURE IF EXISTS GetNodes
+DROP PROCEDURE IF EXISTS GetNodeRating
+DROP PROCEDURE IF EXISTS GetUserNodeRating
+DROP PROCEDURE IF EXISTS GetNodesRatings
+DROP PROCEDURE IF EXISTS GetUserNodesRatings
+DROP PROCEDURE IF EXISTS VerifyAuthorizedToView
+DROP PROCEDURE IF EXISTS RateNodes
 DROP PROCEDURE IF EXISTS UpdateNodeContent
 
 CREATE TABLE [dbo].Accounts(
@@ -1241,34 +1247,6 @@ end
 
 -- =============================================
 -- Author:		Pammy Poor
--- Description:	Rates Node
--- =============================================
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE PROCEDURE [dbo].[RateNode]    
-(
-	@UserHash VARCHAR(128),
-	@NodeID BIGINT,
-	@Rating INT
-)
-as
-BEGIN
-	IF EXISTS (SELECT * FROM NodeRatings WHERE UserHash = @UserHash AND NodeID = @NodeID)
-		BEGIN
-			UPDATE NodeRatings SET Rating = @Rating WHERE UserHash = @UserHash AND NodeID = @NodeID;
-		END
-	ELSE
-		BEGIN
-			INSERT NodeRatings(UserHash, NodeID, Rating) VALUES (@UserHash, @NodeID, @Rating);
-		END
-END
-
-
-
--- =============================================
--- Author:		Pammy Poor
 -- Description:	Removes confirmation link
 -- =============================================
 SET ANSI_NULLS ON
@@ -1382,3 +1360,159 @@ as
 begin
 	UPDATE Accounts SET Confirmed = 0 WHERE Username = @Username AND AuthorizationLevel = @AuthorizationLevel
 end
+
+-- =============================================
+-- Author:		Pammy Poor
+-- Description:	Get Node's Ratings
+-- =============================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetNodeRating]    
+(
+	@NodeID BIGINT
+)
+as
+begin
+	SELECT Avg(Rating) FROM NodeRatings Where NodeID = @NodeID
+end
+
+-- =============================================
+-- Author:		Pammy Poor
+-- Description:	Get Node's Ratings
+-- =============================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetUserNodeRating]    
+(
+	@NodeID BIGINT,
+	@UserHash VARCHAR(128)
+)
+as
+begin
+	SELECT Avg(Rating) FROM NodeRatings Where NodeID = @NodeID AND UserHash = @UserHash
+end
+
+
+
+-- =============================================
+-- Author:		Pammy Poor
+-- Description:	Get Nodes Ratings
+-- =============================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetNodesRatings](@InNodes VARCHAR(MAX))
+as
+begin
+SELECT Nodes.UserHash, Nodes.NodeID, NodeTitle, ParentNodeID, Summary, TimeModified, Visibility, Deleted, COALESCE(AVG(1.0 * Rating),0) AS RatingScore
+        FROM Nodes LEFT JOIN NodeRatings ON Nodes.NodeID = NodeRatings.NodeID
+        WHERE Nodes.NodeID IN (SELECT Value from STRING_SPLIT(@InNodes, ','))
+		GROUP BY Nodes.UserHash, Nodes.NodeID, NodeTitle, ParentNodeID, Summary, TimeModified, Visibility, Deleted
+end
+
+-- =============================================
+-- Author:		Pammy Poor
+-- Description:	Get Nodes Ratings
+-- =============================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[GetUserNodesRatings]    
+(
+	@InNodes VARCHAR(MAX),
+	@UserHash VARCHAR(128)
+)
+as
+begin
+	SELECT Nodes.UserHash, Nodes.NodeID, NodeTitle, Rating FROM Nodes LEFT JOIN NodeRatings on Nodes.NodeID = NodeRatings.NodeID 
+	WHERE Nodes.NodeID IN (SELECT Value from STRING_SPLIT(@InNodes, ',')) AND NodeRatings.UserHash = @UserHash
+
+end
+
+
+
+-- =============================================
+-- Author:		Pammy Poor
+-- Description:	Verify nodes are public or owned by user
+-- =============================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[VerifyAuthorizedToView]    
+(
+	@InNodes VARCHAR(MAX),
+	@UserHash VARCHAR(128)
+)
+as
+begin
+	SELECT CASE WHEN (SELECT COUNT(*) FROM Nodes WHERE NodeID IN (SELECT Value from STRING_SPLIT(@InNodes, ',')) AND (Visibility = 1 OR UserHash = @UserHash)) = (SELECT Count(*) from STRING_SPLIT(@InNodes, ','))
+	  THEN CAST(1 AS BIT)
+	  ELSE CAST(0 AS BIT)
+	END
+end
+
+-- =============================================
+-- Author:		Pammy Poor
+-- Description:	Rates Node
+-- =============================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[RateNode]    
+(
+	@UserHash VARCHAR(128),
+	@NodeID BIGINT,
+	@Rating INT
+)
+as
+BEGIN
+	IF EXISTS (SELECT * FROM NodeRatings WHERE UserHash = @UserHash AND NodeID = @NodeID)
+		BEGIN
+			UPDATE NodeRatings SET Rating = @Rating WHERE UserHash = @UserHash AND NodeID = @NodeID;
+		END
+	ELSE
+		BEGIN
+			INSERT NodeRatings(UserHash, NodeID, Rating) VALUES (@UserHash, @NodeID, @Rating);
+		END
+END
+
+
+-- =============================================
+-- Author:		Pammy Poor
+-- Description:	Rates Node
+-- =============================================
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[RateNodes]    
+(
+	@UserHash VARCHAR(128),
+	@InNodes VARCHAR(MAX),
+	@Rating INT
+)
+as
+BEGIN
+	DECLARE @Temp Table(NodeID BIGINT);
+	INSERT INTO @Temp(NodeID) SELECT Value from STRING_SPLIT(@InNodes, ',')
+
+	Declare @TempID BIGINT = 0
+	
+	WHILE (1 = 1)
+		BEGIN
+			Select Top 1 @TempID = NodeID from @Temp Where NodeID > @TempId Order by NodeID
+
+			if @@ROWCOUNT = 0 BREAK;
+
+			EXEC RateNode @UserHash, @TempID, @Rating
+		END
+END
+

@@ -38,9 +38,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="IntegrationTests\Rating\SetupAndCleanup\" />
     <Folder Include="IntegrationTests\Recovery\SetupAndCleanup\" />
     <Folder Include="IntegrationTests\Registration\SetupAndCleanup\" />
+    <Folder Include="UnitTests\Rate\" />
   </ItemGroup>
 
 </Project>

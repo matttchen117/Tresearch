@@ -56,6 +56,23 @@ namespace TrialByFire.Tresearch.Models.Contracts
             nodeTitleLengthExceeded,
             nodeSummaryLengthExceeded,
             
+            /// <summary>
+            /// Node given for creation is empty
+            /// </summary>
+            noNodeInput,
+
+            /// <summary>
+            /// ParentNodeID(s) edited of the given Nodes
+            /// </summary>
+            editParentSuccess,
+            /// <summary>
+            /// The List of NodeIDs for the parent to be edited is empty
+            /// </summary>
+            noEditParentNodeInput,
+            /// <summary>
+            /// The ID given for the Node's ParentID to be assigned to does not exist
+            /// </summary>
+            noTargetParent,
 
             /// <summary>
             /// Tag added to node(s)
@@ -103,6 +120,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             userRateFail,
             getRateSuccess,
             getRateFail,
+            invalidRating,
 
             jwtValidationSuccess,
             jwtValidationFail,
@@ -181,7 +199,31 @@ namespace TrialByFire.Tresearch.Models.Contracts
             tagDoesNotExist,
             createNodeSuccess,
             deleteNodeSuccess,
-            getNodesSuccess
+            getNodesSuccess,
+
+            copyNodeSuccess,
+            copyNodeFailure,
+            copyNodeError,
+            copyNodeEmptyError,
+            copyNodeMistmatchError,
+
+            isLeaf,
+            isNotLeaf,
+
+            pasteNodeSuccess,
+            pasteNodeFailure,
+            pasteNodeError,
+            pasteNodeEmptyError,
+            pasteNodeMistmatchError,
+            notAuthorizedToPasteTo,
+
+            privateNodeSuccess,
+            privateNodeFailure,
+
+            publicNodeSuccess,
+            publicNodeFailure,
+
+
         }
         public Task<string> GetMessage(Responses response);
     }

@@ -23,6 +23,9 @@ builder.Services.AddScoped<IAccountVerificationService, AccountVerificationServi
 builder.Services.AddScoped<IAccountDeletionService, AccountDeletionService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
+builder.Services.AddScoped<ICreateNodeService, CreateNodeService>();
+builder.Services.AddScoped<IDeleteNodeService, DeleteNodeService>();
+builder.Services.AddScoped<IEditParentService, EditParentService>();
 builder.Services.AddScoped<IMailService, MailService>();
 builder.Services.AddScoped<IOTPRequestService, OTPRequestService>();
 builder.Services.AddScoped<IRecoveryService, RecoveryService>();
@@ -33,6 +36,10 @@ builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<ITreeManagementService, TreeManagementService>();
 builder.Services.AddScoped<IRateService, RateService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+builder.Services.AddScoped<ICopyAndPasteService, CopyAndPasteService>();
+builder.Services.AddScoped<IPrivateAndPublicService, PrivateAndPublicService>();
+
+
 builder.Services.AddScoped<INodeSearchService, NodeSearchService>();
 builder.Services.AddScoped<INodeContentService, NodeContentService>();
 // Managers
@@ -45,11 +52,18 @@ builder.Services.AddScoped<IRegistrationManager, RegistrationManager>();
 builder.Services.AddScoped<ILogoutManager, LogoutManager>();
 builder.Services.AddScoped<ILogManager, LogManager>();
 builder.Services.AddScoped<ITagManager, TagManager>();
-builder.Services.AddScoped<IUADManager, UADManager>();  
+builder.Services.AddScoped<IUADManager, UADManager>();
+builder.Services.AddScoped<ICreateNodeManager, CreateNodeManager>();
+builder.Services.AddScoped<IDeleteNodeManager, DeleteNodeManager>();
+builder.Services.AddScoped<IEditParentManager, EditParentManager>();
 builder.Services.AddScoped<ITreeManagementManager, TreeManagementManager>();
 builder.Services.AddScoped<IUADManager, UADManager>();
 builder.Services.AddScoped<IRateManager, RateManager>();
-builder.Services.AddScoped<IUserManagementManager, UserManagementManager>(); 
+builder.Services.AddScoped<IUserManagementManager, UserManagementManager>();
+builder.Services.AddScoped<ICopyAndPasteManager, CopyAndPasteManager>();
+builder.Services.AddScoped<IPrivateAndPublicManager, PrivateAndPublicManager>();
+
+
 
 builder.Services.AddScoped<IUADManager, UADManager>();
 builder.Services.AddScoped<INodeSearchManager, NodeSearchManager>();
@@ -59,6 +73,8 @@ builder.Services.AddScoped<INodeContentManager, NodeContentManager>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
 
 // Invoked during build, not waht we want, want it to be invoked for AuthN process
 // Need to DI inject into Middleware - look into source code for how to do
