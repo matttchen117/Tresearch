@@ -2927,8 +2927,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-
-
         public async Task<string> IsNodeLeaf(long nodeIDToPasteTo, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!nodeIDToPasteTo.Equals(null))
@@ -3049,10 +3047,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         }
 
-
-
-
-        
         public async Task<IResponse<string>> PublicNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (nodes != null || nodes.Count != 0)
@@ -3111,14 +3105,5 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
 
         }
-
-        
-
-
-
-
-
-
-
     }
 }
