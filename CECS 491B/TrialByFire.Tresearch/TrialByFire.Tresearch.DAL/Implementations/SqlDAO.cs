@@ -2642,6 +2642,12 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+        /// <summary>
+        ///     Returns a list of nodes containing IDs and rating of node
+        /// </summary>
+        /// <param name="nodeIDs">List of Node IDs</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns></returns>
         public async Task<IResponse<IEnumerable<Node>>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             try

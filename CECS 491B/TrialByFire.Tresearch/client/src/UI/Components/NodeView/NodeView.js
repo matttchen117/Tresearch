@@ -47,7 +47,7 @@ class NodeView extends React.PureComponent {
                 this.GetUserRating();
                 this.setState({canMakeChanges: true})
             } else{
-                this.GetTags();
+                this.setState({canMakeChanges: false})
             }
                
 
@@ -91,7 +91,6 @@ class NodeView extends React.PureComponent {
 
     SetRating = async (rating) => {
         axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
-        console.log(this.state.node);
         await axios.post("https://localhost:7010/Rate/rateNode?rating=" + rating, [this.state.node.nodeID])
         .then(response => {
             this.GetRatings();

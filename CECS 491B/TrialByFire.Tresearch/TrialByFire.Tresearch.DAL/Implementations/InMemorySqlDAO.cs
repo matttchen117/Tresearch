@@ -1412,13 +1412,43 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public async Task<IResponse<int>> RateNodeAsync(List<long> nodeIDs, int rating, string userHash, CancellationToken cancellationToken = default(CancellationToken))
         {
+            try
+            {
+                foreach(long nodeID in nodeIDs)
+                {
+                    InMemoryDatabase.NodeRatings.Add(new NodeRating(userHash, nodeID, rating));
+                }
 
-            return new RateResponse<int>("", rating, 200, true);
+                return new RateResponse<int>("", rating, 200, true);
+
+            }
+            catch (OperationCanceledException)
+            {
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), rating, 408, false);
+            }
+            catch(Exception ex)
+            {
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, rating, 500, false);
+            }
         }
 
         public async Task<IResponse<IEnumerable<Node>>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             List<double> ratings = new List<double>();
+
+            try
+            {
+                
+            }
+            catch (OperationCanceledException)
+            {
+                return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), new List<Node>(), 408, false);
+            }
+            catch(Exception ex)
+            {
+                return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, new List<Node>(), 500, false);
+            }
+
 
             return new RateResponse<IEnumerable<Node>>("", new List<Node>(), 200, true);
         }
