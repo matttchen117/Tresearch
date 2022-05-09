@@ -97,7 +97,7 @@ function UserManagement() {
 
         if(handleInput()){
             setAlertData({message: ''})
-            axios.post('https://localhost:7010/UserManagement/createAccount?username=' + accountData.username.toLowerCase() + '&passphrase=' + hashInput(accountData.Passphrase) + '&authorizationLevel=' + accountData.AuthorizationLevel )
+            axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/UserManagement/createAccount?username=' + accountData.username.toLowerCase() + '&passphrase=' + hashInput(accountData.Passphrase) + '&authorizationLevel=' + accountData.AuthorizationLevel )
             .then(res => {
                 setAlertData({message: 'Account Created'});
             })

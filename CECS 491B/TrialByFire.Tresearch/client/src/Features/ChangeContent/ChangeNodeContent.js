@@ -86,7 +86,7 @@ class ChangeNodeContent extends React.PureComponent{
 }
 
   UpdateContent = async() => {
-    await axios.post('https://localhost:7010/NodeContent/update?owner=' + this.state.node.userHash + '&nodeID=' + this.state.node.nodeID + 
+    await axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/NodeContent/update?owner=' + this.state.node.userHash + '&nodeID=' + this.state.node.nodeID + 
     '&title=' + this.handleEncoded(this.state.title) + '&summary=' + this.handleEncoded(this.state.summary))
     .then(response => {
         console.log(response.data)

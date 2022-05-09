@@ -65,7 +65,7 @@ class NodeView extends React.PureComponent {
     GetRatings = async () => {
         axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
         const ID = [this.state.node.nodeID]
-        await axios.post("https://localhost:7010/Rate/getRating?", ID)
+        await axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net/Rate/getRating?", ID)
         .then(response => {
             const r = Math.round(response.data[0].ratingScore * 100) / 100;
             this.setState({rating: r })
@@ -79,7 +79,7 @@ class NodeView extends React.PureComponent {
     GetUserRating = async() => {
         axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
         const ID = [this.state.node.nodeID]
-        await axios.post("https://localhost:7010/Rate/getUserNodeRating?nodeID="+ID)
+        await axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net/Rate/getUserNodeRating?nodeID="+ID)
         .then(response => {
             this.setState({userRating: response.data})
             sessionStorage.setItem('authorization', response.headers['authorization']);
@@ -91,7 +91,7 @@ class NodeView extends React.PureComponent {
 
     SetRating = async (rating) => {
         axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
-        await axios.post("https://localhost:7010/Rate/rateNode?rating=" + rating, [this.state.node.nodeID])
+        await axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net/Rate/rateNode?rating=" + rating, [this.state.node.nodeID])
         .then(response => {
             this.GetRatings();
             sessionStorage.setItem('authorization', response.headers['authorization']);

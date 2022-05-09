@@ -31,7 +31,7 @@ class Tagger extends React.PureComponent{
      axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
 
     // Post request
-    await axios.post("https://localhost:7010/Tag/nodeTagList", this.state.nodes)
+    await axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net/Tag/nodeTagList", this.state.nodes)
     .then(response => {
       // Data from post
       const responseData = Object.values(response.data);
@@ -39,7 +39,7 @@ class Tagger extends React.PureComponent{
       this.setState( {tagData: responseData});
 
       // Retrieve lists of tags
-      axios.get("https://localhost:7010/Tag/taglist", {})
+      axios.get("https://trialbyfiretresearchwebapi.azurewebsites.net/Tag/taglist", {})
         .then(response => {
           // Tags returned from post
           const responseData = Object.values(response.data);
@@ -171,7 +171,7 @@ class Tagger extends React.PureComponent{
     axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
 
     // Add tag from node(s)
-    axios.post("https://localhost:7010/Tag/addTag?tagName="+this.handleEncoded(value) ,this.state.nodes)
+    axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net/Tag/addTag?tagName="+this.handleEncoded(value) ,this.state.nodes)
         .then((response => {
           this.setState( previousState => ({
             // Add tags to list of node tags
@@ -207,7 +207,7 @@ class Tagger extends React.PureComponent{
     axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
 
     // Delete tag from node(s)
-    axios.post("https://localhost:7010/Tag/removeTag?tagName="+this.handleEncoded(value), this.state.nodes)
+    axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net/Tag/removeTag?tagName="+this.handleEncoded(value), this.state.nodes)
         .then(response => {
             this.setState( previousState => ({
                 tagData: previousState.tagData.filter(item => item !== value ), 

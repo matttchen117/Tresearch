@@ -73,7 +73,7 @@ class RateNode extends React.PureComponent{
 
   SetRating = async (rating) => {
     axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
-    await axios.post("https://localhost:7010/Rate/rateNode?rating=" + rating, this.state.nodes)
+    await axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net/Rate/rateNode?rating=" + rating, this.state.nodes)
     .then(response => {
         sessionStorage.setItem('authorization', response.headers['authorization']);
     })
