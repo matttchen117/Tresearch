@@ -96,8 +96,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                             // No API Key right now
                             if (!_options.Environment.Equals("Test"))
                             {
-                                /*result = await _mailService.SendOTPAsync(account.Username, otp,
-                                    otp, otp, _cancellationTokenSource.Token).ConfigureAwait(false);*/
+                                result = await _mailService.SendOTPAsync(account.Username, otp, otp, otp, _cancellationTokenSource.Token).ConfigureAwait(false);
                             }
                             await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
                                  category: ILogManager.Categories.Server, otp);
