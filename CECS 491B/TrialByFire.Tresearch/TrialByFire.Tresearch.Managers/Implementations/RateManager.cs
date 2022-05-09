@@ -28,6 +28,13 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             _options = options.Value;
         }
 
+        /// <summary>
+        ///  Rate List of Node(s) with integer rating
+        /// </summary>
+        /// <param name="nodeIDs">List of node IDs</param>
+        /// <param name="rating">Rating of node(s)</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>Response object</returns>
         public async Task<IResponse<int>> RateNodeAsync(List<long> nodeIDs, int rating, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -74,10 +81,16 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             }
             catch (Exception ex)
             {
-                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), rating, 500, false);
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, rating, 500, false);
             }
         }
 
+        /// <summary>
+        /// Returns corresponding Nodes with average ratings from a list of node IDs
+        /// </summary>
+        /// <param name="nodeIDs">List of node IDs</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>Response object</returns>
         public async Task<IResponse<IEnumerable<Node>>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -99,7 +112,6 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                     IAccount account = new UserAccount(Thread.CurrentPrincipal.Identity.Name, role);
                     
                     userHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
-
 
                     // Verify if account is enabled and confirmed, if not return error
                     string resultVerifyAccount = await _accountVerificationService.VerifyAccountAsync(account, cancellationToken);
@@ -127,6 +139,12 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             }
         }
 
+        /// <summary>
+        ///  Returns a user's node rating corresponding to node ID
+        /// </summary>
+        /// <param name="nodeID">Node ID</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>Response object</returns>
         public async Task<IResponse<int>> GetUserNodeRatingAsync(long nodeID, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
