@@ -25,7 +25,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         }
 
         /// <summary>
-        ///  
+        ///  Rate list of nodes
         /// </summary>
         /// <param name="userHash">User hash of user rating</param>
         /// <param name="nodeID">Node id to rate</param>
@@ -59,7 +59,12 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-
+        /// <summary>
+        ///  Get nodes with rating from list of node IDs
+        /// </summary>
+        /// <param name="nodeIDs">Node IDs</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>Response object</returns>
         public async Task<IResponse<IEnumerable<Node>>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -88,6 +93,13 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
+        /// <summary>
+        ///  Get User Node Rating of node
+        /// </summary>
+        /// <param name="nodeID">Node ID</param>
+        /// <param name="userHash">User Hash</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns>Response object</returns>
         public async Task<IResponse<int>> GetUserNodeRatingAsync(long nodeID, string userHash, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -112,6 +124,5 @@ namespace TrialByFire.Tresearch.Services.Implementations
                 return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message,0, 500, false);
             }
         }
-
     }
 }
