@@ -281,18 +281,17 @@ function Search() {
                         <input type="text" value={query} placeholder="Search" onChange = {event => setQuery(event.target.value)}/>
                     </div>
                     <div className="search-filter-container">
+                    <Checkbox
+                            label = "Filter By Time"
+                            value = {filterByTime}
+                            onChange={handleChangeFilterByTime}
+                        />
                         <Checkbox
                             label = "Filter By Rating"
                             value = {filterByRating}
                             onChange={handleChangeFilterByRating}
                         />
-                        <Checkbox
-                            label = "Filter By Time"
-                            value = {filterByTime}
-                            onChange={handleChangeFilterByTime}
-                        />
                         <button value={reverseList} onClick={handleReverseList}>Reverse Result List</button>
-                        <button onClick={jwtVerification}>Verify Token</button>
                     </div>
                 </form>
                 <div>

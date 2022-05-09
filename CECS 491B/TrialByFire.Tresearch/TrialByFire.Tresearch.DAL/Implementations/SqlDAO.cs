@@ -21,6 +21,11 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         private BuildSettingsOptions _options { get; }
         private IMessageBank _messageBank;
 
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="messageBank"></param>
+        /// <param name="options"></param>
         public SqlDAO(IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> options)
         {
             _messageBank = messageBank;
@@ -28,19 +33,20 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         }
 
         /// <summary>
-        ///     SearchForNodeAsync():
-        ///         Returns a IResponse of IEnumerable<Node> of all nodes related to the Search provided by ISearchInput
+        ///     UpdateNodeContentAsync():
+        ///         Returns a IResponse of string of the result of the SQL operation    
         /// </summary>
-        /// <param name="searchInput">Custom input object that contains relevant information for methods related to Search</param>
-        /// <returns>Response that contains the results of querying the database</returns>
+        /// <param name="nodeContentInput">Custom input object that contains relevant information for methods related to UpdateNodeContent</param>
+        /// <returns>Response that contains the results of operating on the database</returns>
         public async Task<IResponse<string>> UpdateNodeContentAsync(INodeContentInput nodeContentInput)
         {
-            // Check if search input null
+            // Check if input null
             if (nodeContentInput == null)
             {
                 return new NodeContentResponse<string>(await _messageBank.GetMessage(
                     IMessageBank.Responses.noSearchInput).ConfigureAwait(false), null, 400, false);
             }
+            nodeContentInput.CancellationToken.ThrowIfCancellationRequested();
             try
             {
                 nodeContentInput.CancellationToken.ThrowIfCancellationRequested();

@@ -6,6 +6,7 @@ import Popup from "../../Popup/Popup";
 import TagPopup from "../../Popup/TagPopup";
 import NodePopup from "../../Popup/NodePopup";
 import CreateNodePopup from "../../Popup/CreateNodePopup";
+import ChangeContentPopup from "../../Popup/ChangeContentPopup";
 import "./TreeView.css";
 import RateNodePopup from "../../Popup/RateNodePopup";
 
@@ -54,7 +55,9 @@ class TreeView extends React.Component{
             isPopupOpen: false,
             isNodeViewOpen: false,
             isRateViewOpen: false,
+            isEditViewOpen: false,
             copiedNodes: [],
+            selectedNode: [],
             isTaggerOpen: false,
             isCreateNodeOpen: false,
             isPopupOpen: false,
@@ -169,6 +172,12 @@ class TreeView extends React.Component{
             console.log(responseData);
             window.location.reload();
         })
+    }
+
+    EditNode = (e) => {
+        e.stopPropagation();
+        const currentState = Array.from(new Set(this.state.nodeSelect));
+        this.setState( { nodeSelect: currentState, isEditViewOpen: true, isPopupOpen: true, isShown: false,  x: e.pageX, y: e.pageY})
     }
 
     // User clicks edit
@@ -292,6 +301,15 @@ class TreeView extends React.Component{
             })
         }
 
+        const  ToggleEdit = () => {
+            window.location.reload(false)
+            this.setState({
+                isEditViewOpen: false,
+                selectedNode: [],
+                isPopupOpen: false
+            })
+        }
+
         const ToggleCreate = () => {
             this.setState({
                 isCreateNodeOpen: false,
@@ -347,6 +365,7 @@ class TreeView extends React.Component{
         // Right click node, open context menu
         const rightClickNode = (e, nodeData) => {
             this.setState({ nodeSelect: [...this.state.shiftCollection, nodeData.nodeID], shiftCollection: []});
+            this.setState({ selectedNode: nodeData})
             this.setState( { isShown: true, x: e.pageX, y: e.pageY})
         }
 
@@ -388,7 +407,7 @@ class TreeView extends React.Component{
                             <div className="option" onClick = {this.CreateNode}>
                                 Add Child
                             </div>
-                            <div className="option">
+                            <div className="option" onClick = {this.EditNode}>
                                 Edit Node
                             </div>
                             <div className="option" onClick = {this.EditTags}>
@@ -436,6 +455,7 @@ class TreeView extends React.Component{
                     {this.state.isCreateNodeOpen ? <Popup content = {<CreateNodePopup onClick = {ToggleCreate} node = {this.state.nodeSelect}/>}/> : null}
                 </div>
                 <div className = "node-popup-wrapper">
+                    {this.state.isEditViewOpen ? <Popup content = {<ChangeContentPopup onClick={ToggleEdit} node={this.state.selectedNode}/>}/> : null }
                     {this.state.isNodeViewOpen ? <Popup content = {<NodePopup onClick={ToggleNodePopup} node = {this.state.nodeSelect}/>}/> : null }
                 </div>
                 <div className = "node-rate-wrapper">

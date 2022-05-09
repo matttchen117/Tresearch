@@ -29,19 +29,11 @@ const verifyToken = () => {
     // Check if Expired 
     // Check if time is before Issued At
     const signature = encBase64url.stringify(crypto.HmacSHA256(parts[0] + '.' + parts[1], 'XMwiwDaL8LZQwDJPHkYEJytE9C1wPxcOTi1Ks2IA'));
-    console.log(signature)
-    console.log(decodedHeader.alg)
-    console.log(decodedHeader.typ)
-    console.log(decoded.iss)
-    console.log(decoded.nbf * 1000)
-    console.log(decoded.exp * 1000)
-    console.log(decoded.iat * 1000)
-    console.log(now)
 
     if(decodedHeader.alg !== "HS256" || decodedHeader.typ !== "JWT" || decoded.iss !== "TrialByFire.Tresearch" || 
         parts[2] !== signature || decoded.nbf * 1000 > now || now > decoded.exp * 1000 || now < decoded.iat * 1000)
     {
-        localStorage.removeItem('authorization');
+        sessionStorage.removeItem('authorization');
         window.location.assign(window.location.origin);
         window.location = '/';
     }

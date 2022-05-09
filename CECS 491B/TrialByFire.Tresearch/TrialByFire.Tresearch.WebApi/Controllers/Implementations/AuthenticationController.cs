@@ -57,7 +57,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         [HttpPost]
         [Route("authenticate")]
         public async Task<IActionResult> AuthenticateAsync(string username, string otp, 
-            string authorizationLevel, CancellationToken cancellationToken = default)
+            string authorizationLevel)
         {
             string[] split;
             string result;
@@ -125,7 +125,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> AuthenticateAsync(string username, string otp, 
-            string authorizationLevel, DateTime now, CancellationToken cancellationToken = default)
+            string authorizationLevel, DateTime now)
         {
             string[] split;
             string result = "";
@@ -153,7 +153,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 }
                 if (Enum.TryParse(split[1], out ILogManager.Categories category))
                 {
-                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                    await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
                     category, split[2]);
                 }
                 else

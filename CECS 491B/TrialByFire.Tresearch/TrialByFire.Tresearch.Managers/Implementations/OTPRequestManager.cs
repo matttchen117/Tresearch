@@ -69,6 +69,10 @@ namespace TrialByFire.Tresearch.Managers.Implementations
             // Fires operation cancelled exception
             cancellationToken.ThrowIfCancellationRequested();
             string result;
+            if(Thread.CurrentPrincipal == null || Thread.CurrentPrincipal.Identity == null)
+            {
+
+            }
             try
             {
                 if(Thread.CurrentPrincipal.Identity.Name.Equals("guest"))
@@ -94,9 +98,9 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                             {
                                 /*result = await _mailService.SendOTPAsync(account.Username, otp,
                                     otp, otp, _cancellationTokenSource.Token).ConfigureAwait(false);*/
-                                _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
-                                 category: ILogManager.Categories.Server, otp);
                             }
+                            await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
+                                 category: ILogManager.Categories.Server, otp);
                         }
                     }
                     return result;

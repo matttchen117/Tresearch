@@ -69,6 +69,30 @@ namespace TrialByFire.Tresearch.Models.Implementations
             Tags = new List<INodeTag>();
         }
 
+        public Node(long nodeID, long nodeParentID, string nodeTitle, string summary, bool visibility, bool deleted, string userhash, double ratingScore)
+        {
+            NodeID = nodeID;
+            ParentNodeID = nodeParentID;
+            NodeTitle = nodeTitle;
+            Summary = summary;
+            Visibility = visibility;
+            Deleted = deleted;
+            UserHash = userhash;
+            TagScore = 0;
+            RatingScore = ratingScore;
+            Tags = new List<INodeTag>();
+        }
+
+        public Node(string UserHash, long NodeID, string NodeTitle, double Rating)
+        {
+            this.NodeID = NodeID;
+            this.UserHash = UserHash;
+            this.NodeTitle = NodeTitle;
+            RatingScore = Rating;
+
+        }
+
+
         public bool Equals(Node? obj)
         {
             if(obj != null)
