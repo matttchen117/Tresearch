@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Services.Contracts
 {
-    internal class ITreeHistoryService
+    public class ITreeHistoryService
     {
     }
 }

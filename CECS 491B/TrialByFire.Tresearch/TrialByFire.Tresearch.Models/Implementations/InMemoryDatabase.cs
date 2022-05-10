@@ -32,6 +32,8 @@ namespace TrialByFire.Tresearch.Models.Implementations
         public IList<ILog> ArchiveLogs { get; set; }
         public IList<IUserHashObject> UserHashTable { get; set; }
 
+        public IList<IVersionAudit> VersionAudits { get; set; }
+
         public InMemoryDatabase()
         {
             OTPClaims = InitializeOTPClaims();
@@ -50,6 +52,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
             ArchiveLogs = InitializeArchiveLogs();
             UserHashTable = InitializeUserHashTable();
             RecoveryLinks = InitializeRecoveryLinks();
+            VersionAudits = InitializeVersionAudits();
         }
 
         /*
@@ -1001,6 +1004,35 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodeIDsList.Add(12);
 
             return nodeIDsList;
+        }
+
+        private List<IVersionAudit> InitializeVersionAudits() { 
+            List<IVersionAudit> versionAudits = new List<IVersionAudit>();
+
+            List<INodeHistory> nodeHistories1 = new List<INodeHistory>();
+            nodeHistories1.Add(new NodeHistory(1, 1, "Node1", "test1", new DateTime(2022, 5, 3, 0, 19, 15), true, false));
+            nodeHistories1.Add(new NodeHistory(1, 1, "Node2", "test2", new DateTime(2022, 5, 3, 0, 19, 15), true, false));
+            nodeHistories1.Add(new NodeHistory(1, 1, "Node3", "test3", new DateTime(2022, 5, 3, 0, 19, 15), true, false));
+
+            IVersionAudit versionAudit1 = new VersionAudit(new DateTime(2022, 5, 3, 0, 19, 15), 1, nodeHistories1);
+
+
+            List<INodeHistory> nodeHistories2 = new List<INodeHistory>();
+            nodeHistories2.Add(new NodeHistory(1, 1, "Node1", "test1", new DateTime(2022, 5, 3, 0, 19, 15), true, false));
+            nodeHistories2.Add(new NodeHistory(1, 1, "Node2", "test2", new DateTime(2022, 5, 3, 0, 19, 15), true, false));
+            nodeHistories2.Add(new NodeHistory(1, 1, "Node3", "test3", new DateTime(2022, 5, 3, 0, 19, 15), true, false));
+
+            IVersionAudit versionAudit2 = new VersionAudit(new DateTime(2022, 5, 3, 0, 19, 15), 1, nodeHistories2);
+
+
+            List<INodeHistory> nodeHistories3 = new List<INodeHistory>();
+            nodeHistories3.Add(new NodeHistory(1, 1, "Node1", "test1", new DateTime(2022, 5, 3, 0, 19, 15), true, false));
+            nodeHistories3.Add(new NodeHistory(1, 1, "Node2", "test2", new DateTime(2022, 5, 3, 0, 19, 15), true, false));
+
+            IVersionAudit versionAudit3 = new VersionAudit(new DateTime(2022, 5, 3, 0, 19, 15), 1, nodeHistories3);
+
+
+            return versionAudits;
         }
     }
 }

@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Models.Contracts
 {
-    internal interface IVersionAudit
+    public interface IVersionAudit
     {
+        public DateTime CreationDate { get; set; }
+
+        public long RootNodeID { get; set; }
+
+        public List<INodeHistory> NodeHistories { get; set; }
     }
 }

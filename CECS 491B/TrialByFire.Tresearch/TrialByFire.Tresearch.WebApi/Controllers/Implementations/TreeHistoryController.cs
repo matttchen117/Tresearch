@@ -1,4 +1,6 @@
-﻿namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
+﻿
+
+namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
     public class TreeHistoryController
     {

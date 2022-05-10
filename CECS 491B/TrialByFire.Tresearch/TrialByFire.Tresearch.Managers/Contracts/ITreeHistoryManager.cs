@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Managers.Contracts
 {
-    internal interface ITreeHistoryManager
+    public interface ITreeHistoryManager
     {
     }
 }

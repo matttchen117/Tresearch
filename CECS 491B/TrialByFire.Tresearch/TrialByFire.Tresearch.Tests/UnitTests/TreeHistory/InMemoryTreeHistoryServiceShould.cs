@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Tests.UnitTests.TreeHistory
 {
-    internal class InMemoryTreeHistoryServiceShould
+    public class InMemoryTreeHistoryServiceShould
     {
     }
 }

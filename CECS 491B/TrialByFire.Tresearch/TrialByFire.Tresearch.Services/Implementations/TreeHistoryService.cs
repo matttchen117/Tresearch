@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
-    internal class TreeHistoryService
+    public class TreeHistoryService
     {
     }
 }

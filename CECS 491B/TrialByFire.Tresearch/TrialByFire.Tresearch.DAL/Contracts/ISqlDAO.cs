@@ -227,5 +227,10 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public Task<IResponse<string>> PublicNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken));
 
 
+        public Task<string> CreateTreeHistory(List<INodeHistory> nodeHistories, DateTime creationTime, long rootNodeID);
+
+        public Task<Tuple<List<IVersionAudit>, string>> GetTreeHistory(DateTime creationTime, long rootNodeID);
+
+        public Task<string> DeleteTreeHistory(DateTime creationTime, long rootNodeID);
     }
 }

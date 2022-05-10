@@ -1644,5 +1644,20 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         }
 
+        public async Task<string> CreateTreeHistory(List<INodeHistory> nodeHistories, DateTime creationTime, long rootNodeID)
+        {
+
+        }
+
+        public async Task<Tuple<List<IVersionAudit>, string>> GetTreeHistory(DateTime creationTime, long rootNodeID)
+        {
+
+        }
+
+        public async Task<string> DeleteTreeHistory(DateTime creationTime, long rootNodeID)
+        {
+
+        }
+
     }
 }

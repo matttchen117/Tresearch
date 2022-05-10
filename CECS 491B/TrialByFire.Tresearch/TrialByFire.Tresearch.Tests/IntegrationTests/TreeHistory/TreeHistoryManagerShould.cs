@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrialByFire.Tresearch.Tests.IntegrationTests.TreeHistory
 {
-    internal class TreeHistoryManagerShoud
+    public class TreeHistoryManagerShould
     {
     }
 }
