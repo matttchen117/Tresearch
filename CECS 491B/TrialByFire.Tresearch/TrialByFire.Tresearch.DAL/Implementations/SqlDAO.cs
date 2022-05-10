@@ -2992,9 +2992,13 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
         public async Task<IResponse<string>> PrivateNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if(nodes != null || nodes.Count != 0)
+            if(nodes == null || nodes.Count == 0)
             {
+                return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.privateNodeFailure).ConfigureAwait(false), null, 400, false);
 
+            }
+            else
+            {
                 try
                 {
                     cancellationToken.ThrowIfCancellationRequested();
@@ -3005,9 +3009,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     {
                         var procedure = "dbo.PrivatizeNodeS";
 
+                        //use stringbuilder
                         string nodeCSV = "";
 
-                        foreach(long node in nodes)
+                        foreach (long node in nodes)
                         {
                             nodeCSV += node + ",";
                         }
@@ -3016,9 +3021,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                         await connection.OpenAsync();
 
-                        privatizedNodes = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+                        privatizedNodes = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken))
+                                                            .ConfigureAwait(false);
 
-                        if(privatizedNodes <= 0 || privatizedNodes != nodes.Count)
+                        if (privatizedNodes <= 0 || privatizedNodes != nodes.Count)
                         {
                             return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.privateNodeFailure).ConfigureAwait(false), null, 400, false);
                         }
@@ -3028,6 +3034,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
 
                     }
                 }
+                //missing sql exception
                 catch (OperationCanceledException)
                 {
                     //return code for operationCancelled is 500
@@ -3040,11 +3047,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
 
                 }
-
             }
 
             //if there was nothing to copy, should not have happened
-            return new PrivateResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.privateNodeFailure).ConfigureAwait(false), null, 400, false);
 
 
         }
@@ -3055,9 +3060,15 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         
         public async Task<IResponse<string>> PublicNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (nodes != null || nodes.Count != 0)
+            if (nodes == null || nodes.Count == 0)
             {
+                return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.publicNodeFailure).ConfigureAwait(false), null, 400, false);
 
+
+
+            }
+            else
+            {
                 try
                 {
                     cancellationToken.ThrowIfCancellationRequested();
@@ -3103,11 +3114,9 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
 
                 }
-
             }
 
             //if there was nothing to copy, should not have happened
-            return new PublicResponse<string>(await _messageBank.GetMessage(IMessageBank.Responses.publicNodeFailure).ConfigureAwait(false), null, 400, false);
 
 
         }

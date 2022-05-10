@@ -3,8 +3,8 @@
     "",
     "\\CECS 491B",
     "\\CECS 491B\\TrialByFire.Tresearch",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Services\\Implementations",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL",
+    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\Implementations",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\UnitTests",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\UnitTests\\CopyAndPaste",
@@ -12,5 +12,6 @@
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\Controllers",
     "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.WebApi\\Controllers\\Implementations"
   ],
+  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.DAL\\Implementations\\SqlDAO.cs",
   "PreviewInSolutionExplorer": false
 }
