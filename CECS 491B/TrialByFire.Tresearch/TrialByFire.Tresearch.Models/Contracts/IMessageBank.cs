@@ -16,6 +16,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             unhandledException,
             operationCancelled,
             operationTimeExceeded,
+            principalNotSet,
 
             databaseConnectionFail,
 
@@ -49,6 +50,12 @@ namespace TrialByFire.Tresearch.Models.Contracts
             nodeSearchSuccess,
             noSearchInput,
 
+            updateNodeContentSuccess,
+            updateNodeContentRollback,
+            updateNodeContentTimeExceeded,
+            nodeTitleLengthExceeded,
+            nodeSummaryLengthExceeded,
+            
             /// <summary>
             /// Node given for creation is empty
             /// </summary>
@@ -113,6 +120,7 @@ namespace TrialByFire.Tresearch.Models.Contracts
             userRateFail,
             getRateSuccess,
             getRateFail,
+            invalidRating,
 
             jwtValidationSuccess,
             jwtValidationFail,

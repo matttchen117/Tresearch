@@ -41,6 +41,7 @@ builder.Services.AddScoped<IPrivateAndPublicService, PrivateAndPublicService>();
 
 
 builder.Services.AddScoped<INodeSearchService, NodeSearchService>();
+builder.Services.AddScoped<INodeContentService, NodeContentService>();
 // Managers
 builder.Services.AddScoped<ILogManager, LogManager>();
 builder.Services.AddScoped<IAccountDeletionManager, AccountDeletionManager>();
@@ -66,6 +67,7 @@ builder.Services.AddScoped<IPrivateAndPublicManager, PrivateAndPublicManager>();
 
 builder.Services.AddScoped<IUADManager, UADManager>();
 builder.Services.AddScoped<INodeSearchManager, NodeSearchManager>();
+builder.Services.AddScoped<INodeContentManager, NodeContentManager>();
 // Unnecessary, only here temporarily for successful build
 
 builder.Services.AddControllers();

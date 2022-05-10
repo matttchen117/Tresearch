@@ -5,6 +5,7 @@ import { useParams} from "react-router-dom";
 
 import "./NodeSearch.css";
 import userEvent from "@testing-library/user-event";
+import jwtVerification from "../JwtVerification/JwtVerification";
 
 function Search() {
     // Holds array of nodes result
@@ -60,7 +61,7 @@ function Search() {
         event.preventDefault();
         //axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
         var parsedData = handleEncoded(query);
-        var request = "https://localhost:7010/NodeSearch/search?search=" + parsedData + "&filterByRating=" + filterByRating + 
+        var request = "https://trialbyfiretresearchwebapi.azurewebsites.net/NodeSearch/search?search=" + parsedData + "&filterByRating=" + filterByRating + 
         "&filterByTime=" + filterByTime;
         for(var i=0; i<tagData.length; i++)
         {
@@ -81,7 +82,7 @@ function Search() {
 
     const fetchTableData = () => {
         async function fetchData() {
-            const response = await axios.get("https://localhost:7010/Tag/taglist");
+            const response = await axios.get("https://trialbyfiretresearchwebapi.azurewebsites.net/Tag/taglist");
             if(response !== null && response !== undefined)
             {
                 setTagOptions(Object.values(response.data));
@@ -280,15 +281,15 @@ function Search() {
                         <input type="text" value={query} placeholder="Search" onChange = {event => setQuery(event.target.value)}/>
                     </div>
                     <div className="search-filter-container">
+                    <Checkbox
+                            label = "Filter By Time"
+                            value = {filterByTime}
+                            onChange={handleChangeFilterByTime}
+                        />
                         <Checkbox
                             label = "Filter By Rating"
                             value = {filterByRating}
                             onChange={handleChangeFilterByRating}
-                        />
-                        <Checkbox
-                            label = "Filter By Time"
-                            value = {filterByTime}
-                            onChange={handleChangeFilterByTime}
                         />
                         <button value={reverseList} onClick={handleReverseList}>Reverse Result List</button>
                     </div>

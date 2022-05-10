@@ -96,7 +96,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Logging
 
             // Act
             string result = await logManager.StoreAnalyticLogAsync(timestamp, enumLevel, enumCategory,
-                description, cancellationTokenSource.Token).ConfigureAwait(false);
+                description).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(expected, result);
@@ -173,7 +173,7 @@ namespace TrialByFire.Tresearch.Tests.IntegrationTests.Logging
 
             // Act
             string result = await logManager.StoreArchiveLogAsync(timestamp, enumLevel, enumCategory,
-                description, cancellationTokenSource.Token)
+                description)
                 .ConfigureAwait(false);
 
             // Assert

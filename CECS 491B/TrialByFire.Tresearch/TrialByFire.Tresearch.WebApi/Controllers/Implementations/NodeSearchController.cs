@@ -59,31 +59,32 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 if (response.Data != null && response.IsSuccess && response.StatusCode == 200)
                 {
                     // Check if time was exceeded
-                    if (response.ErrorMessage.Equals(""))
+                    if (!response.ErrorMessage.Equals(""))
                     {
+                        await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server,
+                            response.ErrorMessage);
                         stringBuilder.AppendFormat(await _messageBank.GetMessage(IMessageBank.Responses.nodeSearchSuccess).ConfigureAwait(false), search,
                         string.Join(",", tags), filterByRating, filterByTime);
                         await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Info, ILogManager.Categories.Server,
                             stringBuilder.ToString());
                     }
-                    else
-                    {
-                        await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server,
-                            response.ErrorMessage);
-                    }
+                    stringBuilder.AppendFormat(await _messageBank.GetMessage(IMessageBank.Responses.nodeSearchSuccess).ConfigureAwait(false), search,
+                        string.Join(",", tags), filterByRating, filterByTime);
+                    await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Info, ILogManager.Categories.Server,
+                        stringBuilder.ToString());
                     return response.Data.ToList();
                 }
                 else if (response.StatusCode >= 500)
                 {
                     stringBuilder.AppendFormat(response.ErrorMessage, search, string.Join(",", tags), filterByRating, filterByTime);
-                    await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server,
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server,
                         stringBuilder.ToString());
                     return StatusCode(response.StatusCode, response.ErrorMessage);
                 }
                 else
                 {
                     stringBuilder.AppendFormat(response.ErrorMessage, search, string.Join(",", tags), filterByRating, filterByTime);
-                    await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Data,
+                    await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Data,
                         stringBuilder.ToString());
                     return new BadRequestObjectResult(response.ErrorMessage) { StatusCode = response.StatusCode };
                 }
@@ -93,9 +94,10 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 stringBuilder.AppendFormat(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false),
                     ex.Message, stringBuilder.AppendFormat("Search: {0}, Tags: {1}, FilterByRating: {2}, FilterByTime: {3}",
                     search, string.Join(",", tags), filterByRating, filterByTime).ToString());
-                await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server,
+                await _logManager.StoreArchiveLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server,
                     stringBuilder.ToString());
-                return BadRequest();
+                // 500 instead
+                return StatusCode(500);
             }
         }
     }

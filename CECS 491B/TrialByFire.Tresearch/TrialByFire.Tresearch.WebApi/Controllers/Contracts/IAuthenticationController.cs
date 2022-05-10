@@ -5,8 +5,8 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Contracts
     public interface IAuthenticationController
     {
         public Task<IActionResult> AuthenticateAsync(string username, string otp, 
-            string authorizationLevel, CancellationToken cancellationToken = default);
+            string authorizationLevel);
         public Task<IActionResult> AuthenticateAsync(string username, string otp, 
-            string authorizationLevel, DateTime now, CancellationToken cancellationToken = default);
+            string authorizationLevel, DateTime now);
     }
 }

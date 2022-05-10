@@ -9,6 +9,7 @@ using TrialByFire.Tresearch.Exceptions;
 using TrialByFire.Tresearch.Models;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
+using System.Text;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
@@ -20,10 +21,51 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         private BuildSettingsOptions _options { get; }
         private IMessageBank _messageBank;
 
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="messageBank"></param>
+        /// <param name="options"></param>
         public SqlDAO(IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> options)
         {
             _messageBank = messageBank;
             _options = options.Value;
+        }
+
+        /// <summary>
+        ///     UpdateNodeContentAsync():
+        ///         Returns a IResponse of string of the result of the SQL operation    
+        /// </summary>
+        /// <param name="nodeContentInput">Custom input object that contains relevant information for methods related to UpdateNodeContent</param>
+        /// <returns>Response that contains the results of operating on the database</returns>
+        public async Task<IResponse<string>> UpdateNodeContentAsync(INodeContentInput nodeContentInput)
+        {
+            // Check if input null
+            if (nodeContentInput == null)
+            {
+                return new NodeContentResponse<string>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.noSearchInput).ConfigureAwait(false), null, 400, false);
+            }
+            nodeContentInput.CancellationToken.ThrowIfCancellationRequested();
+            try
+            {
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var procedure = "[UpdateNodeContent]";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("NodeID", nodeContentInput.NodeID);
+                    parameters.Add("NodeTitle", nodeContentInput.NodeTitle);
+                    parameters.Add("Summary", nodeContentInput.Summary);
+                    parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                    var result = await connection.ExecuteAsync(procedure, parameters, commandType: CommandType.StoredProcedure);
+                    return new NodeContentResponse<string>("", parameters.Get<int>("Result").ToString(), 200, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new NodeContentResponse<string>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+            }
         }
 
         /// <summary>
@@ -35,55 +77,52 @@ namespace TrialByFire.Tresearch.DAL.Implementations
         public async Task<IResponse<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput)
         {
             // Check if search input null
-            if (searchInput != null)
-            {
-                try
-                {
-                    searchInput.CancellationToken.ThrowIfCancellationRequested();
-                    using (var connection = new SqlConnection(_options.SqlConnectionString))
-                    {
-                        var procedure = "[SearchNodes]";
-                        var parameters = new DynamicParameters();
-                        parameters.Add("Search", searchInput.Search);
-                        // Utilizing Dapper Multi-Relationship capabilities to associate relevant data to Node's
-                        var nodes = await connection.QueryAsync<Node, NodeTag, int, Node>(procedure, (node, tag, rating) =>
-                        {
-                            if (!(tag is null))
-                            {
-                                tag.NodeID = node.NodeID;
-                                node.Tags.Add(tag);
-                            }
-                            node.RatingScore = rating;
-                            return node;
-                        },
-                        parameters,
-                        commandType: CommandType.StoredProcedure,
-                        splitOn: "TagName, Rating");
-                        // Group query results since it comes back as one row per relation
-                        // (Grouping all tags of a node into a single Node's Tags property)
-                        var results = nodes.GroupBy(n => n.NodeID).ToList().Select(g =>
-                        {
-                            var groupedNode = g.FirstOrDefault();
-                            // Verify there is a node
-                            if(groupedNode != null)
-                            {
-                                groupedNode.Tags = g.Select(n => n.Tags.SingleOrDefault()).Where(nt => nt != null).ToList();
-                            }
-                            return groupedNode;
-                        }).ToList();
-                        return new SearchResponse<IEnumerable<Node>>("", results, 200, true);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    return new SearchResponse<IEnumerable<Node>>(await _messageBank.GetMessage(
-                        IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
-                }
-            }
-            else
+            if (searchInput == null)
             {
                 return new SearchResponse<IEnumerable<Node>>(await _messageBank.GetMessage(
                     IMessageBank.Responses.noSearchInput).ConfigureAwait(false), null, 400, false);
+            }
+            try
+            {
+                searchInput.CancellationToken.ThrowIfCancellationRequested();
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var procedure = "[SearchNodes]";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("Search", searchInput.Search);
+                    // Utilizing Dapper Multi-Relationship capabilities to associate relevant data to Node's
+                    var nodes = await connection.QueryAsync<Node, NodeTag, int, Node>(procedure, (node, tag, rating) =>
+                    {
+                        if (!(tag is null))
+                        {
+                            tag.NodeID = node.NodeID;
+                            node.Tags.Add(tag);
+                        }
+                        node.RatingScore = rating;
+                        return node;
+                    },
+                    parameters,
+                    commandType: CommandType.StoredProcedure,
+                    splitOn: "TagName, Rating");
+                    // Group query results since it comes back as one row per relation
+                    // (Grouping all tags of a node into a single Node's Tags property)
+                    var results = nodes.GroupBy(n => n.NodeID).ToList().Select(g =>
+                    {
+                        var groupedNode = g.FirstOrDefault();
+                        // Verify there is a node
+                        if(groupedNode != null)
+                        {
+                            groupedNode.Tags = g.Select(n => n.Tags.SingleOrDefault()).Where(nt => nt != null).ToList();
+                        }
+                        return groupedNode;
+                    }).ToList();
+                    return new SearchResponse<IEnumerable<Node>>("", results, 200, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new SearchResponse<IEnumerable<Node>>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
             }
         }
 
@@ -2575,34 +2614,224 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
-        public async Task<string> RateNodeAsync(string userHash, long nodeID, int rating, CancellationToken cancellationToken)
+        public async Task<IResponse<int>> RateNodeAsync(List<long> nodeIDs, int rating, string userHash, CancellationToken cancellationToken)
         {
             try
             {
                 //Throw Cancellation Exception if token requests cancellation
                 cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if node list is null or empty
+                if (nodeIDs == null || nodeIDs.Count.Equals(0))
+                {
+                    return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound), rating, 404, false);
+                }
+
+                if (rating <= 0)
+                    return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.invalidRating), rating, 422, false);
+
+                StringBuilder nodeCSV = new StringBuilder();
+
+                // Create Comma Seperated Values
+                foreach (long node in nodeIDs)
+                {
+                    nodeCSV.Append(node + ",");
+                }
+
                 // Establish connection to database
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     //Open connection
                     await connection.OpenAsync();
-                    var procedure = "dbo.[RateNode]";
+                    var procedure = "dbo.[RateNodes]";
                     var parameters = new
                     {
-                        UserHash = userHash,
-                        NodeID = nodeID,
-                        Rating = rating
+                        @UserHash = userHash,
+                        @InNodes = nodeCSV.ToString(),
+                        @Rating = rating
                     };
                     //Execute command
                     var executed = await connection.ExecuteAsync(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                    //Check if cancellation token requests cancellation
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        //Perform rollback
-                        
-                    }
+                    return new RateResponse<int>("", rating, 200, true);
+                }
+            }
+            catch (SqlException ex)
+            {
+                //Check sql exception
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail), rating, 503, false);
+                    case 547:   //Adding rating violates foreign key constraint (AKA NO ACCOUNT)
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.accountNotFound), rating, 500, false);
+                    default:
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), rating, 500, false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback already handled
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), rating, 408, false);
+            }
+            catch (Exception ex)
+            {
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException), rating, 500, false);
+            }
+        }
+
+        /// <summary>
+        ///     Returns a list of nodes containing IDs and rating of node
+        /// </summary>
+        /// <param name="nodeIDs">List of Node IDs</param>
+        /// <param name="cancellationToken">Cancellation Token</param>
+        /// <returns></returns>
+        public async Task<IResponse<IEnumerable<Node>>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // Check if node list is null or empty
+                if(nodeIDs == null || nodeIDs.Count.Equals(0))
+                {
+                    return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound), new List<Node>(), 404, false);
+                }
+
+                StringBuilder nodeCSV = new StringBuilder();
+
+                // Create Comma Seperated Values
+                foreach(long node in nodeIDs)
+                {
+                    nodeCSV.Append(node + ",");
+                }
+
+                // Establish connection to database
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    // Open connection
+                    await connection.OpenAsync();
+                    var procedure = "dbo.[GetNodesRatings]";
+                    var parameters = new DynamicParameters();
+                    parameters.Add("InNodes", nodeCSV.ToString());
+
+                    var result = await connection.QueryAsync<Node>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken));
+
+                    List<Node> nodeResult = new List<Node>(result.ToList());
+
+                    // Tag has been added, return success
+                    return new RateResponse<IEnumerable<Node>>("", nodeResult , 200, true);
+                }
+            }
+            catch (SqlException ex)
+            {
+                // Check sql exception
+                switch (ex.Number)
+                {
+                    // Unable to connect to database
+                    case -1:
+                        return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail), new List<Node>(), 503, false);
+                    default:
+                        return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, new List<Node>(), 500, false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // bubble up
+                return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), new List<Node>(), 408, false);
+            }
+            catch (Exception ex)
+            {
+                return new RateResponse<IEnumerable<Node>>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, new List<Node>(), 500, false);
+            }
+        }
+
+        public async Task<IResponse<int>> GetUserNodeRatingAsync(long nodeID, string userHash, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                //Throw Cancellation Exception if token requests cancellation
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (nodeID < 0)
+                    return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound), 0, 404, false);
+
+                // Establish connection to database
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Open connection
+                    await connection.OpenAsync();
+                    var procedure = "dbo.[GetUserNodeRating]";
+                    var parameters = new { @NodeID = nodeID, @UserHash = userHash };
+
+                    int result = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
                     //Tag has been added, return success
-                    return await _messageBank.GetMessage(IMessageBank.Responses.userRateSuccess);
+                    return new RateResponse<int>("", result, 200, true);
+                }
+            }
+            catch (SqlException ex)
+            {
+                //Check sql exception
+                switch (ex.Number)
+                {
+                    //Unable to connect to database
+                    case -1:
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail), 0, 503, false);
+                    default:
+                        return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, 0, 500, false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Rollback already handled
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested), 0, 408, false);
+            }
+            catch (Exception ex)
+            {
+                return new RateResponse<int>(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message, 0, 500, false);
+            }
+        }
+
+        public async Task<string> VerifyAuthorizedToView(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                //Throw Cancellation Exception if token requests cancellation
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (nodeIDs == null || nodeIDs.Count <= 0)
+                    return await _messageBank.GetMessage(IMessageBank.Responses.nodeNotFound).ConfigureAwait(false);
+
+                string nodeCSV = "";
+
+                // Create Comma Seperated Values
+                if(nodeIDs.Count > 1)
+                {
+                    foreach (long node in nodeIDs)
+                    {
+                        nodeCSV += node + ",";
+                    }
+                }
+                else
+                {
+                    nodeCSV  += nodeIDs[0];
+                }
+
+                // Establish connection to database
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    //Open connection
+                    await connection.OpenAsync();
+                    var procedure = "dbo.[VerifyAuthorizedToView]";
+                    var parameters = new { InNodes = nodeCSV, UserHash = userHash};
+
+                    var result = await connection.ExecuteScalarAsync<int>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
+
+                    if (result == 0)
+                        return await _messageBank.GetMessage(IMessageBank.Responses.notAuthorized).ConfigureAwait(false);
+
+                    return await _messageBank.GetMessage(IMessageBank.Responses.verifySuccess).ConfigureAwait(false);
                 }
             }
             catch (SqlException ex)
@@ -2613,10 +2842,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                     //Unable to connect to database
                     case -1:
                         return await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail);
-                    case 547:   //Adding rating violates foreign key constraint (AKA NO ACCOUNT)
-                        return _messageBank.GetMessage(IMessageBank.Responses.userRateFail).Result;
                     default:
-                        return  _options.UnhandledExceptionMessage + ex.Message;
+                        return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message;
                 }
             }
             catch (OperationCanceledException)
@@ -2626,59 +2853,7 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
             catch (Exception ex)
             {
-                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
-            }
-        }
-
-        public async Task<Tuple<List<double>, string>> GetNodeRatingAsync(List<long> nodeIDs, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            try
-            {
-                //Throw Cancellation Exception if token requests cancellation
-                cancellationToken.ThrowIfCancellationRequested();
-                // Establish connection to database
-                using (var connection = new SqlConnection(_options.SqlConnectionString))
-                {
-                    //Open connection
-                    await connection.OpenAsync();
-                    List<double> ratings = new List<double>();
-                    foreach (var nodeId in nodeIDs)
-                    {
-                        var procedure = "dbo.[GetNodeRating]";
-                        var parameters = new { NodeID = nodeId };
-
-                        var result = await connection.ExecuteScalarAsync<double>(new CommandDefinition(procedure, parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false);
-                        
-                        ratings.Add(result);
-                    }
-                    
-                    //Execute command
-                    
-
-                    //Tag has been added, return success
-                    return Tuple.Create(ratings, await _messageBank.GetMessage(IMessageBank.Responses.getRateSuccess));
-                }
-            }
-            catch (SqlException ex)
-            {
-                //Check sql exception
-                switch (ex.Number)
-                {
-                    //Unable to connect to database
-                    case -1:
-                        return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.databaseConnectionFail));
-                    default:
-                        return Tuple.Create(new List<double>(), _options.UnhandledExceptionMessage + ex.Message);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                // Rollback already handled
-                return Tuple.Create(new List<double>(), await _messageBank.GetMessage(IMessageBank.Responses.cancellationRequested));
-            }
-            catch (Exception ex)
-            {
-                return Tuple.Create(new List<double>(), _options.UnhandledExceptionMessage + ex.Message);
+                return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException) + ex.Message;
             }
         }
 

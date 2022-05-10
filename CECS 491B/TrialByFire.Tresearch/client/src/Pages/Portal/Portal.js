@@ -46,13 +46,12 @@ class Portal extends React.PureComponent{
     if(token != null){
       // Set token header when sending post
       axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
-      axios.get("https://localhost:7010/TreeManagement/getNodes?owner=" + token.userHash)
+      axios.get("https://trialbyfiretresearchwebapi.azurewebsites.net/TreeManagement/getNodes?owner=" + token.userHash)
       .then( res => {
         const nodes = this.setup(res.data);
         this.setState({nodes});
       });
-    }
-    
+    }  
   }
 
   // Check JWT Token

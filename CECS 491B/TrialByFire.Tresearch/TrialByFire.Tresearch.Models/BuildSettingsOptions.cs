@@ -21,5 +21,7 @@
         public string GuestName { get; set; } = String.Empty;
         public string GuestRole { get; set; } = String.Empty;
         public string GuestHash { get; set; } = String.Empty;
+        public int NodeTitleMaxLength { get; set; } = 0;
+        public int NodeSummaryMaxLength { get; set; } = 0;
     }
 }

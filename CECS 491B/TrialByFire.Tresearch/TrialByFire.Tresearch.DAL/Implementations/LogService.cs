@@ -10,20 +10,44 @@ using TrialByFire.Tresearch.Models.Implementations;
 
 namespace TrialByFire.Tresearch.DAL.Implementations
 {
+    /// <summary>
+    ///     NodeSearchService: Class that is part of the Service abstraction layer that performs services related to Logging
+    /// </summary>
     public class LogService : ILogService
     {
         private  ISqlDAO _sqlDAO { get; }
         private IMessageBank _messageBank { get; }
 
+        /// <summary>
+        ///     public LogService():
+        ///         Constructor for LogService class
+        /// </summary>
+        /// <param name="sqlDAO">SQL Data Access Object to interact with the database</param>
+        /// <param name="messageBank">Object that contains error and success messages</param>
         public LogService(ISqlDAO sqlDAO, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
             _messageBank = messageBank;
         }
 
+        /// <summary>
+        ///     CreateLogAsync:
+        ///         Async method to create a Log object
+        /// </summary>
+        /// <param name="timestamp">The time of the Log</param>
+        /// <param name="level">The level of the Log</param>
+        /// <param name="category">The category of the Log</param>
+        /// <param name="description">The description of the Log</param>
+        /// <param name="cancellationToken">The cancellation token of the operation</param>
+        /// <returns>The newly created Log object</returns>
         public async Task<ILog> CreateLogAsync(DateTime timestamp, string level, string category, 
             string description, CancellationToken cancellationToken = default)
         {
+            // 
+            if(Thread.CurrentPrincipal is null || Thread.CurrentPrincipal.Identity is null || !(Thread.CurrentPrincipal.Identity is IRoleIdentity))
+            {
+                return null;
+            }
             try
             {
                 string userHash = (Thread.CurrentPrincipal.Identity as IRoleIdentity).UserHash;
@@ -42,6 +66,15 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+        /// <summary>
+        ///     StoreLogAsync:
+        ///         Async method to store a Log to a destination
+        /// </summary>
+        /// <param name="log">The Log to store</param>
+        /// <param name="destination">Where to store the Log (table in the database)</param>
+        /// <param name="cancellationToken">The cancellation token of the operation</param>
+        /// <returns>The result of the attempt to store the Log</returns>
+        /// <exception cref="NotImplementedException"></exception>
         public async Task<string> StoreLogAsync(ILog log, string destination, 
             CancellationToken cancellationToken = default(CancellationToken))
         {
