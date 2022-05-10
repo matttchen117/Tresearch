@@ -94,7 +94,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
                             .ConfigureAwait(false)))
                         {
                             // No API Key right now
-                            if (!_options.Environment.Equals("Test"))
+                            if (!_options.Environment.Equals("Test") && !_options.SendGridAPIKey.Equals(""))
                             {
                                 result = await _mailService.SendOTPAsync(account.Username, otp, otp, otp, _cancellationTokenSource.Token).ConfigureAwait(false);
                             }

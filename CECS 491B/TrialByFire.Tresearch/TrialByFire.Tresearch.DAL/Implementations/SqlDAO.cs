@@ -49,7 +49,6 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             nodeContentInput.CancellationToken.ThrowIfCancellationRequested();
             try
             {
-                nodeContentInput.CancellationToken.ThrowIfCancellationRequested();
                 using (var connection = new SqlConnection(_options.SqlConnectionString))
                 {
                     var procedure = "[UpdateNodeContent]";

@@ -39,6 +39,7 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.NodeContent
             IResponse<string> response = await _nodeContentService.UpdateNodeContentAsync(nodeContentInput).ConfigureAwait(false);
 
             // Assert
+            //Test for every field of response (and first check for null)
             Assert.Equal(expected.ErrorMessage, response.ErrorMessage);
             Assert.Equal(expected.Data, response.Data);
         }

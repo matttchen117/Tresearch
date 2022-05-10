@@ -45,6 +45,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         /// <returns>The result of the operation</returns>
         [HttpPost]
         [Route("update")]
+        // Do object input, extensible
         public async Task<IActionResult> UpdateNodeContentAsync(string owner, long nodeID, string title, string summary)
         {
             try

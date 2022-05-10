@@ -43,6 +43,11 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         /// <returns>Response that contains the result of the database operation</returns>
         public async Task<IResponse<string>> UpdateNodeContentAsync(INodeContentInput nodeContentInput)
         {
+            // Secutiry cehck as private methdo, separate top and bottom
+            // Input validation typicall reusable, have a class for each validation check
+            // Check most likely scenarios first to exit early, check other things later
+            // Do input validation before check if valid user
+
             // Check if input null
             if (nodeContentInput == null)
             {

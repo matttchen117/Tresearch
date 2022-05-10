@@ -84,7 +84,9 @@ class ChangeNodeContent extends React.PureComponent{
     }
     return parsedData;
 }
-
+  // if user logged in for edit, token deleted, now user shouldnt be allowed to do
+  // if no frontend validation, reducing user experience, have to wait for backend to do security check
+  // should be checking token before navigation, on page load, and tertiary (before executing operation)
   UpdateContent = async() => {
     await axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/NodeContent/update?owner=' + this.state.node.userHash + '&nodeID=' + this.state.node.nodeID + 
     '&title=' + this.handleEncoded(this.state.title) + '&summary=' + this.handleEncoded(this.state.summary))
@@ -96,7 +98,9 @@ class ChangeNodeContent extends React.PureComponent{
 
     })
 }
-  
+  // hard coding event, want to programatically assign event to html element 
+  // can change how event gets triggered, don't need to modify code if want to change how even is triggered
+  // Check Github for how to do - JS registration
   render() {
     return(
         <div className="node-wrapper">
