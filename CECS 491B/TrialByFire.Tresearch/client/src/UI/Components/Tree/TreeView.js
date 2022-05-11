@@ -6,6 +6,7 @@ import Popup from "../../Popup/Popup";
 import TagPopup from "../../Popup/TagPopup";
 import NodePopup from "../../Popup/NodePopup";
 import CreateNodePopup from "../../Popup/CreateNodePopup";
+import EditNodePropertiesPopup from "../../Popup/EditNodePropertiesPopup"
 import ChangeContentPopup from "../../Popup/ChangeContentPopup";
 import "./TreeView.css";
 import RateNodePopup from "../../Popup/RateNodePopup";
@@ -67,6 +68,7 @@ class TreeView extends React.Component{
             isShown: false,
             isGuest: true,
             isOwner: false,
+            editNodeProperties: false,
             x: 0,
             y: 0
         }
@@ -148,7 +150,23 @@ class TreeView extends React.Component{
     CreateNode = (e) => {
         e.stopPropagation();
         const currentState = Array.from(new Set(this.state.nodeSelect));
-        this.setState( { nodeSelect: currentState, isCreateNodeOpen: true, isPopupOpen: true, isShown: false,  x: e.pageX, y: e.pageY})
+        this.setState( {    nodeSelect: currentState, 
+                            isCreateNodeOpen: true, 
+                            isPopupOpen: true, 
+                            isShown: false,  
+                            x: e.pageX, 
+                            y: e.pageY})
+    }
+
+    EditNodeProperties = (e) => {
+        e.stopPropagation();
+        const currentState = Array.from(new Set(this.state.nodeSelect));
+        this.setState( {    nodeSelect: currentState, 
+                            editNodeProperties: true, 
+                            isPopupOpen: true, 
+                            isShown: false, 
+                            x: e.pageX, 
+                            y: e.pageY})
     }
 
     DeleteNode = (e) => {
@@ -195,9 +213,6 @@ class TreeView extends React.Component{
         this.unhighlight();
     }
 
-
-
-
     handleEncoded = (e) => {
         var parsedData = e.toString();
         if(parsedData.includes('!')){
@@ -227,7 +242,6 @@ class TreeView extends React.Component{
         return parsedData;
     }
 
-
     CopyNodes = (e) => {
         e.stopPropagation();
         const shiftClickedNodes = Array.from(new Set(this.state.nodeSelect));
@@ -239,8 +253,6 @@ class TreeView extends React.Component{
             sessionStorage.setItem("nodes", JSON.stringify(this.state.copiedNodes));
         })
     }
-
-
 
     PasteNodes = (e) => {
         e.stopPropagation();
@@ -274,7 +286,6 @@ class TreeView extends React.Component{
         )
     }
 
-
     PublicNodes = (e) => {
         e.stopPropagation();
         const nodesToPublic = Array.from(new Set(this.state.nodeSelect));
@@ -287,10 +298,6 @@ class TreeView extends React.Component{
         }
         )
     }
-
-
-
-
 
      render() {
         const  ToggleTagger = () => {
@@ -315,6 +322,16 @@ class TreeView extends React.Component{
                 isCreateNodeOpen: false,
                 isPopupOpen: false
             })
+        }
+
+        const ToggleEditNodeProperties = () => {
+            this.setState(
+                {
+                    editNodeProperties: false,
+                    selectedNode: [],
+                    isPopupOpen: false
+                }
+            )
         }
 
         const ToggleRatePopup = () => {
@@ -412,8 +429,7 @@ class TreeView extends React.Component{
                             </div>
                             <div className="option" onClick = {this.EditTags}>
                                 Edit Tags
-                            </div>
-                            
+                            </div>     
                             <div className="option" onClick = {this.CopyNodes}>
                                 Copy Node(s)
                             </div>
@@ -428,6 +444,9 @@ class TreeView extends React.Component{
                             </div>
                             <div className="option" onClick = {this.DeleteNode}>
                                 Delete Node(s)
+                            </div>
+                            <div className="option" onClick = {this.EditNodeProperties}> 
+                                Edit Node Properties
                             </div>
                         </div>
                     )}
@@ -460,6 +479,9 @@ class TreeView extends React.Component{
                 </div>
                 <div className = "node-rate-wrapper">
                     {this.state.isRateViewOpen ? <Popup content = {<RateNodePopup onClick= {ToggleRatePopup} nodes = {this.state.nodeSelect} />} /> : null }
+                </div>
+                <div className="edit-node-properties-wrapper">
+                    {this.state.editNodeProperties ? <Popup content = {<EditNodePropertiesPopup onClick = {ToggleEditNodeProperties} node = {this.state.nodeSelect}/>} /> : null}
                 </div>
             </div>
         );

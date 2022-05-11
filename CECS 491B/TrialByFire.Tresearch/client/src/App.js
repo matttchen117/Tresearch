@@ -31,7 +31,7 @@ import Search from "./Features/Search/NodeSearch";
 import SearchPage from "./Features/Search/SearchPage";
 import NodeView from "./UI/Components/NodeView/NodeView";
 import Rating from "./UI/Rating/Rating";
-import CreateNode from "./Features/CreateNode/CreateNode"
+import CreateNode from "./Features/CreateNode/CreateNode";
 
 class App extends React.Component {
   constructor(props){

@@ -93,7 +93,7 @@ class NodeCreationForm extends React.Component{
         return (
             <div className="form-createNode-wrapper">
                 <div className="container-createNode-text">
-                    <h1 className="createNode-title">NodeCreation</h1>
+                    <h1 className="">NodeCreation</h1>createNode-title
                 </div>    
                 {renderForm}
             </div>

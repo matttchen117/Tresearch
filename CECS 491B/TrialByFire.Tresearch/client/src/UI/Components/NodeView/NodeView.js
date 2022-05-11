@@ -23,8 +23,6 @@ class NodeView extends React.PureComponent {
     componentDidMount() {
         this.GetRatings();
         this.state.token = this.checkToken();
-        
-        
     }
 
     checkToken = () => {
@@ -60,6 +58,14 @@ class NodeView extends React.PureComponent {
                 window.location = '/';
             }
         }
+    }
+
+    ChangeColor = async () => {
+        
+    }
+
+    ChangeFont = async () => {
+
     }
 
     GetRatings = async () => {

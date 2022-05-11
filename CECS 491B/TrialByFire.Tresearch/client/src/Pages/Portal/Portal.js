@@ -4,6 +4,7 @@ import NavBar from "../../UI/Navigation/NavBar";
 import TreeView from "../../UI/Components/Tree/TreeView";
 import jwt_decode from "jwt-decode";  
 import './Portal.css';
+import EditNodeProperties from "../../Features/EditNodeProperties/EditNodeProperties";
 
 class Portal extends React.PureComponent{
   constructor(props){
