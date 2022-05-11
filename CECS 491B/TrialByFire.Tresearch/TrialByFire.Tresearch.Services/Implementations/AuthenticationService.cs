@@ -18,8 +18,9 @@ using TrialByFire.Tresearch.Models;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
-    // Summary:
-    //     A service class for Authenticating the User.
+    /// <summary>
+    ///     AuthenticationService: Class that is part of the Service abstraction layer that performs services related to Authentication
+    /// </summary>
     public class AuthenticationService : IAuthenticationService
     {
         private ISqlDAO _sqlDAO { get; }
@@ -37,16 +38,13 @@ namespace TrialByFire.Tresearch.Services.Implementations
         }
 
 
-        //
-        // Summary:
-        //     Authenticates the User and returns a JWT token for them on success
-        //
-        // Parameters:
-        //   otpClaim:
-        //     The OTPClaim representing the credentials of the User attempting to Authenticate.
-        //
-        // Returns:
-        //     The result of the Authentication process and a JWT token on success.
+        /// <summary>
+        ///     public AuthenticateAsync():
+        ///         Calls DAO object and interprets the response from it for Authentication
+        /// </summary>
+        /// <param name="authenticationInput">Custom input object that contains relevant information for methods related to Authentication</param>
+        /// <param name="cancellationToken">The cancellation token of the operation</param>
+        /// <returns>The results of the operation</returns>
         public async Task<List<string>> AuthenticateAsync(IAuthenticationInput authenticationInput, 
             CancellationToken cancellationToken = default)
         {
@@ -56,10 +54,13 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 authenticationInput.UserHash = await _sqlDAO.GetUserHashAsync(authenticationInput.UserAccount)
                     .ConfigureAwait(false);
-                authenticationInput.UserAccount.Token = await CreateJwtToken(authenticationInput)
+
+                authenticationInput.UserAccount.Token = await CreateJwtTokenAsync(authenticationInput)
                     .ConfigureAwait(false);
+
                 int result = await _sqlDAO.AuthenticateAsync(authenticationInput, cancellationToken)
                     .ConfigureAwait(false);
+
                 switch (result)
                 {
                     case 0:
@@ -115,21 +116,14 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
-        // use microsoft built in jWT
-        // use default key, randomizer, replace every 3 months
-        // look into AES type 
-
-        //
-        // Summary:
-        //     Creates a JWT token based
-        //
-        // Parameters:
-        //   payload:
-        //     The payload to be put into the JWT
-        //
-        // Returns:
-        //     The result of the JWT creation process and the JWT token on success.
-        private async Task<string> CreateJwtToken(IAuthenticationInput authenticationInput, CancellationToken cancellation 
+        /// <summary>
+        ///     CreateJwtTokenAsync:
+        ///         Creates a JWT token based on the input
+        /// </summary>
+        /// <param name="authenticationInput">Custom input object that contains relevant information for methods related to Authentication</param>
+        /// <param name="cancellationToken">The cancellation token of the operation</param>
+        /// <returns>The created JWT</returns>
+        private async Task<string> CreateJwtTokenAsync(IAuthenticationInput authenticationInput, CancellationToken cancellationToken 
             = default)
         {
             try
@@ -173,13 +167,20 @@ namespace TrialByFire.Tresearch.Services.Implementations
             }
         }
 
+        /// <summary>
+        ///     RefreshSessionAsync:
+        ///         Creates a new JWT for the user
+        /// </summary>
+        /// <param name="authenticationInput">Custom input object that contains relevant information for methods related to Authentication</param>
+        /// <param name="cancellationToken">The cancellation token of the operation</param>
+        /// <returns>The results of the operation</returns>
         public async Task<List<string>> RefreshSessionAsync(IAuthenticationInput authenticationInput, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             List<string> results = new List<string>();
             try
             {
-                string jwt = await CreateJwtToken(authenticationInput, cancellationToken).ConfigureAwait(false);
+                string jwt = await CreateJwtTokenAsync(authenticationInput, cancellationToken).ConfigureAwait(false);
                 results.Add(await _messageBank.GetMessage(IMessageBank.Responses.refreshSessionSuccess).ConfigureAwait(false));
                 results.Add(jwt);
             }

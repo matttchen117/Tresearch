@@ -9,8 +9,10 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
-    // Summary:
-    //     A controller class for logging the User out.
+    /// <summary>
+    ///     LogoutController: Class that is part of the Controller abstraction layer that handles receiving and returning
+    ///         HTTP response and requests for Logout
+    /// </summary>
     [ApiController]
     [EnableCors]
     [Route("[controller]")]
@@ -22,6 +24,14 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         private ILogoutManager _logoutManager { get; }
 
         private BuildSettingsOptions _options { get; }
+        /// <summary>
+        ///     public LogoutController():
+        ///         Constructor for LogoutController class
+        /// </summary>
+        /// <param name="logManager">Manager object for Manager abstraction layer to handle business rules related to Logging</param>
+        /// <param name="messageBank">Object that contains error and success messages</param>
+        /// <param name="logoutManager">Manager object for Manager abstraction layer to handle business rules related to Logout</param>
+        /// <param name="options">The settings/options</param>
         public LogoutController(ILogManager logManager, IMessageBank messageBank, 
             ILogoutManager logoutManager, IOptionsSnapshot<BuildSettingsOptions> options)
         {
@@ -31,29 +41,29 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _options = options.Value;
         }
 
-        //
-        // Summary:
-        //     Entry point for Logout requests and deletes the Users Cookie
-        //
-        // Returns:
-        //     The result of the operation with any status codes if applicable.
+        /// <summary>
+        ///     LogoutAsync:
+        ///         Async method that handles receiving HTTP requests for Logout operation and returning the results
+        /// </summary>
+        /// <returns>The result of the operation</returns>
         [HttpPost]
         [Route("logout")]
-        // Do Async if want to log something for DB (last time logged in)
-        // Only Async if require operation to be done
         public async Task<IActionResult> LogoutAsync()
         {
             try
             {
                 string result = await _logoutManager.LogoutAsync().ConfigureAwait(false);
+
                 string[] split = result.Split(": ");
                 if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.logoutSuccess)
                     .ConfigureAwait(false)))
                 {
+                    // Don't modify header's if in Test environment
                     if (_options.Environment.Equals("Test"))
                     {
                         return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                     }
+
                     HttpContext.User = null;
                     Response.Headers.Remove(_options.JWTHeaderName);
                     await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
