@@ -83,7 +83,6 @@ class AdminLogin extends React.Component  {
 
     onSubmitHandler = (e) => {
         e.preventDefault();
-        this.verifyToken();
         axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
         // pbkdf2 uses callbacks not promises, need to wrap in a promise object
 
@@ -96,8 +95,7 @@ class AdminLogin extends React.Component  {
                         sessionStorage.setItem('authorization', response.headers['authorization']);
                         window.location = '/Admin/Dashboard';
                 }).catch(err => {
-                        console.log(err.data);
-                        //sessionStorage.setItem('authorization', err.headers['authorization']);
+                        
                     })
                 :
                 axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/OTPRequest/requestotp?username=' + this.state.username.toLowerCase() + 
@@ -107,9 +105,11 @@ class AdminLogin extends React.Component  {
                         
                         //navigate('/Login/Authentication');
                 }).catch(err => {
-                    console.log(err.data)
-                    //sessionStorage.setItem('authorization', err.headers['authorization']);
-                    //this.setState({verified: true}); // remvoe later once added in api key
+                    switch(err.response.status){
+                        case 400: this.setState({errorMessage: 'Invalid Credentials'});
+                            break;
+                        default: this.setState({errorMessage: 'Unable to login'});
+                    }
                 })
             }
         }

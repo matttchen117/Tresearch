@@ -58,9 +58,12 @@ class TreeView extends React.Component{
             isEditViewOpen: false,
             copiedNodes: [],
             selectedNode: [],
+            selectNodeTotal: [],
+            shiftNodeTotalCollection: [],
             isTaggerOpen: false,
             isCreateNodeOpen: false,
             isPopupOpen: false,
+            nodeTotalSelect: -1,
             nodeSelect: -1,
             shiftDown: false,
             shiftCollection: [],
@@ -153,7 +156,6 @@ class TreeView extends React.Component{
 
     DeleteNode = (e) => {
         e.stopPropagation();
-        //console.log(this.state.nodeSelect[0])
         const n = {userHash: this.state.nodeSelect[0].userHash,
                         nodeID: this.state.nodeSelect[0].nodeID,
                         parentNodeID: this.state.nodeSelect[0].parentNodeID,
@@ -195,9 +197,6 @@ class TreeView extends React.Component{
         this.unhighlight();
     }
 
-
-
-
     handleEncoded = (e) => {
         var parsedData = e.toString();
         if(parsedData.includes('!')){
@@ -227,7 +226,6 @@ class TreeView extends React.Component{
         return parsedData;
     }
 
-
     CopyNodes = (e) => {
         e.stopPropagation();
         const shiftClickedNodes = Array.from(new Set(this.state.nodeSelect));
@@ -239,8 +237,6 @@ class TreeView extends React.Component{
             sessionStorage.setItem("nodes", JSON.stringify(this.state.copiedNodes));
         })
     }
-
-
 
     PasteNodes = (e) => {
         e.stopPropagation();
@@ -274,7 +270,6 @@ class TreeView extends React.Component{
         )
     }
 
-
     PublicNodes = (e) => {
         e.stopPropagation();
         const nodesToPublic = Array.from(new Set(this.state.nodeSelect));
@@ -287,10 +282,6 @@ class TreeView extends React.Component{
         }
         )
     }
-
-
-
-
 
      render() {
         const  ToggleTagger = () => {
@@ -335,12 +326,13 @@ class TreeView extends React.Component{
             // Check if user is trying to select multiple
             if(this.state.shiftDown){
                 var currentState = this.state.shiftCollection;
+                var currentNodesState = this.state.shiftNodeTotalCollection;
                 if(!currentState.includes(nodeData.nodeID)){
                     handleHighLight(e, nodeData.nodeID);
-                    this.setState({shiftCollection: [...currentState, nodeData.nodeID]})
+                    this.setState({shiftCollection: [...currentState, nodeData.nodeID], shiftNodeTotalCollection: [...currentNodesState, nodeData]})
                 } else{
                     // Douible click (remove from shift collection)
-                    this.setState({shiftCollection: this.state.shiftCollection.filter(x => x != nodeData.nodeID) });
+                    this.setState({shiftCollection: this.state.shiftCollection.filter(x => x != nodeData.nodeID), shiftNodeTotalCollection: this.state.shiftCollection.filter(x=> x!= nodeData) });
                     handleHighLight(e, nodeData.nodeID);
                 }
             } else{
