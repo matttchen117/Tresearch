@@ -10,27 +10,31 @@ using TrialByFire.Tresearch.Services.Contracts;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
-    // Summary:
-    //     A service class for Authorizing the User
+    /// <summary>
+    ///     AuthorizationService: Class that is part of the Service abstraction layer that performs services related to Authorization
+    /// </summary>
     public class AuthorizationService : IAuthorizationService
     {
         private ISqlDAO _sqlDAO { get; }
+
+        /// <summary>
+        ///     public AuthorizationService():
+        ///         Constructor for AuthorizationService class
+        /// </summary>
+        /// <param name="sqlDAO">SQL Data Access Object to interact with the database</param>
         public AuthorizationService(ISqlDAO sqlDAO)
         {
             _sqlDAO = sqlDAO;
         }
 
-        //
-        // Summary:
-        //     Verifies the Authorization Level of the current Principal of the User is 
-        //  
-        //
-        // Parameters:
-        //   requiredAuthLevel:
-        //     The requried Authorization Level to perform the operation
-        //
-        // Returns:
-        //     The result of the verification process.
+        /// <summary>
+        ///     public VerifyAuthorizedAsync():
+        ///         Checks if user is authorized by role or by identity
+        /// </summary>
+        /// <param name="requiredAuthLevel">The authrozation level required</param>
+        /// <param name="identity">The identity of the user</param>
+        /// <param name="cancellationToken">The cancellation token of the operation</param>
+        /// <returns>The result of the operation</returns>
         public async Task<bool> VerifyAuthorizedAsync(string requiredAuthLevel, 
             string identity, CancellationToken cancellationToken = default)
         {
@@ -38,8 +42,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
             {
                 if(!requiredAuthLevel.Equals(""))
                 {
-                    return Thread.CurrentPrincipal.IsInRole(requiredAuthLevel)
-                    || Thread.CurrentPrincipal.IsInRole("admin");
+                    return Thread.CurrentPrincipal.IsInRole(requiredAuthLevel) || Thread.CurrentPrincipal.IsInRole("admin");
                 }
                 else if(!identity.Equals(""))
                 {

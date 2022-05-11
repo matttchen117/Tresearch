@@ -22,8 +22,10 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private BuildSettingsOptions _options { get; }
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
             TimeSpan.FromSeconds(5));
+
         /// <summary>
-        ///     
+        ///     public NodeContentManager():
+        ///         Constructor for NodeContentManager class
         /// </summary>
         /// <param name="messageBank">Object that contains error and success messages</param>
         /// <param name="nodeContentService">Service object for Service abstraction layer to perform services related to UpdateNodeContent</param>

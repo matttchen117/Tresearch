@@ -33,7 +33,7 @@ namespace TrialByFire.Tresearch.Services.Implementations
         ///     public UpdateNodeContentAsync():
         ///         Calls DAO object and interprets the response from it
         /// </summary>
-        /// <param name="searchInput">Custom input object that contains relevant information for methods related to UpdateNodeContent</param>
+        /// <param name="nodeContentInput">Custom input object that contains relevant information for methods related to UpdateNodeContent</param>
         /// <returns>Response that contains the result of the database operation</returns>
         public async Task<IResponse<string>> UpdateNodeContentAsync(INodeContentInput nodeContentInput)
         {

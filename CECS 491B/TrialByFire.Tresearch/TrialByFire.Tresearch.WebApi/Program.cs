@@ -68,7 +68,6 @@ builder.Services.AddScoped<IPrivateAndPublicManager, PrivateAndPublicManager>();
 builder.Services.AddScoped<IUADManager, UADManager>();
 builder.Services.AddScoped<INodeSearchManager, NodeSearchManager>();
 builder.Services.AddScoped<INodeContentManager, NodeContentManager>();
-// Unnecessary, only here temporarily for successful build
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -79,7 +78,6 @@ builder.Services.AddSwaggerGen();
 // Invoked during build, not waht we want, want it to be invoked for AuthN process
 // Need to DI inject into Middleware - look into source code for how to do
 // builder.Services.AddScoped<IRolePrincipal, RolePrincipal>((services) => {new RolePrincipal()});
-
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -114,11 +112,6 @@ app.UseHttpsRedirection();
 app.UseCors(MyAllowSpecificOrigins);
 
 app.UseTokenAuthentication();
-
-/*app.Use((context, next) =>
-{
-
-});*/
 
 app.MapControllers();
 

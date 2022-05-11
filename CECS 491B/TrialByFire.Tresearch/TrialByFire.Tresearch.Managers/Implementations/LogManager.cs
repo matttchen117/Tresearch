@@ -13,7 +13,7 @@ using static TrialByFire.Tresearch.Managers.Contracts.ILogManager;
 namespace TrialByFire.Tresearch.Managers.Implementations
 {
     /// <summary>
-    ///     NodeSearchManager: Class that is part of the Manager abstraction layer that handles business rules related to Logging
+    ///     LogManager: Class that is part of the Manager abstraction layer that handles business rules related to Logging
     /// </summary>
     public class LogManager : ILogManager
     {

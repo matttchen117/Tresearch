@@ -13,36 +13,45 @@ using TrialByFire.Tresearch.Managers.Contracts;
 
 namespace TrialByFire.Tresearch.Middlewares
 {
+    /// <summary>
+    ///     TokenAuthentication:
+    ///         Custom middleware class for JWT token authentication
+    /// </summary>
     public class TokenAuthentication
     {
         private RequestDelegate _next { get; }
         private IOptionsMonitor<BuildSettingsOptions> _options { get; }
+        /// <summary>
+        ///     public TokenAuthentication():
+        ///         Constructor for TokenAuthentication class
+        /// </summary>
+        /// <param name="next">The next delagate in the process</param>
+        /// <param name="options">Snapshot object that represents the setings/configurations of the application</param>
         public TokenAuthentication(RequestDelegate next, IOptionsMonitor<BuildSettingsOptions> options)
         {
             _next = next;
             _options = options;
         }
 
+        /// <summary>
+        ///     Invoke:
+        ///         Operation for TokenAuthentication that checks incoming JWT, validates it, and refreshes it
+        /// </summary>
+        /// <param name="httpContext">The incoming HTTP request context</param>
+        /// <param name="logManager">Manager object for Manager abstraction layer to handle business rules related to Logging</param>
+        /// <param name="messageBank">Object that contains error and success messages</param>
+        /// <param name="authenticationManager">Manager object for Manager abstraction layer to handle business rules related to Authentication</param>
+        /// <returns></returns>
         public async Task Invoke(HttpContext httpContext, ILogManager logManager, 
             IMessageBank messageBank, IAuthenticationManager authenticationManager)
         {
             try
             {
-                // This should check if httpContext.User is not null
-                // The Thread.CurrentPrincipal could be running on a different thread from the logout
-
-            // This is not working, is always not null, but has no values
-
-            // Authorization is usually used default header - gets transferred all the time
-            // ALL hardcoding should be in config
-            // for custom headers, follow format X-{HeaderName}
-
                 if (httpContext.Request.Headers.ContainsKey(_options.CurrentValue.JWTHeaderName))
                 {
                     if (!httpContext.Request.Headers[_options.CurrentValue.JWTHeaderName].Equals("null"))
                     {
-                        // if can modify permissions, always need to check db
-                        // for access, would need to verify db
+                        // Validate JWT
                         string jwt = httpContext.Request.Headers[_options.CurrentValue.JWTHeaderName];
                         var tokenHandler = new JwtSecurityTokenHandler();
                         var keyValue = _options.CurrentValue.JWTTokenKey;
@@ -58,7 +67,8 @@ namespace TrialByFire.Tresearch.Middlewares
                             ClockSkew = TimeSpan.Zero
                         }, out SecurityToken validatedToken);
                         var jwtToken = (JwtSecurityToken)validatedToken;
-                        //singleton
+                        
+                        // Set Principal 
                         IRoleIdentity roleIdentity = new RoleIdentity(true,
                             jwtToken.Claims.First(x => x.Type ==
                                 _options.CurrentValue.RoleIdentityIdentifier1).Value,
@@ -67,25 +77,21 @@ namespace TrialByFire.Tresearch.Middlewares
                             jwtToken.Claims.First(x => x.Type ==
                                 _options.CurrentValue.RoleIdentityIdentifier3).Value);
                         IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
-
-                        // possibly issue with this?
-                        //httpContext.User = new ClaimsPrincipal(rolePrincipal);
                         Thread.CurrentPrincipal = rolePrincipal;
 
 
-                        // call authentcation manager for refresh
-
+                        // call authentication manager for refresh
                         List<string> results = await authenticationManager.RefreshSessionAsync().ConfigureAwait(false);
                         string[] split;
                         string result = results[0];
+                        // Refresh only on success
                         if (result.Equals(await messageBank.GetMessage(IMessageBank.Responses.refreshSessionSuccess).
                                 ConfigureAwait(false)))
                         {
-                            // Decide if refresh even on fail
                             httpContext.Response.Headers.Add(_options.CurrentValue.AccessControlHeaderName, _options.CurrentValue.JWTHeaderName);
                             httpContext.Response.Headers.Add(_options.CurrentValue.JWTHeaderName, results[1]);
                             split = result.Split(": ");
-                            logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(),
+                            await logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(),
                                 level: ILogManager.Levels.Info, category: ILogManager.Categories.Server, split[2]);
                         }
                         else
@@ -93,12 +99,12 @@ namespace TrialByFire.Tresearch.Middlewares
                             split = result.Split(": ");
                             if (Enum.TryParse(split[1], out ILogManager.Categories category))
                             {
-                                logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(),
+                                await logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(),
                                     level: ILogManager.Levels.Error, category, split[2]);
                             }
                             else
                             {
-                                logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(),
+                                await logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(),
                                     level: ILogManager.Levels.Error, category: ILogManager.Categories.Server,
                                     split[2] + ": Bad category passed back.");
                             }
@@ -125,7 +131,7 @@ namespace TrialByFire.Tresearch.Middlewares
                 IRoleIdentity roleIdentity = new RoleIdentity(true, "", "", _options.CurrentValue.GuestHash);
                 IRolePrincipal rolePrincipal = new RolePrincipal(roleIdentity);
                 Thread.CurrentPrincipal = rolePrincipal;
-                logManager.StoreArchiveLogAsync(DateTime.UtcNow, level: ILogManager.Levels.Error, 
+                await logManager.StoreArchiveLogAsync(DateTime.UtcNow, level: ILogManager.Levels.Error, 
                     category: ILogManager.Categories.Server, 
                     await messageBank.GetMessage(IMessageBank.Responses.jwtValidationFail)
                     .ConfigureAwait(false) + ex.Message);

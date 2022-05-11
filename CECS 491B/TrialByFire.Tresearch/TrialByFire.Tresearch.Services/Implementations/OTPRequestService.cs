@@ -11,30 +11,34 @@ using TrialByFire.Tresearch.Services.Contracts;
 
 namespace TrialByFire.Tresearch.Services.Implementations
 {
-    // Summary:
-    //     A service class for requesting OTPs.
+    /// <summary>
+    ///     OTPRequestService: Class that is part of the Service abstraction layer that performs services related to OTPRequest
+    /// </summary>
     public class OTPRequestService : IOTPRequestService
     {
         private ISqlDAO _sqlDAO { get; }
         private IMessageBank _messageBank { get; }
+
+        /// <summary>
+        ///     public OTPRequestService():
+        ///         Constructor for OTPRequestService class
+        /// </summary>
+        /// <param name="sqlDAO">SQL Data Access Object to interact with the database</param>
+        /// <param name="messageBank">Object that contains error and success messages</param>
         public OTPRequestService(ISqlDAO sqlDAO, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
             _messageBank = messageBank;
         }
 
-        //
-        // Summary:
-        //     Verifies the UserAccount and calls the DAO to store an OTPClaim for the corresponding UserAccount
-        //
-        // Parameters:
-        //   account:
-        //     The UserAccount to verify and store the OTPClaim for.
-        //   otpClaim:
-        //     The OTPClaim to store.
-        //
-        // Returns:
-        //     The result of the verification/storing process.
+        /// <summary>
+        ///     RequestOTPAsync:
+        ///         Calls DAO object and interprets the response from it
+        /// </summary>
+        /// <param name="account">The account to associate the OTP with</param>
+        /// <param name="otpClaim">The otp to store</param>
+        /// <param name="cancellationToken">The cancellation token of the operation</param>
+        /// <returns>The result of the operation</returns>
         public async Task<string> RequestOTPAsync(IAccount account, IOTPClaim otpClaim, 
             CancellationToken cancellationToken = default)
         {
@@ -64,7 +68,6 @@ namespace TrialByFire.Tresearch.Services.Implementations
             catch (OTPClaimCreationFailedException occfe)
             {
                 return "400: Server: " + occfe.Message;
-                //return occfe.Message;
             }
             catch (InvalidOperationException ioe)
             {
