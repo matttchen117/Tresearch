@@ -14,8 +14,8 @@ namespace TrialByFire.Tresearch.Services.Implementations
 
         private string _sender = "no-reply@tresearch.systems";
         private string _senderName = "Tresearch Support";
-        private string _confirmationTemplate = "d-a7af897441a34066b64fe416cf76d29b";
-        private string _recoveryTemplate = "d-a8d61f53ced342a9addb30a043e6ef01";
+        private string _confirmationTemplate = "d-2c3f125a25644b23a70e3fab890655d9";
+        private string _recoveryTemplate = "d-7870662d682e4790b83384cdef192087";
 
         public MailService(IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> options) 
         { 
