@@ -1,11 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Cors;
-using TrialByFire.Tresearch.Models.Contracts;
-using TrialByFire.Tresearch.Models.Implementations;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using TrialByFire.Tresearch.DAL.Contracts;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Managers.Implementations;
+using TrialByFire.Tresearch.Models.Implementations;
+using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
+using System.Text;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
@@ -14,35 +16,34 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
     [Route("controller")]
     public class UADController : Controller, IUADController
     {
-        private ISqlDAO _sqlDAO { get; }
-        private ILogService _logService { get; }
+        private ILogManager _logManager { get; }
         private IUADManager _uadManager { get; }
+        private IMessageBank _messageBank { get; }
         private CancellationTokenSource _cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
-        public UADController(ISqlDAO sqlDAO, ILogService logService, IUADManager uadManager)
+        public UADController(ILogManager logManager, IUADManager uadManager, IMessageBank messageBank)
         {
-            _sqlDAO = sqlDAO;
-            _logService = logService;
+            _logManager = logManager;
             _uadManager = uadManager;
+            _messageBank = messageBank;
         }
 
-        [HttpPost("kpi")]
-        public async Task<List<IKPI>> LoadKPIAsync(DateTime now)
+        [HttpPost("uad")]
+        public async Task<ActionResult<IKPI>> LoadKPIAsync(DateTime now)
         {
-            List<IKPI> result = new List<IKPI>();
+            StringBuilder stringBuilder = new StringBuilder();
             try
             {
-                result = await _uadManager.LoadKPIAsync(now, _cts.Token).ConfigureAwait(false);
-                return result;
+                IResponse<IKPI> response = await _uadManager.LoadKPIAsync(now, _cts.Token).ConfigureAwait(false);
+                return BadRequest();
             }
-            catch(OperationCanceledException tce)
+            catch (Exception ex)//TO DO Fix
             {
-                result.Add(new KPI(tce.Message));
-                return result;
-            }
-            catch(Exception ex)
-            {
-                result.Add(new KPI(ex.Message));
-                return result;
+                //stringBuilder.AppendFormat(await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false),
+                    //ex.Message, stringBuilder.AppendFormat("UserHash: {0}",
+                    //userhash));
+                await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Error, ILogManager.Categories.Server,
+                    stringBuilder.ToString());
+                return BadRequest();
             }
         }
     }

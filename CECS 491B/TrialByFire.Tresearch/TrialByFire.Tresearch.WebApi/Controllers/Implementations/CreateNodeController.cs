@@ -57,6 +57,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                     // Check if time was exceeded
                     if (response.ErrorMessage.Equals(""))
                     {
+                        stringBuilder.AppendFormat(await _messageBank.GetMessage(IMessageBank.Responses.createNodeSuccess).ConfigureAwait(false));
                         await _logManager.StoreAnalyticLogAsync(DateTime.UtcNow, ILogManager.Levels.Info, ILogManager.Categories.Server,
                             stringBuilder.ToString());
                     }

@@ -6,7 +6,7 @@ namespace TrialByFire.Tresearch.Services.Contracts
 {
 	public interface IUADService
 	{
-		Task<List<IKPI>> LoadKPIAsync(DateTime now, CancellationToken cancellationToken = default);
+		Task<IResponse<IKPI>> LoadKPIAsync(DateTime now, CancellationToken cancellationToken = default);
 	}
 }
 

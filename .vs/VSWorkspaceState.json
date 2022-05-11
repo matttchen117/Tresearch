@@ -1,12 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\ArchiveProgram",
-    "\\CECS 491B\\TrialByFire.Tresearch",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\UnitTests",
-    "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.Tests\\UnitTests\\Authentication"
+    "\\CECS 491B",
+    "\\CECS 491B\\TrialByFire.Tresearch"
   ],
-  "SelectedNode": "\\ArchiveProgram",
+  "SelectedNode": "\\CECS 491B\\TrialByFire.Tresearch\\TrialByFire.Tresearch.sln",
   "PreviewInSolutionExplorer": false
 }

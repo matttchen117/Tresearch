@@ -1453,5 +1453,10 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                 return await _messageBank.GetMessage(IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message;
             }
         }
+
+        public Task<IResponse<IKPI>> LoadKPIAsync(DateTime now, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -25,30 +25,21 @@ namespace TrialByFire.Tresearch.Services.Implementations
 			this._logService = _logService;
 		}
 
-		public async Task<List<IKPI>> LoadKPIAsync(DateTime now, CancellationToken cancellationToken = default)
+		public async Task<IResponse<IKPI>> LoadKPIAsync(DateTime now, CancellationToken cancellationToken = default)
 		{
-			cancellationToken.ThrowIfCancellationRequested();
-			List<IKPI> kpiList = new List<IKPI>();
-            try
+			if(now != null)
             {
-				kpiList.Add(await _sqlDAO.GetViewKPIAsync(cancellationToken).ConfigureAwait(false));
-				kpiList.Add(await _sqlDAO.GetViewDurationKPIAsync(cancellationToken).ConfigureAwait(false));
-				kpiList.Add(await _sqlDAO.GetNodeKPIAsync(now, cancellationToken).ConfigureAwait(false));
-				kpiList.Add(await _sqlDAO.GetSearchKPIAsync(now, cancellationToken).ConfigureAwait(false));
-				kpiList.Add(await _sqlDAO.GetLoginKPIAsync(now, cancellationToken).ConfigureAwait(false));
-				kpiList.Add(await _sqlDAO.GetRegistrationKPIAsync(now, cancellationToken).ConfigureAwait(false));
-				return kpiList;
+                /*try
+                {
+					IResponse<IKPI> reponse = await _sqlDAO.LoadKPIAsync(now, cancellationToken).ConfigureAwait(false);
+					return reponse;
+                }
+                *//*catch(Exception ex)
+                {
+					return new UADResponse<IKPI>(await _mess)
+                }*/
             }
-            catch(TaskCanceledException tcex)
-            {
-				kpiList.Add(new KPI(tcex.Message));
-				return kpiList;
-            }
-            catch(Exception ex)
-            {
-				kpiList.Add(new KPI(ex.Message));
-				return kpiList;
-            }
+			throw new NotImplementedException();
 		}
 	}
 }

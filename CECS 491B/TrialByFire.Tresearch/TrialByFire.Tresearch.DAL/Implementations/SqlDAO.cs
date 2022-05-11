@@ -85,6 +85,41 @@ namespace TrialByFire.Tresearch.DAL.Implementations
             }
         }
 
+        public async Task<IResponse<IKPI>> LoadKPIAsync(DateTime now, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_options.SqlConnectionString))
+                {
+                    var procedure = "dbo.[LoadKPI]";
+                    var values = new
+                    {
+                        Timestamp = now
+                    };
+
+                    List<string> results = new List<string>(await connection.QueryAsync<string>(new CommandDefinition(procedure, values, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken)).ConfigureAwait(false)).ToList();
+
+                    if(results.Count == 0)
+                    {
+                        return new UADResponse<IKPI>(await _messageBank.GetMessage(
+                            IMessageBank.Responses.logFail), null, 400, false);
+                    }
+                    else
+                    {
+                        IKPI res = new KPI();
+                        return new UADResponse<IKPI>("", res, 200, true);
+                    }
+                    
+                }
+            }
+            catch(Exception ex)
+            {
+                IKPI res = new KPI();
+                return new UADResponse<IKPI>(await _messageBank.GetMessage(
+                    IMessageBank.Responses.unhandledException).ConfigureAwait(false) + ex.Message, null, 500, false);
+            }
+        }
+
         public async Task<IResponse<string>> EditParentNodeAsync(long nodeID, string nodeIDs, CancellationToken cancellationToken = default)
         {
             if(nodeIDs != null)

@@ -52,6 +52,8 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
 
         // KPI Methods
+
+
         public Task<IViewKPI> GetViewKPIAsync(CancellationToken cancellationToken = default);
         public Task<IViewDurationKPI> GetViewDurationKPIAsync(CancellationToken cancellationToken = default);
         public Task<ILoginKPI> GetLoginKPIAsync(DateTime now, CancellationToken cancellationToken = default);
@@ -122,8 +124,8 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 
         public Task<string> UpdateAccountAsync(IAccount account, IAccount updatedAccount, CancellationToken cancellationToken = default(CancellationToken));
 
-        
 
+        public Task<IResponse<IKPI>> LoadKPIAsync(DateTime now, CancellationToken cancellationToken = default);
         public Task<IResponse<string>> CreateNodeAsync(INode node, CancellationToken cancellationToken = default);
         public Task<IResponse<string>> DeleteNodeAsync(long nodeID, long parentID, CancellationToken cancellationToken = default);
         public Task<IResponse<string>> EditParentNodeAsync(long nodeID, string nodeIDs, CancellationToken cancellationToken = default);

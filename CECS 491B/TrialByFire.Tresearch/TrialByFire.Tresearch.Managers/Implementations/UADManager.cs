@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
-using System.Security;
+using System.Reflection;
 using TrialByFire.Tresearch.DAL.Contracts;
-using TrialByFire.Tresearch.DAL.Implementations;
+using TrialByFire.Tresearch.Exceptions;
 using TrialByFire.Tresearch.Managers.Contracts;
 using TrialByFire.Tresearch.Models.Contracts;
 using TrialByFire.Tresearch.Models.Implementations;
@@ -37,25 +38,29 @@ namespace TrialByFire.Tresearch.Managers.Implementations
 			_messageBank = messageaBank;
 		}
 
-		public async Task<List<IKPI>> LoadKPIAsync(DateTime now, CancellationToken cancellationToken = default)
+		public async Task<IResponse<IKPI>> LoadKPIAsync(DateTime now, CancellationToken cancellationToken = default)
 		{
-			cancellationToken.ThrowIfCancellationRequested();
 			List<IKPI> result = new List<IKPI>();
-			if (Thread.CurrentPrincipal != null)
-            {
-				try
+			if ((Thread.CurrentPrincipal.Identity as RoleIdentity).AuthorizationLevel != "admin")
+			{
+				IResponse<IKPI> response = await _uadService.LoadKPIAsync(now, cancellationToken).ConfigureAwait(false);
+
+				if (cancellationToken.IsCancellationRequested)
 				{
-					result = await _uadService.LoadKPIAsync(now, cancellationToken).ConfigureAwait(false);
-					return result;
+					MethodBase? m = MethodBase.GetCurrentMethod();
+					if (m != null)
+					{
+						response.ErrorMessage = await _messageBank.GetMessage(IMessageBank.Responses.operationTimeExceeded).ConfigureAwait(false);
+					}
 				}
-				catch (Exception ex)
-				{
-					result.Add(new KPI("400: Server: LoadKPI Error Occurred"));
-					return result;
-				}
+
+				return response;
 			}
-			result.Add(new KPI(_messageBank.ErrorMessages["notAuthenticated"]));
-			return result;
+            else
+            {
+				return new UADResponse<IKPI>(await _messageBank.GetMessage(
+					IMessageBank.Responses.notAuthorized).ConfigureAwait(false), null, 400, false);
+			}
 		}
 	}
 }
