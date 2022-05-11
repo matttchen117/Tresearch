@@ -69,13 +69,13 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Search
             node8.Tags = new List<INodeTag> { new NodeTag(8, "cooking"), new NodeTag(8, "food") };
             node9.Tags = new List<INodeTag> { new NodeTag(9, "cooking"), new NodeTag(9, "food") };
 
-            node1.RatingScore = 15;
-            node2.RatingScore = 15;
-            node3.RatingScore = 5;
-            node4.RatingScore = 5;
-            node7.RatingScore = 15;
-            node8.RatingScore = 15;
-            node9.RatingScore = 15;
+            node1.RatingScore = 3;
+            node2.RatingScore = 3;
+            node3.RatingScore = 1;
+            node4.RatingScore = 1;
+            node7.RatingScore = 3;
+            node8.RatingScore = 3;
+            node9.RatingScore = 3;
 
             return new[]
             {
