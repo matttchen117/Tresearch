@@ -63,7 +63,8 @@ namespace TrialByFire.Tresearch.DAL.Implementations
                         if (n.NodeTitle.Contains(searchInput.Search, StringComparison.OrdinalIgnoreCase))
                         {
                             n.Tags = InMemoryDatabase.NodeTags.Where(nt => nt.NodeID == n.NodeID).ToList();
-                            n.RatingScore = InMemoryDatabase.NodeRatings.Where(nr => nr.NodeID == n.NodeID).Average(nr => nr.Rating);
+                            IEnumerable<INodeRating> nodeRatings = InMemoryDatabase.NodeRatings.Where(nr => nr.NodeID == n.NodeID);
+                            n.RatingScore = (nodeRatings.Count() >  1 ? InMemoryDatabase.NodeRatings.Where(nr => nr.NodeID == n.NodeID).Average(nr => nr.Rating) : 0);
                             nodes.Add(n);
                         }
                     }
