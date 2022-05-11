@@ -207,18 +207,17 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodes.Add(new Node("0B1CC9CFB7380E8E7A80726D12CB997C936D95B514E7F921187119FD80996BBACA103C08EFCC39553EFF5DFC368D4D8D197C9080C7015AE4DA2E87884E7DE9A6", 1, 1, "Cooking", "This is a test node.", new DateTime(2022, 4, 17), true, false));
             nodes.Add(new Node("0B1CC9CFB7380E8E7A80726D12CB997C936D95B514E7F921187119FD80996BBACA103C08EFCC39553EFF5DFC368D4D8D197C9080C7015AE4DA2E87884E7DE9A6", 2, 1, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 18), true, false));
             nodes.Add(new Node("0B1CC9CFB7380E8E7A80726D12CB997C936D95B514E7F921187119FD80996BBACA103C08EFCC39553EFF5DFC368D4D8D197C9080C7015AE4DA2E87884E7DE9A6", 3, 1, "Cooking Rice", "This is a test node.", new DateTime(2022, 4, 19), true, false));
-            nodes.Add(new Node("D8FC97AC79D370FC43BE4528C72B02AD7B560DC707956B77D5892504754E6C2484C07BF28243FF3CD1A2EA6F778BBBF924B384A34975D6A7D590A40CEE455A32", 4, 1, "Cooking", "This is a test node.", new DateTime(2022, 4, 17), true, false));
-            nodes.Add(new Node("D8FC97AC79D370FC43BE4528C72B02AD7B560DC707956B77D5892504754E6C2484C07BF28243FF3CD1A2EA6F778BBBF924B384A34975D6A7D590A40CEE455A32", 5, 1, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 18), true, false));
-            nodes.Add(new Node("D8FC97AC79D370FC43BE4528C72B02AD7B560DC707956B77D5892504754E6C2484C07BF28243FF3CD1A2EA6F778BBBF924B384A34975D6A7D590A40CEE455A32", 6, 1, "Cooking Rice", "This is a test node.", new DateTime(2022, 4, 19), true, false));
-            nodes.Add(new Node("AE57D4CD0E7DC14F7C8C7EEF4DC8C8B833567A71021C1D123328D9B85C3825D8B72376D162C7F03C78D3CE048104A6BB0047979544F4852679D937048258558D", 7, 1, "Cooking", "This is a test node.", new DateTime(2022, 4, 19), true, false));
-            nodes.Add(new Node("E5D6801551E6079FCAF2B10403FA86F9B9EC40B0D7A70256EDA0A9988ABAB4CC250681D5054D18E224DCF0CADB730BCF6E07546F2B775A0E31D64C3DC41BC159", 8, 1, "Cooking", "This is a test node.", new DateTime(2022, 4, 19), true, false));
-            nodes.Add(new Node("AE57D4CD0E7DC14F7C8C7EEF4DC8C8B833567A71021C1D123328D9B85C3825D8B72376D162C7F03C78D3CE048104A6BB0047979544F4852679D937048258558D", 9, 1, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 19), true, false));
-            nodes.Add(new Node("CB3C47AD9DCEFA2CAC50D472CAFA954F00476EA58B11E8F2CD32E46F4C3DC1C990867A78D484BB25E8FF2FB44CE9F99F356E275E7E2684FFF714BAC11B663FBF", 10, 1, "Cooking", "This is a test node.", new DateTime(2022, 4, 19), false, false));
-            nodes.Add(new Node("E5D6801551E6079FCAF2B10403FA86F9B9EC40B0D7A70256EDA0A9988ABAB4CC250681D5054D18E224DCF0CADB730BCF6E07546F2B775A0E31D64C3DC41BC159", 11, 1, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 19), false, true));
-            nodes.Add(new Node("CB3C47AD9DCEFA2CAC50D472CAFA954F00476EA58B11E8F2CD32E46F4C3DC1C990867A78D484BB25E8FF2FB44CE9F99F356E275E7E2684FFF714BAC11B663FBF", 12, 1, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 19), true, true));
-            nodes.Add(new Node("51549CF94E96FED6DB3B43BD4B3A989B77CC44E481D40BF86A262D081B029C9CEBE4E4D228A288301408797DD30CC094B7814ACB87695D0ACCE0A28C5FA9B126", 13, 12, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 19), true, true));
-            nodes.Add(new Node("51549CF94E96FED6DB3B43BD4B3A989B77CC44E481D40BF86A262D081B029C9CEBE4E4D228A288301408797DD30CC094B7814ACB87695D0ACCE0A28C5FA9B126", 14, 12, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 19), true, true));
-            nodes.Add(new Node("51549CF94E96FED6DB3B43BD4B3A989B77CC44E481D40BF86A262D081B029C9CEBE4E4D228A288301408797DD30CC094B7814ACB87695D0ACCE0A28C5FA9B126", 15, 12, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 19), true, true));
+            nodes.Add(new Node("D8FC97AC79D370FC43BE4528C72B02AD7B560DC707956B77D5892504754E6C2484C07BF28243FF3CD1A2EA6F778BBBF924B384A34975D6A7D590A40CEE455A32", 4, 4, "Cooking", "This is a test node.", new DateTime(2022, 4, 17), true, false));
+            nodes.Add(new Node("D8FC97AC79D370FC43BE4528C72B02AD7B560DC707956B77D5892504754E6C2484C07BF28243FF3CD1A2EA6F778BBBF924B384A34975D6A7D590A40CEE455A32", 5, 4, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 18), true, false));
+            nodes.Add(new Node("D8FC97AC79D370FC43BE4528C72B02AD7B560DC707956B77D5892504754E6C2484C07BF28243FF3CD1A2EA6F778BBBF924B384A34975D6A7D590A40CEE455A32", 6, 4, "Cooking Rice", "This is a test node.", new DateTime(2022, 4, 19), true, false));
+            nodes.Add(new Node("AE57D4CD0E7DC14F7C8C7EEF4DC8C8B833567A71021C1D123328D9B85C3825D8B72376D162C7F03C78D3CE048104A6BB0047979544F4852679D937048258558D", 7, 7, "Cooking", "This is a test node.", new DateTime(2022, 4, 19), true, false));
+            nodes.Add(new Node("E5D6801551E6079FCAF2B10403FA86F9B9EC40B0D7A70256EDA0A9988ABAB4CC250681D5054D18E224DCF0CADB730BCF6E07546F2B775A0E31D64C3DC41BC159", 8, 8, "Cooking", "This is a test node.", new DateTime(2022, 4, 19), true, false));
+            nodes.Add(new Node("AE57D4CD0E7DC14F7C8C7EEF4DC8C8B833567A71021C1D123328D9B85C3825D8B72376D162C7F03C78D3CE048104A6BB0047979544F4852679D937048258558D", 9, 7, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 19), true, false));
+            nodes.Add(new Node("CB3C47AD9DCEFA2CAC50D472CAFA954F00476EA58B11E8F2CD32E46F4C3DC1C990867A78D484BB25E8FF2FB44CE9F99F356E275E7E2684FFF714BAC11B663FBF", 10, 10, "Cooking", "This is a test node.", new DateTime(2022, 4, 19), false, false));
+            nodes.Add(new Node("E5D6801551E6079FCAF2B10403FA86F9B9EC40B0D7A70256EDA0A9988ABAB4CC250681D5054D18E224DCF0CADB730BCF6E07546F2B775A0E31D64C3DC41BC159", 11, 8, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 19), false, true));
+            nodes.Add(new Node("CB3C47AD9DCEFA2CAC50D472CAFA954F00476EA58B11E8F2CD32E46F4C3DC1C990867A78D484BB25E8FF2FB44CE9F99F356E275E7E2684FFF714BAC11B663FBF", 12, 10, "Cooking Pasta", "This is a test node.", new DateTime(2022, 4, 19), true, true));
+            nodes.Add(new Node("0B1CC9CFB7380E8E7A80726D12CB997C936D95B514E7F921187119FD80996BBACA103C08EFCC39553EFF5DFC368D4D8D197C9080C7015AE4DA2E87884E7DE9A6", 13, 13, "Change Content Test", "This is a test node.", new DateTime(2022, 4, 19), true, true));
+
 
             nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 55, 55, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
             nodes.Add(new Node("5607b3bb2ab8ca6338eb483699414c29697a687ce6134944f8c6f302e0db1faa2c04b44bd1274a191ee633be7d6149ce4d5189d9b372fa8edb0d5597cce680cf", 2022030533, 2022030533, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
@@ -268,6 +267,25 @@ namespace TrialByFire.Tresearch.Models.Implementations
             nodes.Add(new Node("0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f", 9019303359, 9019303359, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
             nodes.Add(new Node("0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f", 9019303361, 9019303361, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
             nodes.Add(new Node("0e6ed0cb983d0dd8cf8d96ae9ea44fb5d11659cba04b7e6ec120334f8f5315350bf66a9a981b3d68ac7f0c4425b855feb97df11d64883cca0f8ffd242deb7b4f", 9019303360, 9019303360, "Sql DAO Tag Test", "EH", DateTime.UtcNow, true, false));
+
+
+
+            //adding nodes for copying
+            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 100, 100, "Sql DAO Copy Test", "COPYING NODE 100", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 101, 100, "Sql DAO Copy Test", "COPYING NODE 101", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 102, 100, "Sql DAO Copy Test", "COPYING NODE 102", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 103, 100, "Sql DAO Copy Test", "COPYING NODE 103", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 104, 101, "Sql DAO Copy Test", "COPYING NODE 104", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 105, 102, "Sql DAO Copy Test", "COPYING NODE 105", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 106, 103, "Sql DAO Copy Test", "COPYING NODE 106", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 107, 104, "Sql DAO Copy Test", "COPYING NODE 107", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 108, 105, "Sql DAO Copy Test", "COPYING NODE 108", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 109, 106, "Sql DAO Copy Test", "COPYING NODE 109", DateTime.UtcNow, true, false));
+            nodes.Add(new Node("87ec69f0ab41c3dcb31e01dcf9942d756501b421887524a1e691dff69a698cf1d46c26b68f73dddb29a7d2729eddf43580bab9a5002d2289c0c7bf4d5db7c7ae", 110, 108, "Sql DAO Copy Test", "COPYING NODE 110", DateTime.UtcNow, true, false));
+
+            //adding nodes for privating
+            //nodes.Add(new Node(""));
+
 
 
 
@@ -963,6 +981,25 @@ namespace TrialByFire.Tresearch.Models.Implementations
             userHashObjects.Add(new UserHashObject("tagManagerIntegration3@tresearch.system", "user", "571510127f69c2e3dee263541e8551d8339dc1d98c4b253b5feb5202b41d420dd55c172818feeb5fd7bf85c067c5af142cb930fac9d776b644428adb4b9c4f7b"));
 
             return userHashObjects;
+        }
+
+        private List<long> NodeIDsList()
+        {
+            List<long> nodeIDsList = new List<long>();
+            nodeIDsList.Add(1);
+            nodeIDsList.Add(2);
+            nodeIDsList.Add(3);
+            nodeIDsList.Add(4);
+            nodeIDsList.Add(5);
+            nodeIDsList.Add(6);
+            nodeIDsList.Add(7);
+            nodeIDsList.Add(8);
+            nodeIDsList.Add(9);
+            nodeIDsList.Add(10);
+            nodeIDsList.Add(11);
+            nodeIDsList.Add(12);
+
+            return nodeIDsList;
         }
     }
 }

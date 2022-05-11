@@ -26,24 +26,23 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.CreateNode
             TestProvider = TestServices.BuildServiceProvider();
         }
 
-        /*
-        [Theory]
-        [InlineData("jessie@gmail.com", 69422, 69420, "Sauteeing ", "Preparing food on a stove", true, "jessie@gmail.com", "200: Server: success")]
-        [InlineData("larry@gmail.com", 100000, 100001, "Title 1", "Summary 1", false, "larry@gmail.com", "409: Database: Node Already Exists")]
-        public async Task CreateTheNode(string username, long nodeID, long parentID, string nodeTitle, string summary, bool visibility,
-            string accountOwner, string expected)
-        {
-            //Arrange
-            ICreateNodeService createNodeService = TestProvider.GetService<ICreateNodeService>();
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            Node node = new Node(nodeID, parentID, nodeTitle, summary, visibility, false, accountOwner);
-            Account account = new Account(username, "jessie123", "user");
-            //Act
-            string result = await createNodeService.CreateNodeAsync(account, node, cancellationTokenSource.Token).ConfigureAwait(false);
 
-            //Assert
-            Assert.Equal(expected, result);
+        [Theory]
+        [InlineData("51549CF94E96FED6DB3B43BD4B3A989B77CC44E481D40BF86A262D081B029C9CEBE4E4D228A288301408797DD30CC094B7814ACB87695D0ACCE0A28C5FA9B126",
+            14, "Deadlift", "Deadlift for ORM", true, false, "200: Server: Create Node Success")]
+        public async Task CreateTheNode(string userhash, long parentID, string nodeTitle, string summary, bool visibility, bool deleted,
+            string expected)
+        {
+            // Arrange
+            ICreateNodeService createNodeService = TestProvider.GetRequiredService<ICreateNodeService>();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            Node node = new Node(userhash, 0, parentID, nodeTitle, summary, DateTime.UtcNow, visibility, deleted);
+
+            // Act
+            IResponse<string> response = await createNodeService.CreateNodeAsync(node, cancellationTokenSource.Token).ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal(expected, response.Data);
         }
-        */
     }
 }

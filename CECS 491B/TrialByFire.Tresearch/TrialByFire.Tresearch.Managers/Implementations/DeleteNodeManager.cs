@@ -16,7 +16,7 @@ using TrialByFire.Tresearch.Services.Implementations;
 namespace TrialByFire.Tresearch.Managers.Implementations
 {
     /// <summary>
-    /// Manager class for enforcing business rules for creating a Node and calling the service for operation
+    ///     Manager class for enforcing business rules for creating a Node and calling the service for operation
     /// </summary>
     public class DeleteNodeManager : IDeleteNodeManager
     {
@@ -27,7 +27,7 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private IMessageBank _messageBank { get; }
 
         /// <summary>
-        /// Constructor for creating the manager
+        ///     Constructor for creating the manager
         /// </summary>
         /// <param name="sqlDAO"></param>
         /// <param name="logService"></param>
@@ -46,18 +46,22 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         /// <summary>
         /// Checks that the User attempting to create a Node is the same as the onwer of the tree.
         /// </summary>
-        /// <param name="username">The username attempting to create a Node</param>
-        /// <param name="node">Node object for creation</param>
+        /// <param name="userhash">The userhash of the Node attempting to be deleted</param>
+        /// <param name="nodeID">The ParentNodeID of the Node being deleted</param>
+        /// <param name="parentID">Node ID for delettion</param>
         /// <param name="cancellationToken"></param>
         /// <returns>The result of the operation.</returns>
         /// <exception cref="OperationCanceledException"></exception>
         public async Task<IResponse<string>> DeleteNodeAsync(string userhash, long nodeID, long parentID, CancellationToken cancellationToken = default)
         {
+            // Perform a check that current user has the ability to delete the Node it's given userHash
             if(userhash == (Thread.CurrentPrincipal.Identity as RoleIdentity).UserHash)
             {
                 try
                 {
                     IResponse<string> response = await _deleteNodeService.DeleteNodeAsync(nodeID, parentID, cancellationToken).ConfigureAwait(false);
+                    
+                    // Set error message for cancellation
                     if (cancellationToken.IsCancellationRequested)
                     {
                         MethodBase? m = MethodBase.GetCurrentMethod();

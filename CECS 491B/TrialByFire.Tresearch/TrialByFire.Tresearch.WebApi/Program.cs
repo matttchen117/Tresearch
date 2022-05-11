@@ -36,8 +36,12 @@ builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<ITreeManagementService, TreeManagementService>();
 builder.Services.AddScoped<IRateService, RateService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+builder.Services.AddScoped<ICopyAndPasteService, CopyAndPasteService>();
+builder.Services.AddScoped<IPrivateAndPublicService, PrivateAndPublicService>();
+
 
 builder.Services.AddScoped<INodeSearchService, NodeSearchService>();
+builder.Services.AddScoped<INodeContentService, NodeContentService>();
 // Managers
 builder.Services.AddScoped<ILogManager, LogManager>();
 builder.Services.AddScoped<IAccountDeletionManager, AccountDeletionManager>();
@@ -55,20 +59,25 @@ builder.Services.AddScoped<IEditParentManager, EditParentManager>();
 builder.Services.AddScoped<ITreeManagementManager, TreeManagementManager>();
 builder.Services.AddScoped<IUADManager, UADManager>();
 builder.Services.AddScoped<IRateManager, RateManager>();
-builder.Services.AddScoped<IUserManagementManager, UserManagementManager>(); 
+builder.Services.AddScoped<IUserManagementManager, UserManagementManager>();
+builder.Services.AddScoped<ICopyAndPasteManager, CopyAndPasteManager>();
+builder.Services.AddScoped<IPrivateAndPublicManager, PrivateAndPublicManager>();
+
+
 
 builder.Services.AddScoped<IUADManager, UADManager>();
 builder.Services.AddScoped<INodeSearchManager, NodeSearchManager>();
-// Unnecessary, only here temporarily for successful build
+builder.Services.AddScoped<INodeContentManager, NodeContentManager>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+
 // Invoked during build, not waht we want, want it to be invoked for AuthN process
 // Need to DI inject into Middleware - look into source code for how to do
 // builder.Services.AddScoped<IRolePrincipal, RolePrincipal>((services) => {new RolePrincipal()});
-
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -103,11 +112,6 @@ app.UseHttpsRedirection();
 app.UseCors(MyAllowSpecificOrigins);
 
 app.UseTokenAuthentication();
-
-/*app.Use((context, next) =>
-{
-
-});*/
 
 app.MapControllers();
 

@@ -16,7 +16,6 @@ namespace TrialByFire.Tresearch.Services.Implementations
     public class CreateNodeService : ICreateNodeService
     {
         private ISqlDAO _sqlDAO { get; }
-        private ILogService _logService { get; }
         private IMessageBank _messageBank { get; }
 
         /// <summary>
@@ -28,14 +27,12 @@ namespace TrialByFire.Tresearch.Services.Implementations
         public CreateNodeService(ISqlDAO sqlDAO, ILogService logService, IMessageBank messageBank)
         {
             _sqlDAO = sqlDAO;
-            _logService = logService;
             _messageBank = messageBank;
         }
 
         /// <summary>
         /// Checks that the User attempting to create a Node is the same as the onwer of the tree.
         /// </summary>
-        /// <param name="account">The username attempting to create a Node</param>
         /// <param name="node">Node object for creation</param>
         /// <param name="cancellationToken"></param>
         /// <returns>The result of the operation.</returns>

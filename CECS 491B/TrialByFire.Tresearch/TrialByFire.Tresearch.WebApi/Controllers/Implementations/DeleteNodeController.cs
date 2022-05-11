@@ -12,7 +12,8 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
     /// <summary>
-    /// Controller class for deleting Nodes.
+    ///     DeleteNodeController: Class that is part of the Controller abstraction layer that handles receiving and returning
+    ///         HTTP response and requests
     /// </summary>
     [ApiController]
     [EnableCors]
@@ -37,7 +38,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
         }
 
         /// <summary>
-        /// Entry point for node delete requests that forwards the given node.NodeID to the DeleteNodeManager for the opration to be performed.
+        /// Entry point for Node Delete requests that forwards the given userhash, nodeID, and nodeParentID, to the DeleteNodeManager for the opration to be performed.
         /// </summary>
         /// <param name="node.UserHash"></param>
         /// <param name="node.NodeID"></param>
@@ -53,6 +54,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             {
                 CancellationToken cancellationToken = new CancellationToken();
                 IResponse<string> response = await _deleteNodeManager.DeleteNodeAsync(node.UserHash, node.NodeID, node.ParentNodeID, cancellationToken).ConfigureAwait(false);
+                // Check that the response data is not null as well as the result of the operation
                 if (response.Data != null && response.IsSuccess && response.StatusCode == 200)
                 {
                     // Check if time was exceeded

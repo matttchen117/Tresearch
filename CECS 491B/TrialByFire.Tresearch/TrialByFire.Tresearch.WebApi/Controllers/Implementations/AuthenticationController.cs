@@ -13,8 +13,10 @@ using TrialByFire.Tresearch.WebApi.Controllers.Contracts;
 
 namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 {
-    // Summary:
-    //     A controller class for Authenticating the User.
+    /// <summary>
+    ///     AuthenticationController: Class that is part of the Controller abstraction layer that handles receiving and returning
+    ///         HTTP response and requests for Authentication
+    /// </summary>
     [ApiController]
     [EnableCors]
     [Route("[controller]")]
@@ -26,6 +28,14 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
 
         private BuildSettingsOptions _buildSettingsOptions { get; }
 
+        /// <summary>
+        ///     public AuthenticationController():
+        ///         Constructor for AuthenticationController class
+        /// </summary>
+        /// <param name="logManager">Manager object for Manager abstraction layer to handle business rules related to Logging</param>
+        /// <param name="authenticationManager">Manager object for Manager abstraction layer to handle business rules related to Authentication</param>
+        /// <param name="messageBank">Object that contains error and success messages</param>
+        /// <param name="buildSettingsOptions">Snapshot object that represents the setings/configurations of the application</param>
         public AuthenticationController(ILogManager logManager, 
             IAuthenticationManager authenticationManager, IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> buildSettingsOptions)
         {
@@ -35,31 +45,23 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             _buildSettingsOptions = buildSettingsOptions.Value;
         }
 
-        //
-        // Summary:
-        //     Entry point for Authentication requests and creates the Cookie for the User on success.
-        //
-        // Parameters:
-        //   username:
-        //     The username entered by the User attempting to Authenticate.
-        //   otp:
-        //     The otp entered by the User attempting to Authenticate.
-        //   authorizationLevel:
-        //     The selected authorization level for the UserAccount that the User is trying Authenticate for.
-        //
-        // Returns:
-        //     The result of the operation with any status codes if applicable.
+        /// <summary>
+        ///     AuthenticateAsync:
+        ///         Async method that handles receiving HTTP requests for Authentication operation and returning the results
+        /// </summary>
+        /// <param name="username">The username input by the user</param>
+        /// <param name="otp">The otp input by the user</param>
+        /// <param name="authorizationLevel">The authorization level for the operation</param>
+        /// <returns>The result of the operation</returns>
         [HttpPost]
         [Route("authenticate")]
         public async Task<IActionResult> AuthenticateAsync(string username, string otp, 
-            string authorizationLevel, CancellationToken cancellationToken = default)
+            string authorizationLevel)
         {
             string[] split;
             string result;
             try
             {
-                // Manager needs to check for guest and no token
-                // need to pass in token
                 List<string> results = await _authenticationManager.AuthenticateAsync(username, otp, authorizationLevel,
                     DateTime.Now.ToUniversalTime()).ConfigureAwait(false);
                 result = results[0];
@@ -67,23 +69,21 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 if (result.Equals(await _messageBank.GetMessage(IMessageBank.Responses.authenticationSuccess).
                         ConfigureAwait(false)))
                 {
+                    // Don't modify header's if in Test environment
                     if (_buildSettingsOptions.Environment.Equals("Test"))
                     {
                         return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                     }
+                    // Set headers and access for frontend to store JWT
                     HttpContext.Response.Headers.Add(_buildSettingsOptions.AccessControlHeaderName, _buildSettingsOptions.JWTHeaderName);
                     HttpContext.Response.Headers.Add(_buildSettingsOptions.JWTHeaderName, results[1]);
+
                     await _logManager.StoreAnalyticLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Info,
                         category: ILogManager.Categories.Server, 
                         await _messageBank.GetMessage(IMessageBank.Responses.authenticationSuccess).ConfigureAwait(false));
                     return new OkObjectResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) };
                 }
-                // REST - following http convention, always return proper status code
-                // Return proper object (Ok objects for success, badrequest, internal server, or status code for fails
 
-                // If fire and forget method, no way to test
-                // No unit tests, just integration
-                // always have await for async, regardless of being fire and forget
                 if (Enum.TryParse(split[1], out ILogManager.Categories category))
                 {
                     await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
@@ -94,11 +94,6 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                     await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
                     category: ILogManager.Categories.Server, split[2] + ": Bad category passed back.");
                 }
-                // 500 - server error, nothing user did caused error,  
-                // 400 - user caused error, 
-                //These contain headers, status code does not
-                //return new BadRequestResult(split[2]) { StatusCode = Convert.ToInt32(split[0]) }; // 400 errors
-                //return new InternalServerErrorResult() // 500 errors
                 return StatusCode(Convert.ToInt32(split[0]), split[2]);
             }
             catch (OperationCanceledException tce)
@@ -118,9 +113,11 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
             }
         }
 
+        // For Tests Only
+        // Allows for input DateTime
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> AuthenticateAsync(string username, string otp, 
-            string authorizationLevel, DateTime now, CancellationToken cancellationToken = default)
+            string authorizationLevel, DateTime now)
         {
             string[] split;
             string result = "";
@@ -148,7 +145,7 @@ namespace TrialByFire.Tresearch.WebApi.Controllers.Implementations
                 }
                 if (Enum.TryParse(split[1], out ILogManager.Categories category))
                 {
-                    _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
+                    await _logManager.StoreArchiveLogAsync(DateTime.Now.ToUniversalTime(), level: ILogManager.Levels.Error,
                     category, split[2]);
                 }
                 else

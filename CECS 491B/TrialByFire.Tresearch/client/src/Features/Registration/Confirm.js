@@ -12,7 +12,7 @@ class Confirm extends React.Component {
             const { confirmationGuid } = useParams();
             console.log(confirmationGuid);
             if(confirmationGuid != null){
-                axios.post('https://localhost:7010/Registration/confirm?'+confirmationGuid)
+                axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/Registration/confirm?'+confirmationGuid)
                 .then(res => {
                     window.location = '/Register/AccountConfirmed';
                     return res;

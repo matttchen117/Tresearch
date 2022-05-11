@@ -37,7 +37,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.operationCancelled:
                     return "500: Server: Operation Cancelled Exception: ";
                 case Responses.operationTimeExceeded:
-                    return "500: Server: Operation Exceeded Time Limiet Exception: ";
+                    return "500: Server: Operation Exceeded Time Limit Exception: ";
+                case Responses.principalNotSet:
+                    return "500: Server: Principal was not set correctly.";
 
                 case Responses.databaseConnectionFail:
                     return "503: Database: Unable to connect to database.";
@@ -97,6 +99,17 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.noSearchInput:
                     return "400: Data: No search input provided.";
 
+                case Responses.updateNodeContentSuccess:
+                    return "200: Server: Update node content success.";
+                case Responses.updateNodeContentRollback:
+                    return "500: Database: Update node content rollback occurred.";
+                case Responses.updateNodeContentTimeExceeded:
+                    return "500: Server: Update Node Content exceeded time.";
+                case Responses.nodeTitleLengthExceeded:
+                    return "400: Server: Node title length exceeded max.";
+                case Responses.nodeSummaryLengthExceeded:
+                    return "400: Server: Node summary length exceeded max.";
+
                 case Responses.noNodeInput:
                     return "400: Data: No Node input provided.";
 
@@ -136,6 +149,9 @@ namespace TrialByFire.Tresearch.Models.Implementations
                     return "502: Server: Unable rate node.";
                 case Responses.getRateFail:
                     return "502: Server: Unable to get rating data.";
+                case Responses.invalidRating:
+                    return "422: Servre: Invalid rating.";
+
 
 
                 case Responses.createNodeSuccess:
@@ -288,6 +304,48 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 case Responses.verificationFailure:
                     return "401: Server: Failure to authenticate and verify user for deletion.";
 
+
+                case Responses.copyNodeSuccess:
+                    return "200: Server: Copy Node Successful";
+                case Responses.copyNodeFailure:
+                    return "401: Server: Copy Node failure";
+                case Responses.copyNodeError:
+                    return "503: Database: Copy Node ERROR";
+                case Responses.copyNodeEmptyError:
+                    return "400: Server: No nodes to copy failure";
+                case Responses.copyNodeMistmatchError:
+                    return "503: Database: Mismatched amount of nodes returned";
+
+
+                case Responses.isLeaf:
+                    return "200: Server: Is a leaf";
+                case Responses.isNotLeaf:
+                    return "400: Server: Not a leaf";
+
+
+                case Responses.pasteNodeSuccess:
+                    return "200: Server: Paste Node successful";
+                case Responses.pasteNodeFailure:
+                    return "401: Server: Paste Node failure";
+                case Responses.pasteNodeError:
+                    return "503: Database: Paste Node ERROR";
+                case Responses.pasteNodeEmptyError:
+                    return "400: Server: No nodes to paste failure";
+                case Responses.pasteNodeMistmatchError:
+                    return "503: Database: Mismatched amount of nodes pasted";
+                case Responses.notAuthorizedToPasteTo:
+                    return "400: Server: Cannot paste to another user's tree";
+
+
+                case Responses.privateNodeSuccess:
+                    return "200: Server: Private Node Success";
+                case Responses.privateNodeFailure:
+                    return "400: Server: Private Node Failure";
+
+                case Responses.publicNodeSuccess:
+                    return "200: Server: Public Node Success";
+                case Responses.publicNodeFailure:
+                    return "400: Server: Private Node Failure";
 
 
                 default:

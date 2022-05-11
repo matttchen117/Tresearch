@@ -9,19 +9,19 @@ using System.Text;
 using ArchiveProgram.Models.Implementations;
 using ArchiveProgram.Models.Contracts;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+/// <summary>
+///     Program:
+///         Archive program for grabbing logs from a source, writing them to a file, compressing the file with 7zip,
+///         offloading the compressed file to a destination, and then deleting the logs from the source
+/// </summary>
 
+// Configuration Builder to utilize appsettings/configuration for the application
 IConfiguration config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .AddEnvironmentVariables()
     .Build();
 
-// Service collection registers services
-// Build the service provider
-// Use the service provider to grab the instances
-
-// Doesnt matter when executed, zero time if doing separate check
-// Can look into CookieAuthentication in .NET, but Token is more universally used and avoids privacy laws
-
+// Grab target and destinations as well as connection string
 Settings settings = config.GetRequiredSection("Settings").Get<Settings>();
 CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
             TimeSpan.FromSeconds(5));
@@ -32,10 +32,9 @@ if (System.IO.Directory.Exists(targetFolder))
     try
     {
         string directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        // Specify where 7z.dll DLL is located
+        // Setting up 7zip, specify where 7z.dll DLL is located
         var path = Path.Combine(directory, Environment.Is64BitProcess ? "x64" : "x86", "7z.dll");
         SevenZip.SevenZipBase.SetLibraryPath(path);
-        //SevenZipCompressor.SetLibraryPath(path);
         SevenZipCompressor sevenZipCompressor = new SevenZipCompressor();
         sevenZipCompressor.CompressionLevel = SevenZip.CompressionLevel.Ultra;
         sevenZipCompressor.CompressionMethod = CompressionMethod.Lzma;
@@ -45,24 +44,20 @@ if (System.IO.Directory.Exists(targetFolder))
         _cancellationTokenSource.Token.ThrowIfCancellationRequested();
         using (var connection = new SqlConnection(settings.SqlConnectionString))
         {
+            // Grab logs
             var procedure = "[GetArchiveableLogs]";
             var values = new { Timestamp = dateTime };
             var results = connection.Query<Log>(procedure, values, commandType: CommandType.StoredProcedure).ToList();
             List<string> stringList = results.Select(i => i.ToString()).ToList();
-            foreach (string stringValue in stringList)
-            {
-                Console.WriteLine(stringValue);
-            }
-            //results.ForEach(l => Console.WriteLine($"{l.Timestamp} {l.Level} {l.Username} {l.Category} {l.Description}"));
+            // Write to file
             File.WriteAllLines(filePath, stringList);
             StringBuilder stringBuilder = new StringBuilder();
+            // Compress and offload file
             sevenZipCompressor.CompressFiles(Path.Combine(targetFolder, stringBuilder.AppendFormat("{0}{1}", dateTime, "_Archive.7z").ToString()), filePath);
+            // Delete logs
             procedure = "DeleteArchiveableLogs";
             var rowsAffected = connection.Execute(procedure, values, commandType: CommandType.StoredProcedure);
         }
-        // Compress the directory and save the file in a yyyyMMdd_project-files.7z format (eg. 20141024_project-files.7z
-
-        //sevenZipCompressor.CompressDirectory(sourceCodeFolder, Path.Combine(targetFolder, string.Concat(DateTime.Now.ToString("yyyyMMdd"), "_project-files.7z")));
     }catch(Exception ex)
     {
         DateTime timestamp = DateTime.UtcNow;

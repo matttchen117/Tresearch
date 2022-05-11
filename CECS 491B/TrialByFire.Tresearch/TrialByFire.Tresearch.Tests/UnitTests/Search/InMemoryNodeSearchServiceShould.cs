@@ -54,7 +54,9 @@ namespace TrialByFire.Tresearch.Tests.UnitTests.Search
             IResponse<IEnumerable<Node>> response = await _nodeSearchService.SearchForNodeAsync(searchInput).ConfigureAwait(false);
 
             // Assert
+            // First check if not null
             Assert.Equal(expected.Data, response.Data);
+            // Check if counts match first, then check if each one matches
         }
 
         public static IEnumerable<object[]> SearchInputData()

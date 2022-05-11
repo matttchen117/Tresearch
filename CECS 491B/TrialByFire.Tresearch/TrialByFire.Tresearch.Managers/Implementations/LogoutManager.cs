@@ -12,9 +12,9 @@ using TrialByFire.Tresearch.Services.Contracts;
 
 namespace TrialByFire.Tresearch.Managers.Implementations
 {
-    // Summary:
-    //     A manager class for enforcing the business rules for logging a User out and calling the
-    //     appropriate services for the operation.
+    /// <summary>
+    ///     LogoutManager: Class that is part of the Manager abstraction layer that handles business rules related to Logout
+    /// </summary>
     public class LogoutManager : ILogoutManager
     {
         private IMessageBank _messageBank { get; }
@@ -23,19 +23,24 @@ namespace TrialByFire.Tresearch.Managers.Implementations
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(
             TimeSpan.FromSeconds(5));
 
+        /// <summary>
+        ///     public LogoutManager():
+        ///         Constructor for LogoutManager class
+        /// </summary>
+        /// <param name="messageBank">Object that contains error and success messages</param>
+        /// <param name="options">Snapshot object that represents the setings/configurations of the application</param>
         public LogoutManager(IMessageBank messageBank, IOptionsSnapshot<BuildSettingsOptions> options)
         {
             _messageBank = messageBank;
             _options = options.Value;
         }
 
-        //
-        // Summary:
-        //     Checks that the User is currently Authenticated. Calls the appropriate service for the
-        //     operation.
-        //
-        // Returns:
-        //     The result of the operation.
+        /// <summary>
+        ///     LogoutAsync:
+        ///         Async method that checks business rules related to Logout
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The result of the operation</returns>
         public async Task<string> LogoutAsync(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();

@@ -1,8 +1,6 @@
-import React, { useState } from "react";
-import {useNavigate} from 'react-router-dom';
-import axios, {AxiosResponse, AxiosError} from 'axios';
+import React from "react";
+import axios from 'axios';
 import pbkdf2 from "pbkdf2/lib/sync";
-
 import "./LoginForm.css";
 import Button from "../Button/ButtonComponent";
 
@@ -17,8 +15,6 @@ class LoginForm extends React.Component  {
         errorMessage: ''
     }
     
-    
-
     handleInput() {
         // [username]@[domain name].[domain]
         // Username: a-z, A-Z, 0-9, .-
@@ -99,26 +95,29 @@ class LoginForm extends React.Component  {
         if(this.handleInput()){
             this.setState({errorMessage: ''})
             {this.state.verified ? 
-                axios.post('https://localhost:7010/Authentication/authenticate?username=' + this.state.username.toLowerCase() + 
+                axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/Authentication/authenticate?username=' + this.state.username.toLowerCase() + 
                 '&otp=' + this.hashInput(this.state.otp) + '&authorizationLevel=user')
                 .then(response => {
                         sessionStorage.setItem('authorization', response.headers['authorization']);
                         window.location = '/Portal';
                 }).catch(err => {
-                        console.log(err.data);
                         //sessionStorage.setItem('authorization', err.headers['authorization']);
                     })
                 :
-                axios.post('https://localhost:7010/OTPRequest/requestotp?username=' + this.state.username.toLowerCase() + 
+                axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/OTPRequest/requestotp?username=' + this.state.username.toLowerCase() + 
                 '&passphrase=' + this.hashInput(this.state.passphrase) + '&authorizationLevel=user')
                 .then(response => {
                         this.setState({verified: true});
                         
                         //navigate('/Login/Authentication');
                 }).catch(err => {
-                    console.log(err.data)
-                    //sessionStorage.setItem('authorization', err.headers['authorization']);
-                    //this.setState({verified: true}); // remvoe later once added in api key
+                    switch(err.response.status){
+                        case 400: this.setState({errorMessage: 'Invalid Username or Passphrase'});
+                            break;
+                        case 401: this.setState({errorMessage: 'Account is disabled'});
+                            break;
+                        default: this.setState({errorMessage: 'Unable to login'});
+                    }
                 })
             }
         }
@@ -149,7 +148,6 @@ class LoginForm extends React.Component  {
                     </form>
             </div>
         );
-
         return (
             <div className="form-login-wrapper">
                 <div className="container-login-text">

@@ -3,7 +3,7 @@ using TrialByFire.Tresearch.Models.Contracts;
 
 namespace TrialByFire.Tresearch.Models.Implementations
 {
-    public class NodeRating : INodeRating
+    public class NodeRating : INodeRating, IEquatable<NodeRating>
     {
         public string UserHash { get; set; }
         public long NodeID { get; set; }
@@ -32,6 +32,11 @@ namespace TrialByFire.Tresearch.Models.Implementations
                 }
             }
             return false;
+        }
+
+        public bool Equals(NodeRating rating)
+        {
+            return UserHash.Equals(rating.UserHash) && NodeID.Equals(rating.NodeID) && Rating.Equals(rating.Rating);
         }
     }
 }

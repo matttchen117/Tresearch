@@ -10,6 +10,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
 {
     public interface ISqlDAO
     {
+        public Task<IResponse<string>> UpdateNodeContentAsync(INodeContentInput nodeContentInput);
         public Task<IResponse<IEnumerable<Node>>> SearchForNodeAsync(ISearchInput searchInput); 
         public Task<string> RemoveUserIdentityFromHashTable(string email, string authorizationLevel, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
         public Task<string> CreateUserHashAsync(int ID, string hashedEmail, CancellationToken cancellationToken = default(CancellationToken));
@@ -109,9 +110,11 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         //*/
 
         //Rating
-        public Task<string> RateNodeAsync(string userhash, long nodeID, int rating, CancellationToken cancellationToken = default(CancellationToken));
-        public Task<Tuple<List<double>, string>> GetNodeRatingAsync(List<long> nodeID, CancellationToken cancellationToken = default(CancellationToken));
+        public Task<IResponse<int>> RateNodeAsync(List<long> nodeIDs, int rating , string userHash, CancellationToken cancellationToken = default(CancellationToken));
 
+        public Task<IResponse<IEnumerable<Node>>> GetNodeRatingAsync(List<long> nodeID, CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<IResponse<int>> GetUserNodeRatingAsync(long nodeID, string userHash, CancellationToken cancellationToken = default(CancellationToken));
 
         /**
          *  User Management
@@ -133,7 +136,7 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         public Task<Tuple<INode, string>> GetNodeAsync(long nID, CancellationToken cancellationToken = default);
         public Task<Tuple<List<INode>, string>> GetNodesAsync(string userHash, string acccountHash, CancellationToken cancellationToken = default);
         public Task<Tuple<List<INode>, string>> GetNodeChildren(long nID, CancellationToken cancellationToken = default);
-        
+
         public string CreateNodesCreated(INodesCreated nodesCreated);
 
         public Task<List<NodesCreated>> GetNodesCreatedAsync(DateTime nodeCreationDate, CancellationToken cancellationToken = default);
@@ -211,5 +214,23 @@ namespace TrialByFire.Tresearch.DAL.Contracts
         /// <param name="cancellationToken">Cancellation Token</param>
         /// <returns>List of tags and string status result</returns>
         public Task<Tuple<List<ITag>, string>> GetTagsAsync(CancellationToken cancellationToken = default(CancellationToken));
+
+
+
+        public Task<string> VerifyAuthorizedToView(List<long> nodeIDs, string userHash, CancellationToken cancellationToken = default);
+
+
+        public Task<IResponse<IEnumerable<Node>>> CopyNodeAsync(List<long> nodesCopy, CancellationToken cancellationToken = default(CancellationToken));
+
+
+        public Task<IResponse<string>> PasteNodeAsync(string userHash, long nodeIDPasteTo, List<INode> nodes, CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<string> IsNodeLeaf(long nodeIDToPasteTo, CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<IResponse<string>> PrivateNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken));
+
+        public Task<IResponse<string>> PublicNodeAsync(List<long> nodes, CancellationToken cancellationToken = default(CancellationToken));
+
+
     }
 }

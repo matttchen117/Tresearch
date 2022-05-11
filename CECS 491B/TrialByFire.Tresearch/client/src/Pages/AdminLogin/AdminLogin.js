@@ -83,33 +83,33 @@ class AdminLogin extends React.Component  {
 
     onSubmitHandler = (e) => {
         e.preventDefault();
-        this.verifyToken();
         axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
         // pbkdf2 uses callbacks not promises, need to wrap in a promise object
 
         if(this.handleInput()){
             this.setState({errorMessage: ''})
             {this.state.verified ? 
-                axios.post('https://localhost:7010/Authentication/authenticate?username=' + this.state.username.toLowerCase() + 
+                axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/Authentication/authenticate?username=' + this.state.username.toLowerCase() + 
                 '&otp=' + this.hashInput(this.state.otp) + '&authorizationLevel=admin')
                 .then(response => {
                         sessionStorage.setItem('authorization', response.headers['authorization']);
                         window.location = '/Admin/Dashboard';
                 }).catch(err => {
-                        console.log(err.data);
-                        //sessionStorage.setItem('authorization', err.headers['authorization']);
+                        
                     })
                 :
-                axios.post('https://localhost:7010/OTPRequest/requestotp?username=' + this.state.username.toLowerCase() + 
+                axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/OTPRequest/requestotp?username=' + this.state.username.toLowerCase() + 
                 '&passphrase=' + this.hashInput(this.state.passphrase) + '&authorizationLevel=admin')
                 .then(response => {
                         this.setState({verified: true});
                         
                         //navigate('/Login/Authentication');
                 }).catch(err => {
-                    console.log(err.data)
-                    //sessionStorage.setItem('authorization', err.headers['authorization']);
-                    //this.setState({verified: true}); // remvoe later once added in api key
+                    switch(err.response.status){
+                        case 400: this.setState({errorMessage: 'Invalid Credentials'});
+                            break;
+                        default: this.setState({errorMessage: 'Unable to login'});
+                    }
                 })
             }
         }

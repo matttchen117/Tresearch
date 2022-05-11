@@ -5,7 +5,7 @@ using TrialByFire.Tresearch.Models.Contracts;
 namespace TrialByFire.Tresearch.Models.Implementations
 {
     [DataContract]
-    public class Node : INode
+    public class Node : INode, IEquatable<Node>
     {
         [DataMember]
         public string UserHash { get; set; }
@@ -34,7 +34,7 @@ namespace TrialByFire.Tresearch.Models.Implementations
 
         public Node()
         {
-            RatingScore = 1;
+            RatingScore = 0;
             Tags = new List<INodeTag>();
         }
 
@@ -69,17 +69,38 @@ namespace TrialByFire.Tresearch.Models.Implementations
             Tags = new List<INodeTag>();
         }
 
-        public override bool Equals(object? obj)
+        public Node(long nodeID, long nodeParentID, string nodeTitle, string summary, bool visibility, bool deleted, string userhash, double ratingScore)
         {
-            if (!(obj == null))
+            NodeID = nodeID;
+            ParentNodeID = nodeParentID;
+            NodeTitle = nodeTitle;
+            Summary = summary;
+            Visibility = visibility;
+            Deleted = deleted;
+            UserHash = userhash;
+            TagScore = 0;
+            RatingScore = ratingScore;
+            Tags = new List<INodeTag>();
+        }
+
+        public Node(string UserHash, long NodeID, string NodeTitle, double Rating)
+        {
+            this.NodeID = NodeID;
+            this.UserHash = UserHash;
+            this.NodeTitle = NodeTitle;
+            RatingScore = Rating;
+
+        }
+
+
+        public bool Equals(Node? obj)
+        {
+            if(obj != null)
             {
-                if (obj is Node)
-                {
-                    Node node = (Node)obj;
-                    return NodeID.Equals(node.NodeID) && Tags.SequenceEqual(node.Tags) && RatingScore.Equals(node.RatingScore);
-                }
+                return NodeID.Equals(obj.NodeID) && Tags.SequenceEqual(obj.Tags) && RatingScore.Equals(obj.RatingScore);
             }
             return false;
         }
+
     }
 }
