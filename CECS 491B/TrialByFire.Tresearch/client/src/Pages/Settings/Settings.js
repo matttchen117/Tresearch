@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useEffect } from "react";
 import "./Settings.css";
 import axios, {AxiosResponse, AxiosError} from 'axios';
-
+import NavBar from "../../UI/Navigation/NavBar";
 import Button from "../../UI/Button/ButtonComponent";
 
 
@@ -12,7 +12,6 @@ const handleDelete = (e) => {
 
     axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net/AccountDeletion/DeleteAccount")
         .then((response => {
-            console.log("success");
             sessionStorage.removeItem('authorization');
             window.location = '/';
         }))
@@ -23,6 +22,7 @@ function Settings() {
 
     const renderSettings = (
         <div className = "Settings-Container">
+            {<NavBar/>}
             <div className = "Settings-title">
                     <h1>Settings</h1>
                 </div> 

@@ -54,7 +54,6 @@ function UserManagement() {
             AccountStatus: previousState.AccountStatus,
             Confirmed: previousState.Confirmed,
         }));
-        console.log(accountData);
     }
 
     const hashInput = (value) => {
@@ -102,13 +101,11 @@ function UserManagement() {
                 setAlertData({message: 'Account Created'});
             })
             .catch( err => {
-                console.log("TEST");
                 switch(err.response.status){
                     case 409: setAlertData({message: 'Account already exists'});
                         break;
                     default: setAlertData({message: 'Unable to create account'});
                 }
-                console.log(err);
             })
         }
     }

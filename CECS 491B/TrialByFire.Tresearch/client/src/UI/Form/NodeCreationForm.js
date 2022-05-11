@@ -6,11 +6,22 @@ import "./NodeCreationForm.css";
 import Button from "../Button/ButtonComponent";
 
 class NodeCreationForm extends React.Component{
-    state = {
-        userhash: '',
-        nodeParentID: 0,
-        nodeTitle: '',
-        summary: ''
+    constructor(props){
+        super(props);
+        this.state = {
+            userhash: props.cRForm.userHash,
+            nodeParentID: props.cRForm.nodeID,
+            nodeTitle: '',
+            summary: ''
+        }
+        console.log(props.cRForm)
+    }
+
+
+    
+
+    componentDidMount(){
+        
     }
 
     handleInput() {
@@ -39,15 +50,13 @@ class NodeCreationForm extends React.Component{
 
     onSubmitHandler = (e) => {
         e.preventDefault();
-        console.log(this.state.userhash, this.state.nodeParentID, this.state.nodeTitle, this.state.summary)
-
+        
         if(this.handleInput()){
             this.setState({errorMessage: ''})
             axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/CreateNode/createNode?userhash=' + this.state.userhash + '&parentNodeID=' + 
             this.state.nodeParentID + '&nodeTitle=' + this.state.nodeTitle + '&summary=' + this.state.summary).
             then(response => {
                 const responseData = Object.values(response.data);
-                console.log(responseData);
                 window.location.reload();
             })
             .catch(function (error) {
@@ -71,14 +80,8 @@ class NodeCreationForm extends React.Component{
             <div className="form-createNode-container">
                 <form className="createNode-form" onSubmit={this.onSubmitHandler}>
                     <div className="input-container">
-                        <input type="text" value={this.state.userhash} required placeholder="Userhash" on onChange={this.inputUserHashHandler}/>
-                    </div>
-                    <div className="input-container">
                         <input type="text" value={this.state.nodeTitle} required placeholder="Node Title" on onChange={this.inputTitleHandler}/>
-                    </div>
-                    <div className="input-container">
-                        <input type="number" value={this.state.nodeParentID} required placeholder="Node Parent ID" on onChange={this.inputParentNodeIDHandler}/>
-                    </div>    
+                    </div>   
                     <div className="input-container">
                         <input type="text" value={this.state.summary} required placeholder="Node Summary" on onChange={this.inputSummaryHandler}/>
                     </div>
@@ -93,7 +96,7 @@ class NodeCreationForm extends React.Component{
         return (
             <div className="form-createNode-wrapper">
                 <div className="container-createNode-text">
-                    <h1 className="createNode-title">NodeCreation</h1>
+                    <h1 className="createNode-title">Create Node</h1>
                 </div>    
                 {renderForm}
             </div>

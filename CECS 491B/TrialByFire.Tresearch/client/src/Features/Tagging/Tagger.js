@@ -150,7 +150,6 @@ class Tagger extends React.PureComponent{
     this.handleStatus();                                        // Handle internet status
     window.addEventListener('online', this.handleStatus );      // Listen for internet online (refresh)
     window.addEventListener('offline', this.handleStatus);      // Listen for internet offline
-    console.log(this.state.nodes);
   }
 
   // Runs before user leaves component

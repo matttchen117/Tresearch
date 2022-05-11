@@ -218,14 +218,12 @@ function TagDashboard() {
                     break;
                 case 401: 
                         // User is not authorized to perform
-                        console.log("Not Authorized");
                         localStorage.removeItem('authorization');
                         window.location.assign(window.location.origin);
                         window.location = '/';
                     break;
                 case 503: 
                         // Server cannot connect to database
-                        console.log("Database offline");
                         setAlertData({message: 'Database offline'});
                     break;
                 default: 

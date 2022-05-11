@@ -11,8 +11,6 @@ class Rating extends React.PureComponent{
       size: [0, 1, 2, 3, 4], 
       isAuthorized: props.IsEnabled
     }
-    console.log("HI")
-
   }
 
 

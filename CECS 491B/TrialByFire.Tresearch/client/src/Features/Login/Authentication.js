@@ -26,7 +26,6 @@ const Authentication = () => {
         axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/Authentication/authenticate?username=' + username + '&otp=' + otp 
         + '&authorizationLevel=' + authorizationLevel)
         .then(
-            console.log("success")
         ).catch(err => console.log("api Erorr: ", err.message))
     };
 

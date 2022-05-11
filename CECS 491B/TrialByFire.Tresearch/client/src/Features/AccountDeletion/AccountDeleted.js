@@ -1,6 +1,5 @@
 import React from "react";
 import axios from 'axios';
-
 import "./AccountDeleted.css";
 
 const AccountDeleted = () => {
@@ -17,6 +16,7 @@ const AccountDeleted = () => {
 
     return (
         <div className="component-container">
+            
             <div className="title-text">
                 <h1 className="deleted-title">Account Deleted</h1>
             </div>

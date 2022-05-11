@@ -2,7 +2,7 @@ import axios from "axios";
 import React, {useState, useEffect } from "react";
 import Select from 'react-select';
 import { useParams} from "react-router-dom";
-
+import NavBar from "../../UI/Navigation/NavBar";
 import "./NodeSearch.css";
 import userEvent from "@testing-library/user-event";
 import jwtVerification from "../JwtVerification/JwtVerification";
@@ -104,7 +104,6 @@ function Search() {
             var node = copy[i]
             var numMatches = node.tags.filter(t => tagData.some(td => td.tagName === t.tagName)).length
             node.tagScore = numMatches / (tagData.length + node.tags.length - numMatches)
-            console.log(node.tagScore)
         }
         if(filterByTime && filterByRating)
         {
@@ -276,6 +275,7 @@ function Search() {
     return (
         <div>
             <div className="form-search-container">
+                {<NavBar/>}
                 <form onSubmit = {handleSubmit}>
                     <div className="search-bar-container">
                         <input type="text" value={query} placeholder="Search" onChange = {event => setQuery(event.target.value)}/>

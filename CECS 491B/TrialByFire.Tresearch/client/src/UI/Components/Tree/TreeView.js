@@ -151,14 +151,14 @@ class TreeView extends React.Component{
     CreateNode = (e) => {
         e.stopPropagation();
         const currentState = Array.from(new Set(this.state.nodeSelect));
-        this.setState( { nodeSelect: currentState, isCreateNodeOpen: true, isPopupOpen: true, isShown: false,  x: e.pageX, y: e.pageY})
+        this.setState( { nodeSelect: this.state.selectedNode, isCreateNodeOpen: true, isPopupOpen: true, isShown: false,  x: e.pageX, y: e.pageY})
     }
 
     DeleteNode = (e) => {
         e.stopPropagation();
-        const n = {userHash: this.state.nodeSelect[0].userHash,
-                        nodeID: this.state.nodeSelect[0].nodeID,
-                        parentNodeID: this.state.nodeSelect[0].parentNodeID,
+        const n = {userHash: this.state.selectedNode.userHash,
+                        nodeID: this.state.selectedNode.nodeID,
+                        parentNodeID: this.state.selectedNode.parentNodeID,
                         nodeTitle: "",
                         summary: "",
                         timeModified: "2022-05-04T21:08:21.714Z",//temp value
@@ -167,11 +167,9 @@ class TreeView extends React.Component{
                         exactMatch: false,
                         tagScore: 0,
                         ratingScore: 0}
-        console.log(n)
         axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net/DeleteNode/deleteNode",n)
         .then(response=> {
             const responseData = Object.values(response.data);
-            console.log(responseData);
             window.location.reload();
         })
     }
@@ -229,7 +227,6 @@ class TreeView extends React.Component{
     CopyNodes = (e) => {
         e.stopPropagation();
         const shiftClickedNodes = Array.from(new Set(this.state.nodeSelect));
-        console.log(shiftClickedNodes)
         axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net/CopyAndPaste/Copy", shiftClickedNodes)
         .then(response => {
             const responseData = Object.values(response.data);
@@ -241,11 +238,8 @@ class TreeView extends React.Component{
     PasteNodes = (e) => {
         e.stopPropagation();
         const shiftClickedNodes = Array.from(new Set(this.state.nodeSelect));
-        console.log(shiftClickedNodes)
 
         var nodes = this.handleEncoded(sessionStorage.getItem("nodes"))
-        console.log(nodes)
-
 
         var nodes = this.handleEncoded(sessionStorage.getItem("nodes"));
 
@@ -260,12 +254,12 @@ class TreeView extends React.Component{
     PrivateNodes = (e) => {
         e.stopPropagation();
         const nodesToPrivate = Array.from(new Set(this.state.nodeSelect));
-        console.log(nodesToPrivate)
         axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net/PrivateAndPublic/Private", nodesToPrivate)
         .then(response => {
             const responseDate = Object.values(response.data);
             this.setState({privateNodes: responseDate});
             sessionStorage.setItem("privatedNodes", this.state.privateNodes);
+            window.location.reload(false);
         }
         )
     }
@@ -273,12 +267,12 @@ class TreeView extends React.Component{
     PublicNodes = (e) => {
         e.stopPropagation();
         const nodesToPublic = Array.from(new Set(this.state.nodeSelect));
-        console.log(nodesToPublic)
         axios.post("https://trialbyfiretresearchwebapi.azurewebsites.net/PrivateAndPublic/Public", nodesToPublic)
         .then(response => {
             const responseDate = Object.values(response.data);
             this.setState({publicNodes: responseDate});
             sessionStorage.setItem("privatedNodes", this.state.publicNodes);
+            window.location.reload(false);
         }
         )
     }

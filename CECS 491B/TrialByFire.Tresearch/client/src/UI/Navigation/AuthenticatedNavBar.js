@@ -9,6 +9,7 @@ import './AuthenticatedNavBar.css';
 function AuthenticatedNavBar() {
     const [profileData, setProfileData] = useState([]);
     const [isNotPortal, setIsNotPortal] = useState(false);
+    const [isNotSearch, setIsNotSearch] = useState(false);
 
     const CheckToken = () => {
       const token = sessionStorage.getItem('authorization');
@@ -17,6 +18,9 @@ function AuthenticatedNavBar() {
       if(window.location.pathname !== "/Portal")
       {
         setIsNotPortal(true);
+      }
+      if(window.location.pathname !== "/Search"){
+        setIsNotSearch(true);
       }
       return;
     }
@@ -57,14 +61,16 @@ function AuthenticatedNavBar() {
       axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
       axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/Logout/logout', {})
       .then(response => {
-          console.log(response.data);
-          
+
       }).catch(err => {
-            console.log(err.data);
             
       })
       sessionStorage.removeItem('authorization');
       window.location = '/';
+    }
+
+    const handleSearchClick = (e) => {
+      window.location = '/Search';
     }
 
     const renderMenu = (
@@ -76,6 +82,7 @@ function AuthenticatedNavBar() {
             </ContextMenuTrigger>
             <ContextMenu id = "contextmenu" className = "nav-context-menu">
               {isNotPortal ? <MenuItem onClick={handlePortalClick}>Portal</MenuItem> : null }
+              {isNotSearch ? <MenuItem onClick={handleSearchClick}>Search</MenuItem> : null }
               <MenuItem onClick = {handleFAQClick}>FAQ</MenuItem>
               <MenuItem onClick={handleSettingsClick}>Settings</MenuItem>
               <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>

@@ -97,7 +97,6 @@ class NodeView extends React.PureComponent {
             sessionStorage.setItem('authorization', response.headers['authorization']);
         })
         .catch(err => {
-            console.log(err.response);
         })
     }
 

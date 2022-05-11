@@ -10,7 +10,6 @@ class Confirm extends React.Component {
      render() {
         function GetGuid() {
             const { confirmationGuid } = useParams();
-            console.log(confirmationGuid);
             if(confirmationGuid != null){
                 axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/Registration/confirm?'+confirmationGuid)
                 .then(res => {
@@ -18,8 +17,6 @@ class Confirm extends React.Component {
                     return res;
                 })
                 .catch( err => {
-                    //window.location = '/Register/EULATerms';
-                    console.log(err);
                     return err;
                 })
             }

@@ -9,10 +9,8 @@ function AdminPortal() {
         axios.defaults.headers.common['Authorization'] = sessionStorage.getItem('authorization');
         axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/Logout/logout', {})
         .then(response => {
-            console.log(response.data);
             
         }).catch(err => {
-              console.log(err.data);
               
         })
         sessionStorage.removeItem('authorization');

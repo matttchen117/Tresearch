@@ -91,7 +91,6 @@ class ChangeNodeContent extends React.PureComponent{
     await axios.post('https://trialbyfiretresearchwebapi.azurewebsites.net/NodeContent/update?owner=' + this.state.node.userHash + '&nodeID=' + this.state.node.nodeID + 
     '&title=' + this.handleEncoded(this.state.title) + '&summary=' + this.handleEncoded(this.state.summary))
     .then(response => {
-        console.log(response.data)
         sessionStorage.setItem('authorization', response.headers['authorization']);
     })
     .catch(err => {
