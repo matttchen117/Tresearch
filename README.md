@@ -21,6 +21,7 @@ Tresearch is an interactive mind mapping tool for documenting users' learning jo
 - Ian Ho-Sing-Loy
 - Jessie Lazo
 - Matthew Chen (Team Leader)
+  - Email: matttchen117@gmail.com
 - Pammy Poor
   - Email: pammypoor@gmail.com
   - Github: https://github.com/pammypoor
